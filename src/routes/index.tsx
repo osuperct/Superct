@@ -125,29 +125,34 @@ function Index() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            {modalidades.map((m, i) => (
-              <div
-                key={m.nome}
-                className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4 ${
-                  m.destaque ? "col-span-2" : ""
-                }`}
-                style={{ animationDelay: `${200 + i * 50}ms` }}
-              >
-                {m.imagem && (
-                  <div className="mb-3 -mt-1 -mx-1 overflow-hidden rounded-md">
-                    <img
-                      src={m.imagem}
-                      alt={m.alt}
-                      loading="lazy"
-                      className="h-48 w-full object-cover"
-                    />
-                  </div>
-                )}
-                <div className="absolute right-0 top-0 h-8 w-8 rounded-bl-3xl bg-primary/10" />
-                <h3 className="mb-2 font-display text-lg leading-tight">{m.nome}</h3>
-                <p className="text-[10px] leading-relaxed text-muted-foreground">{m.texto}</p>
-              </div>
-            ))}
+            {modalidades.map((m, i) => {
+              const Card = m.imagem ? "button" : "div";
+              return (
+                <Card
+                  key={m.nome}
+                  type={m.imagem ? "button" : undefined}
+                  onClick={m.imagem ? () => setModalAberto(true) : undefined}
+                  className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4 text-left transition-transform active:scale-[0.98] ${
+                    m.destaque ? "col-span-2" : ""
+                  } ${m.imagem ? "cursor-pointer" : ""}`}
+                  style={{ animationDelay: `${200 + i * 50}ms` }}
+                >
+                  {m.imagem && (
+                    <div className="mb-3 -mt-1 -mx-1 overflow-hidden rounded-md">
+                      <img
+                        src={m.imagem}
+                        alt={m.alt}
+                        loading="lazy"
+                        className="h-48 w-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="absolute right-0 top-0 h-8 w-8 rounded-bl-3xl bg-primary/10" />
+                  <h3 className="mb-2 font-display text-lg leading-tight">{m.nome}</h3>
+                  <p className="text-[10px] leading-relaxed text-muted-foreground">{m.texto}</p>
+                </Card>
+              );
+            })}
           </div>
 
           <div className="animate-reveal mt-4 rounded-lg border border-secondary/20 bg-secondary/10 p-4 [animation-delay:500ms]">
