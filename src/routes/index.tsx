@@ -13,6 +13,7 @@ import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
 import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
 import funcionalInfantilImg from "@/assets/funcional-infantil.png.asset.json";
 import funcionalInfantilCover from "@/assets/funcional-infantil-cover.jpg";
+import esportesCover from "@/assets/esportes-cover-cropped.png.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -50,9 +51,17 @@ const modalidades = [
     imagem: funcionalInfantilCover,
     alt: "Caixa de madeira, corda naval e bolas de peso azul e rosa sobre tatame preto",
     destaque: true,
+    clicavel: true,
   },
   { nome: "GINÁSTICA", texto: "Base motora, equilíbrio e flexibilidade." },
-  { nome: "ESPORTES", texto: "Iniciação esportiva com jogo e trabalho em equipe." },
+  {
+    nome: "ESPORTES",
+    texto: "Iniciação esportiva com jogo e trabalho em equipe.",
+    imagem: esportesCover.url,
+    alt: "Crianças em ação no basquete do Super CT com logo e cesta",
+    destaque: true,
+    position: "top",
+  },
   { nome: "PAREDE DE ESCALADA", texto: "Desafio vertical com total segurança." },
   { nome: "TREPA-TREPA & ARGOLAS", texto: "Domine a gravidade e o movimento." },
   { nome: "COLÔNIA DE FÉRIAS", texto: "Diversão máxima nas pausas escolares." },
@@ -127,15 +136,15 @@ function Index() {
 
           <div className="grid grid-cols-2 gap-3">
             {modalidades.map((m, i) => {
-              const Card = m.imagem ? "button" : "div";
+              const Card = m.imagem && m.clicavel ? "button" : "div";
               return (
                 <Card
                   key={m.nome}
-                  type={m.imagem ? "button" : undefined}
-                  onClick={m.imagem ? () => setModalAberto(true) : undefined}
+                  type={m.imagem && m.clicavel ? "button" : undefined}
+                  onClick={m.imagem && m.clicavel ? () => setModalAberto(true) : undefined}
                   className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4 text-left transition-transform active:scale-[0.98] ${
                     m.destaque ? "col-span-2" : ""
-                  } ${m.imagem ? "cursor-pointer" : ""}`}
+                  } ${m.imagem && m.clicavel ? "cursor-pointer" : ""}`}
                   style={{ animationDelay: `${200 + i * 50}ms` }}
                 >
                   {m.imagem && (
@@ -145,6 +154,7 @@ function Index() {
                         alt={m.alt}
                         loading="lazy"
                         className="h-48 w-full object-cover"
+                        style={{ objectPosition: m.position || "center" }}
                       />
                     </div>
                   )}
