@@ -125,9 +125,21 @@ function Index() {
             {modalidades.map((m, i) => (
               <div
                 key={m.nome}
-                className="animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4"
+                className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4 ${
+                  m.destaque ? "col-span-2" : ""
+                }`}
                 style={{ animationDelay: `${200 + i * 50}ms` }}
               >
+                {m.imagem && (
+                  <div className="mb-3 -mt-1 -mx-1 overflow-hidden rounded-md">
+                    <img
+                      src={m.imagem}
+                      alt={m.alt}
+                      loading="lazy"
+                      className="h-48 w-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="absolute right-0 top-0 h-8 w-8 rounded-bl-3xl bg-primary/10" />
                 <h3 className="mb-2 font-display text-lg leading-tight">{m.nome}</h3>
                 <p className="text-[10px] leading-relaxed text-muted-foreground">{m.texto}</p>
