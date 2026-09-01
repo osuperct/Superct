@@ -10,6 +10,7 @@ import circuitos from "@/assets/IMG_20260901_175513.jpg.asset.json";
 import fachada from "@/assets/IMG_20260901_175731.jpg.asset.json";
 import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
 import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
+import funcionalInfantilImg from "@/assets/funcional-infantil.png.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -44,6 +45,9 @@ const modalidades = [
   {
     nome: "FUNCIONAL INFANTIL",
     texto: "Força, coordenação e postura para o dia a dia.",
+    imagem: funcionalInfantilImg.url,
+    alt: "Criança no Super CT fazendo exercício funcional sobre caixa de madeira",
+    destaque: true,
   },
   { nome: "GINÁSTICA", texto: "Base motora, equilíbrio e flexibilidade." },
   { nome: "ESPORTES", texto: "Iniciação esportiva com jogo e trabalho em equipe." },
@@ -121,9 +125,21 @@ function Index() {
             {modalidades.map((m, i) => (
               <div
                 key={m.nome}
-                className="animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4"
+                className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4 ${
+                  m.destaque ? "col-span-2" : ""
+                }`}
                 style={{ animationDelay: `${200 + i * 50}ms` }}
               >
+                {m.imagem && (
+                  <div className="mb-3 -mt-1 -mx-1 overflow-hidden rounded-md">
+                    <img
+                      src={m.imagem}
+                      alt={m.alt}
+                      loading="lazy"
+                      className="h-48 w-full object-cover"
+                    />
+                  </div>
+                )}
                 <div className="absolute right-0 top-0 h-8 w-8 rounded-bl-3xl bg-primary/10" />
                 <h3 className="mb-2 font-display text-lg leading-tight">{m.nome}</h3>
                 <p className="text-[10px] leading-relaxed text-muted-foreground">{m.texto}</p>
