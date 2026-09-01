@@ -47,8 +47,8 @@ const modalidades = [
   {
     nome: "FUNCIONAL INFANTIL",
     texto: "Força, coordenação e postura para o dia a dia.",
-    imagem: funcionalInfantilImg.url,
-    alt: "Criança no Super CT fazendo exercício funcional sobre caixa de madeira",
+    imagem: funcionalInfantilCover,
+    alt: "Caixa de madeira, corda naval e bolas de peso azul e rosa sobre tatame preto",
     destaque: true,
   },
   { nome: "GINÁSTICA", texto: "Base motora, equilíbrio e flexibilidade." },
