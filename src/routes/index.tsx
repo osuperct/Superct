@@ -14,6 +14,9 @@ import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
 import funcionalInfantilImg from "@/assets/funcional-infantil.png.asset.json";
 import funcionalInfantilCover from "@/assets/funcional-infantil-cover.jpg";
 import esportesCover from "@/assets/esportes-cover-cropped.png.asset.json";
+import esportesFoto1 from "@/assets/esportes-foto1.jpg.asset.json";
+import esportesFoto2 from "@/assets/esportes-foto2.jpg.asset.json";
+import esportesFoto3 from "@/assets/esportes-foto3.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -44,7 +47,18 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const modalidades = [
+type Modalidade = {
+  nome: string;
+  texto: string;
+  imagem?: string;
+  alt?: string;
+  destaque?: boolean;
+  clicavel?: boolean;
+  position?: string;
+  fotos?: { src: string; alt: string }[];
+};
+
+const modalidades: Modalidade[] = [
   {
     nome: "FUNCIONAL INFANTIL",
     texto: "Força, coordenação e postura para o dia a dia.",
@@ -52,6 +66,12 @@ const modalidades = [
     alt: "Caixa de madeira, corda naval e bolas de peso azul e rosa sobre tatame preto",
     destaque: true,
     clicavel: true,
+    fotos: [
+      {
+        src: funcionalInfantilImg.url,
+        alt: "Criança no Super CT fazendo exercício funcional sobre caixa de madeira",
+      },
+    ],
   },
   { nome: "GINÁSTICA", texto: "Base motora, equilíbrio e flexibilidade." },
   {
@@ -61,6 +81,12 @@ const modalidades = [
     alt: "Crianças em ação no basquete do Super CT com logo e cesta",
     destaque: true,
     position: "top",
+    clicavel: true,
+    fotos: [
+      { src: esportesFoto3.url, alt: "Turma do Super CT em treino de basquete na parede de cimento queimado" },
+      { src: esportesFoto1.url, alt: "Duas alunas do Super CT passando a bola em aula de esportes" },
+      { src: esportesFoto2.url, alt: "Crianças do Super CT em atividade com bola durante aula de esportes" },
+    ],
   },
   { nome: "PAREDE DE ESCALADA", texto: "Desafio vertical com total segurança." },
   { nome: "TREPA-TREPA & ARGOLAS", texto: "Domine a gravidade e o movimento." },
@@ -76,7 +102,7 @@ const galeria = [
 ];
 
 function Index() {
-  const [modalAberto, setModalAberto] = useState(false);
+  const [fotosAbertas, setFotosAbertas] = useState<Modalidade["fotos"] | null>(null);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -136,15 +162,16 @@ function Index() {
 
           <div className="grid grid-cols-2 gap-3">
             {modalidades.map((m, i) => {
-              const Card = m.imagem && m.clicavel ? "button" : "div";
+              const abrivel = Boolean(m.clicavel && m.fotos?.length);
+              const Card = abrivel ? "button" : "div";
               return (
                 <Card
                   key={m.nome}
-                  type={m.imagem && m.clicavel ? "button" : undefined}
-                  onClick={m.imagem && m.clicavel ? () => setModalAberto(true) : undefined}
+                  type={abrivel ? "button" : undefined}
+                  onClick={abrivel ? () => setFotosAbertas(m.fotos!) : undefined}
                   className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4 text-left transition-transform active:scale-[0.98] ${
                     m.destaque ? "col-span-2" : ""
-                  } ${m.imagem && m.clicavel ? "cursor-pointer" : ""}`}
+                  } ${abrivel ? "cursor-pointer" : ""}`}
                   style={{ animationDelay: `${200 + i * 50}ms` }}
                 >
                   {m.imagem && (
@@ -298,25 +325,30 @@ function Index() {
         </div>
       </footer>
 
-      {modalAberto && (
+      {fotosAbertas && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
-          onClick={() => setModalAberto(false)}
+          onClick={() => setFotosAbertas(null)}
           role="dialog"
           aria-modal="true"
         >
           <button
             type="button"
-            className="absolute right-4 top-4 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white"
-            onClick={() => setModalAberto(false)}
+            className="absolute right-4 top-4 z-10 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white"
+            onClick={() => setFotosAbertas(null)}
           >
             FECHAR
           </button>
-          <img
-            src={funcionalInfantilImg.url}
-            alt="Criança no Super CT fazendo exercício funcional sobre caixa de madeira"
-            className="max-h-[85vh] max-w-full rounded-lg object-contain shadow-[0_0_40px_oklch(0.78_0.19_148/0.25)]"
-          />
+          <div className="no-scrollbar flex max-h-[85vh] w-full snap-x snap-mandatory gap-4 overflow-x-auto">
+            {fotosAbertas.map((f) => (
+              <img
+                key={f.src}
+                src={f.src}
+                alt={f.alt}
+                className="max-h-[85vh] w-full flex-none snap-center rounded-lg object-contain shadow-[0_0_40px_oklch(0.78_0.19_148/0.25)]"
+              />
+            ))}
+          </div>
         </div>
       )}
 
