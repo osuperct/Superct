@@ -13,7 +13,7 @@ import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
 import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
 import funcionalInfantilImg from "@/assets/funcional-infantil.png.asset.json";
 import funcionalInfantilCover from "@/assets/funcional-infantil-cover.jpg";
-import esportesCover from "@/assets/esportes-cover.png.asset.json";
+import esportesCover from "@/assets/esportes-cover-cropped.png.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -59,6 +59,7 @@ const modalidades = [
     texto: "Iniciação esportiva com jogo e trabalho em equipe.",
     imagem: esportesCover.url,
     alt: "Crianças em ação no basquete do Super CT com logo e cesta",
+    destaque: true,
     position: "top",
   },
   { nome: "PAREDE DE ESCALADA", texto: "Desafio vertical com total segurança." },
