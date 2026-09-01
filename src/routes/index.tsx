@@ -82,13 +82,19 @@ const modalidades: Modalidade[] = [
         src: funcionalFoto3.url,
         alt: "Menino saltando a caixa de madeira em treino funcional no Super CT",
       },
+    ],
+  },
+  {
+    nome: "GINÁSTICA",
+    texto: "Base motora, equilíbrio e flexibilidade.",
+    clicavel: true,
+    fotos: [
       {
         src: funcionalFoto2.url,
         alt: "Menina pulando no mini trampolim em frente à parede de escalada do Super CT",
       },
     ],
   },
-  { nome: "GINÁSTICA", texto: "Base motora, equilíbrio e flexibilidade." },
   {
     nome: "ESPORTES",
     texto: "Iniciação esportiva com jogo e trabalho em equipe.",
