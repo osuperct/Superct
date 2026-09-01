@@ -14,6 +14,9 @@ import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
 import funcionalInfantilImg from "@/assets/funcional-infantil.png.asset.json";
 import funcionalInfantilCover from "@/assets/funcional-infantil-cover.jpg";
 import esportesCover from "@/assets/esportes-cover-cropped.png.asset.json";
+import esportesFoto1 from "@/assets/esportes-foto1.jpg.asset.json";
+import esportesFoto2 from "@/assets/esportes-foto2.jpg.asset.json";
+import esportesFoto3 from "@/assets/esportes-foto3.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
