@@ -143,44 +143,52 @@ function Index() {
         </section>
 
         <section className="px-4 py-12">
-          <div className="mb-6 flex items-center gap-2">
+          <div className="mb-2 flex items-center gap-2">
             <div className="h-[2px] w-8 bg-secondary" />
-            <h2 className="font-display text-2xl uppercase tracking-tight">HORÁRIOS</h2>
+            <h2 className="font-display text-2xl uppercase tracking-tight">HORÁRIOS POR IDADE</h2>
+          </div>
+          <p className="mb-6 font-mono text-[10px] text-primary">AULAS DE SEGUNDA A SEXTA</p>
+
+          <div className="mb-6 flex items-end justify-center gap-2">
+            <img
+              src={mascoteMenino.url}
+              alt="Mascote menino do Super CT com o polegar para cima"
+              loading="lazy"
+              className="h-32 w-auto mix-blend-lighten"
+            />
+            <img
+              src={mascoteMenina.url}
+              alt="Mascote menina do Super CT fazendo um coração com as mãos"
+              loading="lazy"
+              className="h-32 w-auto mix-blend-multiply dark:mix-blend-normal"
+            />
           </div>
 
           <div className="animate-reveal overflow-hidden rounded-lg border border-border bg-surface">
             <table className="w-full text-sm">
               <thead className="bg-primary/10 text-left font-display uppercase tracking-wide text-primary">
                 <tr>
-                  <th className="px-4 py-3">Turma</th>
-                  <th className="px-4 py-3">Horário</th>
-                  <th className="px-4 py-3">Dias</th>
+                  <th className="px-3 py-3">Turma</th>
+                  <th className="px-3 py-3">Horário</th>
+                  <th className="px-3 py-3">Idade</th>
+                  <th className="px-3 py-3">Dias</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                <tr>
-                  <td className="px-4 py-3 font-display">Manhã</td>
-                  <td className="px-4 py-3 text-muted-foreground">08:30 às 10:30</td>
-                  <td className="px-4 py-3 text-muted-foreground">Segunda a sexta</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-display">Tarde 1</td>
-                  <td className="px-4 py-3 text-muted-foreground">15:45 às 17:45</td>
-                  <td className="px-4 py-3 text-muted-foreground">Segunda a sexta</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-display">Tarde 2</td>
-                  <td className="px-4 py-3 text-muted-foreground">17:45 às 18:45</td>
-                  <td className="px-4 py-3 text-muted-foreground">Segunda a quinta</td>
-                </tr>
-                <tr>
-                  <td className="px-4 py-3 font-display">Noite</td>
-                  <td className="px-4 py-3 text-muted-foreground">18:45 às 19:45</td>
-                  <td className="px-4 py-3 text-muted-foreground">Segunda a quinta</td>
-                </tr>
+                {turmas.map((t) => (
+                  <tr key={t.turma}>
+                    <td className="px-3 py-3 font-display text-secondary">{t.turma}</td>
+                    <td className="px-3 py-3 font-mono text-xs">{t.horario}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{t.idade}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{t.dias}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            Agende uma aula experimental pelo WhatsApp (35) 98822-3596
+          </p>
         </section>
 
         <section className="bg-surface/50 py-12">
