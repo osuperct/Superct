@@ -102,7 +102,7 @@ const galeria = [
 ];
 
 function Index() {
-  const [modalAberto, setModalAberto] = useState(false);
+  const [fotosAbertas, setFotosAbertas] = useState<Modalidade["fotos"] | null>(null);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
