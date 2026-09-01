@@ -132,6 +132,47 @@ function Index() {
           </div>
         </section>
 
+        <section className="px-4 py-12">
+          <div className="mb-6 flex items-center gap-2">
+            <div className="h-[2px] w-8 bg-secondary" />
+            <h2 className="font-display text-2xl uppercase tracking-tight">HORÁRIOS</h2>
+          </div>
+
+          <div className="animate-reveal overflow-hidden rounded-lg border border-border bg-surface">
+            <table className="w-full text-sm">
+              <thead className="bg-primary/10 text-left font-display uppercase tracking-wide text-primary">
+                <tr>
+                  <th className="px-4 py-3">Turma</th>
+                  <th className="px-4 py-3">Horário</th>
+                  <th className="px-4 py-3">Dias</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                <tr>
+                  <td className="px-4 py-3 font-display">Manhã</td>
+                  <td className="px-4 py-3 text-muted-foreground">08:30 às 10:30</td>
+                  <td className="px-4 py-3 text-muted-foreground">Segunda a sexta</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3 font-display">Tarde 1</td>
+                  <td className="px-4 py-3 text-muted-foreground">15:45 às 17:45</td>
+                  <td className="px-4 py-3 text-muted-foreground">Segunda a sexta</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3 font-display">Tarde 2</td>
+                  <td className="px-4 py-3 text-muted-foreground">17:45 às 18:45</td>
+                  <td className="px-4 py-3 text-muted-foreground">Segunda a quinta</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3 font-display">Noite</td>
+                  <td className="px-4 py-3 text-muted-foreground">18:45 às 19:45</td>
+                  <td className="px-4 py-3 text-muted-foreground">Segunda a quinta</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
         <section className="bg-surface/50 py-12">
           <div className="mb-6 px-4">
             <h2 className="font-display text-2xl uppercase tracking-tight">NOSSO QG</h2>
