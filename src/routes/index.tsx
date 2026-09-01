@@ -287,6 +287,28 @@ function Index() {
         </div>
       </footer>
 
+      {modalAberto && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+          onClick={() => setModalAberto(false)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <button
+            type="button"
+            className="absolute right-4 top-4 rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-white"
+            onClick={() => setModalAberto(false)}
+          >
+            FECHAR
+          </button>
+          <img
+            src={funcionalInfantilImg.url}
+            alt="Criança no Super CT fazendo exercício funcional sobre caixa de madeira"
+            className="max-h-[85vh] max-w-full rounded-lg object-contain shadow-[0_0_40px_oklch(0.78_0.19_148/0.25)]"
+          />
+        </div>
+      )}
+
       <div className="fixed bottom-6 left-6 right-6 z-50 mx-auto max-w-screen-sm">
         <a
           href={WHATSAPP}
