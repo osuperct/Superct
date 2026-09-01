@@ -83,10 +83,12 @@ function Index() {
             <img
               src={logo}
               alt="Logo Super CT"
-              width={816}
-              height={816}
-              className="mx-auto mb-6 h-36 w-36 object-contain"
+              width={1024}
+              height={1536}
+              className="mx-auto mb-4 h-48 w-auto object-cover object-top mix-blend-lighten"
+              style={{ objectPosition: "center 22%", height: "12rem" }}
             />
+
             <h1 className="mb-4 text-pretty text-center font-display text-5xl uppercase leading-[0.9] tracking-tighter">
               SUA CRIANÇA VIRA <span className="text-primary italic">SUPER!</span>
             </h1>
