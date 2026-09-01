@@ -162,15 +162,16 @@ function Index() {
 
           <div className="grid grid-cols-2 gap-3">
             {modalidades.map((m, i) => {
-              const Card = m.imagem && m.clicavel ? "button" : "div";
+              const abrivel = Boolean(m.clicavel && m.fotos?.length);
+              const Card = abrivel ? "button" : "div";
               return (
                 <Card
                   key={m.nome}
-                  type={m.imagem && m.clicavel ? "button" : undefined}
-                  onClick={m.imagem && m.clicavel ? () => setModalAberto(true) : undefined}
+                  type={abrivel ? "button" : undefined}
+                  onClick={abrivel ? () => setFotosAbertas(m.fotos!) : undefined}
                   className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4 text-left transition-transform active:scale-[0.98] ${
                     m.destaque ? "col-span-2" : ""
-                  } ${m.imagem && m.clicavel ? "cursor-pointer" : ""}`}
+                  } ${abrivel ? "cursor-pointer" : ""}`}
                   style={{ animationDelay: `${200 + i * 50}ms` }}
                 >
                   {m.imagem && (
