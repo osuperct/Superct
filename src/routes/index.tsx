@@ -8,6 +8,16 @@ import escalada from "@/assets/IMG_20260901_175604.jpg.asset.json";
 import argolas from "@/assets/IMG_20260901_175528.jpg.asset.json";
 import circuitos from "@/assets/IMG_20260901_175513.jpg.asset.json";
 import fachada from "@/assets/IMG_20260901_175731.jpg.asset.json";
+import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
+import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
+
+const turmas = [
+  { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
+  { turma: "2", horario: "15:45", idade: "07 a 14 anos", dias: "Segunda a sexta" },
+  { turma: "3", horario: "16:45", idade: "07 a 14 anos", dias: "Segunda a sexta" },
+  { turma: "4", horario: "17:45", idade: "04 a 07 anos", dias: "Segunda a quinta" },
+  { turma: "5", horario: "18:45", idade: "08 a 14 anos", dias: "Segunda a quinta" },
+];
 
 const WHATSAPP = "https://wa.me/5535988223596";
 
