@@ -20,6 +20,8 @@ import esportesCover from "@/assets/esportes-cover-cropped.png.asset.json";
 import esportesFoto1 from "@/assets/esportes-foto1.jpg.asset.json";
 import esportesFoto2 from "@/assets/esportes-foto2.jpg.asset.json";
 import esportesFoto3 from "@/assets/esportes-foto3.jpg.asset.json";
+import argolasFoto1 from "@/assets/argolas-foto1.jpg.asset.json";
+import argolasFoto2 from "@/assets/argolas-foto2.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -110,7 +112,15 @@ const modalidades: Modalidade[] = [
     ],
   },
   { nome: "PAREDE DE ESCALADA", texto: "Desafio vertical com total segurança." },
-  { nome: "TREPA-TREPA & ARGOLAS", texto: "Domine a gravidade e o movimento." },
+  {
+    nome: "TREPA-TREPA & ARGOLAS",
+    texto: "Domine a gravidade e o movimento.",
+    clicavel: true,
+    fotos: [
+      { src: argolasFoto1.url, alt: "Criança de cabeça para baixo nas argolas do Super CT" },
+      { src: argolasFoto2.url, alt: "Aluna suspensa nas argolas laranja em treino no Super CT" },
+    ],
+  },
   { nome: "COLÔNIA DE FÉRIAS", texto: "Diversão máxima nas pausas escolares." },
 ];
 
