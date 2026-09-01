@@ -12,6 +12,9 @@ import fachada from "@/assets/IMG_20260901_175731.jpg.asset.json";
 import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
 import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
 import funcionalInfantilImg from "@/assets/funcional-infantil.png.asset.json";
+import funcionalFoto1 from "@/assets/funcional-foto1.jpg.asset.json";
+import funcionalFoto2 from "@/assets/funcional-foto2.jpg.asset.json";
+import funcionalFoto3 from "@/assets/funcional-foto3.jpg.asset.json";
 import funcionalInfantilCover from "@/assets/funcional-infantil-cover.jpg";
 import esportesCover from "@/assets/esportes-cover-cropped.png.asset.json";
 import esportesFoto1 from "@/assets/esportes-foto1.jpg.asset.json";
@@ -70,6 +73,18 @@ const modalidades: Modalidade[] = [
       {
         src: funcionalInfantilImg.url,
         alt: "Criança no Super CT fazendo exercício funcional sobre caixa de madeira",
+      },
+      {
+        src: funcionalFoto1.url,
+        alt: "Menino em prancha com apoio no step durante treino funcional no Super CT",
+      },
+      {
+        src: funcionalFoto3.url,
+        alt: "Menino saltando a caixa de madeira em treino funcional no Super CT",
+      },
+      {
+        src: funcionalFoto2.url,
+        alt: "Menina pulando no mini trampolim em frente à parede de escalada do Super CT",
       },
     ],
   },
