@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import logo from "@/assets/super-ct-logo.png";
+import logoAsset from "@/assets/super-ct-logo.asset.json";
+
+const logo = logoAsset.url;
 import arena from "@/assets/IMG_20260901_175621.jpg.asset.json";
 import escalada from "@/assets/IMG_20260901_175604.jpg.asset.json";
 import argolas from "@/assets/IMG_20260901_175528.jpg.asset.json";
@@ -78,13 +80,18 @@ function Index() {
           </div>
 
           <div className="animate-reveal [animation-delay:100ms]">
-            <img
-              src={logo}
-              alt="Logo Super CT"
-              width={816}
-              height={816}
-              className="mx-auto mb-6 h-36 w-36 object-contain"
-            />
+            <div className="mx-auto mb-4 h-48 w-64 overflow-hidden">
+              <img
+                src={logo}
+                alt="Logo Super CT"
+                width={1024}
+                height={1536}
+                className="h-full w-full object-cover"
+                style={{ objectPosition: "center 30%" }}
+              />
+            </div>
+
+
             <h1 className="mb-4 text-pretty text-center font-display text-5xl uppercase leading-[0.9] tracking-tighter">
               SUA CRIANÇA VIRA <span className="text-primary italic">SUPER!</span>
             </h1>
@@ -155,7 +162,8 @@ function Index() {
                 src={logo}
                 alt=""
                 loading="lazy"
-                className="size-16 flex-none rounded-full border-2 border-primary bg-surface-2 object-contain p-1"
+                className="size-16 flex-none rounded-full border-2 border-primary bg-black object-cover"
+                style={{ objectPosition: "center 32%" }}
               />
               <div>
                 <h3 className="font-display text-xl">PROFESSOR TIO VICTOR</h3>
