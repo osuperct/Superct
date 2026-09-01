@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "asset_id": "aa4004d2-b578-4afa-a737-f49701f01898",
+  "asset_id": "d074ed68-2225-416f-94fd-16a0af6175cc",
   "project_id": "f98de061-dc8c-43b5-9c7f-56210aba7b2d",
-  "url": "/__l5e/assets-v1/aa4004d2-b578-4afa-a737-f49701f01898/mascote-menino.jpg",
-  "r2_key": "a/v1/f98de061-dc8c-43b5-9c7f-56210aba7b2d/aa4004d2-b578-4afa-a737-f49701f01898/mascote-menino.jpg",
-  "original_filename": "mascote-menino.jpg",
-  "size": 125968,
-  "content_type": "image/jpeg",
-  "created_at": "2026-09-01T21:27:55Z"
+  "url": "/__l5e/assets-v1/d074ed68-2225-416f-94fd-16a0af6175cc/mascote-menino.png",
+  "r2_key": "a/v1/f98de061-dc8c-43b5-9c7f-56210aba7b2d/d074ed68-2225-416f-94fd-16a0af6175cc/mascote-menino.png",
+  "original_filename": "mascote-menino.png",
+  "size": 936755,
+  "content_type": "image/png",
+  "created_at": "2026-09-01T21:29:01Z"
 }
