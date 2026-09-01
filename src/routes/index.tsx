@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import logo from "@/assets/super-ct-logo.png";
+import logoAsset from "@/assets/super-ct-logo.asset.json";
+
+const logo = logoAsset.url;
 import arena from "@/assets/IMG_20260901_175621.jpg.asset.json";
 import escalada from "@/assets/IMG_20260901_175604.jpg.asset.json";
 import argolas from "@/assets/IMG_20260901_175528.jpg.asset.json";
