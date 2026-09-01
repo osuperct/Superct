@@ -185,9 +185,6 @@ function Index() {
               </tbody>
             </table>
           </div>
-          <p className="mt-4 text-center text-xs text-muted-foreground">
-            Agende uma aula experimental pelo WhatsApp (35) 98822-3596
-          </p>
         </section>
 
         <section className="bg-surface/50 py-12">
