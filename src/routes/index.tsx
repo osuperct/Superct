@@ -120,6 +120,7 @@ const modalidades: Modalidade[] = [
     fotos: [
       { src: argolasFoto1.url, alt: "Criança de cabeça para baixo nas argolas do Super CT" },
       { src: argolasFoto2.url, alt: "Aluna suspensa nas argolas laranja em treino no Super CT" },
+      { src: argolasFoto3.url, alt: "Aluno de cabeça para baixo nas argolas laranja no Super CT" },
     ],
   },
   { nome: "COLÔNIA DE FÉRIAS", texto: "Diversão máxima nas pausas escolares." },
