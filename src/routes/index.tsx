@@ -12,6 +12,7 @@ import fachada from "@/assets/IMG_20260901_175731.jpg.asset.json";
 import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
 import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
 import funcionalInfantilImg from "@/assets/funcional-infantil.png.asset.json";
+import funcionalInfantilCover from "@/assets/funcional-infantil-cover.jpg";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
