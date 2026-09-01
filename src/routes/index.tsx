@@ -162,7 +162,8 @@ function Index() {
                 src={logo}
                 alt=""
                 loading="lazy"
-                className="size-16 flex-none rounded-full border-2 border-primary bg-surface-2 object-contain p-1"
+                className="size-16 flex-none rounded-full border-2 border-primary bg-black object-cover"
+                style={{ objectPosition: "center 32%" }}
               />
               <div>
                 <h3 className="font-display text-xl">PROFESSOR TIO VICTOR</h3>
