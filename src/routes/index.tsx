@@ -80,14 +80,17 @@ function Index() {
           </div>
 
           <div className="animate-reveal [animation-delay:100ms]">
-            <img
-              src={logo}
-              alt="Logo Super CT"
-              width={1024}
-              height={1536}
-              className="mx-auto mb-4 h-48 w-auto object-cover object-top mix-blend-lighten"
-              style={{ objectPosition: "center 22%", height: "12rem" }}
-            />
+            <div className="mx-auto mb-4 h-48 w-64 overflow-hidden">
+              <img
+                src={logo}
+                alt="Logo Super CT"
+                width={1024}
+                height={1536}
+                className="h-full w-full object-cover"
+                style={{ objectPosition: "center 30%" }}
+              />
+            </div>
+
 
             <h1 className="mb-4 text-pretty text-center font-display text-5xl uppercase leading-[0.9] tracking-tighter">
               SUA CRIANÇA VIRA <span className="text-primary italic">SUPER!</span>
