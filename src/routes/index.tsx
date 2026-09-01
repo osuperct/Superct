@@ -66,6 +66,8 @@ const galeria = [
 ];
 
 function Index() {
+  const [modalAberto, setModalAberto] = useState(false);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <nav className="fixed top-0 z-50 w-full border-b border-border bg-background/80 px-4 py-3 backdrop-blur-md">
