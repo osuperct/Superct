@@ -154,13 +154,13 @@ function Index() {
               src={mascoteMenino.url}
               alt="Mascote menino do Super CT com o polegar para cima"
               loading="lazy"
-              className="h-32 w-auto mix-blend-lighten"
+              className="h-32 w-auto"
             />
             <img
               src={mascoteMenina.url}
               alt="Mascote menina do Super CT fazendo um coração com as mãos"
               loading="lazy"
-              className="h-32 w-auto mix-blend-multiply dark:mix-blend-normal"
+              className="h-32 w-auto"
             />
           </div>
 
