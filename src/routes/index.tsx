@@ -47,7 +47,18 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const modalidades = [
+type Modalidade = {
+  nome: string;
+  texto: string;
+  imagem?: string;
+  alt?: string;
+  destaque?: boolean;
+  clicavel?: boolean;
+  position?: string;
+  fotos?: { src: string; alt: string }[];
+};
+
+const modalidades: Modalidade[] = [
   {
     nome: "FUNCIONAL INFANTIL",
     texto: "Força, coordenação e postura para o dia a dia.",
@@ -55,6 +66,12 @@ const modalidades = [
     alt: "Caixa de madeira, corda naval e bolas de peso azul e rosa sobre tatame preto",
     destaque: true,
     clicavel: true,
+    fotos: [
+      {
+        src: funcionalInfantilImg.url,
+        alt: "Criança no Super CT fazendo exercício funcional sobre caixa de madeira",
+      },
+    ],
   },
   { nome: "GINÁSTICA", texto: "Base motora, equilíbrio e flexibilidade." },
   {
@@ -64,6 +81,12 @@ const modalidades = [
     alt: "Crianças em ação no basquete do Super CT com logo e cesta",
     destaque: true,
     position: "top",
+    clicavel: true,
+    fotos: [
+      { src: esportesFoto3.url, alt: "Turma do Super CT em treino de basquete na parede de cimento queimado" },
+      { src: esportesFoto1.url, alt: "Duas alunas do Super CT passando a bola em aula de esportes" },
+      { src: esportesFoto2.url, alt: "Crianças do Super CT em atividade com bola durante aula de esportes" },
+    ],
   },
   { nome: "PAREDE DE ESCALADA", texto: "Desafio vertical com total segurança." },
   { nome: "TREPA-TREPA & ARGOLAS", texto: "Domine a gravidade e o movimento." },
