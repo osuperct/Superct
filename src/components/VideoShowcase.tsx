@@ -25,7 +25,7 @@ export function VideoShowcase() {
         <h2 className="font-display text-2xl uppercase tracking-tight">SUPER CT EM AÇÃO</h2>
       </div>
 
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-surface">
+      <div className="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-lg border border-border bg-surface">
         <video
           ref={ref}
           key={atual}
