@@ -98,6 +98,10 @@ const modalidades: Modalidade[] = [
         src: funcionalFoto5.url,
         alt: "Aluno apoiado no step em exercício funcional no Super CT",
       },
+      {
+        src: funcionalFoto6.url,
+        alt: "Menino sentado no tatame do Super CT com bola de peso e arco",
+      },
     ],
   },
   {
