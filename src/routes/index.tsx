@@ -25,6 +25,7 @@ import esportesFoto3 from "@/assets/esportes-foto3.jpg.asset.json";
 import argolasFoto1 from "@/assets/argolas-foto1.jpg.asset.json";
 import argolasFoto2 from "@/assets/argolas-foto2.jpg.asset.json";
 import argolasFoto3 from "@/assets/argolas-foto3.jpg.asset.json";
+import escaladaFoto1 from "@/assets/escalada-foto1.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -122,7 +123,17 @@ const modalidades: Modalidade[] = [
       { src: esportesFoto2.url, alt: "Crianças do Super CT em atividade com bola durante aula de esportes" },
     ],
   },
-  { nome: "PAREDE DE ESCALADA", texto: "Desafio vertical com total segurança." },
+  {
+    nome: "PAREDE DE ESCALADA",
+    texto: "Desafio vertical com total segurança.",
+    clicavel: true,
+    fotos: [
+      {
+        src: escaladaFoto1.url,
+        alt: "Menino escalando a parede de escalada do Super CT com o polegar para cima",
+      },
+    ],
+  },
   {
     nome: "TREPA-TREPA & ARGOLAS",
     texto: "Domine a gravidade e o movimento.",
