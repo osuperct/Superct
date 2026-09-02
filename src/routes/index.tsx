@@ -25,6 +25,7 @@ import esportesFoto3 from "@/assets/esportes-foto3.jpg.asset.json";
 import argolasFoto1 from "@/assets/argolas-foto1.jpg.asset.json";
 import argolasFoto2 from "@/assets/argolas-foto2.jpg.asset.json";
 import argolasFoto3 from "@/assets/argolas-foto3.jpg.asset.json";
+import escaladaFoto1 from "@/assets/escalada-foto1.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
