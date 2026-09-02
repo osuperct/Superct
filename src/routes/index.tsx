@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { VideoShowcase } from "@/components/VideoShowcase";
+
 import logoAsset from "@/assets/super-ct-logo.asset.json";
 
 const logo = logoAsset.url;
@@ -216,6 +218,8 @@ function Index() {
             </p>
           </div>
         </section>
+
+        <VideoShowcase />
 
         <section className="px-4 py-12">
           <div className="mb-8 flex items-center gap-2">
