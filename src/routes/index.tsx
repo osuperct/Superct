@@ -217,6 +217,8 @@ function Index() {
           </div>
         </section>
 
+        <VideoShowcase />
+
         <section className="px-4 py-12">
           <div className="mb-8 flex items-center gap-2">
             <div className="h-[2px] w-8 bg-primary" />
