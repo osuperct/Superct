@@ -127,6 +127,9 @@ const modalidades: Modalidade[] = [
   {
     nome: "PAREDE DE ESCALADA",
     texto: "Desafio vertical com total segurança.",
+    imagem: escaladaCover.url,
+    alt: "Parede de escalada do Super CT com agarras coloridas",
+    destaque: true,
     clicavel: true,
     fotos: [
       {
