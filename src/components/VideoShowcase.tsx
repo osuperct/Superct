@@ -27,6 +27,7 @@ export function VideoShowcase() {
 
       <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-surface">
         <video
+          ref={ref}
           key={atual}
           src={VIDEOS[atual]}
           className="h-full w-full object-cover"
