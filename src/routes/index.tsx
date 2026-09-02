@@ -123,7 +123,17 @@ const modalidades: Modalidade[] = [
       { src: esportesFoto2.url, alt: "Crianças do Super CT em atividade com bola durante aula de esportes" },
     ],
   },
-  { nome: "PAREDE DE ESCALADA", texto: "Desafio vertical com total segurança." },
+  {
+    nome: "PAREDE DE ESCALADA",
+    texto: "Desafio vertical com total segurança.",
+    clicavel: true,
+    fotos: [
+      {
+        src: escaladaFoto1.url,
+        alt: "Menino escalando a parede de escalada do Super CT com o polegar para cima",
+      },
+    ],
+  },
   {
     nome: "TREPA-TREPA & ARGOLAS",
     texto: "Domine a gravidade e o movimento.",
