@@ -18,6 +18,7 @@ import funcionalFoto3 from "@/assets/funcional-foto3.jpg.asset.json";
 import funcionalInfantilCover from "@/assets/funcional-infantil-cover.jpg";
 import funcionalFoto4 from "@/assets/funcional-foto4.jpg.asset.json";
 import funcionalFoto5 from "@/assets/funcional-foto5.jpg.asset.json";
+import funcionalFoto6 from "@/assets/funcional-foto6.jpg.asset.json";
 import esportesCover from "@/assets/esportes-cover-cropped.png.asset.json";
 import esportesFoto1 from "@/assets/esportes-foto1.jpg.asset.json";
 import esportesFoto2 from "@/assets/esportes-foto2.jpg.asset.json";
