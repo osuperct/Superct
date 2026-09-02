@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { VideoShowcase } from "@/components/VideoShowcase";
+
 import logoAsset from "@/assets/super-ct-logo.asset.json";
 
 const logo = logoAsset.url;
