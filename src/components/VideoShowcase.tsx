@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 
-const VIDEOS = ["/videos/video1.mp4", "/videos/video2.mp4"];
+import video1 from "@/assets/video1.mp4.asset.json";
+
+const VIDEOS = [video1.url];
 
 export function VideoShowcase() {
   const ref = useRef<HTMLVideoElement>(null);
