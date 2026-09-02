@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import video1 from "@/assets/video1.mp4.asset.json";
 
@@ -6,6 +6,17 @@ const VIDEOS = [video1.url];
 
 export function VideoShowcase() {
   const [atual, setAtual] = useState(0);
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    v.muted = true;
+    const tocar = () => v.play().catch(() => {});
+    tocar();
+    v.addEventListener("canplay", tocar);
+    return () => v.removeEventListener("canplay", tocar);
+  }, [atual]);
 
   return (
     <section className="px-4 pt-4">
