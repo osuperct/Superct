@@ -446,14 +446,21 @@ function Index() {
       <footer className="border-t border-border bg-black px-6 pb-32 pt-12">
         <div className="mx-auto max-w-screen-md">
           <h2 className="mb-4 font-display text-2xl uppercase tracking-tight">ONDE ESTAMOS</h2>
-          <div className="mb-4 flex items-start gap-3">
-            <div className="mt-1 size-4 shrink-0 bg-primary" />
+          <a
+            href={MAPS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-4 flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-white/5"
+          >
+            <div className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
+              <MapPin size={16} />
+            </div>
             <p className="text-sm text-muted-foreground">
               Rua Geraldo Marcolini, 1609
               <br />
               São Sebastião do Paraíso - MG
             </p>
-          </div>
+          </a>
           <div className="flex items-center gap-3">
             <div className="size-4 shrink-0 bg-secondary" />
             <a
