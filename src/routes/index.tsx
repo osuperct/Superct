@@ -195,7 +195,25 @@ const modalidades: Modalidade[] = [
       { src: argolasFoto3.url, alt: "Aluno de cabeça para baixo nas argolas laranja no Super CT" },
     ],
   },
-  { nome: "COLÔNIA DE FÉRIAS", texto: "Diversão máxima nas pausas escolares." },
+  {
+    nome: "COLÔNIA DE FÉRIAS",
+    texto: "Diversão máxima nas pausas escolares.",
+    imagem: coloniaFoto2.url,
+    alt: "Turma da Colônia de Férias Edição Ninjas do Super CT com o Professor Tio Victor",
+    destaque: true,
+    clicavel: true,
+    position: "top",
+    fotos: [
+      {
+        src: coloniaFoto2.url,
+        alt: "Turma da Colônia de Férias Edição Ninjas do Super CT reunida com o Professor Tio Victor",
+      },
+      {
+        src: coloniaFoto1.url,
+        alt: "Crianças da colônia de férias do Super CT em frente ao painel do Wolverine",
+      },
+    ],
+  },
 ];
 
 const galeria = [
