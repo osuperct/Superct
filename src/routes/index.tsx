@@ -258,7 +258,7 @@ function Index() {
             href={WHATSAPP}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-sm bg-primary px-4 py-2 font-display text-sm text-primary-foreground transition-transform active:scale-95"
+            className="animate-pulse-slow rounded-sm bg-primary px-4 py-2 font-display text-sm text-primary-foreground transition-transform active:scale-95"
           >
             TREINO GRÁTIS
           </a>
@@ -453,7 +453,7 @@ function Index() {
             className="mb-4 flex items-start gap-3 rounded-lg p-2 transition-colors hover:bg-white/5"
           >
             <div className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary/20 text-primary">
-              <MapPin size={16} />
+              <MapPin size={16} className="animate-blink-pin" />
             </div>
             <p className="text-sm text-muted-foreground">
               Rua Geraldo Marcolini, 1609
@@ -511,7 +511,7 @@ function Index() {
           href={WHATSAPP}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex w-full items-center justify-center gap-3 rounded-xl bg-whatsapp py-4 font-bold text-primary-foreground shadow-[0_10px_30px_oklch(0.78_0.19_148/0.3)] transition-all active:scale-[0.98]"
+          className="animate-pulse-slow-green flex w-full items-center justify-center gap-3 rounded-xl bg-whatsapp py-4 font-bold text-primary-foreground shadow-[0_10px_30px_oklch(0.78_0.19_148/0.3)] transition-all active:scale-[0.98]"
         >
           <span className="font-display text-lg tracking-wide">AGENDAR AULA EXPERIMENTAL</span>
         </a>
