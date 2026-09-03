@@ -30,6 +30,8 @@ import argolasFoto2 from "@/assets/argolas-foto2.jpg.asset.json";
 import argolasFoto3 from "@/assets/argolas-foto3.jpg.asset.json";
 import escaladaFoto1 from "@/assets/escalada-foto1.jpg.asset.json";
 import escaladaCover from "@/assets/escalada-cover.jpg.asset.json";
+import ginasticaCover from "@/assets/ginastica-cover.jpg.asset.json";
+import ginasticaFoto2 from "@/assets/ginastica-foto2.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -109,11 +111,18 @@ const modalidades: Modalidade[] = [
   {
     nome: "GINÁSTICA",
     texto: "Base motora, equilíbrio e flexibilidade.",
+    imagem: ginasticaCover.url,
+    alt: "Jump com a logo Super CT gravada em cinza e elásticos de perna sobre tatame preto",
+    destaque: true,
     clicavel: true,
     fotos: [
       {
         src: funcionalFoto2.url,
         alt: "Menina pulando no mini trampolim em frente à parede de escalada do Super CT",
+      },
+      {
+        src: ginasticaFoto2.url,
+        alt: "Aluna do Super CT saltando no jump em frente à parede de escalada",
       },
     ],
   },
