@@ -32,6 +32,16 @@ import escaladaFoto1 from "@/assets/escalada-foto1.jpg.asset.json";
 import escaladaCover from "@/assets/escalada-cover.jpg.asset.json";
 import ginasticaCover from "@/assets/ginastica-cover.jpg.asset.json";
 import ginasticaFoto2 from "@/assets/ginastica-foto2.jpg.asset.json";
+import campaoCover from "@/assets/campao-cover.jpg.asset.json";
+import campaoFoto1 from "@/assets/campao-foto1.jpg.asset.json";
+import campaoFoto2 from "@/assets/campao-foto2.jpg.asset.json";
+import campaoFoto3 from "@/assets/campao-foto3.jpg.asset.json";
+import campaoFoto4 from "@/assets/campao-foto4.jpg.asset.json";
+import campaoFoto5 from "@/assets/campao-foto5.jpg.asset.json";
+import campaoFoto6 from "@/assets/campao-foto6.jpg.asset.json";
+import campaoFoto7 from "@/assets/campao-foto7.jpg.asset.json";
+import campaoFoto8 from "@/assets/campao-foto8.jpg.asset.json";
+import campaoFoto9 from "@/assets/campao-foto9.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
