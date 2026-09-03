@@ -29,6 +29,7 @@ import esportesFoto3 from "@/assets/esportes-foto3.jpg.asset.json";
 import argolasFoto1 from "@/assets/argolas-foto1.jpg.asset.json";
 import argolasFoto2 from "@/assets/argolas-foto2.jpg.asset.json";
 import argolasFoto3 from "@/assets/argolas-foto3.jpg.asset.json";
+import trepaTrepaCover from "@/assets/trepa-trepa-cover.jpg.asset.json";
 import escaladaFoto1 from "@/assets/escalada-foto1.jpg.asset.json";
 import escaladaCover from "@/assets/escalada-cover.jpg.asset.json";
 import ginasticaCover from "@/assets/ginastica-cover.jpg.asset.json";
