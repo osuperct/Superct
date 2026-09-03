@@ -45,6 +45,7 @@ import campaoFoto9 from "@/assets/campao-foto9.jpg.asset.json";
 import coloniaFoto1 from "@/assets/colonia-foto1.jpg.asset.json";
 import coloniaFoto2 from "@/assets/colonia-foto2.png.asset.json";
 import coloniaFoto3 from "@/assets/colonia-foto3.jpg.asset.json";
+import coloniaCover from "@/assets/colonia-cover.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -199,12 +200,16 @@ const modalidades: Modalidade[] = [
   {
     nome: "COLÔNIA DE FÉRIAS",
     texto: "Diversão máxima nas pausas escolares.",
-    imagem: coloniaFoto2.url,
-    alt: "Turma da Colônia de Férias Edição Ninjas do Super CT com o Professor Tio Victor",
+    imagem: coloniaCover.url,
+    alt: "Cartaz Colônia de Férias Edição Ninjas 2026 do Super CT com mascotes ninja e datas 20/07 a 31/07",
     destaque: true,
     clicavel: true,
     position: "top",
     fotos: [
+      {
+        src: coloniaCover.url,
+        alt: "Cartaz Colônia de Férias Edição Ninjas 2026 do Super CT com mascotes ninja e datas 20/07 a 31/07",
+      },
       {
         src: coloniaFoto2.url,
         alt: "Turma da Colônia de Férias Edição Ninjas do Super CT reunida com o Professor Tio Victor",
