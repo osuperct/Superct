@@ -168,7 +168,7 @@ const modalidades: Modalidade[] = [
     nome: "SUPER CAMPÃO — AULAS ESPECIAIS",
     texto: "Vôlei de areia, futebol e jogos na arena externa.",
     imagem: campaoCover.url,
-    alt: "Camiseta do uniforme Super CT sobre a grama do campo ao lado de uma bola de vôlei",
+    alt: "Camiseta do uniforme Super CT com estampa de lava e escudo dourado sobre a grama do campo, ao lado de uma bola de vôlei",
     destaque: true,
     clicavel: true,
     fotos: [
