@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronRight, MapPin } from "lucide-react";
+import { ChevronRight, MapPin, Phone } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { VideoShowcase } from "@/components/VideoShowcase";
@@ -461,17 +461,17 @@ function Index() {
               São Sebastião do Paraíso - MG
             </p>
           </a>
-          <div className="flex items-center gap-3">
-            <div className="size-4 shrink-0 bg-secondary" />
-            <a
-              href={WHATSAPP}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground"
-            >
-              WhatsApp (35) 98822-3596
-            </a>
-          </div>
+          <a
+            href={WHATSAPP}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-lg p-2 transition-colors hover:bg-white/5"
+          >
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-whatsapp/20 text-whatsapp">
+              <Phone size={16} className="animate-pulse-slow-green" />
+            </div>
+            <p className="text-sm text-muted-foreground">WhatsApp (35) 98822-3596</p>
+          </a>
 
           <p className="mt-12 text-center font-mono text-[8px] uppercase tracking-widest text-muted-foreground/40">
             © Super CT • Professor Tio Victor
