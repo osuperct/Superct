@@ -44,6 +44,7 @@ import campaoFoto8 from "@/assets/campao-foto8.jpg.asset.json";
 import campaoFoto9 from "@/assets/campao-foto9.jpg.asset.json";
 import coloniaFoto1 from "@/assets/colonia-foto1.jpg.asset.json";
 import coloniaFoto2 from "@/assets/colonia-foto2.png.asset.json";
+import coloniaFoto3 from "@/assets/colonia-foto3.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -211,6 +212,10 @@ const modalidades: Modalidade[] = [
       {
         src: coloniaFoto1.url,
         alt: "Crianças da colônia de férias do Super CT em frente ao painel do Wolverine",
+      },
+      {
+        src: coloniaFoto3.url,
+        alt: "Cartaz Super Acampa CT do Tio Victor com aventuras, games, esportes e amizades para meninos",
       },
     ],
   },
