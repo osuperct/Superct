@@ -200,12 +200,16 @@ const modalidades: Modalidade[] = [
   {
     nome: "COLÔNIA DE FÉRIAS",
     texto: "Diversão máxima nas pausas escolares.",
-    imagem: coloniaFoto2.url,
-    alt: "Turma da Colônia de Férias Edição Ninjas do Super CT com o Professor Tio Victor",
+    imagem: coloniaCover.url,
+    alt: "Cartaz Colônia de Férias Edição Ninjas 2026 do Super CT com mascotes ninja e datas 20/07 a 31/07",
     destaque: true,
     clicavel: true,
     position: "top",
     fotos: [
+      {
+        src: coloniaCover.url,
+        alt: "Cartaz Colônia de Férias Edição Ninjas 2026 do Super CT com mascotes ninja e datas 20/07 a 31/07",
+      },
       {
         src: coloniaFoto2.url,
         alt: "Turma da Colônia de Férias Edição Ninjas do Super CT reunida com o Professor Tio Victor",
