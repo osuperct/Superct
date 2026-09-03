@@ -197,6 +197,7 @@ const modalidades: Modalidade[] = [
     destaque: true,
     clicavel: true,
     fotos: [
+      { src: trepaTrepaCover.url, alt: "Aluno do Super CT na estrutura de trepa-trepa com parede de escalada ao fundo" },
       { src: argolasFoto1.url, alt: "Criança de cabeça para baixo nas argolas do Super CT" },
       { src: argolasFoto2.url, alt: "Aluna suspensa nas argolas laranja em treino no Super CT" },
       { src: argolasFoto3.url, alt: "Aluno de cabeça para baixo nas argolas laranja no Super CT" },
