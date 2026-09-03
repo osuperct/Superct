@@ -111,11 +111,18 @@ const modalidades: Modalidade[] = [
   {
     nome: "GINÁSTICA",
     texto: "Base motora, equilíbrio e flexibilidade.",
+    imagem: ginasticaCover.url,
+    alt: "Jump com a logo Super CT gravada em cinza e elásticos de perna sobre tatame preto",
+    destaque: true,
     clicavel: true,
     fotos: [
       {
         src: funcionalFoto2.url,
         alt: "Menina pulando no mini trampolim em frente à parede de escalada do Super CT",
+      },
+      {
+        src: ginasticaFoto2.url,
+        alt: "Aluna do Super CT saltando no jump em frente à parede de escalada",
       },
     ],
   },
