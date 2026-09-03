@@ -32,6 +32,16 @@ import escaladaFoto1 from "@/assets/escalada-foto1.jpg.asset.json";
 import escaladaCover from "@/assets/escalada-cover.jpg.asset.json";
 import ginasticaCover from "@/assets/ginastica-cover.jpg.asset.json";
 import ginasticaFoto2 from "@/assets/ginastica-foto2.jpg.asset.json";
+import campaoCover from "@/assets/campao-cover.jpg.asset.json";
+import campaoFoto1 from "@/assets/campao-foto1.jpg.asset.json";
+import campaoFoto2 from "@/assets/campao-foto2.jpg.asset.json";
+import campaoFoto3 from "@/assets/campao-foto3.jpg.asset.json";
+import campaoFoto4 from "@/assets/campao-foto4.jpg.asset.json";
+import campaoFoto5 from "@/assets/campao-foto5.jpg.asset.json";
+import campaoFoto6 from "@/assets/campao-foto6.jpg.asset.json";
+import campaoFoto7 from "@/assets/campao-foto7.jpg.asset.json";
+import campaoFoto8 from "@/assets/campao-foto8.jpg.asset.json";
+import campaoFoto9 from "@/assets/campao-foto9.jpg.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -152,6 +162,25 @@ const modalidades: Modalidade[] = [
         src: escaladaFoto1.url,
         alt: "Menino escalando a parede de escalada do Super CT com o polegar para cima",
       },
+    ],
+  },
+  {
+    nome: "SUPER CAMPÃO — AULAS ESPECIAIS",
+    texto: "Vôlei de areia, futebol e jogos na arena externa.",
+    imagem: campaoCover.url,
+    alt: "Camiseta do uniforme Super CT sobre a grama do campo ao lado de uma bola de vôlei",
+    destaque: true,
+    clicavel: true,
+    fotos: [
+      { src: campaoFoto8.url, alt: "Turma Super Campão reunida com o Professor Tio Victor no fim da aula" },
+      { src: campaoFoto1.url, alt: "Criança do Super CT sacando a bola na quadra de areia" },
+      { src: campaoFoto2.url, alt: "Aluno do Super CT com a bola de vôlei na quadra de areia" },
+      { src: campaoFoto3.url, alt: "Alunas do Super CT jogando vôlei de areia" },
+      { src: campaoFoto4.url, alt: "Turma do Super CT posicionada na quadra de areia antes do jogo" },
+      { src: campaoFoto5.url, alt: "Professor Tio Victor com a bola no campo do Super CT" },
+      { src: campaoFoto6.url, alt: "Alunas do Super CT abraçadas com o uniforme vermelho no campo" },
+      { src: campaoFoto7.url, alt: "Professor Tio Victor conversando com os alunos sentados na areia" },
+      { src: campaoFoto9.url, alt: "Turma do Super CT em roda na areia durante a aula especial" },
     ],
   },
   {
