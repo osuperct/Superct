@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronRight, MapPin } from "lucide-react";
+import { ChevronRight, MapPin, Phone } from "lucide-react";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { VideoShowcase } from "@/components/VideoShowcase";
