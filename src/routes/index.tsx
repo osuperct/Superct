@@ -192,6 +192,9 @@ const modalidades: Modalidade[] = [
   {
     nome: "TREPA-TREPA & ARGOLAS",
     texto: "Domine a gravidade e o movimento.",
+    imagem: trepaTrepaCover.url,
+    alt: "Aluno do Super CT na estrutura de trepa-trepa com parede de escalada ao fundo",
+    destaque: true,
     clicavel: true,
     fotos: [
       { src: argolasFoto1.url, alt: "Criança de cabeça para baixo nas argolas do Super CT" },
