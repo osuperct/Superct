@@ -213,6 +213,10 @@ const modalidades: Modalidade[] = [
         src: coloniaFoto1.url,
         alt: "Crianças da colônia de férias do Super CT em frente ao painel do Wolverine",
       },
+      {
+        src: coloniaFoto3.url,
+        alt: "Cartaz Super Acampa CT do Tio Victor com aventuras, games, esportes e amizades para meninos",
+      },
     ],
   },
 ];
