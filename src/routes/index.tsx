@@ -198,7 +198,7 @@ const modalidades: Modalidade[] = [
     ],
   },
   {
-    nome: "COLÔNIA DE FÉRIAS",
+    nome: "COLÔNIA DE FÉRIAS E ACAMPAMENTO INDOOR",
     texto: "Diversão máxima nas pausas escolares.",
     imagem: coloniaCover.url,
     alt: "Cartaz Colônia de Férias Edição Ninjas 2026 do Super CT com mascotes ninja e datas 20/07 a 31/07",
