@@ -57,6 +57,7 @@ const turmas = [
 ];
 
 const WHATSAPP = "https://wa.me/5535988223596";
+const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Rua+Geraldo+Marcolini%2C+1609%2C+São+Sebastião+do+Paraíso+-+MG%2C+Brasil";
 
 const TITLE = "Super CT — Treinamento Funcional Infantil em São Sebastião do Paraíso";
 const DESCRIPTION =
