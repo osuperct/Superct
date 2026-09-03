@@ -72,12 +72,60 @@
   }
 }
 
+@keyframes slowPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 oklch(0.7 0.19 45 / 0.45);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 24px 8px oklch(0.7 0.19 45 / 0.15);
+  }
+}
+
+@keyframes slowPulseGreen {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 oklch(0.78 0.19 148 / 0.45);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 24px 8px oklch(0.78 0.19 148 / 0.15);
+  }
+}
+
+@keyframes blinkPin {
+  0%,
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px var(--primary));
+  }
+  50% {
+    opacity: 0.5;
+    filter: drop-shadow(0 0 2px var(--primary));
+  }
+}
+
 @utility animate-neon {
   animation: neonPulse 2s infinite ease-in-out;
 }
 
 @utility animate-reveal {
   animation: slideUp 0.6s var(--ease-out-expo) both;
+}
+
+@utility animate-pulse-slow {
+  animation: slowPulse 2.8s infinite ease-in-out;
+}
+
+@utility animate-pulse-slow-green {
+  animation: slowPulseGreen 2.8s infinite ease-in-out;
+}
+
+@utility animate-blink-pin {
+  animation: blinkPin 1.2s infinite ease-in-out;
 }
 
 @utility no-scrollbar {
