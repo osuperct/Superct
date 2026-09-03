@@ -311,7 +311,7 @@ function Index() {
                   style={{ animationDelay: `${200 + i * 50}ms` }}
                 >
                   {m.imagem && (
-                    <div className="mb-3 -mt-1 -mx-1 overflow-hidden rounded-md">
+                    <div className="relative mb-3 -mt-1 -mx-1 overflow-hidden rounded-md">
                       <img
                         src={m.imagem}
                         alt={m.alt}
@@ -319,6 +319,11 @@ function Index() {
                         className="h-48 w-full object-cover"
                         style={{ objectPosition: m.position || "center" }}
                       />
+                      {abrivel && (
+                        <div className="absolute right-0 top-0 flex h-full w-8 items-center justify-center border-l border-border/40 bg-background/60 backdrop-blur-sm">
+                          <ChevronRight className="h-5 w-5 text-primary" />
+                        </div>
+                      )}
                     </div>
                   )}
                   <div className="absolute right-0 top-0 h-8 w-8 rounded-bl-3xl bg-primary/10" />
