@@ -1671,10 +1671,6 @@ function JogoPage() {
           )}
         </div>
 
-        <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Joystick move; segure para baixo para agachar (na parede, cima/baixo sobe e desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira o poder para o lado do chefão • 3 halteres = super bola • pegue os 2 corações de cada fase para ganhar vidas • ao perder uma vida você volta ao checkpoint da fase
-        </p>
-
         <div className="mt-6 flex items-end justify-between gap-3">
           <Joystick onChange={(v) => { dir.current = v.x; dirY.current = v.y; }} />
           <div className="flex gap-2">
@@ -1685,6 +1681,17 @@ function JogoPage() {
               <Zap className="size-6" />
             </ControlButton>
           </div>
+        </div>
+
+        <div className="mt-4 rounded-lg border border-border bg-card/50 p-3 font-mono text-[9px] uppercase leading-relaxed tracking-widest text-muted-foreground">
+          <p>
+            <span className="text-primary">Joystick</span> move; segure para baixo para agachar (na parede, cima/baixo sobe e desce) •{" "}
+            <span className="text-primary">▲</span> pula baixo, <span className="text-primary">▲▲</span> rápido pula alto •{" "}
+            <span className="text-primary">⚡</span> atira o poder para o lado do chefão •{" "}
+            <span className="text-primary">3 halteres</span> = super bola •{" "}
+            <span className="text-primary">2 corações</span> de cada fase para ganhar vidas •{" "}
+            ao perder uma vida você volta ao <span className="text-primary">checkpoint</span> da fase
+          </p>
         </div>
       </main>
     </div>
