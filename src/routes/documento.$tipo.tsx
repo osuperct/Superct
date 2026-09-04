@@ -128,6 +128,15 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
     });
   }
 
+  function valorCampo(c: typeof doc.campos[number]) {
+    if (c.fixo !== undefined) return c.fixo;
+    if (c.multiplos) {
+      const partes = c.multiplos.map((m) => valores[m.chave]).filter(Boolean);
+      return partes.join(" — ");
+    }
+    return valores[c.chave] ?? "";
+  }
+
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
     if (!aceite) {
