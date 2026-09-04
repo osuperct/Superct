@@ -159,7 +159,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       });
       if (erroFicha) throw erroFicha;
 
-      const linhas = doc.campos.map((c) => ({ rotulo: c.rotulo, valor: valores[c.chave] ?? "" }));
+      const linhas = doc.campos.map((c) => ({ rotulo: c.rotulo, valor: valorCampo(c) }));
       const blob = gerarDocumentoPdf({
         titulo: doc.titulo,
         linhas,
