@@ -279,6 +279,7 @@ function JogoPage() {
     duck.current = false;
     subindo.current = false;
     descendoParede.current = false;
+    subindoDesde.current = null;
     ultimoToqueBaixo.current = null;
     bloquearAgarreAte.current = 0;
     maxX.current = 60;
@@ -383,6 +384,7 @@ function JogoPage() {
       x.current = 60;
       y.current = 0;
       vy.current = 0;
+      subindoDesde.current = null;
       vxAr.current = 0;
       noAr.current = false;
       seguro.current = false;
@@ -545,6 +547,7 @@ function JogoPage() {
             if (jump) {
               prox = jump.h;
               vy.current = IMPULSO * 1.2;
+              subindoDesde.current = performance.now();
               noAr.current = true;
             }
             for (const s of solidos) {
@@ -552,6 +555,7 @@ function JogoPage() {
               if (!jump && sobre && anterior >= s.h && prox <= s.h) {
                 prox = s.h;
                 vy.current = 0;
+                subindoDesde.current = null;
                 noAr.current = false;
                 break;
               }
