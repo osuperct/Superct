@@ -184,6 +184,22 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
+    for (const c of doc.campos) {
+      if (!c.obrigatorio) continue;
+      const v = (valores[c.chave] ?? "").trim();
+      if (!v) {
+        toast.error(`Preencha o campo obrigatório: ${c.rotulo}.`);
+        return;
+      }
+      if (c.cpf && !cpfValido(v)) {
+        toast.error("Digite um CPF válido do responsável.");
+        return;
+      }
+      if (!c.cpf && apenasDigitos(v).length < 10) {
+        toast.error("Digite um telefone de contato válido com DDD.");
+        return;
+      }
+    }
     if (!aceite) {
       toast.error("Confirme o termo de uso de imagem e a veracidade das informações.");
       return;
