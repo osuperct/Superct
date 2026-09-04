@@ -41,6 +41,7 @@ type Documento = {
   caminho: string;
   created_at: string;
   aluno_id: string | null;
+  enviado_por_professor: boolean;
 };
 
 const DESCRICAO_DOC: Record<string, string> = {
