@@ -52,6 +52,7 @@ export type Database = {
           aluno_id: string | null
           caminho: string
           created_at: string
+          enviado_por_professor: boolean
           id: string
           nome_arquivo: string
           oculto_responsavel: boolean
@@ -62,6 +63,7 @@ export type Database = {
           aluno_id?: string | null
           caminho: string
           created_at?: string
+          enviado_por_professor?: boolean
           id?: string
           nome_arquivo: string
           oculto_responsavel?: boolean
@@ -72,6 +74,7 @@ export type Database = {
           aluno_id?: string | null
           caminho?: string
           created_at?: string
+          enviado_por_professor?: boolean
           id?: string
           nome_arquivo?: string
           oculto_responsavel?: boolean
