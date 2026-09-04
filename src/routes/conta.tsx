@@ -591,22 +591,25 @@ function Painel({ session }: { session: Session }) {
           ))}
           {alunos.length === 0 && <li className="text-sm text-muted-foreground">Nenhum aluno cadastrado.</li>}
         </ul>
-        <form onSubmit={adicionarAluno} className="mt-3 flex gap-2">
+        <form onSubmit={adicionarAluno} className="mt-3 flex items-center gap-2">
           <input
             value={novoAluno}
             onChange={(e) => setNovoAluno(e.target.value)}
             placeholder="Nome do aluno"
             maxLength={120}
-            className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            className="w-32 shrink-0 rounded-md border border-border bg-background px-2 py-2 text-sm outline-none focus:border-primary"
           />
           <input
             value={novaIdade}
             onChange={(e) => setNovaIdade(e.target.value)}
             placeholder="Idade"
             type="number"
-            className="w-20 rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+            className="w-16 shrink-0 rounded-md border border-border bg-background px-2 py-2 text-center text-sm outline-none focus:border-primary"
           />
-          <button type="submit" className="rounded-md bg-primary px-3 font-display text-sm text-primary-foreground">
+          <button
+            type="submit"
+            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary font-display text-base text-primary-foreground"
+          >
             +
           </button>
         </form>
