@@ -936,6 +936,7 @@ function JogoPage() {
       setPendurado(false);
       noAr.current = true;
       vy.current = (duploToque ? IMPULSO : IMPULSO * 0.95);
+      if (vy.current > 0) subindoDesde.current = performance.now();
       vxAr.current = lado * VELOCIDADE * 2.1;
       bloquearAgarreAte.current = agora + 400;
       return;
@@ -952,6 +953,7 @@ function JogoPage() {
       seguro.current = false;
       noAr.current = true;
       vy.current = duploToque ? IMPULSO : IMPULSO * 0.85;
+      if (vy.current > 0) subindoDesde.current = performance.now();
       return;
     }
 
@@ -959,12 +961,14 @@ function JogoPage() {
     if (duploToque) {
       noAr.current = true;
       vy.current = IMPULSO;
+      if (vy.current > 0) subindoDesde.current = performance.now();
       return;
     }
 
     if (noAr.current) return;
     noAr.current = true;
     vy.current = IMPULSO_BAIXO;
+    if (vy.current > 0) subindoDesde.current = performance.now();
   };
 
 
