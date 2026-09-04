@@ -691,6 +691,21 @@ function JogoPage() {
 
   const pular = () => {
     if (fimRef.current) return;
+    /* pendurado + seta lateral pressionada = solta e pula na diagonal */
+    if (seguro.current && dir.current !== 0) {
+      const lado = dir.current;
+      seguro.current = false;
+      subindo.current = false;
+      descendoParede.current = false;
+      duck.current = false;
+      setAbaixado(false);
+      setPendurado(false);
+      noAr.current = true;
+      vy.current = IMPULSO * 0.95;
+      vxAr.current = lado * VELOCIDADE * 2.1;
+      bloquearAgarreAte.current = performance.now() + 400;
+      return;
+    }
     if (seguro.current === "parede") {
       subindo.current = true;
       duck.current = false;
@@ -709,6 +724,7 @@ function JogoPage() {
     noAr.current = true;
     vy.current = IMPULSO;
   };
+
 
   const pararSubida = () => {
     subindo.current = false;
