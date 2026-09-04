@@ -387,6 +387,34 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         </span>
       </label>
 
+      {doc.clausulas && (
+        <section className="space-y-2">
+          <h2 className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            Cláusulas e regras do Super CT
+          </h2>
+          <div className="max-h-64 space-y-3 overflow-y-auto rounded-md border border-border bg-card/40 p-3">
+            {doc.clausulas.map((c) => (
+              <article key={c.titulo}>
+                <h3 className="font-display text-[11px] tracking-tight text-primary">{c.titulo}</h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{c.texto}</p>
+              </article>
+            ))}
+          </div>
+          <label className="flex gap-3 rounded-md border border-border bg-card/50 p-3 text-xs leading-relaxed">
+            <input
+              type="checkbox"
+              checked={aceiteClausulas}
+              onChange={(e) => setAceiteClausulas(e.target.checked)}
+              className="mt-0.5 size-4 shrink-0"
+            />
+            <span>
+              Li todas as cláusulas e regras acima e estou ciente e de acordo, inclusive com as condições de
+              pagamento e as normas de convivência e segurança do Super CT.
+            </span>
+          </label>
+        </section>
+      )}
+
       <Assinatura onChange={setAssinatura} />
 
       <button
