@@ -121,7 +121,7 @@ function Painel() {
     const [{ data: d }, { data: a }, { data: p }] = await Promise.all([
       supabase
         .from("documentos")
-        .select("id, tipo, nome_arquivo, caminho, created_at, user_id")
+        .select("id, tipo, nome_arquivo, caminho, created_at, user_id, aluno_id, enviado_por_professor")
         .order("created_at", { ascending: false }),
       supabase.from("alunos").select("id, nome, idade, matricula, user_id").order("matricula"),
       supabase.from("perfis").select("id, nome_responsavel, telefone, cpf"),
