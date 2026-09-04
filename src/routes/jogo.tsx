@@ -282,6 +282,17 @@ function JogoPage() {
     return () => ro.disconnect();
   }, []);
 
+  /* troca os quadros da caminhada */
+  useEffect(() => {
+    if (!andando) {
+      setPassoFrame(0);
+      return;
+    }
+    const t = setInterval(() => setPassoFrame((f) => (f === 0 ? 1 : 0)), 170);
+    return () => clearInterval(t);
+  }, [andando]);
+
+
   const zerarHeroi = useCallback(() => {
     dir.current = 0;
     x.current = 60;
