@@ -303,7 +303,7 @@ function Index() {
             <h2 className="font-display text-2xl uppercase tracking-tight">MODALIDADES</h2>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             {modalidades.map((m, i) => {
               const abrivel = Boolean(m.clicavel && m.fotos?.length);
               const Card = abrivel ? "button" : "div";
@@ -312,30 +312,30 @@ function Index() {
                   key={m.nome}
                   type={abrivel ? "button" : undefined}
                   onClick={abrivel ? () => setFotosAbertas(m.fotos!) : undefined}
-                  className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-4 text-left transition-transform active:scale-[0.98] ${
-                    m.destaque ? "col-span-2" : ""
-                  } ${abrivel ? "cursor-pointer" : ""}`}
+                  className={`animate-reveal relative overflow-hidden rounded-lg border border-border bg-surface p-2 text-left transition-transform active:scale-[0.98] ${
+                    abrivel ? "cursor-pointer" : ""
+                  }`}
                   style={{ animationDelay: `${200 + i * 50}ms` }}
                 >
                   {m.imagem && (
-                    <div className="relative mb-3 -mt-1 -mx-1 overflow-hidden rounded-md">
+                    <div className="relative mb-2 -mt-0.5 -mx-0.5 overflow-hidden rounded-md">
                       <img
                         src={m.imagem}
                         alt={m.alt}
                         loading="lazy"
-                        className="h-48 w-full object-cover"
+                        className="h-28 w-full object-cover"
                         style={{ objectPosition: m.position || "center" }}
                       />
                       {abrivel && (
-                        <div className="absolute right-0 top-0 flex h-full w-8 items-center justify-center border-l border-border/40 bg-background/60 backdrop-blur-sm">
-                          <ChevronRight className="h-5 w-5 text-primary" />
+                        <div className="absolute right-0 top-0 flex h-full w-5 items-center justify-center border-l border-border/40 bg-background/60 backdrop-blur-sm">
+                          <ChevronRight className="h-3 w-3 text-primary" />
                         </div>
                       )}
                     </div>
                   )}
-                  <div className="absolute right-0 top-0 h-8 w-8 rounded-bl-3xl bg-primary/10" />
-                  <h3 className="mb-2 font-display text-lg leading-tight">{m.nome}</h3>
-                  <p className="text-[10px] leading-relaxed text-muted-foreground">{m.texto}</p>
+                  <div className="absolute right-0 top-0 h-5 w-5 rounded-bl-xl bg-primary/10" />
+                  <h3 className="mb-1 font-display text-[11px] leading-tight uppercase">{m.nome}</h3>
+                  <p className="text-[9px] leading-relaxed text-muted-foreground">{m.texto}</p>
                 </Card>
               );
             })}
