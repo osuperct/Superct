@@ -531,6 +531,7 @@ function Painel({ session }: { session: Session }) {
     await supabase.from("documentos").insert({
       user_id: uid,
       tipo: tipoDoc,
+      aluno_id: destino,
       nome_arquivo: arquivo.name,
       caminho,
     });
