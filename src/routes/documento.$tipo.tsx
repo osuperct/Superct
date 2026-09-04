@@ -174,6 +174,22 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
     });
   }
 
+  function parseDataBr(value: string): Date | undefined {
+    if (!value) return undefined;
+    const [d, m, y] = value.split("/").map(Number);
+    if (!d || !m || !y) return undefined;
+    const date = new Date(y, m - 1, d);
+    if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) return undefined;
+    return date;
+  }
+
+  function formatarDataBr(date: Date): string {
+    const d = String(date.getDate()).padStart(2, "0");
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
+  }
+
   function valorCampo(c: typeof doc.campos[number]) {
     if (c.fixo !== undefined) return c.fixo;
     if (c.multiplos) {
