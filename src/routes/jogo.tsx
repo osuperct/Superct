@@ -695,7 +695,7 @@ function JogoPage() {
         const novo: Tiro = {
           id: nextTiro.current++,
           x: boss.x,
-          y: boss.y + tam * 0.4 * (tipo === "furacao" || altura === 0 ? 0 : 1) + altura * 0 + altura,
+          y: altura,
           vx: -(1.9 + Math.random() * 1.1) * (0.8 + dif * 0.5),
           vy: tipo === "celular" ? 2.2 : tipo === "donut" ? 1.2 : 0,
           tipo,
