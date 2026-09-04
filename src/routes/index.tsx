@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ChevronRight, MapPin, Phone } from "lucide-react";
-import { createFileRoute } from "@tanstack/react-router";
+import { ChevronRight, MapPin, Phone, UserRound } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { VideoShowcase } from "@/components/VideoShowcase";
 
@@ -255,14 +255,13 @@ function Index() {
               São Sebastião do Paraíso
             </span>
           </div>
-          <a
-            href={WHATSAPP}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="animate-pulse-slow rounded-sm bg-primary px-4 py-2 font-display text-sm text-primary-foreground transition-transform active:scale-95"
+          <Link
+            to="/conta"
+            className="animate-pulse-slow flex items-center gap-1.5 rounded-sm bg-primary px-4 py-2 font-display text-sm text-primary-foreground transition-transform active:scale-95"
           >
-            TREINO GRÁTIS
-          </a>
+            <UserRound className="size-4" />
+            LOGIN
+          </Link>
         </div>
       </nav>
 
