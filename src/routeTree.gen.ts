@@ -14,6 +14,7 @@ import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as HeroisRouteImport } from './routes/herois'
 import { Route as JogoRouteImport } from './routes/jogo'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ViloesRouteImport } from './routes/viloes'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +42,11 @@ const JogoRoute = JogoRouteImport.update({
   path: '/jogo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ViloesRoute = ViloesRouteImport.update({
   id: '/viloes',
   path: '/viloes',
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
 }
 export interface FileRoutesById {
@@ -70,13 +78,28 @@ export interface FileRoutesById {
   '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calendario' | '/conta' | '/herois' | '/jogo' | '/viloes'
+  fullPaths:
+    | '/'
+    | '/calendario'
+    | '/conta'
+    | '/herois'
+    | '/jogo'
+    | '/reset-password'
+    | '/viloes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendario' | '/conta' | '/herois' | '/jogo' | '/viloes'
+  to:
+    | '/'
+    | '/calendario'
+    | '/conta'
+    | '/herois'
+    | '/jogo'
+    | '/reset-password'
+    | '/viloes'
   id:
     | '__root__'
     | '/'
@@ -84,6 +107,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/herois'
     | '/jogo'
+    | '/reset-password'
     | '/viloes'
   fileRoutesById: FileRoutesById
 }
@@ -93,6 +117,7 @@ export interface RootRouteChildren {
   ContaRoute: typeof ContaRoute
   HeroisRoute: typeof HeroisRoute
   JogoRoute: typeof JogoRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ViloesRoute: typeof ViloesRoute
 }
 
@@ -133,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JogoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/viloes': {
       id: '/viloes'
       path: '/viloes'
@@ -149,6 +181,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContaRoute: ContaRoute,
   HeroisRoute: HeroisRoute,
   JogoRoute: JogoRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ViloesRoute: ViloesRoute,
 }
 export const routeTree = rootRouteImport
