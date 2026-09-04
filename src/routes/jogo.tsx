@@ -736,7 +736,7 @@ function JogoPage() {
   const moverDireita = () => {
     const agora = performance.now();
     const anterior = ultimoToqueDireita.current;
-    if (anterior !== null && agora - anterior <= 400) {
+    if (anterior !== null && agora - anterior <= 1500) {
       atirar();
       ultimoToqueDireita.current = null;
     } else {
@@ -1156,7 +1156,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▶ 2x joga bola de tênis • ▲ pula e escala • ▼ 2x em 2s solta • 3 halteres = super bola
+          Setas movem • ▶ 2x em 1,5s joga bola de tênis • ▲ pula e escala • ▼ 2x em 2s solta • 3 halteres = super bola
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
@@ -1164,7 +1164,7 @@ function JogoPage() {
             <ControlButton onStart={mover(-1)} onEnd={parar} label="Mover para a esquerda">
               <ArrowLeft className="size-7" />
             </ControlButton>
-            <ControlButton onStart={moverDireita} onEnd={parar} label="Mover para a direita e atirar bola">
+            <ControlButton onStart={moverDireita} onEnd={parar} label="Mover para a direita e atirar bola (toque duplo em 1,5 s)">
               <ArrowRight className="size-7" />
             </ControlButton>
           </div>
