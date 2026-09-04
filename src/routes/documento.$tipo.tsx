@@ -203,7 +203,13 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       const { error: erroFicha } = await supabase.from("fichas").insert({
         user_id: uid,
         tipo,
-        dados: { ...valores, aceite_imagem: true, assinado_online: true, email_responsavel: emailResponsavel },
+        dados: {
+          ...valores,
+          aceite_imagem: true,
+          aceite_clausulas: doc.clausulas ? true : undefined,
+          assinado_online: true,
+          email_responsavel: emailResponsavel,
+        },
         enviado_em: new Date().toISOString(),
       });
       if (erroFicha) throw erroFicha;
