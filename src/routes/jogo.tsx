@@ -490,6 +490,17 @@ function JogoPage() {
               </div>
             ))}
 
+            {/* cones pequenos no tatame */}
+            {CONES.map((x, i) => (
+              <div key={`c-${i}`} className="absolute" style={{ left: x, bottom: 38 }}>
+                <div className="h-[3px] w-4 rounded-full bg-[#f97316]/70" />
+                <div
+                  className="mx-auto -mt-[11px] h-3 w-0 border-x-[5px] border-b-[12px] border-x-transparent border-b-[#fb923c]"
+                  style={{ filter: "drop-shadow(0 0 4px rgba(249,115,22,0.6))" }}
+                />
+              </div>
+            ))}
+
             {/* caixas de crossfit e steps */}
             {SOLIDOS.map((s, i) =>
               s.tipo === "caixa" ? (
@@ -500,6 +511,9 @@ function JogoPage() {
                 >
                   <div className="absolute inset-x-0 top-0 h-1 bg-primary/70" />
                   <div className="absolute inset-2 rounded-sm border border-white/10" />
+                  <div className="absolute inset-0 flex items-center justify-center text-primary/70">
+                    <LogoVazada size={Math.min(s.w, s.h) - 16} />
+                  </div>
                 </div>
               ) : (
                 <div
@@ -511,6 +525,7 @@ function JogoPage() {
                 </div>
               ),
             )}
+
 
             {/* herói */}
             <img
