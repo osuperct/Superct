@@ -1360,7 +1360,7 @@ function JogoPage() {
               })}
 
 
-            {/* herói (recortado, vira para o lado do movimento; escala de frente pra parede) */}
+            {/* herói (recortado, vira para o lado do movimento; escala de costas na parede) */}
             {(() => {
               const escalando = pendurado === "parede";
               const sombra = pendurado
