@@ -1229,7 +1229,7 @@ function Joystick({ onChange }: { onChange: (v: { x: number; y: number }) => voi
     dragging.current = false;
     pointerId.current = null;
     setKnob({ x: 0, y: 0 });
-    onChange(0);
+    onChange({ x: 0, y: 0 });
   };
 
   return (
