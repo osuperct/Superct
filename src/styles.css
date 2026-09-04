@@ -146,3 +146,26 @@
     font-family: var(--font-body);
   }
 }
+
+@keyframes heroWalk {
+  0% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  25% {
+    transform: translateY(-2px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(0) rotate(4deg);
+  }
+  75% {
+    transform: translateY(-2px) rotate(0deg);
+  }
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+}
+
+@utility animate-hero-walk {
+  transform-origin: 50% 100%;
+  animation: heroWalk 0.36s infinite linear;
+}
