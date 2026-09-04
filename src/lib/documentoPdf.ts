@@ -9,6 +9,7 @@ export function gerarDocumentoPdf(opcoes: {
   termo: string;
   assinaturaDataUrl: string | null;
   nomeAssinante: string;
+  clausulas?: { titulo: string; texto: string }[];
 }): Blob {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const margem = 48;
