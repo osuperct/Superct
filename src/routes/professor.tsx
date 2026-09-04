@@ -81,7 +81,7 @@ function ProfessorPage() {
           </span>
         </h1>
         <p className="mt-1 text-xs text-muted-foreground">
-          Matrículas dos alunos e cópia de toda ficha e contrato assinado on-line pelos responsáveis.
+          Lista de alunos matriculados e cópia dos contratos assinados.
         </p>
 
         {carregando ? (
@@ -153,7 +153,7 @@ function Painel() {
   return (
     <div className="mt-6 space-y-6">
       <section className="rounded-lg border border-primary/50 bg-primary/5 p-4">
-        <h2 className="font-display text-lg tracking-tight text-primary">PROFESSOR RESPONSÁVEL</h2>
+        <h2 className="font-display text-lg tracking-tight text-primary">PROFESSOR</h2>
         <p className="mt-2 text-sm font-medium">Victor Hugo Jorge de Siqueira</p>
         <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           CREF 057790-G/MG
@@ -193,23 +193,15 @@ function Painel() {
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <FileText className="size-4 text-primary" /> DOCUMENTOS ASSINADOS ({docs.length})
+          <FileText className="size-4 text-primary" /> CONTRATOS ASSINADOS ({docs.length})
         </h2>
         <ul className="mt-3 space-y-2">
           {docs.map((d) => (
             <li key={d.id} className="rounded-md border border-border bg-background/40 p-3">
               <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                {d.tipo} • {new Date(d.created_at).toLocaleString("pt-BR")}
+                {new Date(d.created_at).toLocaleString("pt-BR")}
               </p>
               <p className="mt-1 text-sm">{d.nome_arquivo}</p>
-              <p className="text-xs text-muted-foreground">
-                {nomeDe(d.user_id)}
-                {alunosDe(d.user_id).length > 0
-                  ? ` • ${alunosDe(d.user_id)
-                      .map((a) => `${a.nome} (${a.matricula ?? "—"})`)
-                      .join(", ")}`
-                  : ""}
-              </p>
               <button
                 type="button"
                 onClick={() => void abrir(d)}
@@ -219,7 +211,7 @@ function Painel() {
               </button>
             </li>
           ))}
-          {docs.length === 0 && <li className="text-sm text-muted-foreground">Nenhum documento assinado ainda.</li>}
+          {docs.length === 0 && <li className="text-sm text-muted-foreground">Nenhum contrato assinado ainda.</li>}
         </ul>
       </section>
     </div>
