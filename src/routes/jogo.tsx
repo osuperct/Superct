@@ -418,6 +418,12 @@ function JogoPage() {
 
   const pular = () => {
     if (fimRef.current) return;
+    if (seguro.current === "parede") {
+      subindo.current = true;
+      duck.current = false;
+      setAbaixado(false);
+      return;
+    }
     duck.current = false;
     setAbaixado(false);
     if (seguro.current) {
@@ -431,6 +437,10 @@ function JogoPage() {
     vy.current = IMPULSO;
   };
 
+  const pararSubida = () => {
+    subindo.current = false;
+  };
+
   const descer = (ativo: boolean) => () => {
     if (fimRef.current) return;
     if (ativo && seguro.current) {
@@ -439,13 +449,20 @@ function JogoPage() {
       if (toqueAnterior !== null && agora - toqueAnterior <= 2000) {
         seguro.current = false;
         noAr.current = true;
+        subindo.current = false;
+        duck.current = false;
+        setAbaixado(false);
         y.current = Math.max(0, y.current - 4);
         vy.current = -6;
         bloquearAgarreAte.current = agora + 650;
         ultimoToqueBaixo.current = null;
         setPendurado(false);
-      } else {
-        ultimoToqueBaixo.current = agora;
+        return;
+      }
+      ultimoToqueBaixo.current = agora;
+      if (seguro.current === "parede") {
+        subindo.current = false;
+        duck.current = true;
       }
       return;
     }
