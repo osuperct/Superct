@@ -258,6 +258,13 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       "TERMO DE USO DE IMAGEM (aceito e assinado on-line):",
       TERMO_IMAGEM,
       "",
+      ...(doc.clausulas
+        ? [
+            "CLÁUSULAS E REGRAS DO SUPER CT (lidas e aceitas):",
+            ...doc.clausulas.map((c) => `${c.titulo}\n${c.texto}`),
+            "",
+          ]
+        : []),
       `Assinado on-line em ${new Date().toLocaleString("pt-BR")}.`,
       `O PDF assinado está guardado na área do responsável: ${window.location.origin}/conta`,
     ].join("\n");
