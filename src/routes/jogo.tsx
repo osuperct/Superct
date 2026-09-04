@@ -69,6 +69,33 @@ const ARGOLAS: Argola[] = [
   { x: 2872, y: 138 },
 ];
 
+/* cones decorativos no tatame (não colidem) */
+const CONES: number[] = [
+  180, 340, 560, 820, 900, 1100, 1340, 1500, 1700, 1900, 2050, 2300, 2560, 2750,
+  2900, 3100, 3260, 3480, 3720, 3900, 4050,
+];
+
+/* logo vazada (só traço) aplicada nas caixas */
+function LogoVazada({ size }: { size: number }) {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={5}
+      strokeLinejoin="round"
+      strokeLinecap="round"
+    >
+      <path d="M50 8 88 22v34c0 21-16 33-38 44C28 89 12 77 12 56V22Z" />
+      <path d="M62 40a12 12 0 1 0 0 24" />
+      <path d="M30 42h18M39 42v22" />
+    </svg>
+  );
+}
+
+
 type Padrao = "reta" | "queda" | "zigue";
 type Inimigo = {
   id: number;
@@ -463,6 +490,17 @@ function JogoPage() {
               </div>
             ))}
 
+            {/* cones pequenos no tatame */}
+            {CONES.map((x, i) => (
+              <div key={`c-${i}`} className="absolute" style={{ left: x, bottom: 38 }}>
+                <div className="h-[3px] w-4 rounded-full bg-[#f97316]/70" />
+                <div
+                  className="mx-auto -mt-[11px] h-3 w-0 border-x-[5px] border-b-[12px] border-x-transparent border-b-[#fb923c]"
+                  style={{ filter: "drop-shadow(0 0 4px rgba(249,115,22,0.6))" }}
+                />
+              </div>
+            ))}
+
             {/* caixas de crossfit e steps */}
             {SOLIDOS.map((s, i) =>
               s.tipo === "caixa" ? (
@@ -473,6 +511,9 @@ function JogoPage() {
                 >
                   <div className="absolute inset-x-0 top-0 h-1 bg-primary/70" />
                   <div className="absolute inset-2 rounded-sm border border-white/10" />
+                  <div className="absolute inset-0 flex items-center justify-center text-primary/70">
+                    <LogoVazada size={Math.min(s.w, s.h) - 16} />
+                  </div>
                 </div>
               ) : (
                 <div
@@ -484,6 +525,7 @@ function JogoPage() {
                 </div>
               ),
             )}
+
 
             {/* herói */}
             <img
