@@ -3,6 +3,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
 import { FileText, LogOut, Paperclip, Send, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { entrarComCpfOuEmail } from "@/lib/auth.functions";
 
 import { supabase } from "@/integrations/supabase/client";
 
@@ -77,12 +79,14 @@ function Autenticacao() {
   const [senha, setSenha] = useState("");
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [cpf, setCpf] = useState("");
   const [alunoNome, setAlunoNome] = useState("");
   const [alunoIdade, setAlunoIdade] = useState("");
   const [aceite, setAceite] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
   const [credenciais, setCredenciais] = useState<{ email: string; senha: string } | null>(null);
+  const entrar = useServerFn(entrarComCpfOuEmail);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -90,7 +94,15 @@ function Autenticacao() {
     setAviso(null);
     try {
       if (modo === "entrar") {
-        const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
+        const r = await entrar({ data: { identificador: email.trim(), senha } });
+        if (!r.ok) {
+          setAviso(r.erro);
+          return;
+        }
+        const { error } = await supabase.auth.setSession({
+          access_token: r.access_token,
+          refresh_token: r.refresh_token,
+        });
         if (error) throw error;
         toast.success("Bem-vindo de volta!");
       } else {
@@ -106,6 +118,7 @@ function Autenticacao() {
             data: {
               nome_responsavel: nome.trim(),
               telefone: telefone.trim(),
+              cpf: cpf.replace(/\D/g, ""),
               aluno_nome: alunoNome.trim(),
               aluno_idade: alunoIdade,
               aceite_imagem: aceite,
@@ -212,11 +225,19 @@ function Autenticacao() {
               maxLength={20}
               type="tel"
             />
+            <Campo label="CPF do responsável" value={cpf} onChange={setCpf} required maxLength={14} inputMode="numeric" />
             <Campo label="Nome do aluno" value={alunoNome} onChange={setAlunoNome} required maxLength={120} />
             <Campo label="Idade do aluno" value={alunoIdade} onChange={setAlunoIdade} required type="number" />
           </>
         )}
-        <Campo label="E-mail do responsável" value={email} onChange={setEmail} required type="email" maxLength={255} />
+        <Campo
+          label={modo === "entrar" ? "CPF ou e-mail" : "E-mail do responsável"}
+          value={email}
+          onChange={setEmail}
+          required
+          type={modo === "entrar" ? "text" : "email"}
+          maxLength={255}
+        />
         <Campo label="Senha" value={senha} onChange={setSenha} required type="password" maxLength={72} />
 
         {modo === "cadastrar" && (
@@ -254,6 +275,7 @@ function Campo({
   type = "text",
   required,
   maxLength,
+  inputMode,
 }: {
   label: string;
   value: string;
@@ -261,12 +283,14 @@ function Campo({
   type?: string;
   required?: boolean;
   maxLength?: number;
+  inputMode?: "numeric" | "text" | "tel" | "email";
 }) {
   return (
     <label className="block">
       <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</span>
       <input
         type={type}
+        inputMode={inputMode}
         value={value}
         required={required}
         maxLength={maxLength}
