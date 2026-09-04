@@ -81,6 +81,23 @@ const CORDAS: Corda[] = [
 
 const JUMPS: Jump[] = [{ x: 3870, w: 86, h: 18 }];
 
+/* paredes de escalada (pretas com pinos coloridos) */
+const PAREDES: Parede[] = [
+  { x: 790, w: 150, h: 200 },
+  { x: 3700, w: 160, h: 210 },
+];
+const VELOCIDADE_ESCALADA = 2.2;
+
+const CORES_PINO = ["#f97316", "#22d3ee", "#a855f7", "#84cc16", "#f43f5e", "#facc15"];
+const PINOS: Pino[][] = PAREDES.map((p, pi) =>
+  Array.from({ length: 26 }).map((_, i) => ({
+    x: 14 + ((i * 37 + pi * 19) % (p.w - 28)),
+    y: 16 + ((i * 29 + pi * 11) % (p.h - 30)),
+    cor: CORES_PINO[(i + pi) % CORES_PINO.length]!,
+  })),
+);
+
+
 /* cones decorativos no tatame (não colidem) */
 const CONES: number[] = [
   180, 340, 560, 820, 900, 1100, 1340, 1500, 1700, 1900, 2050, 2300, 2560, 2750,
