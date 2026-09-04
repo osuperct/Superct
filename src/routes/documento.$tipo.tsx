@@ -231,11 +231,40 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
     }
     setOcupado(true);
     const nomeAssinante = valores["responsavel_nome"] ?? valores["contratante"] ?? "";
+    const nomeAluno = (valores["aluno"] ?? valores["aluno_nome"] ?? "").trim();
 
     try {
+      /** Garante que o aluno do documento esteja na lista de alunos do responsável. */
+      let alunoId: string | null = null;
+      if (nomeAluno) {
+        const { data: existentes } = await supabase
+          .from("alunos")
+          .select("id, nome")
+          .eq("user_id", uid);
+        const achado = (existentes ?? []).find(
+          (a) => a.nome.trim().toLowerCase() === nomeAluno.toLowerCase(),
+        );
+        if (achado) {
+          alunoId = achado.id;
+        } else {
+          const idadeTexto = (valores["aluno_idade"] ?? "").replace(/\D+/g, "");
+          const { data: criado } = await supabase
+            .from("alunos")
+            .insert({
+              user_id: uid,
+              nome: nomeAluno,
+              idade: idadeTexto ? Number(idadeTexto) : null,
+            })
+            .select("id")
+            .maybeSingle();
+          alunoId = criado?.id ?? null;
+        }
+      }
+
       const { error: erroFicha } = await supabase.from("fichas").insert({
         user_id: uid,
         tipo,
+        ...(alunoId ? { aluno_id: alunoId } : {}),
         dados: {
           ...valores,
           aceite_imagem: true,
@@ -267,6 +296,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       const { error: erroDoc } = await supabase.from("documentos").insert({
         user_id: uid,
         tipo,
+        ...(alunoId ? { aluno_id: alunoId } : {}),
         nome_arquivo: nomeArquivo,
         caminho,
       });

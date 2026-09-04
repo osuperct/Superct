@@ -34,7 +34,21 @@ export const Route = createFileRoute("/conta")({
 });
 
 type Aluno = { id: string; nome: string; idade: number | null; matricula: string | null };
-type Documento = { id: string; tipo: string; nome_arquivo: string; caminho: string; created_at: string };
+type Documento = {
+  id: string;
+  tipo: string;
+  nome_arquivo: string;
+  caminho: string;
+  created_at: string;
+  aluno_id: string | null;
+};
+
+const DESCRICAO_DOC: Record<string, string> = {
+  contrato: "Contrato de prestação de serviço assinado",
+  ficha: "Ficha de anamnese e PAR-Q assinada",
+  documento: "Documento pessoal (RG / certidão)",
+  outro: "Outro documento",
+};
 
 function ContaPage() {
   const [session, setSession] = useState<Session | null>(null);
@@ -444,9 +458,8 @@ function Painel({ session }: { session: Session }) {
   const uid = session.user.id;
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
-  const [novoAluno, setNovoAluno] = useState("");
-  const [novaIdade, setNovaIdade] = useState("");
   const [tipoDoc, setTipoDoc] = useState("contrato");
+  const [alunoDoc, setAlunoDoc] = useState("");
   const [enviandoArquivo, setEnviandoArquivo] = useState(false);
   const [aba, setAba] = useState<"documentos" | "online">("online");
   const inputArquivo = useRef<HTMLInputElement>(null);
@@ -456,7 +469,7 @@ function Painel({ session }: { session: Session }) {
       supabase.from("alunos").select("id, nome, idade, matricula").eq("user_id", uid).order("created_at"),
       supabase
         .from("documentos")
-        .select("id, tipo, nome_arquivo, caminho, created_at")
+        .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id")
         .eq("user_id", uid)
         .order("created_at", { ascending: false }),
     ]);
@@ -484,24 +497,6 @@ function Painel({ session }: { session: Session }) {
   }, [uid]);
 
 
-  async function adicionarAluno(e: React.FormEvent) {
-    e.preventDefault();
-    const nome = novoAluno.trim();
-    if (!nome) return;
-    const { error } = await supabase.from("alunos").insert({
-      user_id: uid,
-      nome,
-      idade: novaIdade ? Number(novaIdade) : null,
-    });
-    if (error) {
-      toast.error("Não foi possível salvar o aluno.");
-      return;
-    }
-    setNovoAluno("");
-    setNovaIdade("");
-    toast.success("Aluno adicionado!");
-    void recarregar();
-  }
 
   async function excluirAluno(id: string) {
     const { error } = await supabase.from("alunos").delete().eq("id", id).eq("user_id", uid);
@@ -519,6 +514,11 @@ function Painel({ session }: { session: Session }) {
       toast.error("Arquivo muito grande (máximo 20 MB).");
       return;
     }
+    const destino = alunoDoc || alunos[0]?.id || "";
+    if (!destino) {
+      toast.error("Preencha primeiro o contrato do aluno para poder anexar documentos dele.");
+      return;
+    }
     setEnviandoArquivo(true);
     const limpo = arquivo.name.replace(/[^\w.\-]+/g, "_");
     const caminho = `${uid}/${Date.now()}-${limpo}`;
@@ -531,6 +531,7 @@ function Painel({ session }: { session: Session }) {
     await supabase.from("documentos").insert({
       user_id: uid,
       tipo: tipoDoc,
+      aluno_id: destino,
       nome_arquivo: arquivo.name,
       caminho,
     });
@@ -586,54 +587,83 @@ function Painel({ session }: { session: Session }) {
 
       <section className="mt-5 rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <UserPlus className="size-4 text-primary" /> ALUNOS
+          <UserPlus className="size-4 text-primary" /> ALUNOS E DOCUMENTOS
         </h2>
-        <ul className="mt-2 space-y-1">
-          {alunos.map((a) => (
-            <li key={a.id} className="flex items-center justify-between gap-2 text-sm">
-              <span className="flex-1 truncate">
-                • {a.nome}
-                {a.idade ? ` — ${a.idade} anos` : ""}
-                {a.matricula && (
-                  <span className="ml-2 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
-                    Matrícula {a.matricula}
+        <p className="mt-1 text-xs text-muted-foreground">
+          O aluno entra nesta lista quando o contrato dele é preenchido e assinado. Abaixo de cada nome ficam
+          todos os documentos daquele aluno.
+        </p>
+        <ul className="mt-3 space-y-3">
+          {alunos.map((a) => {
+            const docsAluno = documentos.filter((d) => d.aluno_id === a.id);
+            return (
+              <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="min-w-0 flex-1 text-sm">
+                    {a.nome}
+                    {a.idade ? ` — ${a.idade} anos` : ""}
+                    {a.matricula && (
+                      <span className="ml-2 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
+                        Matrícula {a.matricula}
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <button
-                type="button"
-                onClick={() => excluirAluno(a.id)}
-                title="Excluir aluno"
-                className="shrink-0 rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-              >
-                <Trash2 className="size-4" />
-              </button>
+                  <button
+                    type="button"
+                    onClick={() => excluirAluno(a.id)}
+                    title="Excluir aluno"
+                    className="shrink-0 rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+                <ul className="mt-2 space-y-1">
+                  {docsAluno.map((d) => (
+                    <li key={d.id} className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-mono text-[10px] uppercase tracking-widest text-primary">
+                          {DESCRICAO_DOC[d.tipo] ?? "Documento anexado"}
+                        </span>
+                        <span className="block truncate text-[11px] text-muted-foreground">
+                          {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => abrir(d)}
+                        className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
+                      >
+                        Ver
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => remover(d)}
+                        className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                      >
+                        Excluir
+                      </button>
+                    </li>
+                  ))}
+                  {docsAluno.length === 0 && (
+                    <li className="text-[11px] text-muted-foreground">Nenhum documento deste aluno ainda.</li>
+                  )}
+                </ul>
+              </li>
+            );
+          })}
+          {alunos.length === 0 && (
+            <li className="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">
+              Nenhum aluno na lista. Preencha o contrato do aluno para incluí-lo aqui.
             </li>
-          ))}
-          {alunos.length === 0 && <li className="text-sm text-muted-foreground">Nenhum aluno cadastrado.</li>}
+          )}
         </ul>
-        <form onSubmit={adicionarAluno} className="mt-3 flex items-center gap-2">
-          <input
-            value={novoAluno}
-            onChange={(e) => setNovoAluno(e.target.value)}
-            placeholder="Nome do aluno"
-            maxLength={120}
-            className="w-32 shrink-0 rounded-md border border-border bg-background px-2 py-2 text-sm outline-none focus:border-primary"
-          />
-          <input
-            value={novaIdade}
-            onChange={(e) => setNovaIdade(e.target.value)}
-            placeholder="Idade"
-            type="number"
-            className="w-16 shrink-0 rounded-md border border-border bg-background px-2 py-2 text-center text-sm outline-none focus:border-primary"
-          />
-          <button
-            type="submit"
-            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary font-display text-base text-primary-foreground"
-          >
-            +
-          </button>
-        </form>
+        <Link
+          to="/documento/$tipo"
+          params={{ tipo: "contrato" }}
+          className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+        >
+          PREENCHER CONTRATO DE UM ALUNO <Send className="size-4 shrink-0" />
+        </Link>
       </section>
 
       <div className="mt-5 flex gap-2">
@@ -663,10 +693,23 @@ function Painel({ session }: { session: Session }) {
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Anexe aqui o contrato de prestação de serviço e a ficha do aluno preenchidos à mão e escaneados
-            (foto ou PDF).
+            (foto ou PDF). Escolha de qual aluno é o documento — ele aparece junto do nome dele na lista de
+            alunos.
           </p>
 
           <div className="mt-3 flex flex-wrap gap-2">
+            <select
+              value={alunoDoc || alunos[0]?.id || ""}
+              onChange={(e) => setAlunoDoc(e.target.value)}
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              {alunos.length === 0 && <option value="">Nenhum aluno com contrato preenchido</option>}
+              {alunos.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.nome}
+                </option>
+              ))}
+            </select>
             <select
               value={tipoDoc}
               onChange={(e) => setTipoDoc(e.target.value)}
@@ -702,7 +745,9 @@ function Painel({ session }: { session: Session }) {
                 <div className="min-w-0">
                   <p className="truncate text-sm">{d.nome_arquivo}</p>
                   <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    {d.tipo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                    {DESCRICAO_DOC[d.tipo] ?? "Documento"} •{" "}
+                    {alunos.find((a) => a.id === d.aluno_id)?.nome ?? "sem aluno"} •{" "}
+                    {new Date(d.created_at).toLocaleDateString("pt-BR")}
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
