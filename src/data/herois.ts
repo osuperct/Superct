@@ -1,5 +1,11 @@
 import kael from "@/assets/heroi-kael.png";
+import kaelAnda1 from "@/assets/heroi-kael-anda1.png";
+import kaelAnda2 from "@/assets/heroi-kael-anda2.png";
+import kaelEscala from "@/assets/heroi-kael-escala.png";
 import miah from "@/assets/heroi-miah.png";
+import miahAnda1 from "@/assets/heroi-miah-anda1.png";
+import miahAnda2 from "@/assets/heroi-miah-anda2.png";
+import miahEscala from "@/assets/heroi-miah-escala.png";
 
 export type HeroiId = "kael" | "miah";
 
@@ -10,6 +16,8 @@ export type Heroi = {
   descricao: string;
   cor: string;
   img: string;
+  anda: [string, string];
+  escala: string;
 };
 
 export const HEROIS: Heroi[] = [
@@ -21,6 +29,8 @@ export const HEROIS: Heroi[] = [
       "Explosivo e destemido, Kael atravessa qualquer circuito e acerta bolas de tênis com precisão de campeão.",
     cor: "#38bdf8",
     img: kael,
+    anda: [kaelAnda1, kaelAnda2],
+    escala: kaelEscala,
   },
   {
     id: "miah",
@@ -30,6 +40,8 @@ export const HEROIS: Heroi[] = [
       "Leve como um salto de ginástica, Miah escala paredes, voa nas argolas e nunca desiste de um desafio.",
     cor: "#c084fc",
     img: miah,
+    anda: [miahAnda1, miahAnda2],
+    escala: miahEscala,
   },
 ];
 

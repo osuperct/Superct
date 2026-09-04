@@ -212,6 +212,7 @@ function JogoPage() {
   const [heroiSel, setHeroiSel] = useState<HeroiId | null>(null);
   const [olhando, setOlhando] = useState<1 | -1>(1);
   const [andando, setAndando] = useState(false);
+  const [passoFrame, setPassoFrame] = useState<0 | 1>(0);
   const heroiRef = useRef<HeroiId | null>(null);
   const olhandoRef = useRef<1 | -1>(1);
   const andandoRef = useRef(false);
@@ -280,6 +281,17 @@ function JogoPage() {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  /* troca os quadros da caminhada */
+  useEffect(() => {
+    if (!andando) {
+      setPassoFrame(0);
+      return;
+    }
+    const t = setInterval(() => setPassoFrame((f) => (f === 0 ? 1 : 0)), 170);
+    return () => clearInterval(t);
+  }, [andando]);
+
 
   const zerarHeroi = useCallback(() => {
     dir.current = 0;
@@ -1349,6 +1361,11 @@ function JogoPage() {
               const sombra = pendurado
                 ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
                 : `drop-shadow(0 0 6px ${heroiAtual.cor})`;
+              const src = escalando
+                ? heroiAtual.escala
+                : andando
+                  ? heroiAtual.anda[passoFrame]!
+                  : heroiAtual.img;
               return (
                 <div
                   className="absolute transition-[height] duration-100"
@@ -1357,56 +1374,17 @@ function JogoPage() {
                     width: HEROI_W,
                     height: alt,
                     bottom: 40 + heroY,
-                    transform: escalando ? "none" : `scaleX(${-olhando})`,
+                    transform: escalando ? "none" : `scaleX(${andando ? olhando : -olhando})`,
                   }}
                 >
-                  {/* corpo */}
                   <img
-                    src={heroiAtual.img}
+                    src={src}
                     alt={`${heroiAtual.nome}, herói do Super CT`}
                     className={`absolute inset-0 size-full object-contain object-bottom${
                       escalando ? " animate-hero-climb-body" : ""
                     }`}
-                    style={{
-                      clipPath: escalando
-                        ? "inset(22% 0 0 0)"
-                        : andando
-                          ? "inset(18% 0 30% 0)"
-                          : undefined,
-                      filter: sombra,
-                    }}
+                    style={{ filter: sombra }}
                   />
-                  {/* braços e perninhas em movimento */}
-                  {escalando
-                    ? ([
-                        { key: "braco-esq", clip: "inset(0 55% 62% 0)", cls: " animate-hero-climb-a" },
-                        { key: "braco-dir", clip: "inset(0 0 62% 55%)", cls: " animate-hero-climb-b" },
-                      ] as const).map((p) => (
-                        <img
-                          key={p.key}
-                          src={heroiAtual.img}
-                          alt=""
-                          aria-hidden
-                          className={`absolute inset-0 size-full object-contain object-bottom${p.cls}`}
-                          style={{ clipPath: p.clip, filter: sombra }}
-                        />
-                      ))
-                    : andando &&
-                      ([
-                        { key: "perna-a", clip: "inset(70% 50% 0 0)", cls: " animate-hero-leg-a" },
-                        { key: "perna-b", clip: "inset(70% 0 0 50%)", cls: " animate-hero-leg-b" },
-                        { key: "braco-a", clip: "inset(18% 58% 55% 0)", cls: " animate-hero-arm-a" },
-                        { key: "braco-b", clip: "inset(18% 0 55% 58%)", cls: " animate-hero-arm-b" },
-                      ] as const).map((p) => (
-                        <img
-                          key={p.key}
-                          src={heroiAtual.img}
-                          alt=""
-                          aria-hidden
-                          className={`absolute inset-0 size-full object-contain object-bottom${p.cls}`}
-                          style={{ clipPath: p.clip, filter: sombra }}
-                        />
-                      ))}
                 </div>
               );
             })()}
