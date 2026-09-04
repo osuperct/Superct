@@ -457,10 +457,25 @@ function Painel({ session }: { session: Session }) {
     setDocumentos((d ?? []) as Documento[]);
   }, [uid]);
 
+  const [ehProfessor, setEhProfessor] = useState(false);
 
   useEffect(() => {
     void recarregar();
   }, [recarregar]);
+
+  useEffect(() => {
+    let ativo = true;
+    void supabase
+      .from("user_roles")
+      .select("role")
+      .then(({ data }) => {
+        if (ativo) setEhProfessor((data ?? []).some((p) => p.role === "professor"));
+      });
+    return () => {
+      ativo = false;
+    };
+  }, [uid]);
+
 
   async function adicionarAluno(e: React.FormEvent) {
     e.preventDefault();
