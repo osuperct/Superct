@@ -170,13 +170,13 @@ function JogoPage() {
           {inimigos.map((i) => (
             <img
               key={i.id}
-              src={VILOES[i.vilao].img}
-              alt={VILOES[i.vilao].nome}
+              src={VILOES[i.vilao]!.img}
+              alt={VILOES[i.vilao]!.nome}
               className="absolute h-14 w-14 object-contain"
               style={{
                 left: `${i.x}%`,
                 bottom: `${CHAO + Math.abs(Math.sin(i.bob)) * 10}px`,
-                filter: `drop-shadow(0 0 10px ${VILOES[i.vilao].cor})`,
+                filter: `drop-shadow(0 0 10px ${VILOES[i.vilao]!.cor})`,
               }}
             />
           ))}
@@ -184,7 +184,7 @@ function JogoPage() {
           {fim && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/80 text-center">
               <p className="font-display text-2xl uppercase tracking-tight text-primary">
-                {derrotado !== null ? `${VILOES[derrotado].nome} te pegou!` : "Fim de jogo"}
+                {derrotado !== null ? `${VILOES[derrotado]!.nome} te pegou!` : "Fim de jogo"}
               </p>
               <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 Pontos: {pontos}
