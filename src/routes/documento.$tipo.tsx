@@ -296,6 +296,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       const { error: erroDoc } = await supabase.from("documentos").insert({
         user_id: uid,
         tipo,
+        ...(alunoId ? { aluno_id: alunoId } : {}),
         nome_arquivo: nomeArquivo,
         caminho,
       });
