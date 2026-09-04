@@ -82,6 +82,7 @@ function Autenticacao() {
   const [aceite, setAceite] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [credenciais, setCredenciais] = useState<{ email: string; senha: string } | null>(null);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -112,6 +113,7 @@ function Autenticacao() {
           },
         });
         if (error) throw error;
+        setCredenciais({ email: email.trim(), senha });
         if (!data.session) {
           setAviso("Cadastro criado! Confira seu e-mail e clique no link de confirmação para entrar.");
         } else {
@@ -123,6 +125,61 @@ function Autenticacao() {
     } finally {
       setOcupado(false);
     }
+  }
+
+  const textoAcesso = credenciais
+    ? `SUPER CT — Professor Tio Victor\nSeus dados de acesso à Área do Responsável:\nE-mail: ${credenciais.email}\nSenha: ${credenciais.senha}\nEntre em: ${window.location.origin}/conta`
+    : "";
+
+  if (credenciais) {
+    return (
+      <div className="mt-6 space-y-4">
+        <div className="rounded-lg border border-primary/60 bg-card/60 p-4">
+          <h2 className="font-display text-lg tracking-tight text-primary">GUARDE SEU ACESSO</h2>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            Salve estes dados agora — é com eles que você entra na sua área e vê os documentos do aluno.
+          </p>
+          <dl className="mt-3 space-y-2 font-mono text-xs">
+            <div className="rounded-md border border-border bg-background/60 p-2">
+              <dt className="text-[9px] uppercase tracking-widest text-muted-foreground">E-mail</dt>
+              <dd className="break-all text-foreground">{credenciais.email}</dd>
+            </div>
+            <div className="rounded-md border border-border bg-background/60 p-2">
+              <dt className="text-[9px] uppercase tracking-widest text-muted-foreground">Senha</dt>
+              <dd className="break-all text-foreground">{credenciais.senha}</dd>
+            </div>
+          </dl>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                void navigator.clipboard
+                  .writeText(textoAcesso)
+                  .then(() => toast.success("Dados de acesso copiados!"))
+                  .catch(() => toast.error("Copie manualmente os dados acima."));
+              }}
+              className="rounded-md bg-primary px-3 py-2 font-display text-xs tracking-tight text-primary-foreground"
+            >
+              COPIAR DADOS
+            </button>
+            <a
+              href={`mailto:${credenciais.email}?subject=${encodeURIComponent("Seu acesso — Super CT")}&body=${encodeURIComponent(textoAcesso)}`}
+              className="rounded-md border border-primary px-3 py-2 text-center font-display text-xs tracking-tight text-primary"
+            >
+              ENVIAR PRO MEU E-MAIL
+            </a>
+          </div>
+        </div>
+        {aviso && <p className="text-xs text-primary">{aviso}</p>}
+        <button
+          type="button"
+          onClick={() => setCredenciais(null)}
+          className="w-full rounded-md border border-border px-4 py-2 font-display text-xs tracking-tight text-muted-foreground"
+        >
+          JÁ GUARDEI, CONTINUAR
+        </button>
+      </div>
+    );
   }
 
   return (
