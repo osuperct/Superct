@@ -1183,7 +1183,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Joystick move • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
+          Joystick move (na parede, para cima/baixo sobe/desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-3">
