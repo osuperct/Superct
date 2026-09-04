@@ -156,14 +156,15 @@ export const DOCS: Record<
   { titulo: string; subtitulo: string; campos: CampoDoc[]; arquivo: string; clausulas?: { titulo: string; texto: string }[] }
 > = {
   ficha: {
-    titulo: "Ficha do Aluno",
-    subtitulo: "Anexo com os dados do aluno, saúde e contatos.",
+    titulo: "Ficha de Anamnese e PAR-Q (Anexo)",
+    subtitulo: "Avaliação de prontidão para atividade física infantil — Prof. Victor Hugo (CREF 057790-G/MG).",
     campos: CAMPOS_FICHA,
-    arquivo: "ficha-do-aluno",
+    arquivo: "ficha-anamnese-parq",
+    clausulas: [{ titulo: "DECLARAÇÃO E TERMO DE RESPONSABILIDADE", texto: DECLARACAO_FICHA }],
   },
   contrato: {
-    titulo: "Contrato de Prestação de Serviços",
-    subtitulo: "Contrato de prestação de serviço entre o responsável e o Super CT.",
+    titulo: "Contrato Misto de Prestação de Serviços",
+    subtitulo: "Super CT — recreação, desenvolvimento infantil e treinamento funcional.",
     campos: CAMPOS_CONTRATO,
     arquivo: "contrato",
     clausulas: CLAUSULAS_CONTRATO,
