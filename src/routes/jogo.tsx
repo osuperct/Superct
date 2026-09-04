@@ -137,7 +137,8 @@ function JogoPage() {
   const y = useRef(0);
   const vy = useRef(0);
   const noAr = useRef(false);
-  const seguro = useRef<false | "barra" | "argola" | "corda">(false);
+  const seguro = useRef<false | "barra" | "argola" | "corda" | "parede">(false);
+  const subindo = useRef(false);
   const ultimoToqueBaixo = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
   const duck = useRef(false);
