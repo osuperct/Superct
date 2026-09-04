@@ -120,6 +120,7 @@ function JogoPage() {
   const noAr = useRef(false);
   const seguro = useRef<false | "barra" | "argola" | "corda">(false);
   const ultimoToqueBaixo = useRef<number | null>(null);
+  const bloquearAgarreAte = useRef(0);
   const duck = useRef(false);
   const fimRef = useRef(false);
   const vistaRef = useRef(360);
@@ -157,6 +158,7 @@ function JogoPage() {
     maxX.current = 60;
     passados.current = 0;
     ultimoToqueBaixo.current = null;
+    bloquearAgarreAte.current = 0;
     setHeroX(60);
     setHeroY(0);
     setCamera(0);
@@ -226,7 +228,7 @@ function JogoPage() {
         let prox = y.current + vy.current;
 
         // agarrar barra, argola ou corda durante o salto
-        if (vy.current > -4) {
+        if (vy.current > -4 && performance.now() >= bloquearAgarreAte.current) {
           const topo = prox + alt;
           const cx = x.current + HEROI_W / 2;
           const barra = BARRAS.find((b) => cx > b.x && cx < b.x + b.w && Math.abs(topo - b.y) < 16);
@@ -396,8 +398,11 @@ function JogoPage() {
       if (toqueAnterior !== null && agora - toqueAnterior <= 2000) {
         seguro.current = false;
         noAr.current = true;
-        vy.current = -2;
+        y.current = Math.max(0, y.current - 4);
+        vy.current = -6;
+        bloquearAgarreAte.current = agora + 650;
         ultimoToqueBaixo.current = null;
+        setPendurado(false);
       } else {
         ultimoToqueBaixo.current = agora;
       }
