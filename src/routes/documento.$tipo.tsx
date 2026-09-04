@@ -364,6 +364,24 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           );
         }
 
+        if (c.date) {
+          return (
+            <label key={c.chave} className="block">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                {c.rotulo}
+                {c.obrigatorio && <span className="text-primary"> *obrigatório</span>}
+              </span>
+              <div className="mt-1">
+                <DatePicker
+                  value={parseDataBr(valores[c.chave] ?? "")}
+                  onChange={(date) => set(c.chave, date ? formatarDataBr(date) : "")}
+                  placeholder="Clique para selecionar a data"
+                />
+              </div>
+            </label>
+          );
+        }
+
         if (c.opcoes) {
           return (
             <label key={c.chave} className="block">
