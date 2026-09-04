@@ -799,6 +799,8 @@ function JogoPage() {
         setChefao(null);
         setBolas([]);
         setHalteres([]);
+        tirosRef.current = [];
+        setTiros([]);
         if (faseRef.current >= TOTAL_FASES) {
           fimRef.current = true;
           setVenceu(true);
