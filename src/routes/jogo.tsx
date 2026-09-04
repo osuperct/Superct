@@ -1239,7 +1239,7 @@ function ControlButton({
       onPointerUp={onEnd}
       onPointerLeave={onEnd}
       onPointerCancel={onEnd}
-      className="flex size-14 select-none touch-none items-center justify-center rounded-full border border-border bg-card text-primary active:scale-95 active:bg-primary/20"
+      className="flex size-12 select-none touch-none items-center justify-center rounded-full border border-border bg-card text-primary active:scale-95 active:bg-primary/20"
     >
       {children}
     </button>
