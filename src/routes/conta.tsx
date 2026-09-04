@@ -464,8 +464,10 @@ function Painel({ session }: { session: Session }) {
   const [aba, setAba] = useState<"documentos" | "online">("online");
   const inputArquivo = useRef<HTMLInputElement>(null);
 
+  const [entregues, setEntregues] = useState<{ tipo: string; aluno_id: string | null }[]>([]);
+
   const recarregar = useCallback(async () => {
-    const [{ data: a }, { data: d }] = await Promise.all([
+    const [{ data: a }, { data: d }, { data: todos }] = await Promise.all([
       supabase.from("alunos").select("id, nome, idade, matricula").eq("user_id", uid).order("created_at"),
       supabase
         .from("documentos")
@@ -473,11 +475,13 @@ function Painel({ session }: { session: Session }) {
         .eq("user_id", uid)
         .eq("oculto_responsavel", false)
         .order("created_at", { ascending: false }),
-
+      supabase.from("documentos").select("tipo, aluno_id").eq("user_id", uid),
     ]);
     setAlunos((a ?? []) as Aluno[]);
     setDocumentos((d ?? []) as Documento[]);
+    setEntregues((todos ?? []) as { tipo: string; aluno_id: string | null }[]);
   }, [uid]);
+
 
   const [ehProfessor, setEhProfessor] = useState(false);
 
