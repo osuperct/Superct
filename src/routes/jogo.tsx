@@ -638,7 +638,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▲ pula entre aparelhos • ▼ duas vezes solta • jump impulsiona sozinho
+          Setas movem • ▲ pula entre aparelhos • ▼ 2x em 2s solta • jump impulsiona sozinho
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
