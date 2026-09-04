@@ -725,12 +725,20 @@ function JogoPage() {
     if (seguro.current) {
       seguro.current = false;
       noAr.current = true;
-      vy.current = IMPULSO * 0.85;
+      vy.current = duploToque ? IMPULSO : IMPULSO * 0.85;
       return;
     }
+
+    /* toque duplo rápido converte o pulo baixo em pulo alto (sem quicar) */
+    if (duploToque) {
+      noAr.current = true;
+      vy.current = IMPULSO;
+      return;
+    }
+
     if (noAr.current) return;
     noAr.current = true;
-    vy.current = duploToque ? IMPULSO : IMPULSO_BAIXO;
+    vy.current = IMPULSO_BAIXO;
   };
 
 
