@@ -228,6 +228,18 @@ function JogoPage() {
           const a = ARGOLAS.find((a) => Math.abs(a.x - (x.current + HEROI_W / 2)) < 34);
           if (a) apoio = a.y - alt;
           else seguro.current = false;
+        } else if (seguro.current === "parede") {
+          const cx = x.current + HEROI_W / 2;
+          const p = PAREDES.find((p) => cx > p.x - 6 && cx < p.x + p.w + 6);
+          if (p) {
+            x.current = Math.min(p.x + p.w - HEROI_W, Math.max(p.x, x.current));
+            const delta = subindo.current
+              ? VELOCIDADE_ESCALADA
+              : duck.current
+                ? -VELOCIDADE_ESCALADA
+                : 0;
+            apoio = Math.min(p.h - alt, Math.max(0, y.current + delta));
+          } else seguro.current = false;
         } else {
           const corda = CORDAS.find((c) => Math.abs(c.x - (x.current + HEROI_W / 2)) < 28);
           if (corda) {
