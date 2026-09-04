@@ -556,6 +556,16 @@ function Painel({ session }: { session: Session }) {
         </button>
       </div>
 
+      {ehProfessor && (
+        <Link
+          to="/professor"
+          className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+        >
+          <GraduationCap className="size-4" /> ÁREA DO PROFESSOR
+        </Link>
+      )}
+
+
       <section className="mt-5 rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <UserPlus className="size-4 text-primary" /> ALUNOS
