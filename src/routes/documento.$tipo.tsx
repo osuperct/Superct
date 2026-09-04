@@ -455,7 +455,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             />
             <span>
               Li todas as cláusulas e regras acima e estou ciente e de acordo, inclusive com as condições de
-              pagamento e as normas de convivência e segurança do Super CT.
+              pagamento e as normas de convivência e segurança do Super CT. <span className="text-primary">*obrigatório</span>
             </span>
           </label>
           <h2 className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
