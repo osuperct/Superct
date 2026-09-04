@@ -464,18 +464,24 @@ function Painel({ session }: { session: Session }) {
   const [aba, setAba] = useState<"documentos" | "online">("online");
   const inputArquivo = useRef<HTMLInputElement>(null);
 
+  const [entregues, setEntregues] = useState<{ tipo: string; aluno_id: string | null }[]>([]);
+
   const recarregar = useCallback(async () => {
-    const [{ data: a }, { data: d }] = await Promise.all([
+    const [{ data: a }, { data: d }, { data: todos }] = await Promise.all([
       supabase.from("alunos").select("id, nome, idade, matricula").eq("user_id", uid).order("created_at"),
       supabase
         .from("documentos")
         .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id")
         .eq("user_id", uid)
+        .eq("oculto_responsavel", false)
         .order("created_at", { ascending: false }),
+      supabase.from("documentos").select("tipo, aluno_id").eq("user_id", uid),
     ]);
     setAlunos((a ?? []) as Aluno[]);
     setDocumentos((d ?? []) as Documento[]);
+    setEntregues((todos ?? []) as { tipo: string; aluno_id: string | null }[]);
   }, [uid]);
+
 
   const [ehProfessor, setEhProfessor] = useState(false);
 
@@ -548,11 +554,16 @@ function Painel({ session }: { session: Session }) {
   }
 
   async function remover(doc: Documento) {
-    await supabase.storage.from(BUCKET).remove([doc.caminho]);
-    await supabase.from("documentos").delete().eq("id", doc.id);
-    toast.success("Documento removido.");
+    /** Some da área do responsável, mas a cópia continua guardada na área do professor. */
+    const { error } = await supabase.from("documentos").update({ oculto_responsavel: true }).eq("id", doc.id);
+    if (error) {
+      toast.error("Não foi possível remover o documento.");
+      return;
+    }
+    toast.success("Documento removido da sua lista. A cópia fica arquivada com o professor.");
     void recarregar();
   }
+
 
   async function sair() {
     await supabase.auth.signOut();
@@ -596,6 +607,11 @@ function Painel({ session }: { session: Session }) {
         <ul className="mt-3 space-y-3">
           {alunos.map((a) => {
             const docsAluno = documentos.filter((d) => d.aluno_id === a.id);
+            const doAluno = entregues.filter((e) => e.aluno_id === a.id);
+            const faltando = (["contrato", "ficha"] as const).filter(
+              (t) => !doAluno.some((e) => e.tipo === t),
+            );
+
             return (
               <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
                 <div className="flex items-start justify-between gap-2">
@@ -648,9 +664,32 @@ function Painel({ session }: { session: Session }) {
                     <li className="text-[11px] text-muted-foreground">Nenhum documento deste aluno ainda.</li>
                   )}
                 </ul>
+                {faltando.length > 0 && (
+                  <div className="mt-3 rounded-md border border-primary/60 bg-primary/10 p-3">
+                    <p className="text-[11px]">
+                      Falta concluir o preenchimento de {a.nome}:{" "}
+                      <span className="text-primary">
+                        {faltando.map((t) => (t === "contrato" ? "contrato" : "ficha de anamnese / PAR-Q")).join(" e ")}
+                      </span>
+                      .
+                    </p>
+                    {faltando.map((t) => (
+                      <Link
+                        key={t}
+                        to="/documento/$tipo"
+                        params={{ tipo: t }}
+                        className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 font-display text-xs tracking-tight text-primary-foreground"
+                      >
+                        {t === "contrato" ? "PREENCHER O CONTRATO AGORA" : "PREENCHER A FICHA / PAR-Q AGORA"}
+                        <Send className="size-3 shrink-0" />
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </li>
             );
           })}
+
           {alunos.length === 0 && (
             <li className="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">
               Nenhum aluno na lista. Preencha o contrato do aluno para incluí-lo aqui.

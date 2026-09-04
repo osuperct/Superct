@@ -54,6 +54,7 @@ export type Database = {
           created_at: string
           id: string
           nome_arquivo: string
+          oculto_responsavel: boolean
           tipo: string
           user_id: string
         }
@@ -63,6 +64,7 @@ export type Database = {
           created_at?: string
           id?: string
           nome_arquivo: string
+          oculto_responsavel?: boolean
           tipo?: string
           user_id: string
         }
@@ -72,6 +74,7 @@ export type Database = {
           created_at?: string
           id?: string
           nome_arquivo?: string
+          oculto_responsavel?: boolean
           tipo?: string
           user_id?: string
         }

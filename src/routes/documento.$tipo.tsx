@@ -536,15 +536,24 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           >
             <Send className="size-4" /> ENVIAR CÓPIA POR E-MAIL
           </button>
-          {tipo === "contrato" && (
+          {tipo === "contrato" ? (
             <Link
               to="/documento/$tipo"
               params={{ tipo: "ficha" }}
               className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-xs tracking-tight text-primary-foreground"
             >
-              <FileText className="size-4" /> PREENCHER AGORA A FICHA / PAR-Q
+              <FileText className="size-4" /> AGORA PREENCHA A FICHA / PAR-Q
+            </Link>
+          ) : (
+            <Link
+              to="/documento/$tipo"
+              params={{ tipo: "contrato" }}
+              className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-xs tracking-tight text-primary-foreground"
+            >
+              <FileText className="size-4" /> AINDA FALTA O CONTRATO? PREENCHER AGORA
             </Link>
           )}
+
           <Link
             to="/conta"
             className={`block rounded-md px-4 py-2 text-center font-display text-xs tracking-tight ${

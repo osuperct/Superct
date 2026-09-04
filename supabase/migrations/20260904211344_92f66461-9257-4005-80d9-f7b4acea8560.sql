@@ -1,0 +1,1 @@
+ALTER TABLE public.documentos ADD COLUMN IF NOT EXISTS oculto_responsavel boolean NOT NULL DEFAULT false;
