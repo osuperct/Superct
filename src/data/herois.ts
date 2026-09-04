@@ -1,11 +1,11 @@
 import kael from "@/assets/heroi-kael.png";
-import kaelAnda1 from "@/assets/heroi-kael-anda1-v3.png.asset.json";
-import kaelAnda2 from "@/assets/heroi-kael-anda2-v3.png.asset.json";
-import kaelEscala from "@/assets/heroi-kael-escala-costas-v2.png.asset.json";
+import kaelAnda1 from "@/assets/heroi-kael-anda1-atual.png";
+import kaelAnda2 from "@/assets/heroi-kael-anda2-atual.png";
+import kaelEscala from "@/assets/heroi-kael-escala-costas-atual.png";
 import miah from "@/assets/heroi-miah.png";
 import miahAnda1 from "@/assets/heroi-miah-anda1.png";
 import miahAnda2 from "@/assets/heroi-miah-anda2.png";
-import miahEscala from "@/assets/heroi-miah-escala-costas-v2.png.asset.json";
+import miahEscala from "@/assets/heroi-miah-escala-costas-atual.png";
 
 export type HeroiId = "kael" | "miah";
 
@@ -29,8 +29,8 @@ export const HEROIS: Heroi[] = [
       "Explosivo e destemido, Kael atravessa qualquer circuito e acerta bolas de tênis com precisão de campeão.",
     cor: "#38bdf8",
     img: kael,
-    anda: [kaelAnda1.url, kaelAnda2.url],
-    escala: kaelEscala.url,
+    anda: [kaelAnda1, kaelAnda2],
+    escala: kaelEscala,
   },
   {
     id: "miah",
@@ -41,7 +41,7 @@ export const HEROIS: Heroi[] = [
     cor: "#c084fc",
     img: miah,
     anda: [miahAnda1, miahAnda2],
-    escala: miahEscala.url,
+    escala: miahEscala,
   },
 ];
 
