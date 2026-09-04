@@ -14,12 +14,12 @@ export const Route = createFileRoute("/professor")({
       {
         name: "description",
         content:
-          "Painel do Professor Tio Victor: matrículas dos alunos, fichas de anamnese e contratos assinados pelos responsáveis do Super CT.",
+          "Painel do Professor Tio Victor: alunos matriculados e contratos assinados do Super CT.",
       },
       { property: "og:title", content: "Área do Professor — Super CT" },
       {
         property: "og:description",
-        content: "Matrículas, fichas e contratos assinados dos alunos do Super CT.",
+        content: "Alunos matriculados e contratos assinados do Super CT.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -146,9 +146,6 @@ function Painel() {
         Esta área é exclusiva do professor. Entre com a conta do Super CT (osuper.c.t@gmail.com) para acessar.
       </p>
     );
-
-  const nomeDe = (uid: string) => perfis.find((p) => p.id === uid)?.nome_responsavel || "Responsável";
-  const alunosDe = (uid: string) => alunos.filter((a) => a.user_id === uid);
 
   return (
     <div className="mt-6 space-y-6">
