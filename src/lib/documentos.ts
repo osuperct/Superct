@@ -76,6 +76,7 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
   {
     chave: "valor",
     rotulo: "Valor da mensalidade (R$)",
+    obrigatorio: true,
     opcoes: [
       "Plano mensal R$185,00",
       "Plano Recorrente R$160,00",
@@ -85,7 +86,7 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
       "Plano semestral 6x de R$150,00",
     ],
   },
-  { chave: "vencimento", rotulo: "Dia de vencimento", opcoes: ["5", "10", "20", "25"] },
+  { chave: "vencimento", rotulo: "Dia de vencimento", obrigatorio: true, opcoes: ["5", "10", "20", "25"] },
   { chave: "forma_pagamento", rotulo: "Forma de pagamento", opcoes: ["Pix / dinheiro", "Cartão", "Cartão Recorrente (link)"] },
   { chave: "observacoes", rotulo: "Observações", longo: true },
 ];
