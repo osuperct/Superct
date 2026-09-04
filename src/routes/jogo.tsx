@@ -1203,6 +1203,73 @@ function JogoPage() {
   );
 }
 
+function Joystick({ onChange }: { onChange: (x: number) => void }) {
+  const baseRef = useRef<HTMLDivElement>(null);
+  const [knob, setKnob] = useState({ x: 0, y: 0 });
+  const dragging = useRef(false);
+  const pointerId = useRef<number | null>(null);
+  const center = useRef({ x: 0, y: 0 });
+  const maxR = 32;
+
+  const update = (clientX: number, clientY: number) => {
+    const dx = clientX - center.current.x;
+    const dy = clientY - center.current.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const r = Math.min(dist, maxR);
+    const angle = Math.atan2(dy, dx);
+    const kx = Math.cos(angle) * r;
+    const ky = Math.sin(angle) * r;
+    setKnob({ x: kx, y: ky });
+    onChange(Math.max(-1, Math.min(1, dx / maxR)));
+  };
+
+  const end = () => {
+    dragging.current = false;
+    pointerId.current = null;
+    setKnob({ x: 0, y: 0 });
+    onChange(0);
+  };
+
+  return (
+    <div
+      ref={baseRef}
+      className="relative flex h-28 w-28 select-none touch-none items-center justify-center rounded-full border-2 border-border bg-card/80 shadow-inner"
+      onPointerDown={(e) => {
+        if (!baseRef.current) return;
+        const rect = baseRef.current.getBoundingClientRect();
+        center.current = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        dragging.current = true;
+        pointerId.current = e.pointerId;
+        baseRef.current.setPointerCapture(e.pointerId);
+        update(e.clientX, e.clientY);
+      }}
+      onPointerMove={(e) => {
+        if (!dragging.current || e.pointerId !== pointerId.current) return;
+        update(e.clientX, e.clientY);
+      }}
+      onPointerUp={(e) => {
+        if (e.pointerId !== pointerId.current) return;
+        if (baseRef.current) baseRef.current.releasePointerCapture(e.pointerId);
+        end();
+      }}
+      onPointerLeave={(e) => {
+        if (e.pointerId !== pointerId.current) return;
+        if (baseRef.current) baseRef.current.releasePointerCapture(e.pointerId);
+        end();
+      }}
+      onPointerCancel={(e) => {
+        if (e.pointerId !== pointerId.current) return;
+        end();
+      }}
+    >
+      <div
+        className="pointer-events-none size-12 rounded-full border border-primary bg-primary shadow-[0_0_14px_rgba(255,122,24,0.55)]"
+        style={{ transform: `translate(${knob.x}px, ${knob.y}px)` }}
+      />
+    </div>
+  );
+}
+
 function ControlButton({
   children,
   onStart,
