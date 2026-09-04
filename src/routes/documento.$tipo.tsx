@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Assinatura } from "@/components/Assinatura";
-import { formatarCpf } from "@/lib/cpf";
+import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 import { gerarDocumentoPdf } from "@/lib/documentoPdf";
 import { BUCKET, DOCS, EMAIL_SUPER_CT, TERMO_IMAGEM, type TipoDoc } from "@/lib/documentos";
 

@@ -11,6 +11,8 @@ export type CampoDoc = {
   fixo?: string;
   opcoes?: string[];
   multiplos?: { chave: string; rotulo: string; opcoes: string[] }[];
+  obrigatorio?: boolean;
+  cpf?: boolean;
 };
 
 const SIM_NAO = ["Não", "Sim"];
@@ -21,10 +23,10 @@ export const CAMPOS_FICHA: CampoDoc[] = [
   { chave: "aluno_idade", rotulo: "Idade" },
   { chave: "escola", rotulo: "Escola / série" },
   { chave: "responsavel_nome", rotulo: "Nome do responsável legal" },
-  { chave: "responsavel_cpf", rotulo: "CPF do responsável" },
+  { chave: "responsavel_cpf", rotulo: "CPF do responsável", obrigatorio: true, cpf: true },
   { chave: "responsavel_rg", rotulo: "RG do responsável" },
   { chave: "endereco", rotulo: "Endereço completo" },
-  { chave: "telefone", rotulo: "Telefone / WhatsApp" },
+  { chave: "telefone", rotulo: "Telefone / WhatsApp", obrigatorio: true },
   { chave: "contato_emergencia", rotulo: "Telefone de emergência (nome e número)" },
   { chave: "parq_1", rotulo: "PAR-Q 1 — Algum médico já disse que o aluno possui problema cardíaco ou restrição para exercícios?", opcoes: SIM_NAO },
   { chave: "parq_2", rotulo: "PAR-Q 2 — O aluno sente dores no peito, falta de ar inexplicável ou tonturas ao se exercitar?", opcoes: SIM_NAO },
@@ -42,7 +44,7 @@ export const CAMPOS_FICHA: CampoDoc[] = [
     opcoes: ["Condicionamento físico", "Desenvolvimento motor", "Recreação", "Socialização"],
   },
   { chave: "plano", rotulo: "Convênio / plano de saúde" },
-  { chave: "turma", rotulo: "Turma e horário desejados" },
+  { chave: "turma", rotulo: "Turma e horário desejados", opcoes: ["Turma Manhã", "Turma Tarde", "Turma Noite"] },
 ];
 
 export const CAMPOS_CONTRATO: CampoDoc[] = [
@@ -53,9 +55,9 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
     fixo: "Victor Hugo Jorge de Siqueira | CREF 057790-G/MG | CPF 097.854.576-13",
   },
   { chave: "contratante", rotulo: "Nome do responsável legal (contratante)" },
-  { chave: "cpf", rotulo: "CPF do contratante" },
+  { chave: "cpf", rotulo: "CPF do contratante", obrigatorio: true, cpf: true },
   { chave: "rg", rotulo: "RG do contratante" },
-  { chave: "telefone", rotulo: "Telefone / WhatsApp" },
+  { chave: "telefone", rotulo: "Telefone / WhatsApp", obrigatorio: true },
   { chave: "endereco", rotulo: "Endereço completo" },
   { chave: "aluno", rotulo: "Nome do aluno(a)" },
   { chave: "aluno_nascimento", rotulo: "Data de nascimento do aluno" },
