@@ -438,6 +438,7 @@ function Painel({ session }: { session: Session }) {
 
   return (
     <div className="mt-6">
+      <LembreteAcesso />
       <div className="flex items-center justify-between rounded-md border border-border bg-card/50 p-3">
         <div>
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
