@@ -226,6 +226,7 @@ function JogoPage() {
   const seguro = useRef<false | "barra" | "argola" | "corda" | "parede">(false);
   const subindo = useRef(false);
   const descendoParede = useRef(false);
+  const subindoDesde = useRef<number | null>(null);
   const ultimoToqueBaixo = useRef<number | null>(null);
   const ultimoToqueCima = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
@@ -278,6 +279,7 @@ function JogoPage() {
     duck.current = false;
     subindo.current = false;
     descendoParede.current = false;
+    subindoDesde.current = null;
     ultimoToqueBaixo.current = null;
     bloquearAgarreAte.current = 0;
     maxX.current = 60;
@@ -305,6 +307,8 @@ function JogoPage() {
       bolasRef.current = [];
       tirosRef.current = [];
       invulAte.current = performance.now() + 900;
+      vidasRef.current = VIDAS_CHEFAO;
+      setVidas(VIDAS_CHEFAO);
       if (reporCoracoes) {
         coracoesRef.current = CORACOES.map((_, i) => i);
         setCoracoes(coracoesRef.current);
@@ -342,6 +346,8 @@ function JogoPage() {
     spawnTiro.current = 70;
     cargaRef.current = 0;
     invulAte.current = performance.now() + 900;
+    vidasRef.current = VIDAS_CHEFAO;
+    setVidas(VIDAS_CHEFAO);
     setPiscando(false);
     setCarga(0);
     setBolas([]);
@@ -378,6 +384,7 @@ function JogoPage() {
       x.current = 60;
       y.current = 0;
       vy.current = 0;
+      subindoDesde.current = null;
       vxAr.current = 0;
       noAr.current = false;
       seguro.current = false;
@@ -490,6 +497,12 @@ function JogoPage() {
       } else if (noAr.current || y.current > 0) {
         const anterior = y.current;
         vy.current += GRAVIDADE;
+        if (vy.current > 0 && subindoDesde.current === null) subindoDesde.current = performance.now();
+        if (vy.current <= 0) subindoDesde.current = null;
+        if (vy.current > 0 && subindoDesde.current !== null && performance.now() - subindoDesde.current > 1000) {
+          vy.current = 0;
+          subindoDesde.current = null;
+        }
         let prox = y.current + vy.current;
 
         if (vy.current > -4 && performance.now() >= bloquearAgarreAte.current) {
@@ -505,23 +518,27 @@ function JogoPage() {
             seguro.current = "barra";
             y.current = barra.y - alt;
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           } else if (argola) {
             seguro.current = "argola";
             y.current = argola.y - alt;
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           } else if (corda) {
             seguro.current = "corda";
             x.current = corda.x - HEROI_W / 2;
             y.current = Math.min(corda.topo - alt, Math.max(corda.base, prox));
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           } else if (parede) {
             seguro.current = "parede";
             x.current = Math.min(parede.x + parede.w - HEROI_W, Math.max(parede.x, x.current));
             y.current = Math.max(0, prox);
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           }
         }
@@ -534,6 +551,7 @@ function JogoPage() {
             if (jump) {
               prox = jump.h;
               vy.current = IMPULSO * 1.2;
+              subindoDesde.current = performance.now();
               noAr.current = true;
             }
             for (const s of solidos) {
@@ -541,6 +559,7 @@ function JogoPage() {
               if (!jump && sobre && anterior >= s.h && prox <= s.h) {
                 prox = s.h;
                 vy.current = 0;
+                subindoDesde.current = null;
                 noAr.current = false;
                 break;
               }
@@ -549,6 +568,7 @@ function JogoPage() {
           if (prox <= 0) {
             prox = 0;
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           }
           y.current = prox;
@@ -925,6 +945,7 @@ function JogoPage() {
       setPendurado(false);
       noAr.current = true;
       vy.current = (duploToque ? IMPULSO : IMPULSO * 0.95);
+      if (vy.current > 0) subindoDesde.current = performance.now();
       vxAr.current = lado * VELOCIDADE * 2.1;
       bloquearAgarreAte.current = agora + 400;
       return;
@@ -941,6 +962,7 @@ function JogoPage() {
       seguro.current = false;
       noAr.current = true;
       vy.current = duploToque ? IMPULSO : IMPULSO * 0.85;
+      if (vy.current > 0) subindoDesde.current = performance.now();
       return;
     }
 
@@ -948,12 +970,14 @@ function JogoPage() {
     if (duploToque) {
       noAr.current = true;
       vy.current = IMPULSO;
+      if (vy.current > 0) subindoDesde.current = performance.now();
       return;
     }
 
     if (noAr.current) return;
     noAr.current = true;
     vy.current = IMPULSO_BAIXO;
+    if (vy.current > 0) subindoDesde.current = performance.now();
   };
 
 
@@ -975,6 +999,7 @@ function JogoPage() {
         setAbaixado(false);
         y.current = Math.max(0, y.current - 4);
         vy.current = -6;
+        subindoDesde.current = null;
         bloquearAgarreAte.current = agora + 650;
         ultimoToqueBaixo.current = null;
         setPendurado(false);
