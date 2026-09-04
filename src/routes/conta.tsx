@@ -256,7 +256,10 @@ function Painel({ session }: { session: Session }) {
       nome,
       idade: novaIdade ? Number(novaIdade) : null,
     });
-    if (error) return toast.error("Não foi possível salvar o aluno.");
+    if (error) {
+      toast.error("Não foi possível salvar o aluno.");
+      return;
+    }
     setNovoAluno("");
     setNovaIdade("");
     toast.success("Aluno adicionado!");
