@@ -113,6 +113,7 @@ function Autenticacao() {
           },
         });
         if (error) throw error;
+        sessionStorage.setItem("superct_acesso", JSON.stringify({ email: email.trim(), senha }));
         setCredenciais({ email: email.trim(), senha });
         if (!data.session) {
           setAviso("Cadastro criado! Confira seu e-mail e clique no link de confirmação para entrar.");
@@ -277,6 +278,75 @@ function Campo({
 }
 
 /* ---------------------------------- PAINEL ---------------------------------- */
+
+function LembreteAcesso() {
+  const [dados, setDados] = useState<{ email: string; senha: string } | null>(null);
+
+  useEffect(() => {
+    const bruto = sessionStorage.getItem("superct_acesso");
+    if (!bruto) return;
+    try {
+      setDados(JSON.parse(bruto) as { email: string; senha: string });
+    } catch {
+      sessionStorage.removeItem("superct_acesso");
+    }
+  }, []);
+
+  if (!dados) return null;
+
+  const texto = `SUPER CT — Professor Tio Victor\nSeus dados de acesso à Área do Responsável:\nE-mail: ${dados.email}\nSenha: ${dados.senha}\nEntre em: ${window.location.origin}/conta`;
+
+  function guardei() {
+    sessionStorage.removeItem("superct_acesso");
+    setDados(null);
+  }
+
+  return (
+    <div className="mb-4 rounded-lg border border-primary/60 bg-card/60 p-4">
+      <h2 className="font-display text-lg tracking-tight text-primary">GUARDE SEU ACESSO</h2>
+      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+        Salve estes dados agora — é com eles que você entra na sua área e vê os documentos do aluno.
+      </p>
+      <dl className="mt-3 space-y-2 font-mono text-xs">
+        <div className="rounded-md border border-border bg-background/60 p-2">
+          <dt className="text-[9px] uppercase tracking-widest text-muted-foreground">E-mail</dt>
+          <dd className="break-all text-foreground">{dados.email}</dd>
+        </div>
+        <div className="rounded-md border border-border bg-background/60 p-2">
+          <dt className="text-[9px] uppercase tracking-widest text-muted-foreground">Senha</dt>
+          <dd className="break-all text-foreground">{dados.senha}</dd>
+        </div>
+      </dl>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            void navigator.clipboard
+              .writeText(texto)
+              .then(() => toast.success("Dados de acesso copiados!"))
+              .catch(() => toast.error("Copie manualmente os dados acima."));
+          }}
+          className="rounded-md bg-primary px-3 py-2 font-display text-xs tracking-tight text-primary-foreground"
+        >
+          COPIAR DADOS
+        </button>
+        <a
+          href={`mailto:${dados.email}?subject=${encodeURIComponent("Seu acesso — Super CT")}&body=${encodeURIComponent(texto)}`}
+          className="rounded-md border border-primary px-3 py-2 text-center font-display text-xs tracking-tight text-primary"
+        >
+          ENVIAR PRO MEU E-MAIL
+        </a>
+      </div>
+      <button
+        type="button"
+        onClick={guardei}
+        className="mt-2 w-full rounded-md border border-border px-4 py-2 font-display text-xs tracking-tight text-muted-foreground"
+      >
+        JÁ GUARDEI
+      </button>
+    </div>
+  );
+}
 
 function Painel({ session }: { session: Session }) {
   const uid = session.user.id;
