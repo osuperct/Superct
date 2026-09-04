@@ -182,10 +182,10 @@ const CORES_DONUT = ["#ec4899", "#f59e0b", "#22d3ee", "#a3e635", "#f43f5e"];
 const VIDAS_CHEFAO = 3;
 const VIDAS_MAX = 5;
 
-/* dois corações por fase, em pontos difíceis (bem alto, exigindo pulo dos aparelhos) */
+/* dois corações por fase, bem altos mas antes do limite do teto — só alcançáveis pulando dos aparelhos */
 const CORACOES: { x: number; y: number }[] = [
-  { x: 1372, y: 186 },
-  { x: 3560, y: 196 },
+  { x: 1372, y: 150 },
+  { x: 3560, y: 158 },
 ];
 
 
