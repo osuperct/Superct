@@ -178,6 +178,7 @@ function JogoPage() {
   const [derrotado, setDerrotado] = useState<number | null>(null);
 
   const dir = useRef(0);
+  const dirY = useRef(0);
   const x = useRef(60);
   const y = useRef(0);
   const vy = useRef(0);
@@ -360,11 +361,9 @@ function JogoPage() {
           const p = paredes.find((p) => cx > p.x - 6 && cx < p.x + p.w + 6);
           if (p) {
             x.current = Math.min(p.x + p.w - HEROI_W, Math.max(p.x, x.current));
-            const delta = subindo.current
-              ? VELOCIDADE_ESCALADA
-              : descendoParede.current
-                ? -VELOCIDADE_ESCALADA
-                : 0;
+            const querSubir = subindo.current || dirY.current < -0.3;
+            const querDescer = descendoParede.current || dirY.current > 0.3;
+            const delta = querSubir ? VELOCIDADE_ESCALADA : querDescer ? -VELOCIDADE_ESCALADA : 0;
             apoio = Math.min(p.h - alt, Math.max(0, y.current + delta));
           } else seguro.current = false;
         } else {
@@ -1184,11 +1183,11 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Joystick move • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
+          Joystick move (na parede, para cima/baixo sobe/desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-3">
-          <Joystick onChange={(x: number) => { dir.current = x; }} />
+          <Joystick onChange={(v) => { dir.current = v.x; dirY.current = v.y; }} />
           <div className="flex gap-2">
             <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
               <ChevronUp className="size-6" />
@@ -1203,7 +1202,7 @@ function JogoPage() {
   );
 }
 
-function Joystick({ onChange }: { onChange: (x: number) => void }) {
+function Joystick({ onChange }: { onChange: (v: { x: number; y: number }) => void }) {
   const baseRef = useRef<HTMLDivElement>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
   const dragging = useRef(false);
@@ -1220,14 +1219,17 @@ function Joystick({ onChange }: { onChange: (x: number) => void }) {
     const kx = Math.cos(angle) * r;
     const ky = Math.sin(angle) * r;
     setKnob({ x: kx, y: ky });
-    onChange(Math.max(-1, Math.min(1, dx / maxR)));
+    onChange({
+      x: Math.max(-1, Math.min(1, dx / maxR)),
+      y: Math.max(-1, Math.min(1, dy / maxR)),
+    });
   };
 
   const end = () => {
     dragging.current = false;
     pointerId.current = null;
     setKnob({ x: 0, y: 0 });
-    onChange(0);
+    onChange({ x: 0, y: 0 });
   };
 
   return (
