@@ -312,8 +312,8 @@ function JogoPage() {
       const alt = alturaHeroi(duck.current);
 
       /* ---- movimento horizontal ---- */
-      if (dir.current !== 0) {
-        const alvo = x.current + dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE);
+      const passo = (delta: number) => {
+        const alvo = x.current + delta;
         let livre = true;
         if (!seguro.current) {
           for (const s of solidos) {
@@ -325,7 +325,22 @@ function JogoPage() {
           }
         }
         if (livre) x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
+      };
+
+      if (dir.current !== 0) {
+        passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
       }
+
+      /* ---- impulso lateral do salto ao soltar aparelho ---- */
+      if (vxAr.current !== 0) {
+        if (seguro.current) vxAr.current = 0;
+        else {
+          passo(vxAr.current);
+          vxAr.current *= 0.94;
+          if (Math.abs(vxAr.current) < 0.25) vxAr.current = 0;
+        }
+      }
+
 
       /* ---- vertical ---- */
       if (seguro.current) {
