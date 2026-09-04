@@ -1194,8 +1194,8 @@ function JogoPage() {
           ◀ ▶ ▼ movem e esquivam • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
         </p>
 
-        <div className="mt-6 flex items-end justify-between gap-4">
-          <div className="flex gap-3">
+        <div className="mt-6 flex items-end justify-between gap-3">
+          <div className="flex gap-2">
             <ControlButton onStart={mover(-1)} onEnd={parar} label="Mover para a esquerda">
               <ArrowLeft className="size-6" />
             </ControlButton>
@@ -1206,7 +1206,7 @@ function JogoPage() {
               <ChevronDown className="size-6" />
             </ControlButton>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2">
             <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
               <ChevronUp className="size-6" />
             </ControlButton>
