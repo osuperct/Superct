@@ -550,11 +550,16 @@ function Painel({ session }: { session: Session }) {
   }
 
   async function remover(doc: Documento) {
-    await supabase.storage.from(BUCKET).remove([doc.caminho]);
-    await supabase.from("documentos").delete().eq("id", doc.id);
-    toast.success("Documento removido.");
+    /** Some da área do responsável, mas a cópia continua guardada na área do professor. */
+    const { error } = await supabase.from("documentos").update({ oculto_responsavel: true }).eq("id", doc.id);
+    if (error) {
+      toast.error("Não foi possível remover o documento.");
+      return;
+    }
+    toast.success("Documento removido da sua lista. A cópia fica arquivada com o professor.");
     void recarregar();
   }
+
 
   async function sair() {
     await supabase.auth.signOut();
