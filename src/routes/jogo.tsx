@@ -226,6 +226,7 @@ function JogoPage() {
   const seguro = useRef<false | "barra" | "argola" | "corda" | "parede">(false);
   const subindo = useRef(false);
   const descendoParede = useRef(false);
+  const subindoDesde = useRef<number | null>(null);
   const ultimoToqueBaixo = useRef<number | null>(null);
   const ultimoToqueCima = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
@@ -305,6 +306,8 @@ function JogoPage() {
       bolasRef.current = [];
       tirosRef.current = [];
       invulAte.current = performance.now() + 900;
+      vidasRef.current = VIDAS_CHEFAO;
+      setVidas(VIDAS_CHEFAO);
       if (reporCoracoes) {
         coracoesRef.current = CORACOES.map((_, i) => i);
         setCoracoes(coracoesRef.current);
@@ -342,6 +345,8 @@ function JogoPage() {
     spawnTiro.current = 70;
     cargaRef.current = 0;
     invulAte.current = performance.now() + 900;
+    vidasRef.current = VIDAS_CHEFAO;
+    setVidas(VIDAS_CHEFAO);
     setPiscando(false);
     setCarga(0);
     setBolas([]);
