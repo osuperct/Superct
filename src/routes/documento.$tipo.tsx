@@ -193,7 +193,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
   }
 
   function enviarEmail() {
-    const linhas = doc.campos.map((c) => `${c.rotulo}: ${valores[c.chave] || "-"}`);
+    const linhas = doc.campos.map((c) => `${c.rotulo}: ${valorCampo(c) || "-"}`);
     const corpo = [
       `${doc.titulo.toUpperCase()} — SUPER CT`,
       "",
