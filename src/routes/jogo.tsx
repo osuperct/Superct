@@ -31,6 +31,8 @@ const ARENA = 720;
 const ALTURA_CENA = 260;
 const GRAVIDADE = -1.25;
 const IMPULSO = 17.5;
+const IMPULSO_BAIXO = 12;
+const TOQUE_DUPLO_CIMA_MS = 350;
 const VELOCIDADE = 2.8;
 const HEROI_W = 34;
 const HEROI_H = 44;
@@ -185,6 +187,7 @@ function JogoPage() {
   const descendoParede = useRef(false);
   const ultimoToqueBaixo = useRef<number | null>(null);
   const ultimoToqueDireita = useRef<number | null>(null);
+  const ultimoToqueCima = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
   const vxAr = useRef(0);
   const duck = useRef(false);
@@ -691,6 +694,11 @@ function JogoPage() {
 
   const pular = () => {
     if (fimRef.current) return;
+    const agora = performance.now();
+    const toqueAnterior = ultimoToqueCima.current;
+    const duploToque = toqueAnterior !== null && agora - toqueAnterior <= TOQUE_DUPLO_CIMA_MS;
+    ultimoToqueCima.current = agora;
+
     /* pendurado + seta lateral pressionada = solta e pula na diagonal */
     if (seguro.current && dir.current !== 0) {
       const lado = dir.current;
@@ -701,9 +709,9 @@ function JogoPage() {
       setAbaixado(false);
       setPendurado(false);
       noAr.current = true;
-      vy.current = IMPULSO * 0.95;
+      vy.current = (duploToque ? IMPULSO : IMPULSO * 0.95);
       vxAr.current = lado * VELOCIDADE * 2.1;
-      bloquearAgarreAte.current = performance.now() + 400;
+      bloquearAgarreAte.current = agora + 400;
       return;
     }
     if (seguro.current === "parede") {
@@ -722,7 +730,7 @@ function JogoPage() {
     }
     if (noAr.current) return;
     noAr.current = true;
-    vy.current = IMPULSO;
+    vy.current = duploToque ? IMPULSO : IMPULSO_BAIXO;
   };
 
 
@@ -1188,7 +1196,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▶ 2x em 1,5s joga bola de tênis • ▲ pula e escala • ▼ 2x em 2s solta • 3 halteres = super bola
+          Setas movem • ▶ 2x em 1,5s joga bola de tênis • ▲ pula baixo, ▲▲ rápido pula alto • ▼ 2x em 2s solta • 3 halteres = super bola
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
@@ -1204,7 +1212,7 @@ function JogoPage() {
             <ControlButton onStart={descer(true)} onEnd={descer(false)} label="Abaixar e esquivar">
               <ChevronDown className="size-7" />
             </ControlButton>
-            <ControlButton onStart={pular} onEnd={pararSubida} label="Pular e escalar">
+            <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
               <ChevronUp className="size-7" />
             </ControlButton>
           </div>
