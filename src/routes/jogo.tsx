@@ -1202,7 +1202,7 @@ function JogoPage() {
   );
 }
 
-function Joystick({ onChange }: { onChange: (x: number) => void }) {
+function Joystick({ onChange }: { onChange: (v: { x: number; y: number }) => void }) {
   const baseRef = useRef<HTMLDivElement>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
   const dragging = useRef(false);
