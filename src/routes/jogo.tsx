@@ -178,6 +178,14 @@ const TAM_TIRO: Record<TipoTiro, { w: number; h: number }> = {
 };
 const CORES_DONUT = ["#ec4899", "#f59e0b", "#22d3ee", "#a3e635", "#f43f5e"];
 const VIDAS_CHEFAO = 3;
+const VIDAS_MAX = 5;
+
+/* dois corações por fase, em pontos difíceis (bem alto, exigindo pulo dos aparelhos) */
+const CORACOES: { x: number; y: number }[] = [
+  { x: 1372, y: 186 },
+  { x: 3560, y: 196 },
+];
+
 
 const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_H);
 const dificuldade = (fase: number) => 0.525 + (fase - 1) * 0.168;
@@ -196,7 +204,9 @@ function JogoPage() {
   const [chefao, setChefao] = useState<Chefao | null>(null);
   const [tiros, setTiros] = useState<Tiro[]>([]);
   const [vidas, setVidas] = useState(VIDAS_CHEFAO);
+  const [coracoes, setCoracoes] = useState<number[]>(CORACOES.map((_, i) => i));
   const [piscando, setPiscando] = useState(false);
+
   const [carga, setCarga] = useState(0);
   const [pontos, setPontos] = useState(0);
   const [fase, setFase] = useState(1);
@@ -242,7 +252,9 @@ function JogoPage() {
   const nextTiro = useRef(0);
   const spawnTiro = useRef(90);
   const vidasRef = useRef(VIDAS_CHEFAO);
+  const coracoesRef = useRef<number[]>(CORACOES.map((_, i) => i));
   const invulAte = useRef(0);
+
 
   useEffect(() => {
     const el = palcoRef.current;
@@ -277,7 +289,7 @@ function JogoPage() {
   }, []);
 
   const iniciarCorrida = useCallback(
-    (novaFase: number) => {
+    (novaFase: number, reporCoracoes = true) => {
       faseRef.current = novaFase;
       setFase(novaFase);
       modoRef.current = "corrida";
@@ -292,6 +304,11 @@ function JogoPage() {
       chefaoRef.current = null;
       bolasRef.current = [];
       tirosRef.current = [];
+      invulAte.current = performance.now() + 900;
+      if (reporCoracoes) {
+        coracoesRef.current = CORACOES.map((_, i) => i);
+        setCoracoes(coracoesRef.current);
+      }
       setTiros([]);
       setCarga(0);
       setChefao(null);
@@ -301,6 +318,7 @@ function JogoPage() {
       setDerrotado(null);
       setVenceu(false);
       setFim(false);
+      setPiscando(false);
       zerarHeroi();
     },
     [zerarHeroi],
@@ -309,6 +327,8 @@ function JogoPage() {
   const reiniciar = useCallback(() => {
     pontosRef.current = 0;
     setPontos(0);
+    vidasRef.current = VIDAS_CHEFAO;
+    setVidas(VIDAS_CHEFAO);
     iniciarCorrida(1);
   }, [iniciarCorrida]);
 
@@ -321,9 +341,7 @@ function JogoPage() {
     spawnHaltere.current = 90;
     spawnTiro.current = 70;
     cargaRef.current = 0;
-    vidasRef.current = VIDAS_CHEFAO;
-    invulAte.current = 0;
-    setVidas(VIDAS_CHEFAO);
+    invulAte.current = performance.now() + 900;
     setPiscando(false);
     setCarga(0);
     setBolas([]);
@@ -339,8 +357,45 @@ function JogoPage() {
     setChefao(boss);
   }, [zerarHeroi]);
 
+
   useEffect(() => {
     let raf = 0;
+
+    /* perder uma vida: volta ao checkpoint do trecho atual (corrida ou arena do chefão) */
+    const perderVida = (vilao: number | null) => {
+      if (fimRef.current || performance.now() <= invulAte.current) return;
+      vidasRef.current -= 1;
+      setVidas(vidasRef.current);
+      invulAte.current = performance.now() + 1800;
+      setPiscando(true);
+      window.setTimeout(() => setPiscando(false), 1600);
+      if (vidasRef.current <= 0) {
+        fimRef.current = true;
+        setFim(true);
+        setDerrotado(vilao);
+        return;
+      }
+      x.current = 60;
+      y.current = 0;
+      vy.current = 0;
+      vxAr.current = 0;
+      noAr.current = false;
+      seguro.current = false;
+      duck.current = false;
+      subindo.current = false;
+      descendoParede.current = false;
+      setHeroX(60);
+      setHeroY(0);
+      setAbaixado(false);
+      setPendurado(false);
+      tirosRef.current = [];
+      setTiros([]);
+      bolasRef.current = [];
+      setBolas([]);
+      if (modoRef.current !== "chefao") setInimigos([]);
+    };
+
+
     const loop = () => {
       raf = requestAnimationFrame(loop);
       if (fimRef.current || pausaRef.current) return;
@@ -356,7 +411,15 @@ function JogoPage() {
       const paredes = emChefao ? ARENA_PAREDES : PAREDES;
       const dif = dificuldade(faseRef.current);
 
+      /* ---- segurar o analógico para baixo agacha o personagem ---- */
+      const querAgachar = dirY.current > 0.45 && !seguro.current && !noAr.current;
+      if (querAgachar !== duck.current) {
+        duck.current = querAgachar;
+        setAbaixado(querAgachar);
+      }
+
       const alt = alturaHeroi(duck.current);
+
 
       /* ---- movimento horizontal ---- */
       const passo = (delta: number) => {
@@ -518,6 +581,27 @@ function JogoPage() {
           setPontos(pontosRef.current + ganho);
         }
 
+        /* corações escondidos no alto: cada um vale uma vida extra */
+        if (coracoesRef.current.length > 0) {
+          const pego = coracoesRef.current.find((idx) => {
+            const c = CORACOES[idx]!;
+            return (
+              x.current + HEROI_W > c.x - 12 &&
+              x.current < c.x + 12 &&
+              y.current + hAlt > c.y - 6 &&
+              y.current < c.y + 24
+            );
+          });
+          if (pego !== undefined) {
+            coracoesRef.current = coracoesRef.current.filter((idx) => idx !== pego);
+            setCoracoes(coracoesRef.current);
+            vidasRef.current = Math.min(VIDAS_MAX, vidasRef.current + 1);
+            setVidas(vidasRef.current);
+            pontosRef.current += 15;
+            setPontos(pontosRef.current);
+          }
+        }
+
         /* medalha de bronze suspensa: pegar pulando */
         const pegouMedalha =
           x.current + HEROI_W > MEDALHA.x - 18 &&
@@ -534,6 +618,7 @@ function JogoPage() {
           setInimigos([]);
           return;
         }
+
 
         /* inimigos do percurso (mais lentos na fase 1) */
         spawn.current -= 1;
@@ -576,11 +661,11 @@ function JogoPage() {
             const bateX = nx + 34 > hx + 4 && nx + 4 < hx + HEROI_W - 4;
             const bateY = ny + 34 > hy + 4 && ny + 4 < hy + hAlt;
             if (bateX && bateY) {
-              fimRef.current = true;
-              setFim(true);
-              setDerrotado(i.vilao);
+              perderVida(i.vilao);
+              continue;
             }
             proximos.push({ ...i, x: nx, y: ny });
+
           }
           return proximos;
         });
@@ -658,7 +743,7 @@ function JogoPage() {
       const bolasAtuais: Bola[] = [];
       for (const b of bolasRef.current) {
         const nx = b.x + b.vx;
-        if (nx > ARENA + 20) continue;
+        if (nx > ARENA + 20 || nx < -40) continue;
         const raio = b.super ? 26 : 12;
         const bateu =
           nx + raio > boss.x && nx < boss.x + tam && b.y + raio > boss.y && b.y < boss.y + tam;
@@ -765,29 +850,10 @@ function JogoPage() {
         y.current < boss.y + tam - 8;
 
       if (levouDano || (bateBoss && performance.now() > invulAte.current)) {
-        vidasRef.current -= 1;
-        setVidas(vidasRef.current);
-        invulAte.current = performance.now() + 1600;
-        setPiscando(true);
-        window.setTimeout(() => setPiscando(false), 1600);
-        if (vidasRef.current <= 0) {
-          fimRef.current = true;
-          setFim(true);
-          setDerrotado(Math.min(faseRef.current, TOTAL_FASES) - 1);
-          return;
-        }
-        /* volta para o começo da arena após perder uma vida */
-        x.current = 60;
-        y.current = 0;
-        vy.current = 0;
-        noAr.current = false;
-        seguro.current = false;
-        setHeroX(60);
-        setHeroY(0);
-        tirosRef.current = [];
-        setTiros([]);
+        perderVida(Math.min(faseRef.current, TOTAL_FASES) - 1);
         return;
       }
+
 
 
       /* chefão derrotado */
@@ -822,16 +888,24 @@ function JogoPage() {
       cargaRef.current = 0;
       setCarga(0);
     }
+    /* o poder sai para o lado onde o chefão está no momento */
+    const boss = chefaoRef.current;
+    const tam = chefaoTamanho(faseRef.current);
+    const centroBoss = boss ? boss.x + tam / 2 : ARENA;
+    const lado = centroBoss >= x.current + HEROI_W / 2 ? 1 : -1;
+    const tamBola = ehSuper ? 26 : 12;
+    const velocidade = ehSuper ? 7.5 : 6.5;
     const nova: Bola = {
       id: nextBola.current++,
-      x: x.current + HEROI_W,
+      x: lado > 0 ? x.current + HEROI_W : x.current - tamBola,
       y: y.current + alturaHeroi(duck.current) / 2 - (ehSuper ? 13 : 6),
-      vx: ehSuper ? 7.5 : 6.5,
+      vx: lado * velocidade,
       super: ehSuper,
     };
     bolasRef.current = [...bolasRef.current, nova];
     setBolas(bolasRef.current);
   }, []);
+
 
   const pular = () => {
     if (fimRef.current) return;
@@ -1161,6 +1235,26 @@ function JogoPage() {
               </div>
             )}
 
+            {/* corações extras suspensos bem alto */}
+            {!emChefao &&
+              coracoes.map((idx) => {
+                const c = CORACOES[idx]!;
+                return (
+                  <div
+                    key={`coracao-${idx}`}
+                    className="absolute flex size-7 items-center justify-center rounded-full border-2 border-[#f43f5e] bg-[#f43f5e]/20 animate-pulse-slow"
+                    style={{
+                      left: c.x - 14,
+                      bottom: 40 + c.y,
+                      boxShadow: "0 0 14px 4px rgba(244,63,94,0.65)",
+                    }}
+                  >
+                    <Heart className="size-4" style={{ color: "#f43f5e", fill: "#f43f5e" }} />
+                  </div>
+                );
+              })}
+
+
             {/* herói */}
             <img
               src={mascote.url}
@@ -1328,26 +1422,25 @@ function JogoPage() {
             </span>
           )}
 
-          {emChefao && (
-            <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/70 px-2 py-1">
-              {[0, 1, 2].map((i) => (
-                <Heart
-                  key={`vida-${i}`}
-                  className="size-3"
-                  style={{
-                    color: vidas > i ? "#f43f5e" : "#3f3f46",
-                    fill: vidas > i ? "#f43f5e" : "transparent",
-                    filter: vidas > i ? "drop-shadow(0 0 6px #f43f5e)" : undefined,
-                  }}
-                />
-              ))}
-              {piscando && (
-                <span className="ml-1 font-mono text-[8px] uppercase tracking-widest text-[#f43f5e]">
-                  Perdeu uma vida!
-                </span>
-              )}
-            </span>
-          )}
+          <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/70 px-2 py-1">
+            {Array.from({ length: Math.max(VIDAS_CHEFAO, vidas) }).map((_, i) => (
+              <Heart
+                key={`vida-${i}`}
+                className="size-3"
+                style={{
+                  color: vidas > i ? "#f43f5e" : "#3f3f46",
+                  fill: vidas > i ? "#f43f5e" : "transparent",
+                  filter: vidas > i ? "drop-shadow(0 0 6px #f43f5e)" : undefined,
+                }}
+              />
+            ))}
+            {piscando && (
+              <span className="ml-1 font-mono text-[8px] uppercase tracking-widest text-[#f43f5e]">
+                Perdeu uma vida — voltou ao checkpoint!
+              </span>
+            )}
+          </span>
+
 
 
           {pendurado && (
@@ -1425,7 +1518,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Joystick move (na parede, para cima/baixo sobe/desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola • no chefão você tem 3 vidas: desvie do ataque dele
+          Joystick move; segure para baixo para agachar (na parede, cima/baixo sobe e desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira o poder para o lado do chefão • 3 halteres = super bola • pegue os 2 corações de cada fase para ganhar vidas • ao perder uma vida você volta ao checkpoint da fase
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-3">
