@@ -1219,7 +1219,10 @@ function Joystick({ onChange }: { onChange: (v: { x: number; y: number }) => voi
     const kx = Math.cos(angle) * r;
     const ky = Math.sin(angle) * r;
     setKnob({ x: kx, y: ky });
-    onChange(Math.max(-1, Math.min(1, dx / maxR)));
+    onChange({
+      x: Math.max(-1, Math.min(1, dx / maxR)),
+      y: Math.max(-1, Math.min(1, dy / maxR)),
+    });
   };
 
   const end = () => {
