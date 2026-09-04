@@ -84,7 +84,7 @@ function DocumentoPage() {
         {carregando ? (
           <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>
         ) : session ? (
-          <Formulario tipo={tipo} session={session} />
+          <Formulario key={tipo} tipo={tipo} session={session} />
         ) : (
           <Aviso texto="Entre na sua conta para preencher e assinar este documento." />
         )}
