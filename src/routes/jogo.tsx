@@ -38,6 +38,8 @@ const HEROI_H_ABAIXADO = 24;
 type Solido = { x: number; w: number; h: number; tipo: "caixa" | "step" };
 type Barra = { x: number; w: number; y: number };
 type Argola = { x: number; y: number };
+type Corda = { x: number; base: number; topo: number };
+type Jump = { x: number; w: number; h: number };
 
 const SOLIDOS: Solido[] = [
   { x: 430, w: 72, h: 56, tipo: "caixa" },
@@ -70,6 +72,13 @@ const ARGOLAS: Argola[] = [
   { x: 2872, y: 138 },
 ];
 
+const CORDAS: Corda[] = [
+  { x: 3125, base: 26, topo: 205 },
+  { x: 3235, base: 34, topo: 205 },
+];
+
+const JUMPS: Jump[] = [{ x: 3870, w: 86, h: 18 }];
+
 /* cones decorativos no tatame (não colidem) */
 const CONES: number[] = [
   180, 340, 560, 820, 900, 1100, 1340, 1500, 1700, 1900, 2050, 2300, 2560, 2750,
@@ -98,7 +107,7 @@ function JogoPage() {
   const [camera, setCamera] = useState(0);
   const [inimigos, setInimigos] = useState<Inimigo[]>([]);
   const [pontos, setPontos] = useState(0);
-  const [pendurado, setPendurado] = useState<false | "barra" | "argola">(false);
+  const [pendurado, setPendurado] = useState<false | "barra" | "argola" | "corda">(false);
   const [abaixado, setAbaixado] = useState(false);
   const [fim, setFim] = useState(false);
   const [venceu, setVenceu] = useState(false);
@@ -109,7 +118,8 @@ function JogoPage() {
   const y = useRef(0);
   const vy = useRef(0);
   const noAr = useRef(false);
-  const seguro = useRef<false | "barra" | "argola">(false);
+  const seguro = useRef<false | "barra" | "argola" | "corda">(false);
+  const ultimoToqueBaixo = useRef(0);
   const duck = useRef(false);
   const fimRef = useRef(false);
   const vistaRef = useRef(360);
@@ -146,6 +156,7 @@ function JogoPage() {
     tick.current = 0;
     maxX.current = 60;
     passados.current = 0;
+    ultimoToqueBaixo.current = 0;
     setHeroX(60);
     setHeroY(0);
     setCamera(0);
@@ -191,10 +202,16 @@ function JogoPage() {
           const b = BARRAS.find((b) => x.current + HEROI_W / 2 > b.x && x.current + HEROI_W / 2 < b.x + b.w);
           if (b) apoio = b.y - alt;
           else seguro.current = false;
-        } else {
+        } else if (seguro.current === "argola") {
           const a = ARGOLAS.find((a) => Math.abs(a.x - (x.current + HEROI_W / 2)) < 34);
           if (a) apoio = a.y - alt;
           else seguro.current = false;
+        } else {
+          const corda = CORDAS.find((c) => Math.abs(c.x - (x.current + HEROI_W / 2)) < 28);
+          if (corda) {
+            x.current = corda.x - HEROI_W / 2;
+            apoio = Math.min(corda.topo - alt, Math.max(corda.base, y.current + 0.7));
+          } else seguro.current = false;
         }
         if (seguro.current) {
           y.current = apoio;
@@ -208,12 +225,15 @@ function JogoPage() {
         vy.current += GRAVIDADE;
         let prox = y.current + vy.current;
 
-        // agarrar barra ou argola subindo
+        // agarrar barra, argola ou corda durante o salto
         if (vy.current > -4) {
           const topo = prox + alt;
           const cx = x.current + HEROI_W / 2;
           const barra = BARRAS.find((b) => cx > b.x && cx < b.x + b.w && Math.abs(topo - b.y) < 16);
           const argola = ARGOLAS.find((a) => Math.abs(a.x - cx) < 26 && Math.abs(topo - a.y) < 20);
+          const corda = CORDAS.find(
+            (c) => Math.abs(c.x - cx) < 22 && prox + alt > c.base && prox < c.topo,
+          );
           if (barra) {
             seguro.current = "barra";
             y.current = barra.y - alt;
@@ -224,15 +244,29 @@ function JogoPage() {
             y.current = argola.y - alt;
             vy.current = 0;
             noAr.current = false;
+          } else if (corda) {
+            seguro.current = "corda";
+            x.current = corda.x - HEROI_W / 2;
+            y.current = Math.min(corda.topo - alt, Math.max(corda.base, prox));
+            vy.current = 0;
+            noAr.current = false;
           }
         }
 
         if (!seguro.current) {
           // pousar em caixas e steps
           if (vy.current < 0) {
+            const jump = JUMPS.find(
+              (j) => x.current + HEROI_W > j.x + 2 && x.current < j.x + j.w - 2 && anterior >= j.h && prox <= j.h,
+            );
+            if (jump) {
+              prox = jump.h;
+              vy.current = IMPULSO * 1.2;
+              noAr.current = true;
+            }
             for (const s of SOLIDOS) {
               const sobre = x.current + HEROI_W > s.x + 2 && x.current < s.x + s.w - 2;
-              if (sobre && anterior >= s.h && prox <= s.h) {
+              if (!jump && sobre && anterior >= s.h && prox <= s.h) {
                 prox = s.h;
                 vy.current = 0;
                 noAr.current = false;
@@ -357,9 +391,15 @@ function JogoPage() {
   const descer = (ativo: boolean) => () => {
     if (fimRef.current) return;
     if (ativo && seguro.current) {
-      seguro.current = false;
-      noAr.current = true;
-      vy.current = -2;
+      const agora = performance.now();
+      if (agora - ultimoToqueBaixo.current <= 500) {
+        seguro.current = false;
+        noAr.current = true;
+        vy.current = -2;
+        ultimoToqueBaixo.current = 0;
+      } else {
+        ultimoToqueBaixo.current = agora;
+      }
       return;
     }
     duck.current = ativo;
@@ -470,6 +510,19 @@ function JogoPage() {
               </div>
             ))}
 
+            {/* cordas navais escaláveis */}
+            {CORDAS.map((corda, i) => (
+              <div
+                key={`corda-${i}`}
+                className="absolute w-3 rounded-b-full border-x-2 border-amber-200/70 bg-[repeating-linear-gradient(0deg,#92400e_0px,#92400e_5px,#f59e0b_6px,#f59e0b_9px)] shadow-[0_0_8px_rgba(245,158,11,0.35)]"
+                style={{
+                  left: corda.x - 6,
+                  bottom: 40 + corda.base,
+                  height: corda.topo - corda.base,
+                }}
+              />
+            ))}
+
             {/* cones pequenos no tatame */}
             {CONES.map((x, i) => (
               <div key={`c-${i}`} className="absolute" style={{ left: x, bottom: 38 }}>
@@ -511,6 +564,17 @@ function JogoPage() {
               ),
             )}
 
+            {/* jump que lança o personagem automaticamente */}
+            {JUMPS.map((jump, i) => (
+              <div
+                key={`jump-${i}`}
+                className="absolute rounded-t-full border-2 border-cyan-200 bg-cyan-500/25 shadow-[0_0_16px_rgba(34,211,238,0.75)]"
+                style={{ left: jump.x, width: jump.w, height: jump.h, bottom: 40 }}
+              >
+                <div className="absolute inset-x-3 top-1 h-1 rounded-full bg-cyan-100" />
+              </div>
+            ))}
+
 
             {/* herói */}
             <img
@@ -544,7 +608,7 @@ function JogoPage() {
 
           {pendurado && (
             <span className="absolute left-2 top-12 rounded-full bg-black/70 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary">
-              Pendurado — pule para soltar
+              {pendurado === "corda" ? "Subindo — pule para a próxima" : "Pendurado"} • ▼ duas vezes para soltar
             </span>
           )}
 
@@ -572,7 +636,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▲ pula e solta dos aparelhos • ▼ abaixa para esquivar
+          Setas movem • ▲ pula entre aparelhos • ▼ duas vezes solta • jump impulsiona sozinho
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
