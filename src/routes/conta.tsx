@@ -34,7 +34,21 @@ export const Route = createFileRoute("/conta")({
 });
 
 type Aluno = { id: string; nome: string; idade: number | null; matricula: string | null };
-type Documento = { id: string; tipo: string; nome_arquivo: string; caminho: string; created_at: string };
+type Documento = {
+  id: string;
+  tipo: string;
+  nome_arquivo: string;
+  caminho: string;
+  created_at: string;
+  aluno_id: string | null;
+};
+
+const DESCRICAO_DOC: Record<string, string> = {
+  contrato: "Contrato de prestação de serviço assinado",
+  ficha: "Ficha de anamnese e PAR-Q assinada",
+  documento: "Documento pessoal (RG / certidão)",
+  outro: "Outro documento",
+};
 
 function ContaPage() {
   const [session, setSession] = useState<Session | null>(null);
