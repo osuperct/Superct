@@ -745,7 +745,9 @@ function Painel({ session }: { session: Session }) {
                 <div className="min-w-0">
                   <p className="truncate text-sm">{d.nome_arquivo}</p>
                   <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    {d.tipo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                    {DESCRICAO_DOC[d.tipo] ?? "Documento"} •{" "}
+                    {alunos.find((a) => a.id === d.aluno_id)?.nome ?? "sem aluno"} •{" "}
+                    {new Date(d.created_at).toLocaleDateString("pt-BR")}
                   </p>
                 </div>
                 <div className="flex shrink-0 gap-2">
