@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Assinatura } from "@/components/Assinatura";
+import { formatarCpf } from "@/lib/cpf";
 import { gerarDocumentoPdf } from "@/lib/documentoPdf";
 import { BUCKET, DOCS, EMAIL_SUPER_CT, TERMO_IMAGEM, type TipoDoc } from "@/lib/documentos";
 
@@ -104,6 +105,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
 
   const [valores, setValores] = useState<Record<string, string>>(valoresFixos);
   const [aceite, setAceite] = useState(false);
+  const [aceiteClausulas, setAceiteClausulas] = useState(false);
   const [assinatura, setAssinatura] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [pdfPronto, setPdfPronto] = useState<{ url: string; nome: string } | null>(null);
@@ -119,6 +121,49 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       }
     }
   }, [rascunhoKey]);
+
+  /** Traz os dados já cadastrados (responsável, aluno e ficha) para dentro do documento. */
+  useEffect(() => {
+    let ativo = true;
+    void (async () => {
+      const [{ data: perfil }, { data: alunos }, { data: fichas }] = await Promise.all([
+        supabase.from("perfis").select("nome_responsavel, telefone, cpf, endereco").eq("id", uid).maybeSingle(),
+        supabase.from("alunos").select("nome, idade, nascimento").eq("user_id", uid).order("created_at").limit(1),
+        supabase.from("fichas").select("dados").eq("user_id", uid).order("created_at", { ascending: false }).limit(1),
+      ]);
+      if (!ativo) return;
+      const aluno = alunos?.[0];
+      const daFicha = (fichas?.[0]?.dados ?? {}) as Record<string, string>;
+      const sugestoes: Record<string, string> = {
+        contratante: perfil?.nome_responsavel || daFicha["responsavel_nome"] || "",
+        responsavel_nome: perfil?.nome_responsavel || daFicha["responsavel_nome"] || "",
+        cpf: formatarCpf(perfil?.cpf ?? "") || daFicha["responsavel_cpf"] || "",
+        responsavel_cpf: formatarCpf(perfil?.cpf ?? "") || daFicha["responsavel_cpf"] || "",
+        endereco: perfil?.endereco || daFicha["endereco"] || "",
+        telefone: perfil?.telefone || daFicha["telefone"] || "",
+        aluno: aluno?.nome || daFicha["aluno_nome"] || "",
+        aluno_nome: aluno?.nome || daFicha["aluno_nome"] || "",
+        aluno_idade: aluno?.idade != null ? String(aluno.idade) : daFicha["aluno_idade"] || "",
+        aluno_nascimento: aluno?.nascimento || daFicha["aluno_nascimento"] || "",
+        escola: daFicha["escola"] || "",
+        contato_emergencia: daFicha["contato_emergencia"] || "",
+        plano: daFicha["plano"] || "",
+        saude: daFicha["saude"] || "",
+      };
+      setValores((atual) => {
+        const prox = { ...atual };
+        for (const c of doc.campos) {
+          const sugestao = sugestoes[c.chave];
+          if (c.fixo === undefined && sugestao && !prox[c.chave]) prox[c.chave] = sugestao;
+        }
+        return prox;
+      });
+    })();
+    return () => {
+      ativo = false;
+    };
+  }, [uid, tipo]);
+
 
   function set(chave: string, v: string) {
     setValores((atual) => {
@@ -143,6 +188,10 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       toast.error("Confirme o termo de uso de imagem e a veracidade das informações.");
       return;
     }
+    if (doc.clausulas && !aceiteClausulas) {
+      toast.error("Leia as cláusulas e regras do Super CT e marque que está ciente.");
+      return;
+    }
     if (!assinatura) {
       toast.error("Assine no quadro com a canetinha antes de salvar.");
       return;
@@ -154,7 +203,13 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       const { error: erroFicha } = await supabase.from("fichas").insert({
         user_id: uid,
         tipo,
-        dados: { ...valores, aceite_imagem: true, assinado_online: true, email_responsavel: emailResponsavel },
+        dados: {
+          ...valores,
+          aceite_imagem: true,
+          aceite_clausulas: doc.clausulas ? true : undefined,
+          assinado_online: true,
+          email_responsavel: emailResponsavel,
+        },
         enviado_em: new Date().toISOString(),
       });
       if (erroFicha) throw erroFicha;
@@ -166,6 +221,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         termo: TERMO_IMAGEM,
         assinaturaDataUrl: assinatura,
         nomeAssinante,
+        ...(doc.clausulas ? { clausulas: doc.clausulas } : {}),
       });
       const nomeArquivo = `${doc.arquivo}-assinado-${new Date().toISOString().slice(0, 10)}.pdf`;
       const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
@@ -202,6 +258,13 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       "TERMO DE USO DE IMAGEM (aceito e assinado on-line):",
       TERMO_IMAGEM,
       "",
+      ...(doc.clausulas
+        ? [
+            "CLÁUSULAS E REGRAS DO SUPER CT (lidas e aceitas):",
+            ...doc.clausulas.map((c) => `${c.titulo}\n${c.texto}`),
+            "",
+          ]
+        : []),
       `Assinado on-line em ${new Date().toLocaleString("pt-BR")}.`,
       `O PDF assinado está guardado na área do responsável: ${window.location.origin}/conta`,
     ].join("\n");
@@ -323,6 +386,34 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           {TERMO_IMAGEM}
         </span>
       </label>
+
+      {doc.clausulas && (
+        <section className="space-y-2">
+          <h2 className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            Cláusulas e regras do Super CT
+          </h2>
+          <div className="max-h-64 space-y-3 overflow-y-auto rounded-md border border-border bg-card/40 p-3">
+            {doc.clausulas.map((c) => (
+              <article key={c.titulo}>
+                <h3 className="font-display text-[11px] tracking-tight text-primary">{c.titulo}</h3>
+                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{c.texto}</p>
+              </article>
+            ))}
+          </div>
+          <label className="flex gap-3 rounded-md border border-border bg-card/50 p-3 text-xs leading-relaxed">
+            <input
+              type="checkbox"
+              checked={aceiteClausulas}
+              onChange={(e) => setAceiteClausulas(e.target.checked)}
+              className="mt-0.5 size-4 shrink-0"
+            />
+            <span>
+              Li todas as cláusulas e regras acima e estou ciente e de acordo, inclusive com as condições de
+              pagamento e as normas de convivência e segurança do Super CT.
+            </span>
+          </label>
+        </section>
+      )}
 
       <Assinatura onChange={setAssinatura} />
 
