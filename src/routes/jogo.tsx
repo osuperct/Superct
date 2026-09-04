@@ -776,13 +776,6 @@ function JogoPage() {
     setAbaixado(ativo);
   };
 
-  const mover = (valor: number) => () => {
-    dir.current = valor;
-  };
-  const parar = () => {
-    dir.current = 0;
-  };
-
   const alt = alturaHeroi(abaixado);
   const emChefao = modo === "chefao";
   const mundoAtual = emChefao ? ARENA : MUNDO;
