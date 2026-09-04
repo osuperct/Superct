@@ -361,11 +361,9 @@ function JogoPage() {
           const p = paredes.find((p) => cx > p.x - 6 && cx < p.x + p.w + 6);
           if (p) {
             x.current = Math.min(p.x + p.w - HEROI_W, Math.max(p.x, x.current));
-            const delta = subindo.current
-              ? VELOCIDADE_ESCALADA
-              : descendoParede.current
-                ? -VELOCIDADE_ESCALADA
-                : 0;
+            const querSubir = subindo.current || dirY.current < -0.3;
+            const querDescer = descendoParede.current || dirY.current > 0.3;
+            const delta = querSubir ? VELOCIDADE_ESCALADA : querDescer ? -VELOCIDADE_ESCALADA : 0;
             apoio = Math.min(p.h - alt, Math.max(0, y.current + delta));
           } else seguro.current = false;
         } else {
