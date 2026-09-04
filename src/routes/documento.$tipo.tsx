@@ -379,11 +379,16 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           </label>
         ) : (
           <label key={c.chave} className="block">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{c.rotulo}</span>
+            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+              {c.rotulo}
+              {c.obrigatorio && <span className="text-primary"> *obrigatório</span>}
+            </span>
             <input
               value={valores[c.chave] ?? ""}
-              onChange={(e) => set(c.chave, e.target.value)}
-              maxLength={300}
+              onChange={(e) => set(c.chave, c.cpf ? formatarCpf(e.target.value) : e.target.value)}
+              maxLength={c.cpf ? 14 : 300}
+              required={c.obrigatorio === true}
+              inputMode={c.cpf || c.chave === "telefone" ? "numeric" : undefined}
               className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             />
           </label>
