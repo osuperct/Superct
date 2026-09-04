@@ -75,7 +75,7 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
   },
   {
     chave: "valor",
-    rotulo: "Valor mensal / do evento (R$)",
+    rotulo: "Valor da mensalidade (R$)",
     opcoes: [
       "Plano mensal R$185,00",
       "Plano Recorrente R$160,00",
