@@ -40,6 +40,8 @@ type Barra = { x: number; w: number; y: number };
 type Argola = { x: number; y: number };
 type Corda = { x: number; base: number; topo: number };
 type Jump = { x: number; w: number; h: number };
+type Parede = { x: number; w: number; h: number };
+type Pino = { x: number; y: number; cor: string };
 
 const SOLIDOS: Solido[] = [
   { x: 430, w: 72, h: 56, tipo: "caixa" },
