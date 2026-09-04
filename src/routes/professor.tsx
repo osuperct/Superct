@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { FileText, GraduationCap, Users } from "lucide-react";
+import { FileText, GraduationCap, Paperclip, Trash2, Upload, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +38,8 @@ type Doc = {
   caminho: string;
   created_at: string;
   user_id: string;
+  aluno_id: string | null;
+  enviado_por_professor: boolean;
 };
 type Alu = { id: string; nome: string; idade: number | null; matricula: string | null; user_id: string };
 type Perfil = { id: string; nome_responsavel: string; telefone: string | null; cpf: string | null };
@@ -109,6 +111,10 @@ function Painel() {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [alunos, setAlunos] = useState<Alu[]>([]);
   const [perfis, setPerfis] = useState<Perfil[]>([]);
+  const [alunoSel, setAlunoSel] = useState("");
+  const [tipoSel, setTipoSel] = useState("contrato");
+  const [enviando, setEnviando] = useState(false);
+  const inputArquivo = useRef<HTMLInputElement>(null);
 
   const carregar = useCallback(async () => {
     const { data: papeis } = await supabase.from("user_roles").select("role");
@@ -119,7 +125,7 @@ function Painel() {
     const [{ data: d }, { data: a }, { data: p }] = await Promise.all([
       supabase
         .from("documentos")
-        .select("id, tipo, nome_arquivo, caminho, created_at, user_id")
+        .select("id, tipo, nome_arquivo, caminho, created_at, user_id, aluno_id, enviado_por_professor")
         .order("created_at", { ascending: false }),
       supabase.from("alunos").select("id, nome, idade, matricula, user_id").order("matricula"),
       supabase.from("perfis").select("id, nome_responsavel, telefone, cpf"),
@@ -138,6 +144,57 @@ function Painel() {
     if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
     else toast.error("Não foi possível abrir o arquivo.");
   }
+
+  async function excluir(doc: Doc) {
+    if (!window.confirm(`Excluir definitivamente "${doc.nome_arquivo}"?`)) return;
+    const { error } = await supabase.from("documentos").delete().eq("id", doc.id);
+    if (error) {
+      toast.error("Não foi possível excluir o documento.");
+      return;
+    }
+    await supabase.storage.from(BUCKET).remove([doc.caminho]);
+    toast.success("Documento excluído.");
+    void carregar();
+  }
+
+  async function anexar(arquivo: File) {
+    const alu = alunos.find((a) => a.id === alunoSel);
+    if (!alu) {
+      toast.error("Escolha o aluno do documento.");
+      return;
+    }
+    if (arquivo.size > 20 * 1024 * 1024) {
+      toast.error("Arquivo muito grande (máximo 20 MB).");
+      return;
+    }
+    setEnviando(true);
+    const limpo = arquivo.name.replace(/[^\w.\-]+/g, "_");
+    const caminho = `${alu.user_id}/${Date.now()}-${limpo}`;
+    const { error: erroUp } = await supabase.storage.from(BUCKET).upload(caminho, arquivo);
+    if (erroUp) {
+      setEnviando(false);
+      toast.error("Falha ao enviar o arquivo.");
+      return;
+    }
+    const { error } = await supabase.from("documentos").insert({
+      user_id: alu.user_id,
+      aluno_id: alu.id,
+      tipo: tipoSel,
+      nome_arquivo: arquivo.name,
+      caminho,
+      enviado_por_professor: true,
+    });
+    setEnviando(false);
+    if (inputArquivo.current) inputArquivo.current.value = "";
+    if (error) {
+      toast.error("Não foi possível registrar o documento.");
+      return;
+    }
+    toast.success(`Documento anexado ao cadastro de ${alu.nome}.`);
+    void carregar();
+  }
+
+
 
   if (autorizado === null) return <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>;
   if (!autorizado)
@@ -190,24 +247,96 @@ function Painel() {
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <Paperclip className="size-4 text-primary" /> ANEXAR CONTRATO DE UM ALUNO
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Envie um contrato já preenchido (foto ou PDF) para o cadastro do responsável. O responsável poderá
+          ver e baixar, mas não excluir.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <select
+            value={alunoSel}
+            onChange={(e) => setAlunoSel(e.target.value)}
+            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="">Escolha o aluno…</option>
+            {alunos.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.nome} — {perfis.find((p) => p.id === a.user_id)?.nome_responsavel || "responsável"}
+              </option>
+            ))}
+          </select>
+          <select
+            value={tipoSel}
+            onChange={(e) => setTipoSel(e.target.value)}
+            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="contrato">Contrato assinado</option>
+            <option value="ficha">Ficha / PAR-Q</option>
+            <option value="documento">Documento pessoal</option>
+            <option value="outro">Outro</option>
+          </select>
+          <input
+            ref={inputArquivo}
+            type="file"
+            accept="image/*,application/pdf"
+            id="anexo-professor"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void anexar(f);
+            }}
+          />
+          <label
+            htmlFor="anexo-professor"
+            className="flex cursor-pointer items-center gap-2 rounded-md bg-primary px-4 py-2 font-display text-sm text-primary-foreground"
+          >
+            <Upload className="size-4" /> {enviando ? "ENVIANDO…" : "ANEXAR"}
+          </label>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-border bg-card/40 p-4">
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <FileText className="size-4 text-primary" /> CONTRATOS ASSINADOS ({docs.length})
         </h2>
         <ul className="mt-3 space-y-2">
-          {docs.map((d) => (
-            <li key={d.id} className="rounded-md border border-border bg-background/40 p-3">
-              <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                {new Date(d.created_at).toLocaleString("pt-BR")}
-              </p>
-              <p className="mt-1 text-sm">{d.nome_arquivo}</p>
-              <button
-                type="button"
-                onClick={() => void abrir(d)}
-                className="mt-2 rounded-md border border-primary px-3 py-1.5 font-display text-xs tracking-tight text-primary"
-              >
-                ABRIR PDF
-              </button>
-            </li>
-          ))}
+          {docs.map((d) => {
+            const alu = alunos.find((a) => a.id === d.aluno_id);
+            const resp = perfis.find((p) => p.id === d.user_id);
+            return (
+              <li key={d.id} className="rounded-md border border-border bg-background/40 p-3">
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                  {new Date(d.created_at).toLocaleString("pt-BR")}
+                </p>
+                <p className="mt-1 text-sm font-medium text-primary">
+                  {alu?.nome ?? "Aluno não identificado"}
+                  {alu?.matricula ? ` • ${alu.matricula}` : ""}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Responsável: {resp?.nome_responsavel || "—"}
+                  {d.enviado_por_professor ? " • anexado pelo professor" : ""}
+                </p>
+                <p className="mt-1 text-sm">{d.nome_arquivo}</p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void abrir(d)}
+                    className="rounded-md border border-primary px-3 py-1.5 font-display text-xs tracking-tight text-primary"
+                  >
+                    ABRIR PDF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void excluir(d)}
+                    className="flex items-center gap-1 rounded-md border border-border px-3 py-1.5 font-display text-xs tracking-tight text-muted-foreground hover:border-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="size-3" /> EXCLUIR
+                  </button>
+                </div>
+              </li>
+            );
+          })}
           {docs.length === 0 && <li className="text-sm text-muted-foreground">Nenhum contrato assinado ainda.</li>}
         </ul>
       </section>

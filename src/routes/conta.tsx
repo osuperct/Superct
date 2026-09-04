@@ -41,6 +41,7 @@ type Documento = {
   caminho: string;
   created_at: string;
   aluno_id: string | null;
+  enviado_por_professor: boolean;
 };
 
 const DESCRICAO_DOC: Record<string, string> = {
@@ -471,7 +472,7 @@ function Painel({ session }: { session: Session }) {
       supabase.from("alunos").select("id, nome, idade, matricula").eq("user_id", uid).order("created_at"),
       supabase
         .from("documentos")
-        .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id")
+        .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id, enviado_por_professor")
         .eq("user_id", uid)
         .eq("oculto_responsavel", false)
         .order("created_at", { ascending: false }),
@@ -642,6 +643,7 @@ function Painel({ session }: { session: Session }) {
                         </span>
                         <span className="block truncate text-[11px] text-muted-foreground">
                           {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                          {d.enviado_por_professor ? " • enviado pelo professor" : ""}
                         </span>
                       </span>
                       <button
@@ -651,13 +653,15 @@ function Painel({ session }: { session: Session }) {
                       >
                         Ver
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => remover(d)}
-                        className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
-                      >
-                        Excluir
-                      </button>
+                      {!d.enviado_por_professor && (
+                        <button
+                          type="button"
+                          onClick={() => remover(d)}
+                          className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                        >
+                          Excluir
+                        </button>
+                      )}
                     </li>
                   ))}
                   {docsAluno.length === 0 && (
@@ -797,13 +801,15 @@ function Painel({ session }: { session: Session }) {
                   >
                     Ver
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => remover(d)}
-                    className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
-                  >
-                    Excluir
-                  </button>
+                  {!d.enviado_por_professor && (
+                    <button
+                      type="button"
+                      onClick={() => remover(d)}
+                      className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                    >
+                      Excluir
+                    </button>
+                  )}
                 </div>
               </li>
             ))}
