@@ -586,54 +586,83 @@ function Painel({ session }: { session: Session }) {
 
       <section className="mt-5 rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <UserPlus className="size-4 text-primary" /> ALUNOS
+          <UserPlus className="size-4 text-primary" /> ALUNOS E DOCUMENTOS
         </h2>
-        <ul className="mt-2 space-y-1">
-          {alunos.map((a) => (
-            <li key={a.id} className="flex items-center justify-between gap-2 text-sm">
-              <span className="flex-1 truncate">
-                • {a.nome}
-                {a.idade ? ` — ${a.idade} anos` : ""}
-                {a.matricula && (
-                  <span className="ml-2 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
-                    Matrícula {a.matricula}
+        <p className="mt-1 text-xs text-muted-foreground">
+          O aluno entra nesta lista quando o contrato dele é preenchido e assinado. Abaixo de cada nome ficam
+          todos os documentos daquele aluno.
+        </p>
+        <ul className="mt-3 space-y-3">
+          {alunos.map((a) => {
+            const docsAluno = documentos.filter((d) => d.aluno_id === a.id);
+            return (
+              <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
+                <div className="flex items-start justify-between gap-2">
+                  <span className="min-w-0 flex-1 text-sm">
+                    {a.nome}
+                    {a.idade ? ` — ${a.idade} anos` : ""}
+                    {a.matricula && (
+                      <span className="ml-2 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
+                        Matrícula {a.matricula}
+                      </span>
+                    )}
                   </span>
-                )}
-              </span>
-              <button
-                type="button"
-                onClick={() => excluirAluno(a.id)}
-                title="Excluir aluno"
-                className="shrink-0 rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-              >
-                <Trash2 className="size-4" />
-              </button>
+                  <button
+                    type="button"
+                    onClick={() => excluirAluno(a.id)}
+                    title="Excluir aluno"
+                    className="shrink-0 rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </div>
+                <ul className="mt-2 space-y-1">
+                  {docsAluno.map((d) => (
+                    <li key={d.id} className="flex items-center justify-between gap-2">
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-mono text-[10px] uppercase tracking-widest text-primary">
+                          {DESCRICAO_DOC[d.tipo] ?? "Documento anexado"}
+                        </span>
+                        <span className="block truncate text-[11px] text-muted-foreground">
+                          {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => abrir(d)}
+                        className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
+                      >
+                        Ver
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => remover(d)}
+                        className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                      >
+                        Excluir
+                      </button>
+                    </li>
+                  ))}
+                  {docsAluno.length === 0 && (
+                    <li className="text-[11px] text-muted-foreground">Nenhum documento deste aluno ainda.</li>
+                  )}
+                </ul>
+              </li>
+            );
+          })}
+          {alunos.length === 0 && (
+            <li className="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">
+              Nenhum aluno na lista. Preencha o contrato do aluno para incluí-lo aqui.
             </li>
-          ))}
-          {alunos.length === 0 && <li className="text-sm text-muted-foreground">Nenhum aluno cadastrado.</li>}
+          )}
         </ul>
-        <form onSubmit={adicionarAluno} className="mt-3 flex items-center gap-2">
-          <input
-            value={novoAluno}
-            onChange={(e) => setNovoAluno(e.target.value)}
-            placeholder="Nome do aluno"
-            maxLength={120}
-            className="w-32 shrink-0 rounded-md border border-border bg-background px-2 py-2 text-sm outline-none focus:border-primary"
-          />
-          <input
-            value={novaIdade}
-            onChange={(e) => setNovaIdade(e.target.value)}
-            placeholder="Idade"
-            type="number"
-            className="w-16 shrink-0 rounded-md border border-border bg-background px-2 py-2 text-center text-sm outline-none focus:border-primary"
-          />
-          <button
-            type="submit"
-            className="ml-auto flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary font-display text-base text-primary-foreground"
-          >
-            +
-          </button>
-        </form>
+        <Link
+          to="/documento/$tipo"
+          params={{ tipo: "contrato" }}
+          className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+        >
+          PREENCHER CONTRATO DE UM ALUNO <Send className="size-4 shrink-0" />
+        </Link>
       </section>
 
       <div className="mt-5 flex gap-2">
