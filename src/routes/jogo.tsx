@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
 import mascote from "@/assets/mascote-menino.jpg.asset.json";
+import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
 
 const TITLE = "Super Jogo — Academia dos vilões do Super CT | Professor Tio Victor";
@@ -74,27 +75,6 @@ const CONES: number[] = [
   180, 340, 560, 820, 900, 1100, 1340, 1500, 1700, 1900, 2050, 2300, 2560, 2750,
   2900, 3100, 3260, 3480, 3720, 3900, 4050,
 ];
-
-/* logo vazada (só traço) aplicada nas caixas */
-function LogoVazada({ size }: { size: number }) {
-  return (
-    <svg
-      viewBox="0 0 100 100"
-      width={size}
-      height={size}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={5}
-      strokeLinejoin="round"
-      strokeLinecap="round"
-    >
-      <path d="M50 8 88 22v34c0 21-16 33-38 44C28 89 12 77 12 56V22Z" />
-      <path d="M62 40a12 12 0 1 0 0 24" />
-      <path d="M30 42h18M39 42v22" />
-    </svg>
-  );
-}
-
 
 type Padrao = "reta" | "queda" | "zigue";
 type Inimigo = {
@@ -511,8 +491,13 @@ function JogoPage() {
                 >
                   <div className="absolute inset-x-0 top-0 h-1 bg-primary/70" />
                   <div className="absolute inset-2 rounded-sm border border-white/10" />
-                  <div className="absolute inset-0 flex items-center justify-center text-primary/70">
-                    <LogoVazada size={Math.min(s.w, s.h) - 16} />
+                  <div className="absolute inset-1 flex items-center justify-center">
+                    <img
+                      src={logoVazada}
+                      alt=""
+                      aria-hidden="true"
+                      className="h-full w-full object-contain opacity-80"
+                    />
                   </div>
                 </div>
               ) : (
