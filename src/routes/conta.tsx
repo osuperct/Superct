@@ -458,9 +458,8 @@ function Painel({ session }: { session: Session }) {
   const uid = session.user.id;
   const [alunos, setAlunos] = useState<Aluno[]>([]);
   const [documentos, setDocumentos] = useState<Documento[]>([]);
-  const [novoAluno, setNovoAluno] = useState("");
-  const [novaIdade, setNovaIdade] = useState("");
   const [tipoDoc, setTipoDoc] = useState("contrato");
+  const [alunoDoc, setAlunoDoc] = useState("");
   const [enviandoArquivo, setEnviandoArquivo] = useState(false);
   const [aba, setAba] = useState<"documentos" | "online">("online");
   const inputArquivo = useRef<HTMLInputElement>(null);
