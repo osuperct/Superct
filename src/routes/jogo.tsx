@@ -510,7 +510,7 @@ function JogoPage() {
               y: base,
               vilao,
               padrao,
-              vx: (0.85 + Math.min(1.1, tick.current / 5000) + Math.random() * 0.5) * dif,
+              vx: (0.55 + Math.min(0.85, tick.current / 7000) + Math.random() * 0.35) * dif,
               fase: Math.random() * Math.PI * 2,
               base,
             },
