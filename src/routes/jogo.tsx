@@ -211,8 +211,10 @@ function JogoPage() {
   const [piscando, setPiscando] = useState(false);
   const [heroiSel, setHeroiSel] = useState<HeroiId | null>(null);
   const [olhando, setOlhando] = useState<1 | -1>(1);
+  const [andando, setAndando] = useState(false);
   const heroiRef = useRef<HeroiId | null>(null);
   const olhandoRef = useRef<1 | -1>(1);
+  const andandoRef = useRef(false);
 
 
 
@@ -461,8 +463,17 @@ function JogoPage() {
           setOlhando(lado);
         }
         passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
-
       }
+
+      /* ---- animação de caminhada ---- */
+      {
+        const caminhando = dir.current !== 0 && !noAr.current && !seguro.current;
+        if (andandoRef.current !== caminhando) {
+          andandoRef.current = caminhando;
+          setAndando(caminhando);
+        }
+      }
+
 
       /* ---- impulso lateral do salto ao soltar aparelho ---- */
       if (vxAr.current !== 0) {
@@ -1333,21 +1344,28 @@ function JogoPage() {
 
 
             {/* herói (recortado, vira para o lado do movimento) */}
-            <img
-              src={heroiAtual.img}
-              alt={`${heroiAtual.nome}, herói do Super CT`}
-              className="absolute object-contain object-bottom transition-[height] duration-100"
+            <div
+              className="absolute transition-[height] duration-100"
               style={{
                 left: heroX,
                 width: HEROI_W,
                 height: alt,
                 bottom: 40 + heroY,
                 transform: `scaleX(${olhando})`,
-                filter: pendurado
-                  ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
-                  : `drop-shadow(0 0 6px ${heroiAtual.cor})`,
               }}
-            />
+            >
+              <img
+                src={heroiAtual.img}
+                alt={`${heroiAtual.nome}, herói do Super CT`}
+                className={`size-full object-contain object-bottom${andando ? " animate-hero-walk" : ""}`}
+                style={{
+                  filter: pendurado
+                    ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
+                    : `drop-shadow(0 0 6px ${heroiAtual.cor})`,
+                }}
+              />
+            </div>
+
 
 
             {/* vilões do percurso */}
