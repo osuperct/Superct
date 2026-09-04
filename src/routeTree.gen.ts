@@ -16,6 +16,7 @@ import { Route as HeroisRouteImport } from './routes/herois'
 import { Route as JogoRouteImport } from './routes/jogo'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ViloesRouteImport } from './routes/viloes'
+import { Route as DocumentoTipoRouteImport } from './routes/documento.$tipo'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const ViloesRoute = ViloesRouteImport.update({
   path: '/viloes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DocumentoTipoRoute = DocumentoTipoRouteImport.update({
+  id: '/documento/$tipo',
+  path: '/documento/$tipo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/jogo': typeof JogoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
+  '/documento/$tipo': typeof DocumentoTipoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/jogo': typeof JogoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
+  '/documento/$tipo': typeof DocumentoTipoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/jogo': typeof JogoRoute
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
+  '/documento/$tipo': typeof DocumentoTipoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/jogo'
     | '/reset-password'
     | '/viloes'
+    | '/documento/$tipo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/jogo'
     | '/reset-password'
     | '/viloes'
+    | '/documento/$tipo'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/jogo'
     | '/reset-password'
     | '/viloes'
+    | '/documento/$tipo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   JogoRoute: typeof JogoRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ViloesRoute: typeof ViloesRoute
+  DocumentoTipoRoute: typeof DocumentoTipoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ViloesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/documento/$tipo': {
+      id: '/documento/$tipo'
+      path: '/documento/$tipo'
+      fullPath: '/documento/$tipo'
+      preLoaderRoute: typeof DocumentoTipoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   JogoRoute: JogoRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ViloesRoute: ViloesRoute,
+  DocumentoTipoRoute: DocumentoTipoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

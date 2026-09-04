@@ -659,221 +659,33 @@ function Painel({ session }: { session: Session }) {
           </ul>
         </section>
       ) : (
-        <FormulariosOnline uid={uid} emailResponsavel={session.user.email ?? ""} aoSalvar={recarregar} />
+        <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+            <FileText className="size-4 text-primary" /> PREENCHER ONLINE
+          </h2>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Cada documento abre numa página só dele: você digita os espaços em branco pelo celular, assina com a
+            canetinha e ele fica arquivado aqui nos documentos do aluno.
+          </p>
+          <div className="mt-4 space-y-2">
+            {(
+              [
+                ["contrato", "CONTRATO DE PRESTAÇÃO DE SERVIÇO"],
+                ["ficha", "FICHA DO ALUNO (ANEXO)"],
+              ] as const
+            ).map(([id, rotulo]) => (
+              <Link
+                key={id}
+                to="/documento/$tipo"
+                params={{ tipo: id }}
+                className="flex items-center justify-between gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+              >
+                {rotulo} <Send className="size-4 shrink-0" />
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
     </div>
-  );
-}
-
-/* ----------------------------- FORMULÁRIOS ONLINE ----------------------------- */
-
-const CAMPOS_FICHA = [
-  ["aluno_nome", "Nome completo do aluno"],
-  ["aluno_nascimento", "Data de nascimento"],
-  ["aluno_idade", "Idade"],
-  ["escola", "Escola / série"],
-  ["responsavel_nome", "Nome do responsável"],
-  ["responsavel_cpf", "CPF do responsável"],
-  ["responsavel_rg", "RG do responsável"],
-  ["endereco", "Endereço completo"],
-  ["telefone", "Telefone / WhatsApp"],
-  ["contato_emergencia", "Contato de emergência (nome e telefone)"],
-  ["saude", "Problemas de saúde, alergias ou medicamentos"],
-  ["plano", "Convênio / plano de saúde"],
-  ["turma", "Turma e horário desejados"],
-] as const;
-
-const CAMPOS_CONTRATO = [
-  ["contratante", "Nome do contratante (responsável)"],
-  ["cpf", "CPF do contratante"],
-  ["endereco", "Endereço do contratante"],
-  ["aluno", "Nome do aluno"],
-  ["servico", "Serviço contratado (modalidade / evento)"],
-  ["data_inicio", "Data de início"],
-  ["dias_horarios", "Dias e horários"],
-  ["valor", "Valor mensal / do evento (R$)"],
-  ["vencimento", "Dia de vencimento"],
-  ["forma_pagamento", "Forma de pagamento"],
-  ["observacoes", "Observações"],
-] as const;
-
-function FormulariosOnline({
-  uid,
-  emailResponsavel,
-  aoSalvar,
-}: {
-  uid: string;
-  emailResponsavel: string;
-  aoSalvar: () => void | Promise<void>;
-}) {
-  const [qual, setQual] = useState<"ficha" | "contrato">("ficha");
-  const campos = qual === "ficha" ? CAMPOS_FICHA : CAMPOS_CONTRATO;
-  const [valores, setValores] = useState<Record<string, string>>({});
-  const [aceite, setAceite] = useState(false);
-  const [ocupado, setOcupado] = useState(false);
-  const [assinatura, setAssinatura] = useState<string | null>(null);
-  const [pdfPronto, setPdfPronto] = useState<{ url: string; nome: string } | null>(null);
-
-  function set(chave: string, v: string) {
-    setValores((atual) => ({ ...atual, [chave]: v }));
-  }
-
-  async function enviar(e: React.FormEvent) {
-    e.preventDefault();
-    if (!aceite) {
-      toast.error("Confirme o termo de uso de imagem e a veracidade das informações.");
-      return;
-    }
-    if (!assinatura) {
-      toast.error("Assine no quadro com a canetinha antes de enviar.");
-      return;
-    }
-    setOcupado(true);
-    const titulo = qual === "ficha" ? "Ficha do Aluno" : "Contrato de Prestação de Serviços";
-    const nomeAssinante = valores["responsavel_nome"] ?? valores["contratante"] ?? "";
-
-    try {
-      const { error: erroFicha } = await supabase.from("fichas").insert({
-        user_id: uid,
-        tipo: qual,
-        dados: {
-          ...valores,
-          aceite_imagem: true,
-          assinado_online: true,
-          email_responsavel: emailResponsavel,
-        },
-        enviado_em: new Date().toISOString(),
-      });
-      if (erroFicha) throw erroFicha;
-
-      const linhas = campos.map(([k, rotulo]) => ({ rotulo, valor: valores[k] ?? "" }));
-      const blob = gerarDocumentoPdf({
-        titulo,
-        linhas,
-        termo: TERMO_IMAGEM,
-        assinaturaDataUrl: assinatura,
-        nomeAssinante,
-      });
-      const nomeArquivo = `${qual === "ficha" ? "ficha-do-aluno" : "contrato"}-assinado-${new Date()
-        .toISOString()
-        .slice(0, 10)}.pdf`;
-      const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
-      const { error: erroUpload } = await supabase.storage
-        .from(BUCKET)
-        .upload(caminho, blob, { contentType: "application/pdf" });
-      if (erroUpload) throw erroUpload;
-
-      const { error: erroDoc } = await supabase.from("documentos").insert({
-        user_id: uid,
-        tipo: qual === "ficha" ? "ficha" : "contrato",
-        nome_arquivo: nomeArquivo,
-        caminho,
-      });
-      if (erroDoc) throw erroDoc;
-
-      setPdfPronto({ url: URL.createObjectURL(blob), nome: nomeArquivo });
-      await aoSalvar();
-
-      const corpo = [
-        `${titulo.toUpperCase()} — SUPER CT`,
-        "",
-        ...linhas.map((l) => `${l.rotulo}: ${l.valor || "-"}`),
-        "",
-        "TERMO DE USO DE IMAGEM (aceito e assinado on-line):",
-        TERMO_IMAGEM,
-        "",
-        `Assinado on-line por ${nomeAssinante || emailResponsavel} em ${new Date().toLocaleString("pt-BR")}.`,
-        `O documento assinado em PDF também está guardado na área do responsável: ${window.location.origin}/conta`,
-      ].join("\n");
-
-      window.location.href = `mailto:${encodeURIComponent(emailResponsavel)}?cc=${encodeURIComponent(
-        EMAIL_SUPER_CT,
-      )}&subject=${encodeURIComponent(
-        `${titulo} assinado — ${valores["aluno_nome"] ?? valores["aluno"] ?? "novo aluno"}`,
-      )}&body=${encodeURIComponent(corpo)}`;
-
-      toast.success("Documento assinado, anexado nos documentos do aluno e pronto para envio!");
-    } catch {
-      toast.error("Não foi possível concluir o envio do documento.");
-    } finally {
-      setOcupado(false);
-    }
-  }
-
-  return (
-    <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <FileText className="size-4 text-primary" /> PREENCHER ONLINE
-      </h2>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Preencha, assine com a canetinha e o PDF assinado vai direto para os documentos do aluno e para o
-        seu e-mail (com cópia para o Super CT).
-      </p>
-
-      <div className="mt-3 flex gap-2">
-        {(
-          [
-            ["ficha", "FICHA DO ALUNO"],
-            ["contrato", "CONTRATO"],
-          ] as const
-        ).map(([id, rotulo]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setQual(id)}
-            className={`flex-1 rounded-md px-3 py-2 font-display text-xs tracking-tight ${
-              qual === id ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"
-            }`}
-          >
-            {rotulo}
-          </button>
-        ))}
-      </div>
-
-      <form onSubmit={enviar} className="mt-4 space-y-3">
-        {campos.map(([chave, rotulo]) => (
-          <Campo
-            key={chave}
-            label={rotulo}
-            value={valores[chave] ?? ""}
-            onChange={(v) => set(chave, v)}
-            maxLength={300}
-          />
-        ))}
-
-        <label className="flex gap-3 rounded-md border border-border bg-card/50 p-3 text-xs leading-relaxed">
-          <input
-            type="checkbox"
-            checked={aceite}
-            onChange={(e) => setAceite(e.target.checked)}
-            className="mt-0.5 size-4 shrink-0"
-          />
-          <span>
-            Declaro que as informações são verdadeiras e autorizo o uso de imagem do(a) aluno(a) conforme o
-            termo: {TERMO_IMAGEM}
-          </span>
-        </label>
-
-        <Assinatura onChange={setAssinatura} />
-
-        <button
-          type="submit"
-          disabled={ocupado}
-          className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display tracking-tight text-primary-foreground disabled:opacity-60"
-        >
-          <Send className="size-4" /> {ocupado ? "ENVIANDO…" : "ASSINAR E ENVIAR"}
-        </button>
-
-        {pdfPronto && (
-          <a
-            href={pdfPronto.url}
-            download={pdfPronto.nome}
-            className="block rounded-md border border-primary px-4 py-2 text-center font-display text-xs tracking-tight text-primary"
-          >
-            BAIXAR PDF ASSINADO (para anexar no e-mail)
-          </a>
-        )}
-      </form>
-    </section>
   );
 }
