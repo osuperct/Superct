@@ -1374,7 +1374,7 @@ function JogoPage() {
                     width: HEROI_W,
                     height: alt,
                     bottom: 40 + heroY,
-                    transform: escalando ? "none" : `scaleX(${-olhando})`,
+                    transform: escalando ? "none" : `scaleX(${andando ? olhando : -olhando})`,
                   }}
                 >
                   <img
