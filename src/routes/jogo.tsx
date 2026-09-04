@@ -186,6 +186,7 @@ function JogoPage() {
   const ultimoToqueBaixo = useRef<number | null>(null);
   const ultimoToqueDireita = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
+  const vxAr = useRef(0);
   const duck = useRef(false);
   const fimRef = useRef(false);
   const pausaRef = useRef(false);
@@ -312,8 +313,8 @@ function JogoPage() {
       const alt = alturaHeroi(duck.current);
 
       /* ---- movimento horizontal ---- */
-      if (dir.current !== 0) {
-        const alvo = x.current + dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE);
+      const passo = (delta: number) => {
+        const alvo = x.current + delta;
         let livre = true;
         if (!seguro.current) {
           for (const s of solidos) {
@@ -325,7 +326,22 @@ function JogoPage() {
           }
         }
         if (livre) x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
+      };
+
+      if (dir.current !== 0) {
+        passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
       }
+
+      /* ---- impulso lateral do salto ao soltar aparelho ---- */
+      if (vxAr.current !== 0) {
+        if (seguro.current) vxAr.current = 0;
+        else {
+          passo(vxAr.current);
+          vxAr.current *= 0.94;
+          if (Math.abs(vxAr.current) < 0.25) vxAr.current = 0;
+        }
+      }
+
 
       /* ---- vertical ---- */
       if (seguro.current) {
@@ -675,6 +691,21 @@ function JogoPage() {
 
   const pular = () => {
     if (fimRef.current) return;
+    /* pendurado + seta lateral pressionada = solta e pula na diagonal */
+    if (seguro.current && dir.current !== 0) {
+      const lado = dir.current;
+      seguro.current = false;
+      subindo.current = false;
+      descendoParede.current = false;
+      duck.current = false;
+      setAbaixado(false);
+      setPendurado(false);
+      noAr.current = true;
+      vy.current = IMPULSO * 0.95;
+      vxAr.current = lado * VELOCIDADE * 2.1;
+      bloquearAgarreAte.current = performance.now() + 400;
+      return;
+    }
     if (seguro.current === "parede") {
       subindo.current = true;
       duck.current = false;
@@ -693,6 +724,7 @@ function JogoPage() {
     noAr.current = true;
     vy.current = IMPULSO;
   };
+
 
   const pararSubida = () => {
     subindo.current = false;
