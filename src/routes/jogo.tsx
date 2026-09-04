@@ -491,6 +491,11 @@ function JogoPage() {
       if (vxAr.current !== 0) {
         if (seguro.current) vxAr.current = 0;
         else {
+          const ladoAr: 1 | -1 = vxAr.current > 0 ? 1 : -1;
+          if (olhandoRef.current !== ladoAr) {
+            olhandoRef.current = ladoAr;
+            setOlhando(ladoAr);
+          }
           passo(vxAr.current);
           vxAr.current *= 0.94;
           if (Math.abs(vxAr.current) < 0.25) vxAr.current = 0;
@@ -1374,7 +1379,7 @@ function JogoPage() {
                     width: HEROI_W,
                     height: alt,
                     bottom: 40 + heroY,
-                    transform: escalando ? "none" : `scaleX(${andando ? olhando : -olhando})`,
+                    transform: escalando ? "none" : `scaleX(${olhando})`,
                   }}
                 >
                   <img
