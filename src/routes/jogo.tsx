@@ -610,7 +610,7 @@ function JogoPage() {
 
           {pendurado && (
             <span className="absolute left-2 top-12 rounded-full bg-black/70 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary">
-              {pendurado === "corda" ? "Subindo — pule para a próxima" : "Pendurado"} • ▼ duas vezes para soltar
+              {pendurado === "corda" ? "Subindo — pule para a próxima" : "Pendurado"} • ▼ 2x em 2s para soltar
             </span>
           )}
 
