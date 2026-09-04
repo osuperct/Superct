@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Home,
@@ -9,7 +9,10 @@ import {
   UserRound,
   ChevronLeft,
   ChevronRight,
+  GraduationCap,
 } from "lucide-react";
+
+import { supabase } from "@/integrations/supabase/client";
 
 const itens = [
   { to: "/", label: "Início", icon: Home },
@@ -22,6 +25,25 @@ const itens = [
 
 export function SideRail() {
   const [aberta, setAberta] = useState(true);
+  const [professor, setProfessor] = useState(false);
+
+  useEffect(() => {
+    let ativo = true;
+    async function checar() {
+      const { data } = await supabase.from("user_roles").select("role");
+      if (ativo) setProfessor((data ?? []).some((p) => p.role === "professor"));
+    }
+    void checar();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => void checar());
+    return () => {
+      ativo = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  const links = professor
+    ? [...itens, { to: "/professor", label: "Professor", icon: GraduationCap } as const]
+    : itens;
 
   if (!aberta) {
     return (
@@ -39,7 +61,7 @@ export function SideRail() {
   return (
     <aside className="fixed left-0 top-1/2 z-[60] -translate-y-1/2">
       <nav className="flex flex-col gap-1 rounded-r-lg border border-l-0 border-border bg-background/70 py-2 pl-1 pr-1.5 backdrop-blur-md">
-        {itens.map((item) => (
+        {links.map((item) => (
           <Link
             key={item.to}
             to={item.to}

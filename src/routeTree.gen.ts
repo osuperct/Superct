@@ -14,6 +14,7 @@ import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as HeroisRouteImport } from './routes/herois'
 import { Route as JogoRouteImport } from './routes/jogo'
+import { Route as ProfessorRouteImport } from './routes/professor'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ViloesRouteImport } from './routes/viloes'
 import { Route as DocumentoTipoRouteImport } from './routes/documento.$tipo'
@@ -43,6 +44,11 @@ const JogoRoute = JogoRouteImport.update({
   path: '/jogo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProfessorRoute = ProfessorRouteImport.update({
+  id: '/professor',
+  path: '/professor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
+  '/professor': typeof ProfessorRoute
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
+  '/professor': typeof ProfessorRoute
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
+  '/professor': typeof ProfessorRoute
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/herois'
     | '/jogo'
+    | '/professor'
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/herois'
     | '/jogo'
+    | '/professor'
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/conta'
     | '/herois'
     | '/jogo'
+    | '/professor'
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   ContaRoute: typeof ContaRoute
   HeroisRoute: typeof HeroisRoute
   JogoRoute: typeof JogoRoute
+  ProfessorRoute: typeof ProfessorRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ViloesRoute: typeof ViloesRoute
   DocumentoTipoRoute: typeof DocumentoTipoRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JogoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/professor': {
+      id: '/professor'
+      path: '/professor'
+      fullPath: '/professor'
+      preLoaderRoute: typeof ProfessorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContaRoute: ContaRoute,
   HeroisRoute: HeroisRoute,
   JogoRoute: JogoRoute,
+  ProfessorRoute: ProfessorRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ViloesRoute: ViloesRoute,
   DocumentoTipoRoute: DocumentoTipoRoute,
