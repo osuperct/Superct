@@ -152,10 +152,37 @@ type Bola = { id: number; x: number; y: number; vx: number; super: boolean };
 type Haltere = { id: number; x: number; y: number; cor: "verde" | "azul"; caindo: boolean };
 type Chefao = { x: number; y: number; vx: number; vy: number; hp: number; hpMax: number };
 type Modo = "corrida" | "intervalo" | "chefao" | "fase-vencida";
+type TipoTiro = "celular" | "batata" | "furacao" | "corda" | "donut" | "balao";
+type Tiro = {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  tipo: TipoTiro;
+  volta: boolean;
+  origem: number;
+  cor: string;
+  fase: number;
+};
+
+/* cada chefão tem seu ataque, na ordem dos vilões */
+const ATAQUE_FASE: TipoTiro[] = ["celular", "batata", "furacao", "corda", "donut", "balao"];
+const TAM_TIRO: Record<TipoTiro, { w: number; h: number }> = {
+  celular: { w: 16, h: 26 },
+  batata: { w: 20, h: 14 },
+  furacao: { w: 30, h: 42 },
+  corda: { w: 44, h: 10 },
+  donut: { w: 22, h: 22 },
+  balao: { w: 40, h: 24 },
+};
+const CORES_DONUT = ["#ec4899", "#f59e0b", "#22d3ee", "#a3e635", "#f43f5e"];
+const VIDAS_CHEFAO = 3;
 
 const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_H);
 const dificuldade = (fase: number) => 0.525 + (fase - 1) * 0.168;
 const chefaoTamanho = (fase: number) => 78 + fase * 4;
+
 
 function JogoPage() {
   const palcoRef = useRef<HTMLDivElement>(null);
