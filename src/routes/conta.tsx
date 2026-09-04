@@ -607,6 +607,11 @@ function Painel({ session }: { session: Session }) {
         <ul className="mt-3 space-y-3">
           {alunos.map((a) => {
             const docsAluno = documentos.filter((d) => d.aluno_id === a.id);
+            const doAluno = entregues.filter((e) => e.aluno_id === a.id);
+            const faltando = (["contrato", "ficha"] as const).filter(
+              (t) => !doAluno.some((e) => e.tipo === t),
+            );
+
             return (
               <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
                 <div className="flex items-start justify-between gap-2">
