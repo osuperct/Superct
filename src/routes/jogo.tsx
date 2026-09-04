@@ -119,7 +119,7 @@ function JogoPage() {
   const vy = useRef(0);
   const noAr = useRef(false);
   const seguro = useRef<false | "barra" | "argola" | "corda">(false);
-  const ultimoToqueBaixo = useRef(0);
+  const ultimoToqueBaixo = useRef<number | null>(null);
   const duck = useRef(false);
   const fimRef = useRef(false);
   const vistaRef = useRef(360);
@@ -156,7 +156,7 @@ function JogoPage() {
     tick.current = 0;
     maxX.current = 60;
     passados.current = 0;
-    ultimoToqueBaixo.current = 0;
+    ultimoToqueBaixo.current = null;
     setHeroX(60);
     setHeroY(0);
     setCamera(0);
@@ -392,16 +392,18 @@ function JogoPage() {
     if (fimRef.current) return;
     if (ativo && seguro.current) {
       const agora = performance.now();
-      if (agora - ultimoToqueBaixo.current <= 500) {
+      const toqueAnterior = ultimoToqueBaixo.current;
+      if (toqueAnterior !== null && agora - toqueAnterior <= 1500) {
         seguro.current = false;
         noAr.current = true;
         vy.current = -2;
-        ultimoToqueBaixo.current = 0;
+        ultimoToqueBaixo.current = null;
       } else {
         ultimoToqueBaixo.current = agora;
       }
       return;
     }
+    if (ativo) ultimoToqueBaixo.current = null;
     duck.current = ativo;
     setAbaixado(ativo);
   };
