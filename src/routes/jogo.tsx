@@ -495,6 +495,12 @@ function JogoPage() {
       } else if (noAr.current || y.current > 0) {
         const anterior = y.current;
         vy.current += GRAVIDADE;
+        if (vy.current > 0 && subindoDesde.current === null) subindoDesde.current = performance.now();
+        if (vy.current <= 0) subindoDesde.current = null;
+        if (vy.current > 0 && subindoDesde.current !== null && performance.now() - subindoDesde.current > 1000) {
+          vy.current = 0;
+          subindoDesde.current = null;
+        }
         let prox = y.current + vy.current;
 
         if (vy.current > -4 && performance.now() >= bloquearAgarreAte.current) {
