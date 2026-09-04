@@ -1187,7 +1187,7 @@ function JogoPage() {
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-3">
-          <Joystick onChange={(x: number) => { dir.current = x; }} />
+          <Joystick onChange={(v) => { dir.current = v.x; dirY.current = v.y; }} />
           <div className="flex gap-2">
             <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
               <ChevronUp className="size-6" />
