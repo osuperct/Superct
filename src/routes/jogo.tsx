@@ -204,7 +204,9 @@ function JogoPage() {
   const [chefao, setChefao] = useState<Chefao | null>(null);
   const [tiros, setTiros] = useState<Tiro[]>([]);
   const [vidas, setVidas] = useState(VIDAS_CHEFAO);
+  const [coracoes, setCoracoes] = useState<number[]>(CORACOES.map((_, i) => i));
   const [piscando, setPiscando] = useState(false);
+
   const [carga, setCarga] = useState(0);
   const [pontos, setPontos] = useState(0);
   const [fase, setFase] = useState(1);
