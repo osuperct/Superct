@@ -306,6 +306,28 @@ function Autenticacao() {
         </button>
 
         {modo === "entrar" && (
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("");
+                setSenha("");
+              }}
+              className="rounded-md border border-border px-3 py-2 font-display text-xs tracking-tight text-muted-foreground"
+            >
+              ÁREA DO RESPONSÁVEL
+            </button>
+            <button
+              type="button"
+              onClick={() => setEmail("osuper.c.t@gmail.com")}
+              className="rounded-md border border-primary/60 bg-primary/5 px-3 py-2 font-display text-xs tracking-tight text-primary"
+            >
+              ÁREA DO PROFESSOR
+            </button>
+          </div>
+        )}
+
+        {modo === "entrar" && (
           <button
             type="button"
             onClick={() => void esqueciSenha()}
@@ -314,14 +336,6 @@ function Autenticacao() {
           >
             {recuperando ? "Enviando…" : "Esqueci minha senha"}
           </button>
-        )}
-
-        {modo === "entrar" && (
-          <p className="rounded-md border border-primary/40 bg-primary/5 p-3 font-mono text-[10px] uppercase leading-relaxed tracking-widest text-muted-foreground">
-            <GraduationCap className="mr-1 inline size-3 text-primary" />
-            Área do Professor: entre com o e-mail <span className="text-primary">osuper.c.t@gmail.com</span> e a senha
-            cadastrada.
-          </p>
         )}
       </form>
     </div>
