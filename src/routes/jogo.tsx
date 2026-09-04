@@ -545,6 +545,27 @@ function JogoPage() {
           setPontos(pontosRef.current + ganho);
         }
 
+        /* corações escondidos no alto: cada um vale uma vida extra */
+        if (coracoesRef.current.length > 0) {
+          const pego = coracoesRef.current.find((idx) => {
+            const c = CORACOES[idx]!;
+            return (
+              x.current + HEROI_W > c.x - 12 &&
+              x.current < c.x + 12 &&
+              y.current + hAlt > c.y - 6 &&
+              y.current < c.y + 24
+            );
+          });
+          if (pego !== undefined) {
+            coracoesRef.current = coracoesRef.current.filter((idx) => idx !== pego);
+            setCoracoes(coracoesRef.current);
+            vidasRef.current = Math.min(VIDAS_MAX, vidasRef.current + 1);
+            setVidas(vidasRef.current);
+            pontosRef.current += 15;
+            setPontos(pontosRef.current);
+          }
+        }
+
         /* medalha de bronze suspensa: pegar pulando */
         const pegouMedalha =
           x.current + HEROI_W > MEDALHA.x - 18 &&
@@ -561,6 +582,7 @@ function JogoPage() {
           setInimigos([]);
           return;
         }
+
 
         /* inimigos do percurso (mais lentos na fase 1) */
         spawn.current -= 1;
