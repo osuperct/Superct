@@ -437,14 +437,17 @@ function Painel({ session }: { session: Session }) {
 
   const recarregar = useCallback(async () => {
     const [{ data: a }, { data: d }] = await Promise.all([
-      supabase.from("alunos").select("id, nome, idade, matricula").order("created_at"),
-      supabase.from("documentos").select("id, tipo, nome_arquivo, caminho, created_at").order("created_at", {
-        ascending: false,
-      }),
+      supabase.from("alunos").select("id, nome, idade, matricula").eq("user_id", uid).order("created_at"),
+      supabase
+        .from("documentos")
+        .select("id, tipo, nome_arquivo, caminho, created_at")
+        .eq("user_id", uid)
+        .order("created_at", { ascending: false }),
     ]);
     setAlunos((a ?? []) as Aluno[]);
     setDocumentos((d ?? []) as Documento[]);
-  }, []);
+  }, [uid]);
+
 
   useEffect(() => {
     void recarregar();
