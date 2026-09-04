@@ -1196,7 +1196,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▶ 2x em 1,5s joga bola de tênis • ▲ pula e escala • ▼ 2x em 2s solta • 3 halteres = super bola
+          Setas movem • ▶ 2x em 1,5s joga bola de tênis • ▲ pula baixo, ▲▲ rápido pula alto • ▼ 2x em 2s solta • 3 halteres = super bola
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
