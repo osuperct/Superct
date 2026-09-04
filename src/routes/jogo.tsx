@@ -1524,7 +1524,38 @@ function JogoPage() {
             </span>
           )}
 
+          {!heroiSel && (
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/90 px-4 text-center">
+              <p className="font-display text-xl uppercase tracking-tight text-primary">Escolha seu herói</p>
+              <div className="flex items-end gap-6">
+                {HEROIS.map((h) => (
+                  <button
+                    key={h.id}
+                    type="button"
+                    onClick={() => escolherHeroi(h.id)}
+                    className="flex flex-col items-center gap-1 rounded-lg border border-border px-3 py-2 active:scale-95"
+                    style={{ boxShadow: `0 0 20px -8px ${h.cor}` }}
+                  >
+                    <img
+                      src={h.img}
+                      alt={`${h.nome} em pose de herói`}
+                      className="h-24 w-auto object-contain"
+                      style={{ filter: `drop-shadow(0 0 10px ${h.cor})` }}
+                    />
+                    <span
+                      className="font-mono text-[10px] uppercase tracking-widest"
+                      style={{ color: h.cor }}
+                    >
+                      {h.nome}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {modo === "intervalo" && !fim && (
+
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
               <Medal className="size-8 text-amber-400" />
               <p className="font-display text-xl uppercase tracking-tight text-primary">
