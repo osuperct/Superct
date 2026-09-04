@@ -664,9 +664,32 @@ function Painel({ session }: { session: Session }) {
                     <li className="text-[11px] text-muted-foreground">Nenhum documento deste aluno ainda.</li>
                   )}
                 </ul>
+                {faltando.length > 0 && (
+                  <div className="mt-3 rounded-md border border-primary/60 bg-primary/10 p-3">
+                    <p className="text-[11px]">
+                      Falta concluir o preenchimento de {a.nome}:{" "}
+                      <span className="text-primary">
+                        {faltando.map((t) => (t === "contrato" ? "contrato" : "ficha de anamnese / PAR-Q")).join(" e ")}
+                      </span>
+                      .
+                    </p>
+                    {faltando.map((t) => (
+                      <Link
+                        key={t}
+                        to="/documento/$tipo"
+                        params={{ tipo: t }}
+                        className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 font-display text-xs tracking-tight text-primary-foreground"
+                      >
+                        {t === "contrato" ? "PREENCHER O CONTRATO AGORA" : "PREENCHER A FICHA / PAR-Q AGORA"}
+                        <Send className="size-3 shrink-0" />
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </li>
             );
           })}
+
           {alunos.length === 0 && (
             <li className="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">
               Nenhum aluno na lista. Preencha o contrato do aluno para incluí-lo aqui.
