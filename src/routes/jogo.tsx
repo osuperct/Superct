@@ -178,6 +178,14 @@ const TAM_TIRO: Record<TipoTiro, { w: number; h: number }> = {
 };
 const CORES_DONUT = ["#ec4899", "#f59e0b", "#22d3ee", "#a3e635", "#f43f5e"];
 const VIDAS_CHEFAO = 3;
+const VIDAS_MAX = 5;
+
+/* dois corações por fase, em pontos difíceis (bem alto, exigindo pulo dos aparelhos) */
+const CORACOES: { x: number; y: number }[] = [
+  { x: 1372, y: 186 },
+  { x: 3560, y: 196 },
+];
+
 
 const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_H);
 const dificuldade = (fase: number) => 0.525 + (fase - 1) * 0.168;
