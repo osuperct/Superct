@@ -29,6 +29,7 @@ export const Route = createFileRoute("/jogo")({
 const MUNDO = 4200;
 const ARENA = 720;
 const ALTURA_CENA = 260;
+const TETO = ALTURA_CENA - 40; /* linha de neon: o herói não atravessa */
 const GRAVIDADE = -1.25;
 const IMPULSO = 17.5;
 const IMPULSO_BAIXO = 12;
