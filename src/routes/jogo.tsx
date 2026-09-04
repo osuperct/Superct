@@ -603,11 +603,11 @@ function JogoPage() {
             const bateX = nx + 34 > hx + 4 && nx + 4 < hx + HEROI_W - 4;
             const bateY = ny + 34 > hy + 4 && ny + 4 < hy + hAlt;
             if (bateX && bateY) {
-              fimRef.current = true;
-              setFim(true);
-              setDerrotado(i.vilao);
+              perderVida(i.vilao);
+              continue;
             }
             proximos.push({ ...i, x: nx, y: ny });
+
           }
           return proximos;
         });
