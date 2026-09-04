@@ -375,7 +375,15 @@ function JogoPage() {
       const paredes = emChefao ? ARENA_PAREDES : PAREDES;
       const dif = dificuldade(faseRef.current);
 
+      /* ---- segurar o analógico para baixo agacha o personagem ---- */
+      const querAgachar = dirY.current > 0.45 && !seguro.current && !noAr.current && y.current <= 0.5;
+      if (querAgachar !== duck.current) {
+        duck.current = querAgachar;
+        setAbaixado(querAgachar);
+      }
+
       const alt = alturaHeroi(duck.current);
+
 
       /* ---- movimento horizontal ---- */
       const passo = (delta: number) => {
