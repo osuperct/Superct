@@ -61,7 +61,7 @@ const MAPS_URL = "https://www.google.com/maps/search/?api=1&query=Rua+Geraldo+Ma
 
 const TITLE = "Super CT — Treinamento Funcional Infantil em São Sebastião do Paraíso";
 const DESCRIPTION =
-  "Sua criança vira super! Treinamento funcional infantil, ginástica, esportes e circuitos com o Professor Tio Victor. Rua Geraldo Marcolini 1609, São Sebastião do Paraíso - MG.";
+  "Sua criança vira super! Treinamento funcional infantil e recreativo, ginástica, esportes e circuitos com o Professor Tio Victor. Rua Geraldo Marcolini 1609, São Sebastião do Paraíso - MG.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -288,8 +288,8 @@ function Index() {
               SUA CRIANÇA VIRA <span className="text-primary italic">SUPER!</span>
             </h1>
             <p className="mx-auto max-w-[30ch] text-center text-sm text-muted-foreground">
-              Treinamento funcional infantil, ginástica, esportes e circuitos com o Professor
-              Tio Victor.
+              Treinamento funcional infantil e recreativo, ginástica, esportes e circuitos com o
+              Professor Tio Victor.
             </p>
           </div>
         </section>
@@ -474,7 +474,8 @@ function Index() {
           </a>
 
           <p className="mt-12 text-center font-mono text-[8px] uppercase tracking-widest text-muted-foreground/40">
-            © Super CT • Professor Tio Victor
+            © Super CT • Professor Tio Victor / CREF 057790/MG - Geraldo Marcolini 1609 - S.S.
+            Paraíso/ MG
           </p>
         </div>
       </footer>
