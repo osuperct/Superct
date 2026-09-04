@@ -1212,7 +1212,7 @@ function JogoPage() {
             <ControlButton onStart={descer(true)} onEnd={descer(false)} label="Abaixar e esquivar">
               <ChevronDown className="size-7" />
             </ControlButton>
-            <ControlButton onStart={pular} onEnd={pararSubida} label="Pular e escalar">
+            <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
               <ChevronUp className="size-7" />
             </ControlButton>
           </div>
