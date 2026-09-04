@@ -736,7 +736,7 @@ function JogoPage() {
   const moverDireita = () => {
     const agora = performance.now();
     const anterior = ultimoToqueDireita.current;
-    if (anterior !== null && agora - anterior <= 400) {
+    if (anterior !== null && agora - anterior <= 1500) {
       atirar();
       ultimoToqueDireita.current = null;
     } else {
@@ -772,8 +772,8 @@ function JogoPage() {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Atravesse a academia, pegue a medalha de bronze suspensa no fim do percurso e encare o chefão da
-          fase. Toque duas vezes na seta da direita para jogar bolas de tênis e pegue 3 halteres para soltar
-          a super bola.
+          fase. Toque duas vezes em até 1,5 s na seta da direita para jogar bolas de tênis e pegue 3 halteres
+          para soltar a super bola.
         </p>
 
         <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -1156,7 +1156,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▶ 2x joga bola de tênis • ▲ pula e escala • ▼ 2x em 2s solta • 3 halteres = super bola
+          Setas movem • ▶ 2x em 1,5s joga bola de tênis • ▲ pula e escala • ▼ 2x em 2s solta • 3 halteres = super bola
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
@@ -1164,7 +1164,7 @@ function JogoPage() {
             <ControlButton onStart={mover(-1)} onEnd={parar} label="Mover para a esquerda">
               <ArrowLeft className="size-7" />
             </ControlButton>
-            <ControlButton onStart={moverDireita} onEnd={parar} label="Mover para a direita e atirar bola">
+            <ControlButton onStart={moverDireita} onEnd={parar} label="Mover para a direita e atirar bola (toque duplo em 1,5 s)">
               <ArrowRight className="size-7" />
             </ControlButton>
           </div>
