@@ -514,6 +514,11 @@ function Painel({ session }: { session: Session }) {
       toast.error("Arquivo muito grande (máximo 20 MB).");
       return;
     }
+    const destino = alunoDoc || alunos[0]?.id || "";
+    if (!destino) {
+      toast.error("Preencha primeiro o contrato do aluno para poder anexar documentos dele.");
+      return;
+    }
     setEnviandoArquivo(true);
     const limpo = arquivo.name.replace(/[^\w.\-]+/g, "_");
     const caminho = `${uid}/${Date.now()}-${limpo}`;
