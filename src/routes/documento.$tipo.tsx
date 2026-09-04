@@ -98,7 +98,11 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
   const emailResponsavel = session.user.email ?? "";
   const rascunhoKey = `superct_rascunho_${tipo}`;
 
-  const [valores, setValores] = useState<Record<string, string>>({});
+  const valoresFixos = Object.fromEntries(
+    doc.campos.filter((c) => c.fixo !== undefined).map((c) => [c.chave, c.fixo as string]),
+  );
+
+  const [valores, setValores] = useState<Record<string, string>>(valoresFixos);
   const [aceite, setAceite] = useState(false);
   const [assinatura, setAssinatura] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
@@ -108,7 +112,8 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
     const bruto = localStorage.getItem(rascunhoKey);
     if (bruto) {
       try {
-        setValores(JSON.parse(bruto) as Record<string, string>);
+        const salvo = JSON.parse(bruto) as Record<string, string>;
+        setValores({ ...valoresFixos, ...salvo });
       } catch {
         /* rascunho inválido */
       }
@@ -121,6 +126,15 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       localStorage.setItem(rascunhoKey, JSON.stringify(prox));
       return prox;
     });
+  }
+
+  function valorCampo(c: typeof doc.campos[number]) {
+    if (c.fixo !== undefined) return c.fixo;
+    if (c.multiplos) {
+      const partes = c.multiplos.map((m) => valores[m.chave]).filter(Boolean);
+      return partes.join(" — ");
+    }
+    return valores[c.chave] ?? "";
   }
 
   async function enviar(e: React.FormEvent) {
@@ -145,7 +159,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       });
       if (erroFicha) throw erroFicha;
 
-      const linhas = doc.campos.map((c) => ({ rotulo: c.rotulo, valor: valores[c.chave] ?? "" }));
+      const linhas = doc.campos.map((c) => ({ rotulo: c.rotulo, valor: valorCampo(c) }));
       const blob = gerarDocumentoPdf({
         titulo: doc.titulo,
         linhas,
@@ -179,7 +193,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
   }
 
   function enviarEmail() {
-    const linhas = doc.campos.map((c) => `${c.rotulo}: ${valores[c.chave] || "-"}`);
+    const linhas = doc.campos.map((c) => `${c.rotulo}: ${valorCampo(c) || "-"}`);
     const corpo = [
       `${doc.titulo.toUpperCase()} — SUPER CT`,
       "",
@@ -203,8 +217,77 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         página e salve: o PDF assinado fica arquivado nos documentos do aluno.
       </p>
 
-      {doc.campos.map((c) =>
-        c.longo ? (
+      {doc.campos.map((c) => {
+        if (c.fixo !== undefined) {
+          return (
+            <label key={c.chave} className="block">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{c.rotulo}</span>
+              <input
+                value={c.fixo}
+                readOnly
+                disabled
+                className="mt-1 w-full rounded-md border border-border bg-muted px-3 py-2 text-sm text-muted-foreground outline-none"
+              />
+            </label>
+          );
+        }
+
+        if (c.multiplos) {
+          const partes = c.multiplos.map((m) => valores[m.chave] ?? "");
+          const completo = partes.every(Boolean) ? partes.join(" — ") : "";
+          return (
+            <div key={c.chave} className="block">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{c.rotulo}</span>
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                {c.multiplos.map((m) => (
+                  <label key={m.chave} className="block">
+                    <span className="text-[10px] text-muted-foreground">{m.rotulo}</span>
+                    <select
+                      value={valores[m.chave] ?? ""}
+                      onChange={(e) => set(m.chave, e.target.value)}
+                      className="mt-1 w-full appearance-none rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+                    >
+                      <option value="">Selecione</option>
+                      {m.opcoes.map((op) => (
+                        <option key={op} value={op}>
+                          {op}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ))}
+              </div>
+              <input type="hidden" name={c.chave} value={completo} />
+              {completo ? (
+                <p className="mt-1 text-[10px] text-primary">{completo}</p>
+              ) : (
+                <p className="mt-1 text-[10px] text-muted-foreground">Escolha os dias e o horário.</p>
+              )}
+            </div>
+          );
+        }
+
+        if (c.opcoes) {
+          return (
+            <label key={c.chave} className="block">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{c.rotulo}</span>
+              <select
+                value={valores[c.chave] ?? ""}
+                onChange={(e) => set(c.chave, e.target.value)}
+                className="mt-1 w-full appearance-none rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+              >
+                <option value="">Selecione</option>
+                {c.opcoes.map((op) => (
+                  <option key={op} value={op}>
+                    {op}
+                  </option>
+                ))}
+              </select>
+            </label>
+          );
+        }
+
+        return c.longo ? (
           <label key={c.chave} className="block">
             <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{c.rotulo}</span>
             <textarea
@@ -225,8 +308,8 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
               className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             />
           </label>
-        ),
-      )}
+        );
+      })}
 
       <label className="flex gap-3 rounded-md border border-border bg-card/50 p-3 text-xs leading-relaxed">
         <input

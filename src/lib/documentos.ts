@@ -4,7 +4,14 @@ export const BUCKET = "documentos-alunos";
 export const TERMO_IMAGEM =
   "Autorizo, de forma gratuita e por prazo indeterminado, o uso da imagem e da voz do(a) aluno(a) em fotos e vídeos captados nas atividades do Super CT, para divulgação nas redes sociais e materiais de comunicação do Super CT, sem qualquer ônus ou contrapartida financeira.";
 
-export type CampoDoc = { chave: string; rotulo: string; longo?: boolean };
+export type CampoDoc = {
+  chave: string;
+  rotulo: string;
+  longo?: boolean;
+  fixo?: string;
+  opcoes?: string[];
+  multiplos?: { chave: string; rotulo: string; opcoes: string[] }[];
+};
 
 export const CAMPOS_FICHA: CampoDoc[] = [
   { chave: "aluno_nome", rotulo: "Nome completo do aluno" },
@@ -27,9 +34,16 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
   { chave: "cpf", rotulo: "CPF do contratante" },
   { chave: "endereco", rotulo: "Endereço do contratante" },
   { chave: "aluno", rotulo: "Nome do aluno" },
-  { chave: "servico", rotulo: "Serviço contratado (modalidade / evento)" },
+  { chave: "servico", rotulo: "Serviço contratado (modalidade / evento)", fixo: "Treinamento funcional e recreação" },
   { chave: "data_inicio", rotulo: "Data de início" },
-  { chave: "dias_horarios", rotulo: "Dias e horários" },
+  {
+    chave: "dias_horarios",
+    rotulo: "Dias e horários",
+    multiplos: [
+      { chave: "dias", rotulo: "Dias", opcoes: ["1x na semana", "2x na semana", "Todos os dias"] },
+      { chave: "horario", rotulo: "Horário", opcoes: ["Turma Manhã", "Turma Tarde", "Turma Noite"] },
+    ],
+  },
   { chave: "valor", rotulo: "Valor mensal / do evento (R$)" },
   { chave: "vencimento", rotulo: "Dia de vencimento" },
   { chave: "forma_pagamento", rotulo: "Forma de pagamento" },
