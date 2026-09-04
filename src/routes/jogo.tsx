@@ -1195,13 +1195,15 @@ function JogoPage() {
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-3">
-          <div className="flex gap-2">
-            <ControlButton onStart={mover(-1)} onEnd={parar} label="Mover para a esquerda">
-              <ArrowLeft className="size-6" />
-            </ControlButton>
-            <ControlButton onStart={mover(1)} onEnd={parar} label="Mover para a direita">
-              <ArrowRight className="size-6" />
-            </ControlButton>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex gap-2">
+              <ControlButton onStart={mover(-1)} onEnd={parar} label="Mover para a esquerda">
+                <ArrowLeft className="size-6" />
+              </ControlButton>
+              <ControlButton onStart={mover(1)} onEnd={parar} label="Mover para a direita">
+                <ArrowRight className="size-6" />
+              </ControlButton>
+            </div>
             <ControlButton onStart={descer(true)} onEnd={descer(false)} label="Abaixar e esquivar">
               <ChevronDown className="size-6" />
             </ControlButton>
