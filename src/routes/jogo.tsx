@@ -178,6 +178,7 @@ function JogoPage() {
   const [derrotado, setDerrotado] = useState<number | null>(null);
 
   const dir = useRef(0);
+  const dirY = useRef(0);
   const x = useRef(60);
   const y = useRef(0);
   const vy = useRef(0);
