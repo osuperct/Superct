@@ -643,6 +643,7 @@ function Painel({ session }: { session: Session }) {
                         </span>
                         <span className="block truncate text-[11px] text-muted-foreground">
                           {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                          {d.enviado_por_professor ? " • enviado pelo professor" : ""}
                         </span>
                       </span>
                       <button
@@ -652,13 +653,15 @@ function Painel({ session }: { session: Session }) {
                       >
                         Ver
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => remover(d)}
-                        className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
-                      >
-                        Excluir
-                      </button>
+                      {!d.enviado_por_professor && (
+                        <button
+                          type="button"
+                          onClick={() => remover(d)}
+                          className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                        >
+                          Excluir
+                        </button>
+                      )}
                     </li>
                   ))}
                   {docsAluno.length === 0 && (
