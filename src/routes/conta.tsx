@@ -7,6 +7,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { entrarComCpfOuEmail } from "@/lib/auth.functions";
 
 import { supabase } from "@/integrations/supabase/client";
+import { Assinatura } from "@/components/Assinatura";
+import { gerarDocumentoPdf } from "@/lib/documentoPdf";
 
 const EMAIL_SUPER_CT = "osuper.c.t@gmail.com";
 const BUCKET = "documentos-alunos";
@@ -604,7 +606,7 @@ function Painel({ session }: { session: Session }) {
           </ul>
         </section>
       ) : (
-        <FormulariosOnline uid={uid} emailResponsavel={session.user.email ?? ""} />
+        <FormulariosOnline uid={uid} emailResponsavel={session.user.email ?? ""} aoSalvar={recarregar} />
       )}
     </div>
   );
@@ -642,12 +644,22 @@ const CAMPOS_CONTRATO = [
   ["observacoes", "Observações"],
 ] as const;
 
-function FormulariosOnline({ uid, emailResponsavel }: { uid: string; emailResponsavel: string }) {
+function FormulariosOnline({
+  uid,
+  emailResponsavel,
+  aoSalvar,
+}: {
+  uid: string;
+  emailResponsavel: string;
+  aoSalvar: () => void | Promise<void>;
+}) {
   const [qual, setQual] = useState<"ficha" | "contrato">("ficha");
   const campos = qual === "ficha" ? CAMPOS_FICHA : CAMPOS_CONTRATO;
   const [valores, setValores] = useState<Record<string, string>>({});
   const [aceite, setAceite] = useState(false);
   const [ocupado, setOcupado] = useState(false);
+  const [assinatura, setAssinatura] = useState<string | null>(null);
+  const [pdfPronto, setPdfPronto] = useState<{ url: string; nome: string } | null>(null);
 
   function set(chave: string, v: string) {
     setValores((atual) => ({ ...atual, [chave]: v }));
@@ -659,39 +671,80 @@ function FormulariosOnline({ uid, emailResponsavel }: { uid: string; emailRespon
       toast.error("Confirme o termo de uso de imagem e a veracidade das informações.");
       return;
     }
-    setOcupado(true);
-    const titulo = qual === "ficha" ? "Ficha do Aluno" : "Contrato de Prestação de Serviços";
-    const { error } = await supabase.from("fichas").insert({
-      user_id: uid,
-      tipo: qual,
-      dados: { ...valores, aceite_imagem: true, email_responsavel: emailResponsavel },
-      enviado_em: new Date().toISOString(),
-    });
-    setOcupado(false);
-    if (error) {
-      toast.error("Não foi possível salvar o formulário.");
+    if (!assinatura) {
+      toast.error("Assine no quadro com a canetinha antes de enviar.");
       return;
     }
+    setOcupado(true);
+    const titulo = qual === "ficha" ? "Ficha do Aluno" : "Contrato de Prestação de Serviços";
+    const nomeAssinante = valores["responsavel_nome"] ?? valores["contratante"] ?? "";
 
-    const linhas = campos.map(([k, rotulo]) => `${rotulo}: ${valores[k] ?? "-"}`);
-    const corpo = [
-      `${titulo.toUpperCase()} — SUPER CT`,
-      "",
-      ...linhas,
-      "",
-      `E-mail do responsável: ${emailResponsavel}`,
-      "",
-      "TERMO DE USO DE IMAGEM (aceito):",
-      TERMO_IMAGEM,
-      "",
-      `Enviado em ${new Date().toLocaleString("pt-BR")} pelo site do Super CT.`,
-    ].join("\n");
+    try {
+      const { error: erroFicha } = await supabase.from("fichas").insert({
+        user_id: uid,
+        tipo: qual,
+        dados: {
+          ...valores,
+          aceite_imagem: true,
+          assinado_online: true,
+          email_responsavel: emailResponsavel,
+        },
+        enviado_em: new Date().toISOString(),
+      });
+      if (erroFicha) throw erroFicha;
 
-    window.location.href = `mailto:${EMAIL_SUPER_CT}?subject=${encodeURIComponent(
-      `${titulo} — ${valores["aluno_nome"] ?? valores["aluno"] ?? "novo aluno"}`,
-    )}&body=${encodeURIComponent(corpo)}`;
+      const linhas = campos.map(([k, rotulo]) => ({ rotulo, valor: valores[k] ?? "" }));
+      const blob = gerarDocumentoPdf({
+        titulo,
+        linhas,
+        termo: TERMO_IMAGEM,
+        assinaturaDataUrl: assinatura,
+        nomeAssinante,
+      });
+      const nomeArquivo = `${qual === "ficha" ? "ficha-do-aluno" : "contrato"}-assinado-${new Date()
+        .toISOString()
+        .slice(0, 10)}.pdf`;
+      const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
+      const { error: erroUpload } = await supabase.storage
+        .from(BUCKET)
+        .upload(caminho, blob, { contentType: "application/pdf" });
+      if (erroUpload) throw erroUpload;
 
-    toast.success("Formulário salvo e pronto para envio ao Super CT!");
+      const { error: erroDoc } = await supabase.from("documentos").insert({
+        user_id: uid,
+        tipo: qual === "ficha" ? "ficha" : "contrato",
+        nome_arquivo: nomeArquivo,
+        caminho,
+      });
+      if (erroDoc) throw erroDoc;
+
+      setPdfPronto({ url: URL.createObjectURL(blob), nome: nomeArquivo });
+      await aoSalvar();
+
+      const corpo = [
+        `${titulo.toUpperCase()} — SUPER CT`,
+        "",
+        ...linhas.map((l) => `${l.rotulo}: ${l.valor || "-"}`),
+        "",
+        "TERMO DE USO DE IMAGEM (aceito e assinado on-line):",
+        TERMO_IMAGEM,
+        "",
+        `Assinado on-line por ${nomeAssinante || emailResponsavel} em ${new Date().toLocaleString("pt-BR")}.`,
+        `O documento assinado em PDF também está guardado na área do responsável: ${window.location.origin}/conta`,
+      ].join("\n");
+
+      window.location.href = `mailto:${encodeURIComponent(emailResponsavel)}?cc=${encodeURIComponent(
+        EMAIL_SUPER_CT,
+      )}&subject=${encodeURIComponent(
+        `${titulo} assinado — ${valores["aluno_nome"] ?? valores["aluno"] ?? "novo aluno"}`,
+      )}&body=${encodeURIComponent(corpo)}`;
+
+      toast.success("Documento assinado, anexado nos documentos do aluno e pronto para envio!");
+    } catch {
+      toast.error("Não foi possível concluir o envio do documento.");
+    } finally {
+      setOcupado(false);
+    }
   }
 
   return (
@@ -700,7 +753,8 @@ function FormulariosOnline({ uid, emailResponsavel }: { uid: string; emailRespon
         <FileText className="size-4 text-primary" /> PREENCHER ONLINE
       </h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        Preencha aqui e o formulário é salvo na sua conta e enviado por e-mail para o Super CT.
+        Preencha, assine com a canetinha e o PDF assinado vai direto para os documentos do aluno e para o
+        seu e-mail (com cópia para o Super CT).
       </p>
 
       <div className="mt-3 flex gap-2">
@@ -747,13 +801,25 @@ function FormulariosOnline({ uid, emailResponsavel }: { uid: string; emailRespon
           </span>
         </label>
 
+        <Assinatura onChange={setAssinatura} />
+
         <button
           type="submit"
           disabled={ocupado}
           className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display tracking-tight text-primary-foreground disabled:opacity-60"
         >
-          <Send className="size-4" /> {ocupado ? "ENVIANDO…" : "ENVIAR PARA O SUPER CT"}
+          <Send className="size-4" /> {ocupado ? "ENVIANDO…" : "ASSINAR E ENVIAR"}
         </button>
+
+        {pdfPronto && (
+          <a
+            href={pdfPronto.url}
+            download={pdfPronto.nome}
+            className="block rounded-md border border-primary px-4 py-2 text-center font-display text-xs tracking-tight text-primary"
+          >
+            BAIXAR PDF ASSINADO (para anexar no e-mail)
+          </a>
+        )}
       </form>
     </section>
   );
