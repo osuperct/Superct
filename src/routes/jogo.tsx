@@ -139,6 +139,7 @@ function JogoPage() {
   const noAr = useRef(false);
   const seguro = useRef<false | "barra" | "argola" | "corda" | "parede">(false);
   const subindo = useRef(false);
+  const descendoParede = useRef(false);
   const ultimoToqueBaixo = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
   const duck = useRef(false);
@@ -171,6 +172,8 @@ function JogoPage() {
     noAr.current = false;
     seguro.current = false;
     duck.current = false;
+    subindo.current = false;
+    descendoParede.current = false;
     fimRef.current = false;
     nextId.current = 0;
     spawn.current = 60;
@@ -235,7 +238,7 @@ function JogoPage() {
             x.current = Math.min(p.x + p.w - HEROI_W, Math.max(p.x, x.current));
             const delta = subindo.current
               ? VELOCIDADE_ESCALADA
-              : duck.current
+              : descendoParede.current
                 ? -VELOCIDADE_ESCALADA
                 : 0;
             apoio = Math.min(p.h - alt, Math.max(0, y.current + delta));
@@ -450,6 +453,7 @@ function JogoPage() {
         seguro.current = false;
         noAr.current = true;
         subindo.current = false;
+        descendoParede.current = false;
         duck.current = false;
         setAbaixado(false);
         y.current = Math.max(0, y.current - 4);
@@ -462,10 +466,11 @@ function JogoPage() {
       ultimoToqueBaixo.current = agora;
       if (seguro.current === "parede") {
         subindo.current = false;
-        duck.current = true;
+        descendoParede.current = true;
       }
       return;
     }
+    if (!ativo) descendoParede.current = false;
     if (ativo) ultimoToqueBaixo.current = null;
     duck.current = ativo;
     setAbaixado(ativo);
