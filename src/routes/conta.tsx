@@ -432,7 +432,7 @@ function Painel({ session }: { session: Session }) {
   const [novaIdade, setNovaIdade] = useState("");
   const [tipoDoc, setTipoDoc] = useState("contrato");
   const [enviandoArquivo, setEnviandoArquivo] = useState(false);
-  const [aba, setAba] = useState<"documentos" | "online">("documentos");
+  const [aba, setAba] = useState<"documentos" | "online">("online");
   const inputArquivo = useRef<HTMLInputElement>(null);
 
   const recarregar = useCallback(async () => {
@@ -566,8 +566,8 @@ function Painel({ session }: { session: Session }) {
       <div className="mt-5 flex gap-2">
         {(
           [
-            ["documentos", "ANEXAR DOCUMENTOS"],
             ["online", "PREENCHER ONLINE"],
+            ["documentos", "ANEXAR DOCUMENTOS"],
           ] as const
         ).map(([id, rotulo]) => (
           <button

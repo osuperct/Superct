@@ -84,7 +84,7 @@ function DocumentoPage() {
         {carregando ? (
           <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>
         ) : session ? (
-          <Formulario tipo={tipo} session={session} />
+          <Formulario key={tipo} tipo={tipo} session={session} />
         ) : (
           <Aviso texto="Entre na sua conta para preencher e assinar este documento." />
         )}
@@ -184,6 +184,22 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
+    for (const c of doc.campos) {
+      if (!c.obrigatorio) continue;
+      const v = (valores[c.chave] ?? "").trim();
+      if (!v) {
+        toast.error(`Preencha o campo obrigatório: ${c.rotulo}.`);
+        return;
+      }
+      if (c.cpf && !cpfValido(v)) {
+        toast.error("Digite um CPF válido do responsável.");
+        return;
+      }
+      if (!c.cpf && apenasDigitos(v).length < 10) {
+        toast.error("Digite um telefone de contato válido com DDD.");
+        return;
+      }
+    }
     if (!aceite) {
       toast.error("Confirme o termo de uso de imagem e a veracidade das informações.");
       return;
@@ -363,11 +379,16 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           </label>
         ) : (
           <label key={c.chave} className="block">
-            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{c.rotulo}</span>
+            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+              {c.rotulo}
+              {c.obrigatorio && <span className="text-primary"> *obrigatório</span>}
+            </span>
             <input
               value={valores[c.chave] ?? ""}
-              onChange={(e) => set(c.chave, e.target.value)}
-              maxLength={300}
+              onChange={(e) => set(c.chave, c.cpf ? formatarCpf(e.target.value) : e.target.value)}
+              maxLength={c.cpf ? 14 : 300}
+              required={c.obrigatorio === true}
+              inputMode={c.cpf || c.chave === "telefone" ? "numeric" : undefined}
               className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
             />
           </label>
@@ -445,9 +466,22 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           >
             <Send className="size-4" /> ENVIAR CÓPIA POR E-MAIL
           </button>
+          {tipo === "contrato" && (
+            <Link
+              to="/documento/$tipo"
+              params={{ tipo: "ficha" }}
+              className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-xs tracking-tight text-primary-foreground"
+            >
+              <FileText className="size-4" /> PREENCHER AGORA A FICHA / PAR-Q
+            </Link>
+          )}
           <Link
             to="/conta"
-            className="block rounded-md bg-primary px-4 py-2 text-center font-display text-xs tracking-tight text-primary-foreground"
+            className={`block rounded-md px-4 py-2 text-center font-display text-xs tracking-tight ${
+              tipo === "contrato"
+                ? "border border-primary text-primary"
+                : "bg-primary text-primary-foreground"
+            }`}
           >
             VER MEUS DOCUMENTOS
           </Link>
