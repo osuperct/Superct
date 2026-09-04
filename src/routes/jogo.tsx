@@ -888,16 +888,24 @@ function JogoPage() {
       cargaRef.current = 0;
       setCarga(0);
     }
+    /* o poder sai para o lado onde o chefão está no momento */
+    const boss = chefaoRef.current;
+    const tam = chefaoTamanho(faseRef.current);
+    const centroBoss = boss ? boss.x + tam / 2 : ARENA;
+    const lado = centroBoss >= x.current + HEROI_W / 2 ? 1 : -1;
+    const tamBola = ehSuper ? 26 : 12;
+    const velocidade = ehSuper ? 7.5 : 6.5;
     const nova: Bola = {
       id: nextBola.current++,
-      x: x.current + HEROI_W,
+      x: lado > 0 ? x.current + HEROI_W : x.current - tamBola,
       y: y.current + alturaHeroi(duck.current) / 2 - (ehSuper ? 13 : 6),
-      vx: ehSuper ? 7.5 : 6.5,
+      vx: lado * velocidade,
       super: ehSuper,
     };
     bolasRef.current = [...bolasRef.current, nova];
     setBolas(bolasRef.current);
   }, []);
+
 
   const pular = () => {
     if (fimRef.current) return;
