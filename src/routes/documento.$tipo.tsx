@@ -188,6 +188,10 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       toast.error("Confirme o termo de uso de imagem e a veracidade das informações.");
       return;
     }
+    if (doc.clausulas && !aceiteClausulas) {
+      toast.error("Leia as cláusulas e regras do Super CT e marque que está ciente.");
+      return;
+    }
     if (!assinatura) {
       toast.error("Assine no quadro com a canetinha antes de salvar.");
       return;
