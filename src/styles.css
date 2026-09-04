@@ -169,3 +169,26 @@
   transform-origin: 50% 100%;
   animation: heroWalk 0.36s infinite linear;
 }
+
+@keyframes heroLeg {
+  0% {
+    transform: rotate(-16deg);
+  }
+  50% {
+    transform: rotate(16deg);
+  }
+  100% {
+    transform: rotate(-16deg);
+  }
+}
+
+@utility animate-hero-leg-a {
+  transform-origin: 50% 70%;
+  animation: heroLeg 0.4s infinite ease-in-out;
+}
+
+@utility animate-hero-leg-b {
+  transform-origin: 50% 70%;
+  animation: heroLeg 0.4s infinite ease-in-out;
+  animation-delay: -0.2s;
+}
