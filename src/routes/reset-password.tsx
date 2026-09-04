@@ -46,8 +46,8 @@ function ResetPasswordPage() {
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
-    if (senha.length < 6) {
-      setAviso("A senha precisa ter pelo menos 6 caracteres.");
+    if (!senha) {
+      setAviso("Digite a nova senha.");
       return;
     }
     if (senha !== repetir) {
