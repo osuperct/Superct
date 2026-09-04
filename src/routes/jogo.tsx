@@ -1242,6 +1242,82 @@ function JogoPage() {
                 }}
               />
             )}
+            {/* ataques do chefão */}
+            {tiros.map((t) => {
+              const d = TAM_TIRO[t.tipo];
+              const comum = {
+                left: t.x,
+                bottom: 40 + t.y,
+                width: d.w,
+                height: d.h,
+              } as const;
+              if (t.tipo === "celular")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute rounded-[3px] border border-white/60 bg-[#1e293b]"
+                    style={{ ...comum, boxShadow: `0 0 10px ${t.cor}` }}
+                  >
+                    <span className="absolute inset-[2px] rounded-[2px] bg-[#38bdf8]/70" />
+                  </div>
+                );
+              if (t.tipo === "batata")
+                return (
+                  <div key={`t-${t.id}`} className="absolute flex items-end gap-[2px]" style={comum}>
+                    {[0, 1, 2, 3].map((i) => (
+                      <span
+                        key={i}
+                        className="w-[3px] rounded-sm bg-[#fbbf24]"
+                        style={{ height: 8 + i * 2, boxShadow: "0 0 6px #fbbf24" }}
+                      />
+                    ))}
+                  </div>
+                );
+              if (t.tipo === "donut")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute rounded-full border-[6px]"
+                    style={{ ...comum, borderColor: t.cor, boxShadow: `0 0 10px ${t.cor}` }}
+                  />
+                );
+              if (t.tipo === "balao")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute flex items-center justify-center rounded-md border bg-white/90 font-mono text-[10px] font-bold text-black"
+                    style={{ ...comum, borderColor: t.cor, boxShadow: `0 0 10px ${t.cor}` }}
+                  >
+                    @#!#!
+                  </div>
+                );
+              if (t.tipo === "corda")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute rounded-full"
+                    style={{
+                      ...comum,
+                      background: "repeating-linear-gradient(90deg,#d97706 0 6px,#92400e 6px 12px)",
+                      boxShadow: "0 0 8px #d97706",
+                    }}
+                  />
+                );
+              return (
+                <div
+                  key={`t-${t.id}`}
+                  className="absolute"
+                  style={{
+                    ...comum,
+                    background: `conic-gradient(from 0deg, transparent, ${t.cor}, transparent, ${t.cor})`,
+                    clipPath: "polygon(0 0,100% 0,72% 100%,28% 100%)",
+                    borderRadius: "50% 50% 40% 40%",
+                    boxShadow: `0 0 14px ${t.cor}`,
+                    opacity: 0.9,
+                  }}
+                />
+              );
+            })}
           </div>
 
           {emChefao && (
@@ -1249,6 +1325,28 @@ function JogoPage() {
               Chefão: {vilaoFase.nome}
             </span>
           )}
+
+          {emChefao && (
+            <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/70 px-2 py-1">
+              {[0, 1, 2].map((i) => (
+                <Heart
+                  key={`vida-${i}`}
+                  className="size-3"
+                  style={{
+                    color: vidas > i ? "#f43f5e" : "#3f3f46",
+                    fill: vidas > i ? "#f43f5e" : "transparent",
+                    filter: vidas > i ? "drop-shadow(0 0 6px #f43f5e)" : undefined,
+                  }}
+                />
+              ))}
+              {piscando && (
+                <span className="ml-1 font-mono text-[8px] uppercase tracking-widest text-[#f43f5e]">
+                  Perdeu uma vida!
+                </span>
+              )}
+            </span>
+          )}
+
 
           {pendurado && (
             <span className="absolute left-2 top-12 rounded-full bg-black/70 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary">
