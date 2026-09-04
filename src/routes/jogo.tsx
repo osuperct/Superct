@@ -186,6 +186,7 @@ function JogoPage() {
   const ultimoToqueBaixo = useRef<number | null>(null);
   const ultimoToqueDireita = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
+  const vxAr = useRef(0);
   const duck = useRef(false);
   const fimRef = useRef(false);
   const pausaRef = useRef(false);
