@@ -1065,6 +1065,14 @@ function JogoPage() {
   const vilaoFase = VILOES[Math.min(fase, TOTAL_FASES) - 1]!;
   const tamBoss = chefaoTamanho(fase);
   const progresso = emChefao ? 100 : Math.min(100, (heroX / (MUNDO - HEROI_W)) * 100);
+  const heroiAtual = heroiPorId(heroiSel ?? "kael");
+
+  const escolherHeroi = (id: HeroiId) => {
+    heroiRef.current = id;
+    setHeroiSel(id);
+    reiniciar();
+  };
+
 
   return (
     <div className="min-h-screen bg-background pl-16 text-foreground">
