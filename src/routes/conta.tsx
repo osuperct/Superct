@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { FileText, LogOut, Paperclip, Send, Upload, UserPlus } from "lucide-react";
+import { FileText, GraduationCap, LogOut, Paperclip, Send, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -315,10 +315,19 @@ function Autenticacao() {
             {recuperando ? "Enviando…" : "Esqueci minha senha"}
           </button>
         )}
+
+        {modo === "entrar" && (
+          <p className="rounded-md border border-primary/40 bg-primary/5 p-3 font-mono text-[10px] uppercase leading-relaxed tracking-widest text-muted-foreground">
+            <GraduationCap className="mr-1 inline size-3 text-primary" />
+            Área do Professor: entre com o e-mail <span className="text-primary">osuper.c.t@gmail.com</span> e a senha
+            cadastrada.
+          </p>
+        )}
       </form>
     </div>
   );
 }
+
 
 function Campo({
   label,
@@ -448,10 +457,25 @@ function Painel({ session }: { session: Session }) {
     setDocumentos((d ?? []) as Documento[]);
   }, [uid]);
 
+  const [ehProfessor, setEhProfessor] = useState(false);
 
   useEffect(() => {
     void recarregar();
   }, [recarregar]);
+
+  useEffect(() => {
+    let ativo = true;
+    void supabase
+      .from("user_roles")
+      .select("role")
+      .then(({ data }) => {
+        if (ativo) setEhProfessor((data ?? []).some((p) => p.role === "professor"));
+      });
+    return () => {
+      ativo = false;
+    };
+  }, [uid]);
+
 
   async function adicionarAluno(e: React.FormEvent) {
     e.preventDefault();
@@ -531,6 +555,16 @@ function Painel({ session }: { session: Session }) {
           <LogOut className="size-3" /> Sair
         </button>
       </div>
+
+      {ehProfessor && (
+        <Link
+          to="/professor"
+          className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+        >
+          <GraduationCap className="size-4" /> ÁREA DO PROFESSOR
+        </Link>
+      )}
+
 
       <section className="mt-5 rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
