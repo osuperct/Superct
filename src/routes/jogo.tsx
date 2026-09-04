@@ -126,7 +126,7 @@ function JogoPage() {
   const [camera, setCamera] = useState(0);
   const [inimigos, setInimigos] = useState<Inimigo[]>([]);
   const [pontos, setPontos] = useState(0);
-  const [pendurado, setPendurado] = useState<false | "barra" | "argola" | "corda">(false);
+  const [pendurado, setPendurado] = useState<false | "barra" | "argola" | "corda" | "parede">(false);
   const [abaixado, setAbaixado] = useState(false);
   const [fim, setFim] = useState(false);
   const [venceu, setVenceu] = useState(false);
