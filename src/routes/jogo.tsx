@@ -268,6 +268,9 @@ function JogoPage() {
           const corda = CORDAS.find(
             (c) => Math.abs(c.x - cx) < 22 && prox + alt > c.base && prox < c.topo,
           );
+          const parede = PAREDES.find(
+            (p) => cx > p.x - 4 && cx < p.x + p.w + 4 && prox >= 0 && prox < p.h - alt,
+          );
           if (barra) {
             seguro.current = "barra";
             y.current = barra.y - alt;
@@ -282,6 +285,12 @@ function JogoPage() {
             seguro.current = "corda";
             x.current = corda.x - HEROI_W / 2;
             y.current = Math.min(corda.topo - alt, Math.max(corda.base, prox));
+            vy.current = 0;
+            noAr.current = false;
+          } else if (parede) {
+            seguro.current = "parede";
+            x.current = Math.min(parede.x + parede.w - HEROI_W, Math.max(parede.x, x.current));
+            y.current = Math.max(0, prox);
             vy.current = 0;
             noAr.current = false;
           }
