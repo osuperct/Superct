@@ -1098,6 +1098,17 @@ function JogoPage() {
           >
             <RotateCcw className="size-3" /> Reiniciar
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              heroiRef.current = null;
+              setHeroiSel(null);
+            }}
+            className="ml-2 inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-primary"
+          >
+            Trocar herói
+          </button>
+
         </div>
 
         {/* super poder */}
