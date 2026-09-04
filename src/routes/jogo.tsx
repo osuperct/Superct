@@ -1275,6 +1275,7 @@ function JogoPage() {
                 return (
                   <div
                     key={`coracao-${idx}`}
+                    aria-label="Coração extra"
                     className="absolute flex size-7 items-center justify-center rounded-full border-2 border-[#f43f5e] bg-[#f43f5e]/20 animate-pulse-slow"
                     style={{
                       left: c.x - 14,
