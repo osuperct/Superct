@@ -10,12 +10,18 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as HeroisRouteImport } from './routes/herois'
 import { Route as JogoRouteImport } from './routes/jogo'
 import { Route as ViloesRouteImport } from './routes/viloes'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeroisRoute = HeroisRouteImport.update({
+  id: '/herois',
+  path: '/herois',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JogoRoute = JogoRouteImport.update({
@@ -31,30 +37,34 @@ const ViloesRoute = ViloesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/viloes': typeof ViloesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/viloes': typeof ViloesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/viloes': typeof ViloesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/jogo' | '/viloes'
+  fullPaths: '/' | '/herois' | '/jogo' | '/viloes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/jogo' | '/viloes'
-  id: '__root__' | '/' | '/jogo' | '/viloes'
+  to: '/' | '/herois' | '/jogo' | '/viloes'
+  id: '__root__' | '/' | '/herois' | '/jogo' | '/viloes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HeroisRoute: typeof HeroisRoute
   JogoRoute: typeof JogoRoute
   ViloesRoute: typeof ViloesRoute
 }
@@ -66,6 +76,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/herois': {
+      id: '/herois'
+      path: '/herois'
+      fullPath: '/herois'
+      preLoaderRoute: typeof HeroisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/jogo': {
@@ -87,6 +104,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HeroisRoute: HeroisRoute,
   JogoRoute: JogoRoute,
   ViloesRoute: ViloesRoute,
 }
