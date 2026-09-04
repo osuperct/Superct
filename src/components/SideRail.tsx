@@ -1,15 +1,41 @@
+import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Home, Gamepad2, Skull, Shield } from "lucide-react";
+import {
+  Home,
+  Gamepad2,
+  Skull,
+  Shield,
+  CalendarDays,
+  UserRound,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const itens = [
   { to: "/", label: "Início", icon: Home },
+  { to: "/conta", label: "Conta", icon: UserRound },
+  { to: "/calendario", label: "Agenda", icon: CalendarDays },
   { to: "/jogo", label: "Jogo", icon: Gamepad2 },
   { to: "/herois", label: "Heróis", icon: Shield },
   { to: "/viloes", label: "Vilões", icon: Skull },
 ] as const;
 
-
 export function SideRail() {
+  const [aberta, setAberta] = useState(true);
+
+  if (!aberta) {
+    return (
+      <button
+        type="button"
+        aria-label="Abrir menu lateral"
+        onClick={() => setAberta(true)}
+        className="fixed left-0 top-1/2 z-[60] -translate-y-1/2 rounded-r-lg border border-l-0 border-border bg-background/80 py-6 pl-0.5 pr-1 text-primary backdrop-blur-md active:scale-95"
+      >
+        <ChevronRight className="size-4" />
+      </button>
+    );
+  }
+
   return (
     <aside className="fixed left-0 top-1/2 z-[60] -translate-y-1/2">
       <nav className="flex flex-col gap-1 rounded-r-lg border border-l-0 border-border bg-background/70 py-2 pl-1 pr-1.5 backdrop-blur-md">
@@ -27,6 +53,14 @@ export function SideRail() {
             <span className="font-mono text-[8px] uppercase tracking-widest">{item.label}</span>
           </Link>
         ))}
+        <button
+          type="button"
+          aria-label="Recolher menu lateral"
+          onClick={() => setAberta(false)}
+          className="mt-1 flex w-12 items-center justify-center rounded-md border-t border-border py-1.5 text-muted-foreground active:scale-95"
+        >
+          <ChevronLeft className="size-4" />
+        </button>
       </nav>
     </aside>
   );

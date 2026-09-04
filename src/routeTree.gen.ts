@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CalendarioRouteImport } from './routes/calendario'
+import { Route as ContaRouteImport } from './routes/conta'
 import { Route as HeroisRouteImport } from './routes/herois'
 import { Route as JogoRouteImport } from './routes/jogo'
 import { Route as ViloesRouteImport } from './routes/viloes'
@@ -17,6 +19,16 @@ import { Route as ViloesRouteImport } from './routes/viloes'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarioRoute = CalendarioRouteImport.update({
+  id: '/calendario',
+  path: '/calendario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContaRoute = ContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HeroisRoute = HeroisRouteImport.update({
@@ -37,12 +49,16 @@ const ViloesRoute = ViloesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
+  '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/viloes': typeof ViloesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
+  '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/viloes': typeof ViloesRoute
@@ -50,20 +66,31 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/calendario': typeof CalendarioRoute
+  '/conta': typeof ContaRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/viloes': typeof ViloesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/herois' | '/jogo' | '/viloes'
+  fullPaths: '/' | '/calendario' | '/conta' | '/herois' | '/jogo' | '/viloes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/herois' | '/jogo' | '/viloes'
-  id: '__root__' | '/' | '/herois' | '/jogo' | '/viloes'
+  to: '/' | '/calendario' | '/conta' | '/herois' | '/jogo' | '/viloes'
+  id:
+    | '__root__'
+    | '/'
+    | '/calendario'
+    | '/conta'
+    | '/herois'
+    | '/jogo'
+    | '/viloes'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CalendarioRoute: typeof CalendarioRoute
+  ContaRoute: typeof ContaRoute
   HeroisRoute: typeof HeroisRoute
   JogoRoute: typeof JogoRoute
   ViloesRoute: typeof ViloesRoute
@@ -76,6 +103,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendario': {
+      id: '/calendario'
+      path: '/calendario'
+      fullPath: '/calendario'
+      preLoaderRoute: typeof CalendarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conta': {
+      id: '/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof ContaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/herois': {
@@ -104,6 +145,8 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CalendarioRoute: CalendarioRoute,
+  ContaRoute: ContaRoute,
   HeroisRoute: HeroisRoute,
   JogoRoute: JogoRoute,
   ViloesRoute: ViloesRoute,
