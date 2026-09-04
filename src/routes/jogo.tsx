@@ -211,8 +211,10 @@ function JogoPage() {
   const [piscando, setPiscando] = useState(false);
   const [heroiSel, setHeroiSel] = useState<HeroiId | null>(null);
   const [olhando, setOlhando] = useState<1 | -1>(1);
+  const [andando, setAndando] = useState(false);
   const heroiRef = useRef<HeroiId | null>(null);
   const olhandoRef = useRef<1 | -1>(1);
+  const andandoRef = useRef(false);
 
 
 
