@@ -820,8 +820,8 @@ function JogoPage() {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Atravesse a academia, pegue a medalha de bronze suspensa no fim do percurso e encare o chefão da
-          fase. Toque duas vezes em até 1,5 s na seta da direita para jogar bolas de tênis e pegue 3 halteres
-          para soltar a super bola.
+          fase. Use o botão de poder para jogar bolas de tênis no chefão e junte 3 halteres para soltar a
+          super bola.
         </p>
 
         <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
