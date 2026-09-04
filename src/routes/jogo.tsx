@@ -568,6 +568,7 @@ function JogoPage() {
           if (prox <= 0) {
             prox = 0;
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           }
           y.current = prox;
