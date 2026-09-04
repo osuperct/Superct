@@ -360,6 +360,42 @@ function JogoPage() {
 
   useEffect(() => {
     let raf = 0;
+
+    /* perder uma vida: volta ao checkpoint do trecho atual (corrida ou arena do chefão) */
+    const perderVida = (vilao: number | null) => {
+      if (fimRef.current || performance.now() <= invulAte.current) return;
+      vidasRef.current -= 1;
+      setVidas(vidasRef.current);
+      invulAte.current = performance.now() + 1800;
+      setPiscando(true);
+      window.setTimeout(() => setPiscando(false), 1600);
+      if (vidasRef.current <= 0) {
+        fimRef.current = true;
+        setFim(true);
+        setDerrotado(vilao);
+        return;
+      }
+      x.current = 60;
+      y.current = 0;
+      vy.current = 0;
+      vxAr.current = 0;
+      noAr.current = false;
+      seguro.current = false;
+      duck.current = false;
+      subindo.current = false;
+      descendoParede.current = false;
+      setHeroX(60);
+      setHeroY(0);
+      setAbaixado(false);
+      setPendurado(false);
+      tirosRef.current = [];
+      setTiros([]);
+      bolasRef.current = [];
+      setBolas([]);
+      if (modoRef.current !== "chefao") setInimigos([]);
+    };
+
+
     const loop = () => {
       raf = requestAnimationFrame(loop);
       if (fimRef.current || pausaRef.current) return;
