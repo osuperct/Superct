@@ -192,3 +192,63 @@
   animation: heroLeg 0.4s infinite ease-in-out;
   animation-delay: -0.2s;
 }
+
+@keyframes heroArm {
+  0% {
+    transform: rotate(14deg);
+  }
+  50% {
+    transform: rotate(-14deg);
+  }
+  100% {
+    transform: rotate(14deg);
+  }
+}
+
+@utility animate-hero-arm-a {
+  transform-origin: 50% 20%;
+  animation: heroArm 0.4s infinite ease-in-out;
+}
+
+@utility animate-hero-arm-b {
+  transform-origin: 50% 20%;
+  animation: heroArm 0.4s infinite ease-in-out;
+  animation-delay: -0.2s;
+}
+
+@keyframes heroClimbArm {
+  0% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(-5px) rotate(-18deg);
+  }
+  100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+}
+
+@utility animate-hero-climb-a {
+  transform-origin: 50% 90%;
+  animation: heroClimbArm 0.7s infinite ease-in-out;
+}
+
+@utility animate-hero-climb-b {
+  transform-origin: 50% 90%;
+  animation: heroClimbArm 0.7s infinite ease-in-out;
+  animation-delay: -0.35s;
+}
+
+@keyframes heroClimbBody {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@utility animate-hero-climb-body {
+  animation: heroClimbBody 0.7s infinite ease-in-out;
+}
