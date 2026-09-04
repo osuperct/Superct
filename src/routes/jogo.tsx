@@ -1351,20 +1351,43 @@ function JogoPage() {
                 width: HEROI_W,
                 height: alt,
                 bottom: 40 + heroY,
-                transform: `scaleX(${olhando})`,
+                transform: `scaleX(${-olhando})`,
               }}
             >
+              {/* corpo */}
               <img
                 src={heroiAtual.img}
                 alt={`${heroiAtual.nome}, herói do Super CT`}
-                className={`size-full object-contain object-bottom${andando ? " animate-hero-walk" : ""}`}
+                className="absolute inset-0 size-full object-contain object-bottom"
                 style={{
+                  clipPath: andando ? "inset(0 0 30% 0)" : undefined,
                   filter: pendurado
                     ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
                     : `drop-shadow(0 0 6px ${heroiAtual.cor})`,
                 }}
               />
+              {/* perninhas mexendo */}
+              {andando &&
+                ([
+                  { key: "perna-a", clip: "inset(70% 50% 0 0)", cls: " animate-hero-leg-a" },
+                  { key: "perna-b", clip: "inset(70% 0 0 50%)", cls: " animate-hero-leg-b" },
+                ] as const).map((p) => (
+                  <img
+                    key={p.key}
+                    src={heroiAtual.img}
+                    alt=""
+                    aria-hidden
+                    className={`absolute inset-0 size-full object-contain object-bottom${p.cls}`}
+                    style={{
+                      clipPath: p.clip,
+                      filter: pendurado
+                        ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
+                        : `drop-shadow(0 0 6px ${heroiAtual.cor})`,
+                    }}
+                  />
+                ))}
             </div>
+
 
 
 
