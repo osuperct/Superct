@@ -29,6 +29,7 @@ export const Route = createFileRoute("/jogo")({
 const MUNDO = 4200;
 const ARENA = 720;
 const ALTURA_CENA = 260;
+const TETO = ALTURA_CENA - 40; /* linha de neon: o herói não atravessa */
 const GRAVIDADE = -1.25;
 const IMPULSO = 17.5;
 const IMPULSO_BAIXO = 12;
@@ -488,7 +489,7 @@ function JogoPage() {
           } else seguro.current = false;
         }
         if (seguro.current) {
-          y.current = apoio;
+          y.current = Math.min(TETO - alt, apoio);
           vy.current = 0;
           noAr.current = false;
         } else {
@@ -504,6 +505,11 @@ function JogoPage() {
           subindoDesde.current = null;
         }
         let prox = y.current + vy.current;
+        if (prox + alt > TETO) {
+          prox = TETO - alt;
+          vy.current = 0;
+          subindoDesde.current = null;
+        }
 
         if (vy.current > -4 && performance.now() >= bloquearAgarreAte.current) {
           const topo = prox + alt;
