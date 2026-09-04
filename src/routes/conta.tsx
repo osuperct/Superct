@@ -590,14 +590,24 @@ function Painel({ session }: { session: Session }) {
         </h2>
         <ul className="mt-2 space-y-1">
           {alunos.map((a) => (
-            <li key={a.id} className="text-sm">
-              • {a.nome}
-              {a.idade ? ` — ${a.idade} anos` : ""}
-              {a.matricula && (
-                <span className="ml-2 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
-                  Matrícula {a.matricula}
-                </span>
-              )}
+            <li key={a.id} className="flex items-center justify-between gap-2 text-sm">
+              <span className="flex-1 truncate">
+                • {a.nome}
+                {a.idade ? ` — ${a.idade} anos` : ""}
+                {a.matricula && (
+                  <span className="ml-2 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
+                    Matrícula {a.matricula}
+                  </span>
+                )}
+              </span>
+              <button
+                type="button"
+                onClick={() => excluirAluno(a.id)}
+                title="Excluir aluno"
+                className="shrink-0 rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+              >
+                <Trash2 className="size-4" />
+              </button>
             </li>
           ))}
           {alunos.length === 0 && <li className="text-sm text-muted-foreground">Nenhum aluno cadastrado.</li>}
