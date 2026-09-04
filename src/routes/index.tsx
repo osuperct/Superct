@@ -48,6 +48,7 @@ import coloniaFoto1 from "@/assets/colonia-foto1.jpg.asset.json";
 import coloniaFoto2 from "@/assets/colonia-foto2.png.asset.json";
 import coloniaFoto3 from "@/assets/colonia-foto3.jpg.asset.json";
 import coloniaCover from "@/assets/colonia-cover.jpg.asset.json";
+import professorTioVictor from "@/assets/professor-tio-victor.png.asset.json";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -423,11 +424,12 @@ function Index() {
           <div className="relative rounded-r-xl border-l-4 border-primary bg-surface p-6">
             <div className="mb-4 flex items-start gap-4">
               <img
-                src={logo}
-                alt=""
+                src={professorTioVictor.url}
+                alt="Professor Tio Victor"
                 loading="lazy"
+                width={1024}
+                height={1024}
                 className="size-16 flex-none rounded-full border-2 border-primary bg-black object-cover"
-                style={{ objectPosition: "center 32%" }}
               />
               <div>
                 <h3 className="font-display text-xl">PROFESSOR TIO VICTOR</h3>
