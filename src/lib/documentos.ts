@@ -64,7 +64,7 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
   { chave: "aluno_nascimento", rotulo: "Data de nascimento do aluno" },
   { chave: "servico", rotulo: "Serviço contratado (modalidade / evento)", fixo: "Treinamento funcional e recreação" },
   { chave: "data_inicio", rotulo: "Data de início", date: true, obrigatorio: true },
-  { chave: "matricula", rotulo: "Taxa de matrícula / cadastro (R$)" },
+  { chave: "matricula", rotulo: "Taxa de matrícula / cadastro (R$)", fixo: "R$ 50,00" },
   {
     chave: "dias_horarios",
     rotulo: "Dias e horários",
