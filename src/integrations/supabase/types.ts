@@ -14,7 +14,148 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alunos: {
+        Row: {
+          created_at: string
+          id: string
+          idade: number | null
+          nascimento: string | null
+          nome: string
+          observacoes: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          idade?: number | null
+          nascimento?: string | null
+          nome: string
+          observacoes?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          idade?: number | null
+          nascimento?: string | null
+          nome?: string
+          observacoes?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      documentos: {
+        Row: {
+          aluno_id: string | null
+          caminho: string
+          created_at: string
+          id: string
+          nome_arquivo: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          aluno_id?: string | null
+          caminho: string
+          created_at?: string
+          id?: string
+          nome_arquivo: string
+          tipo?: string
+          user_id: string
+        }
+        Update: {
+          aluno_id?: string | null
+          caminho?: string
+          created_at?: string
+          id?: string
+          nome_arquivo?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fichas: {
+        Row: {
+          aluno_id: string | null
+          created_at: string
+          dados: Json
+          enviado_em: string | null
+          id: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          aluno_id?: string | null
+          created_at?: string
+          dados?: Json
+          enviado_em?: string | null
+          id?: string
+          tipo?: string
+          user_id: string
+        }
+        Update: {
+          aluno_id?: string | null
+          created_at?: string
+          dados?: Json
+          enviado_em?: string | null
+          id?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fichas_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      perfis: {
+        Row: {
+          aceite_imagem: boolean
+          aceite_imagem_em: string | null
+          cpf: string | null
+          created_at: string
+          endereco: string | null
+          id: string
+          nome_responsavel: string
+          telefone: string | null
+          updated_at: string
+        }
+        Insert: {
+          aceite_imagem?: boolean
+          aceite_imagem_em?: string | null
+          cpf?: string | null
+          created_at?: string
+          endereco?: string | null
+          id: string
+          nome_responsavel?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          aceite_imagem?: boolean
+          aceite_imagem_em?: string | null
+          cpf?: string | null
+          created_at?: string
+          endereco?: string | null
+          id?: string
+          nome_responsavel?: string
+          telefone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
