@@ -1349,6 +1349,11 @@ function JogoPage() {
               const sombra = pendurado
                 ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
                 : `drop-shadow(0 0 6px ${heroiAtual.cor})`;
+              const src = escalando
+                ? heroiAtual.escala
+                : andando
+                  ? heroiAtual.anda[passoFrame]!
+                  : heroiAtual.img;
               return (
                 <div
                   className="absolute transition-[height] duration-100"
@@ -1360,53 +1365,14 @@ function JogoPage() {
                     transform: escalando ? "none" : `scaleX(${-olhando})`,
                   }}
                 >
-                  {/* corpo */}
                   <img
-                    src={heroiAtual.img}
+                    src={src}
                     alt={`${heroiAtual.nome}, herói do Super CT`}
                     className={`absolute inset-0 size-full object-contain object-bottom${
                       escalando ? " animate-hero-climb-body" : ""
                     }`}
-                    style={{
-                      clipPath: escalando
-                        ? "inset(22% 0 0 0)"
-                        : andando
-                          ? "inset(18% 0 30% 0)"
-                          : undefined,
-                      filter: sombra,
-                    }}
+                    style={{ filter: sombra }}
                   />
-                  {/* braços e perninhas em movimento */}
-                  {escalando
-                    ? ([
-                        { key: "braco-esq", clip: "inset(0 55% 62% 0)", cls: " animate-hero-climb-a" },
-                        { key: "braco-dir", clip: "inset(0 0 62% 55%)", cls: " animate-hero-climb-b" },
-                      ] as const).map((p) => (
-                        <img
-                          key={p.key}
-                          src={heroiAtual.img}
-                          alt=""
-                          aria-hidden
-                          className={`absolute inset-0 size-full object-contain object-bottom${p.cls}`}
-                          style={{ clipPath: p.clip, filter: sombra }}
-                        />
-                      ))
-                    : andando &&
-                      ([
-                        { key: "perna-a", clip: "inset(70% 50% 0 0)", cls: " animate-hero-leg-a" },
-                        { key: "perna-b", clip: "inset(70% 0 0 50%)", cls: " animate-hero-leg-b" },
-                        { key: "braco-a", clip: "inset(18% 58% 55% 0)", cls: " animate-hero-arm-a" },
-                        { key: "braco-b", clip: "inset(18% 0 55% 58%)", cls: " animate-hero-arm-b" },
-                      ] as const).map((p) => (
-                        <img
-                          key={p.key}
-                          src={heroiAtual.img}
-                          alt=""
-                          aria-hidden
-                          className={`absolute inset-0 size-full object-contain object-bottom${p.cls}`}
-                          style={{ clipPath: p.clip, filter: sombra }}
-                        />
-                      ))}
                 </div>
               );
             })()}
