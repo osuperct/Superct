@@ -289,7 +289,7 @@ function JogoPage() {
   }, []);
 
   const iniciarCorrida = useCallback(
-    (novaFase: number) => {
+    (novaFase: number, reporCoracoes = true) => {
       faseRef.current = novaFase;
       setFase(novaFase);
       modoRef.current = "corrida";
@@ -304,6 +304,11 @@ function JogoPage() {
       chefaoRef.current = null;
       bolasRef.current = [];
       tirosRef.current = [];
+      invulAte.current = performance.now() + 900;
+      if (reporCoracoes) {
+        coracoesRef.current = CORACOES.map((_, i) => i);
+        setCoracoes(coracoesRef.current);
+      }
       setTiros([]);
       setCarga(0);
       setChefao(null);
@@ -313,6 +318,7 @@ function JogoPage() {
       setDerrotado(null);
       setVenceu(false);
       setFim(false);
+      setPiscando(false);
       zerarHeroi();
     },
     [zerarHeroi],
@@ -321,6 +327,8 @@ function JogoPage() {
   const reiniciar = useCallback(() => {
     pontosRef.current = 0;
     setPontos(0);
+    vidasRef.current = VIDAS_CHEFAO;
+    setVidas(VIDAS_CHEFAO);
     iniciarCorrida(1);
   }, [iniciarCorrida]);
 
@@ -333,9 +341,7 @@ function JogoPage() {
     spawnHaltere.current = 90;
     spawnTiro.current = 70;
     cargaRef.current = 0;
-    vidasRef.current = VIDAS_CHEFAO;
-    invulAte.current = 0;
-    setVidas(VIDAS_CHEFAO);
+    invulAte.current = performance.now() + 900;
     setPiscando(false);
     setCarga(0);
     setBolas([]);
@@ -350,6 +356,7 @@ function JogoPage() {
     chefaoRef.current = boss;
     setChefao(boss);
   }, [zerarHeroi]);
+
 
   useEffect(() => {
     let raf = 0;
