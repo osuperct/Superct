@@ -1263,7 +1263,7 @@ function Joystick({ onChange }: { onChange: (x: number) => void }) {
       }}
     >
       <div
-        className="pointer-events-none size-12 rounded-full border border-primary bg-primary shadow-[0_0_14px_rgba(255,122,24,0.55)]"
+        className="pointer-events-none size-12 rounded-full border border-primary bg-primary shadow-[0_0_14px_var(--primary)]"
         style={{ transform: `translate(${knob.x}px, ${knob.y}px)` }}
       />
     </div>
