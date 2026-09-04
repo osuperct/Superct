@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronUp, Heart, Medal, RotateCcw, Zap } from "lucide-react";
-import mascote from "@/assets/mascote-menino.jpg.asset.json";
+import { HEROIS, heroiPorId, type HeroiId } from "@/data/herois";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
+
 
 const TITLE = "Super Jogo — Fases e chefões do Super CT | Professor Tio Victor";
 const DESCRIPTION =
@@ -208,6 +209,12 @@ function JogoPage() {
   const [vidas, setVidas] = useState(VIDAS_CHEFAO);
   const [coracoes, setCoracoes] = useState<number[]>(CORACOES.map((_, i) => i));
   const [piscando, setPiscando] = useState(false);
+  const [heroiSel, setHeroiSel] = useState<HeroiId | null>(null);
+  const [olhando, setOlhando] = useState<1 | -1>(1);
+  const heroiRef = useRef<HeroiId | null>(null);
+  const olhandoRef = useRef<1 | -1>(1);
+
+
 
   const [carga, setCarga] = useState(0);
   const [pontos, setPontos] = useState(0);
@@ -408,7 +415,7 @@ function JogoPage() {
 
     const loop = () => {
       raf = requestAnimationFrame(loop);
-      if (fimRef.current || pausaRef.current) return;
+      if (fimRef.current || pausaRef.current || !heroiRef.current) return;
       tick.current += 1;
 
       const emChefao = modoRef.current === "chefao";
@@ -448,7 +455,13 @@ function JogoPage() {
       };
 
       if (dir.current !== 0) {
+        const lado: 1 | -1 = dir.current > 0 ? 1 : -1;
+        if (olhandoRef.current !== lado) {
+          olhandoRef.current = lado;
+          setOlhando(lado);
+        }
         passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
+
       }
 
       /* ---- impulso lateral do salto ao soltar aparelho ---- */
@@ -1052,6 +1065,14 @@ function JogoPage() {
   const vilaoFase = VILOES[Math.min(fase, TOTAL_FASES) - 1]!;
   const tamBoss = chefaoTamanho(fase);
   const progresso = emChefao ? 100 : Math.min(100, (heroX / (MUNDO - HEROI_W)) * 100);
+  const heroiAtual = heroiPorId(heroiSel ?? "kael");
+
+  const escolherHeroi = (id: HeroiId) => {
+    heroiRef.current = id;
+    setHeroiSel(id);
+    reiniciar();
+  };
+
 
   return (
     <div className="min-h-screen bg-background pl-16 text-foreground">
@@ -1077,6 +1098,17 @@ function JogoPage() {
           >
             <RotateCcw className="size-3" /> Reiniciar
           </button>
+          <button
+            type="button"
+            onClick={() => {
+              heroiRef.current = null;
+              setHeroiSel(null);
+            }}
+            className="ml-2 inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-primary"
+          >
+            Trocar herói
+          </button>
+
         </div>
 
         {/* super poder */}
@@ -1300,19 +1332,23 @@ function JogoPage() {
               })}
 
 
-            {/* herói */}
+            {/* herói (recortado, vira para o lado do movimento) */}
             <img
-              src={mascote.url}
-              alt="Herói do Super CT"
-              className="absolute rounded-full border-2 border-primary object-cover transition-[height] duration-100"
+              src={heroiAtual.img}
+              alt={`${heroiAtual.nome}, herói do Super CT`}
+              className="absolute object-contain object-bottom transition-[height] duration-100"
               style={{
                 left: heroX,
                 width: HEROI_W,
                 height: alt,
                 bottom: 40 + heroY,
-                filter: pendurado ? "drop-shadow(0 0 8px rgba(255,140,0,0.8))" : undefined,
+                transform: `scaleX(${olhando})`,
+                filter: pendurado
+                  ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
+                  : `drop-shadow(0 0 6px ${heroiAtual.cor})`,
               }}
             />
+
 
             {/* vilões do percurso */}
             {inimigos.map((i) => (
@@ -1499,7 +1535,38 @@ function JogoPage() {
             </span>
           )}
 
+          {!heroiSel && (
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/90 px-4 text-center">
+              <p className="font-display text-xl uppercase tracking-tight text-primary">Escolha seu herói</p>
+              <div className="flex items-end gap-6">
+                {HEROIS.map((h) => (
+                  <button
+                    key={h.id}
+                    type="button"
+                    onClick={() => escolherHeroi(h.id)}
+                    className="flex flex-col items-center gap-1 rounded-lg border border-border px-3 py-2 active:scale-95"
+                    style={{ boxShadow: `0 0 20px -8px ${h.cor}` }}
+                  >
+                    <img
+                      src={h.img}
+                      alt={`${h.nome} em pose de herói`}
+                      className="h-24 w-auto object-contain"
+                      style={{ filter: `drop-shadow(0 0 10px ${h.cor})` }}
+                    />
+                    <span
+                      className="font-mono text-[10px] uppercase tracking-widest"
+                      style={{ color: h.cor }}
+                    >
+                      {h.nome}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {modo === "intervalo" && !fim && (
+
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
               <Medal className="size-8 text-amber-400" />
               <p className="font-display text-xl uppercase tracking-tight text-primary">
