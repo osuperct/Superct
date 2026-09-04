@@ -212,7 +212,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         toast.error("Digite um CPF válido do responsável.");
         return;
       }
-      if (!c.cpf && apenasDigitos(v).length < 10) {
+      if (c.chave === "telefone" && apenasDigitos(v).length < 10) {
         toast.error("Digite um telefone de contato válido com DDD.");
         return;
       }
@@ -385,10 +385,14 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         if (c.opcoes) {
           return (
             <label key={c.chave} className="block">
-              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{c.rotulo}</span>
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                {c.rotulo}
+                {c.obrigatorio && <span className="text-primary"> *obrigatório</span>}
+              </span>
               <select
                 value={valores[c.chave] ?? ""}
                 onChange={(e) => set(c.chave, e.target.value)}
+                required={c.obrigatorio === true}
                 className="mt-1 w-full appearance-none rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
               >
                 <option value="">Selecione</option>
