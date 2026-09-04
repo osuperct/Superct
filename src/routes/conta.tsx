@@ -306,26 +306,19 @@ function Autenticacao() {
         </button>
 
         {modo === "entrar" && (
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                setEmail("");
-                setSenha("");
-              }}
-              className="rounded-md border border-border px-3 py-2 font-display text-xs tracking-tight text-muted-foreground"
-            >
-              ÁREA DO RESPONSÁVEL
-            </button>
-            <button
-              type="button"
-              onClick={() => setEmail("osuper.c.t@gmail.com")}
-              className="rounded-md border border-primary/60 bg-primary/5 px-3 py-2 font-display text-xs tracking-tight text-primary"
-            >
-              ÁREA DO PROFESSOR
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setEmail("");
+              setSenha("");
+              setAviso("Área do Professor: informe o e-mail e a senha do professor para entrar.");
+            }}
+            className="w-full rounded-md border border-primary/60 bg-primary/5 px-3 py-2 font-display text-xs tracking-tight text-primary"
+          >
+            ÁREA DO PROFESSOR
+          </button>
         )}
+
 
         {modo === "entrar" && (
           <button
