@@ -60,7 +60,7 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
   { chave: "rg", rotulo: "RG do contratante" },
   { chave: "telefone", rotulo: "Telefone / WhatsApp", obrigatorio: true },
   { chave: "endereco", rotulo: "Endereço completo" },
-  { chave: "aluno", rotulo: "Nome do aluno(a)" },
+  { chave: "aluno", rotulo: "Nome do aluno(a)", obrigatorio: true },
   { chave: "aluno_nascimento", rotulo: "Data de nascimento do aluno" },
   { chave: "servico", rotulo: "Serviço contratado (modalidade / evento)", fixo: "Treinamento funcional e recreação" },
   { chave: "data_inicio", rotulo: "Data de início", date: true, obrigatorio: true },
