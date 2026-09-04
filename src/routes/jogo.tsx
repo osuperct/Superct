@@ -518,23 +518,27 @@ function JogoPage() {
             seguro.current = "barra";
             y.current = barra.y - alt;
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           } else if (argola) {
             seguro.current = "argola";
             y.current = argola.y - alt;
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           } else if (corda) {
             seguro.current = "corda";
             x.current = corda.x - HEROI_W / 2;
             y.current = Math.min(corda.topo - alt, Math.max(corda.base, prox));
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           } else if (parede) {
             seguro.current = "parede";
             x.current = Math.min(parede.x + parede.w - HEROI_W, Math.max(parede.x, x.current));
             y.current = Math.max(0, prox);
             vy.current = 0;
+            subindoDesde.current = null;
             noAr.current = false;
           }
         }
