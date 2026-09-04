@@ -693,10 +693,23 @@ function Painel({ session }: { session: Session }) {
           </h2>
           <p className="mt-1 text-xs text-muted-foreground">
             Anexe aqui o contrato de prestação de serviço e a ficha do aluno preenchidos à mão e escaneados
-            (foto ou PDF).
+            (foto ou PDF). Escolha de qual aluno é o documento — ele aparece junto do nome dele na lista de
+            alunos.
           </p>
 
           <div className="mt-3 flex flex-wrap gap-2">
+            <select
+              value={alunoDoc || alunos[0]?.id || ""}
+              onChange={(e) => setAlunoDoc(e.target.value)}
+              className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+            >
+              {alunos.length === 0 && <option value="">Nenhum aluno com contrato preenchido</option>}
+              {alunos.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.nome}
+                </option>
+              ))}
+            </select>
             <select
               value={tipoDoc}
               onChange={(e) => setTipoDoc(e.target.value)}
