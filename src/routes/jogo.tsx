@@ -238,6 +238,11 @@ function JogoPage() {
   const cargaRef = useRef(0);
   const bolasRef = useRef<Bola[]>([]);
   const chefaoRef = useRef<Chefao | null>(null);
+  const tirosRef = useRef<Tiro[]>([]);
+  const nextTiro = useRef(0);
+  const spawnTiro = useRef(90);
+  const vidasRef = useRef(VIDAS_CHEFAO);
+  const invulAte = useRef(0);
 
   useEffect(() => {
     const el = palcoRef.current;
