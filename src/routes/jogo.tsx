@@ -1191,27 +1191,15 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          ◀ ▶ ▼ movem e esquivam • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
+          Joystick move • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-3">
-          <div className="flex flex-col items-center gap-2">
+          <Joystick onChange={(x) => { dir.current = x; }} />
+          <div className="flex gap-2">
             <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
               <ChevronUp className="size-6" />
             </ControlButton>
-            <div className="flex gap-2">
-              <ControlButton onStart={mover(-1)} onEnd={parar} label="Mover para a esquerda">
-                <ArrowLeft className="size-6" />
-              </ControlButton>
-              <ControlButton onStart={mover(1)} onEnd={parar} label="Mover para a direita">
-                <ArrowRight className="size-6" />
-              </ControlButton>
-            </div>
-            <ControlButton onStart={descer(true)} onEnd={descer(false)} label="Abaixar e esquivar">
-              <ChevronDown className="size-6" />
-            </ControlButton>
-          </div>
-          <div className="flex gap-2">
             <ControlButton onStart={atirar} label="Atirar bola de tênis no chefão">
               <Zap className="size-6" />
             </ControlButton>
