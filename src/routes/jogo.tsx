@@ -415,7 +415,7 @@ function JogoPage() {
 
     const loop = () => {
       raf = requestAnimationFrame(loop);
-      if (fimRef.current || pausaRef.current) return;
+      if (fimRef.current || pausaRef.current || !heroiRef.current) return;
       tick.current += 1;
 
       const emChefao = modoRef.current === "chefao";
@@ -455,7 +455,13 @@ function JogoPage() {
       };
 
       if (dir.current !== 0) {
+        const lado: 1 | -1 = dir.current > 0 ? 1 : -1;
+        if (olhandoRef.current !== lado) {
+          olhandoRef.current = lado;
+          setOlhando(lado);
+        }
         passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
+
       }
 
       /* ---- impulso lateral do salto ao soltar aparelho ---- */
@@ -1307,19 +1313,23 @@ function JogoPage() {
               })}
 
 
-            {/* herói */}
+            {/* herói (recortado, vira para o lado do movimento) */}
             <img
-              src={mascote.url}
-              alt="Herói do Super CT"
-              className="absolute rounded-full border-2 border-primary object-cover transition-[height] duration-100"
+              src={heroiAtual.img}
+              alt={`${heroiAtual.nome}, herói do Super CT`}
+              className="absolute object-contain object-bottom transition-[height] duration-100"
               style={{
                 left: heroX,
                 width: HEROI_W,
                 height: alt,
                 bottom: 40 + heroY,
-                filter: pendurado ? "drop-shadow(0 0 8px rgba(255,140,0,0.8))" : undefined,
+                transform: `scaleX(${olhando})`,
+                filter: pendurado
+                  ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
+                  : `drop-shadow(0 0 6px ${heroiAtual.cor})`,
               }}
             />
+
 
             {/* vilões do percurso */}
             {inimigos.map((i) => (
