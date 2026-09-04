@@ -494,7 +494,7 @@ function JogoPage() {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Atravesse a academia do Super CT: pendure na barra, segure nas argolas, suba nas caixas de
-          crossfit, pule os steps e se abaixe para esquivar dos vilões.
+          crossfit, escale a parede de pinos coloridos, pule os steps e se abaixe para esquivar dos vilões.
         </p>
 
         <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -634,6 +634,30 @@ function JogoPage() {
               ),
             )}
 
+            {/* paredes de escalada */}
+            {PAREDES.map((p, pi) => (
+              <div
+                key={`parede-${pi}`}
+                className="absolute rounded-t-md border-2 border-white/15 bg-[#0a0a0a] shadow-[inset_0_0_24px_rgba(0,0,0,0.9)]"
+                style={{ left: p.x, width: p.w, height: p.h, bottom: 40 }}
+              >
+                <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_1px,transparent_1px,transparent_26px),repeating-linear-gradient(0deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_1px,transparent_1px,transparent_26px)]" />
+                {PINOS[pi]!.map((pino, i) => (
+                  <div
+                    key={`pino-${pi}-${i}`}
+                    className="absolute size-2 rounded-sm"
+                    style={{
+                      left: pino.x,
+                      bottom: pino.y,
+                      background: pino.cor,
+                      boxShadow: `0 0 6px 1px ${pino.cor}`,
+                    }}
+                  />
+                ))}
+                <div className="absolute inset-x-0 top-0 h-[3px] bg-primary/70 shadow-[0_0_10px_2px_rgba(255,120,0,0.5)]" />
+              </div>
+            ))}
+
             {/* jump que lança o personagem automaticamente */}
             {JUMPS.map((jump, i) => (
               <div
@@ -678,7 +702,12 @@ function JogoPage() {
 
           {pendurado && (
             <span className="absolute left-2 top-12 rounded-full bg-black/70 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary">
-              {pendurado === "corda" ? "Subindo — pule para a próxima" : "Pendurado"} • ▼ 2x em 2s para soltar
+              {pendurado === "corda"
+                ? "Subindo — pule para a próxima"
+                : pendurado === "parede"
+                  ? "Escalando — ▲ sobe, ▼ desce, setas movem"
+                  : "Pendurado"}{" "}
+              • ▼ 2x em 2s para soltar
             </span>
           )}
 
@@ -706,7 +735,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▲ pula entre aparelhos • ▼ 2x em 2s solta • jump impulsiona sozinho
+          Setas movem • ▲ pula e escala • ▼ 2x em 2s solta • parede de escalada e jump no percurso
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
@@ -722,7 +751,7 @@ function JogoPage() {
             <ControlButton onStart={descer(true)} onEnd={descer(false)} label="Abaixar e esquivar">
               <ChevronDown className="size-7" />
             </ControlButton>
-            <ControlButton onStart={pular} label="Pular">
+            <ControlButton onStart={pular} onEnd={pararSubida} label="Pular e escalar">
               <ChevronUp className="size-7" />
             </ControlButton>
           </div>
