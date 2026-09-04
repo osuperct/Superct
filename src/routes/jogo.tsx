@@ -999,6 +999,7 @@ function JogoPage() {
         setAbaixado(false);
         y.current = Math.max(0, y.current - 4);
         vy.current = -6;
+        subindoDesde.current = null;
         bloquearAgarreAte.current = agora + 650;
         ultimoToqueBaixo.current = null;
         setPendurado(false);
