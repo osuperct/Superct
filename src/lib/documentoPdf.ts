@@ -1,16 +1,39 @@
 import { jsPDF } from "jspdf";
+import assinaturaVictor from "@/assets/assinatura-victor.png.asset.json";
+import seloSuperCt from "@/assets/selo-superct.png.asset.json";
 
 export type LinhaDoc = { rotulo: string; valor: string };
 
+async function carregarDataUrl(url: string): Promise<string | null> {
+  try {
+    const resposta = await fetch(url);
+    if (!resposta.ok) return null;
+    const blob = await resposta.blob();
+    return await new Promise<string>((resolver, rejeitar) => {
+      const leitor = new FileReader();
+      leitor.onload = () => resolver(String(leitor.result));
+      leitor.onerror = () => rejeitar(leitor.error);
+      leitor.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
 /** Gera o PDF do contrato/ficha preenchido, já com a assinatura desenhada. */
-export function gerarDocumentoPdf(opcoes: {
+export async function gerarDocumentoPdf(opcoes: {
   titulo: string;
   linhas: LinhaDoc[];
   termo: string;
   assinaturaDataUrl: string | null;
   nomeAssinante: string;
   clausulas?: { titulo: string; texto: string }[];
-}): Blob {
+  /** Inclui a assinatura do Prof. Victor e o selo da empresa (contrato). */
+  assinaturaEmpresa?: boolean;
+}): Promise<Blob> {
+  const [assinaturaProf, selo] = opcoes.assinaturaEmpresa
+    ? await Promise.all([carregarDataUrl(assinaturaVictor.url), carregarDataUrl(seloSuperCt.url)])
+    : [null, null];
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const margem = 48;
   const largura = doc.internal.pageSize.getWidth() - margem * 2;
@@ -110,6 +133,43 @@ export function gerarDocumentoPdf(opcoes: {
   doc.text(`${opcoes.nomeAssinante || "Responsável"} — assinatura do responsável`, margem, y);
   y += 13;
   doc.text(`Assinado on-line em ${new Date().toLocaleString("pt-BR")}`, margem, y);
+
+  if (opcoes.assinaturaEmpresa) {
+    y += 34;
+    if (y > 620) {
+      doc.addPage();
+      y = margem;
+    }
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.text(
+      `São Sebastião do Paraíso — MG, ${new Date().toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}.`,
+      margem,
+      y,
+    );
+    y += 24;
+
+    const colunaDireita = margem + largura / 2 + 10;
+    if (assinaturaProf) doc.addImage(assinaturaProf, "PNG", margem, y, 170, 32);
+    if (selo) doc.addImage(selo, "PNG", colunaDireita + 40, y - 4, 52, 32);
+    y += 38;
+
+    doc.line(margem, y, margem + 200, y);
+    doc.line(colunaDireita, y, colunaDireita + 200, y);
+    y += 13;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.text("VICTOR HUGO JORGE DE SIQUEIRA", margem, y);
+    doc.text("SUPER CT RECREAÇÃO INFANTIL", colunaDireita, y);
+    y += 12;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("CREF: 057790-G/MG | CPF: 097.854.576-13", margem, y);
+    doc.text("CNPJ: 61.251.274/0001-48", colunaDireita, y);
+    y += 11;
+    doc.text("(Educador Físico / Prestador)", margem, y);
+    doc.text("(Prestadora / Infraestrutura)", colunaDireita, y);
+  }
 
   return doc.output("blob");
 }

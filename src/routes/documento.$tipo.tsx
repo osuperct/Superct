@@ -231,12 +231,13 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       if (erroFicha) throw erroFicha;
 
       const linhas = doc.campos.map((c) => ({ rotulo: c.rotulo, valor: valorCampo(c) }));
-      const blob = gerarDocumentoPdf({
+      const blob = await gerarDocumentoPdf({
         titulo: doc.titulo,
         linhas,
         termo: TERMO_IMAGEM,
         assinaturaDataUrl: assinatura,
         nomeAssinante,
+        assinaturaEmpresa: tipo === "contrato",
         ...(doc.clausulas ? { clausulas: doc.clausulas } : {}),
       });
       const nomeArquivo = `${doc.arquivo}-assinado-${new Date().toISOString().slice(0, 10)}.pdf`;
