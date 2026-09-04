@@ -40,6 +40,8 @@ type Barra = { x: number; w: number; y: number };
 type Argola = { x: number; y: number };
 type Corda = { x: number; base: number; topo: number };
 type Jump = { x: number; w: number; h: number };
+type Parede = { x: number; w: number; h: number };
+type Pino = { x: number; y: number; cor: string };
 
 const SOLIDOS: Solido[] = [
   { x: 430, w: 72, h: 56, tipo: "caixa" },
@@ -79,6 +81,23 @@ const CORDAS: Corda[] = [
 
 const JUMPS: Jump[] = [{ x: 3870, w: 86, h: 18 }];
 
+/* paredes de escalada (pretas com pinos coloridos) */
+const PAREDES: Parede[] = [
+  { x: 790, w: 150, h: 200 },
+  { x: 3700, w: 160, h: 210 },
+];
+const VELOCIDADE_ESCALADA = 2.2;
+
+const CORES_PINO = ["#f97316", "#22d3ee", "#a855f7", "#84cc16", "#f43f5e", "#facc15"];
+const PINOS: Pino[][] = PAREDES.map((p, pi) =>
+  Array.from({ length: 26 }).map((_, i) => ({
+    x: 14 + ((i * 37 + pi * 19) % (p.w - 28)),
+    y: 16 + ((i * 29 + pi * 11) % (p.h - 30)),
+    cor: CORES_PINO[(i + pi) % CORES_PINO.length]!,
+  })),
+);
+
+
 /* cones decorativos no tatame (não colidem) */
 const CONES: number[] = [
   180, 340, 560, 820, 900, 1100, 1340, 1500, 1700, 1900, 2050, 2300, 2560, 2750,
@@ -107,7 +126,7 @@ function JogoPage() {
   const [camera, setCamera] = useState(0);
   const [inimigos, setInimigos] = useState<Inimigo[]>([]);
   const [pontos, setPontos] = useState(0);
-  const [pendurado, setPendurado] = useState<false | "barra" | "argola" | "corda">(false);
+  const [pendurado, setPendurado] = useState<false | "barra" | "argola" | "corda" | "parede">(false);
   const [abaixado, setAbaixado] = useState(false);
   const [fim, setFim] = useState(false);
   const [venceu, setVenceu] = useState(false);
@@ -118,7 +137,9 @@ function JogoPage() {
   const y = useRef(0);
   const vy = useRef(0);
   const noAr = useRef(false);
-  const seguro = useRef<false | "barra" | "argola" | "corda">(false);
+  const seguro = useRef<false | "barra" | "argola" | "corda" | "parede">(false);
+  const subindo = useRef(false);
+  const descendoParede = useRef(false);
   const ultimoToqueBaixo = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
   const duck = useRef(false);
@@ -151,6 +172,8 @@ function JogoPage() {
     noAr.current = false;
     seguro.current = false;
     duck.current = false;
+    subindo.current = false;
+    descendoParede.current = false;
     fimRef.current = false;
     nextId.current = 0;
     spawn.current = 60;
@@ -208,6 +231,18 @@ function JogoPage() {
           const a = ARGOLAS.find((a) => Math.abs(a.x - (x.current + HEROI_W / 2)) < 34);
           if (a) apoio = a.y - alt;
           else seguro.current = false;
+        } else if (seguro.current === "parede") {
+          const cx = x.current + HEROI_W / 2;
+          const p = PAREDES.find((p) => cx > p.x - 6 && cx < p.x + p.w + 6);
+          if (p) {
+            x.current = Math.min(p.x + p.w - HEROI_W, Math.max(p.x, x.current));
+            const delta = subindo.current
+              ? VELOCIDADE_ESCALADA
+              : descendoParede.current
+                ? -VELOCIDADE_ESCALADA
+                : 0;
+            apoio = Math.min(p.h - alt, Math.max(0, y.current + delta));
+          } else seguro.current = false;
         } else {
           const corda = CORDAS.find((c) => Math.abs(c.x - (x.current + HEROI_W / 2)) < 28);
           if (corda) {
@@ -236,6 +271,9 @@ function JogoPage() {
           const corda = CORDAS.find(
             (c) => Math.abs(c.x - cx) < 22 && prox + alt > c.base && prox < c.topo,
           );
+          const parede = PAREDES.find(
+            (p) => cx > p.x - 4 && cx < p.x + p.w + 4 && prox >= 0 && prox < p.h - alt,
+          );
           if (barra) {
             seguro.current = "barra";
             y.current = barra.y - alt;
@@ -250,6 +288,12 @@ function JogoPage() {
             seguro.current = "corda";
             x.current = corda.x - HEROI_W / 2;
             y.current = Math.min(corda.topo - alt, Math.max(corda.base, prox));
+            vy.current = 0;
+            noAr.current = false;
+          } else if (parede) {
+            seguro.current = "parede";
+            x.current = Math.min(parede.x + parede.w - HEROI_W, Math.max(parede.x, x.current));
+            y.current = Math.max(0, prox);
             vy.current = 0;
             noAr.current = false;
           }
@@ -377,6 +421,12 @@ function JogoPage() {
 
   const pular = () => {
     if (fimRef.current) return;
+    if (seguro.current === "parede") {
+      subindo.current = true;
+      duck.current = false;
+      setAbaixado(false);
+      return;
+    }
     duck.current = false;
     setAbaixado(false);
     if (seguro.current) {
@@ -390,6 +440,10 @@ function JogoPage() {
     vy.current = IMPULSO;
   };
 
+  const pararSubida = () => {
+    subindo.current = false;
+  };
+
   const descer = (ativo: boolean) => () => {
     if (fimRef.current) return;
     if (ativo && seguro.current) {
@@ -398,16 +452,25 @@ function JogoPage() {
       if (toqueAnterior !== null && agora - toqueAnterior <= 2000) {
         seguro.current = false;
         noAr.current = true;
+        subindo.current = false;
+        descendoParede.current = false;
+        duck.current = false;
+        setAbaixado(false);
         y.current = Math.max(0, y.current - 4);
         vy.current = -6;
         bloquearAgarreAte.current = agora + 650;
         ultimoToqueBaixo.current = null;
         setPendurado(false);
-      } else {
-        ultimoToqueBaixo.current = agora;
+        return;
+      }
+      ultimoToqueBaixo.current = agora;
+      if (seguro.current === "parede") {
+        subindo.current = false;
+        descendoParede.current = true;
       }
       return;
     }
+    if (!ativo) descendoParede.current = false;
     if (ativo) ultimoToqueBaixo.current = null;
     duck.current = ativo;
     setAbaixado(ativo);
@@ -431,7 +494,7 @@ function JogoPage() {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Atravesse a academia do Super CT: pendure na barra, segure nas argolas, suba nas caixas de
-          crossfit, pule os steps e se abaixe para esquivar dos vilões.
+          crossfit, escale a parede de pinos coloridos, pule os steps e se abaixe para esquivar dos vilões.
         </p>
 
         <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -571,6 +634,30 @@ function JogoPage() {
               ),
             )}
 
+            {/* paredes de escalada */}
+            {PAREDES.map((p, pi) => (
+              <div
+                key={`parede-${pi}`}
+                className="absolute rounded-t-md border-2 border-white/15 bg-[#0a0a0a] shadow-[inset_0_0_24px_rgba(0,0,0,0.9)]"
+                style={{ left: p.x, width: p.w, height: p.h, bottom: 40 }}
+              >
+                <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_1px,transparent_1px,transparent_26px),repeating-linear-gradient(0deg,rgba(255,255,255,0.06)_0px,rgba(255,255,255,0.06)_1px,transparent_1px,transparent_26px)]" />
+                {PINOS[pi]!.map((pino, i) => (
+                  <div
+                    key={`pino-${pi}-${i}`}
+                    className="absolute size-2 rounded-sm"
+                    style={{
+                      left: pino.x,
+                      bottom: pino.y,
+                      background: pino.cor,
+                      boxShadow: `0 0 6px 1px ${pino.cor}`,
+                    }}
+                  />
+                ))}
+                <div className="absolute inset-x-0 top-0 h-[3px] bg-primary/70 shadow-[0_0_10px_2px_rgba(255,120,0,0.5)]" />
+              </div>
+            ))}
+
             {/* jump que lança o personagem automaticamente */}
             {JUMPS.map((jump, i) => (
               <div
@@ -615,7 +702,12 @@ function JogoPage() {
 
           {pendurado && (
             <span className="absolute left-2 top-12 rounded-full bg-black/70 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary">
-              {pendurado === "corda" ? "Subindo — pule para a próxima" : "Pendurado"} • ▼ 2x em 2s para soltar
+              {pendurado === "corda"
+                ? "Subindo — pule para a próxima"
+                : pendurado === "parede"
+                  ? "Escalando — ▲ sobe, ▼ desce, setas movem"
+                  : "Pendurado"}{" "}
+              • ▼ 2x em 2s para soltar
             </span>
           )}
 
@@ -643,7 +735,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▲ pula entre aparelhos • ▼ 2x em 2s solta • jump impulsiona sozinho
+          Setas movem • ▲ pula e escala • ▼ 2x em 2s solta • parede de escalada e jump no percurso
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
@@ -659,7 +751,7 @@ function JogoPage() {
             <ControlButton onStart={descer(true)} onEnd={descer(false)} label="Abaixar e esquivar">
               <ChevronDown className="size-7" />
             </ControlButton>
-            <ControlButton onStart={pular} label="Pular">
+            <ControlButton onStart={pular} onEnd={pararSubida} label="Pular e escalar">
               <ChevronUp className="size-7" />
             </ControlButton>
           </div>
