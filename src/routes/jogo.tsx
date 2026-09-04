@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChevronUp, Heart, Medal, RotateCcw, Zap } from "lucide-react";
-import mascote from "@/assets/mascote-menino.jpg.asset.json";
+import { HEROIS, heroiPorId, type HeroiId } from "@/data/herois";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
+
 
 const TITLE = "Super Jogo — Fases e chefões do Super CT | Professor Tio Victor";
 const DESCRIPTION =
@@ -208,6 +209,12 @@ function JogoPage() {
   const [vidas, setVidas] = useState(VIDAS_CHEFAO);
   const [coracoes, setCoracoes] = useState<number[]>(CORACOES.map((_, i) => i));
   const [piscando, setPiscando] = useState(false);
+  const [heroiSel, setHeroiSel] = useState<HeroiId | null>(null);
+  const [olhando, setOlhando] = useState<1 | -1>(1);
+  const heroiRef = useRef<HeroiId | null>(null);
+  const olhandoRef = useRef<1 | -1>(1);
+
+
 
   const [carga, setCarga] = useState(0);
   const [pontos, setPontos] = useState(0);
