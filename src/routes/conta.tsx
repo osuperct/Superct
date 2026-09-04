@@ -8,10 +8,7 @@ import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.f
 import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 
 import { supabase } from "@/integrations/supabase/client";
-import { Assinatura } from "@/components/Assinatura";
-import { gerarDocumentoPdf } from "@/lib/documentoPdf";
 
-const EMAIL_SUPER_CT = "osuper.c.t@gmail.com";
 const BUCKET = "documentos-alunos";
 
 const TERMO_IMAGEM =
