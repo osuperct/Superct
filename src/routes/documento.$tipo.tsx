@@ -221,6 +221,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         termo: TERMO_IMAGEM,
         assinaturaDataUrl: assinatura,
         nomeAssinante,
+        ...(doc.clausulas ? { clausulas: doc.clausulas } : {}),
       });
       const nomeArquivo = `${doc.arquivo}-assinado-${new Date().toISOString().slice(0, 10)}.pdf`;
       const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
