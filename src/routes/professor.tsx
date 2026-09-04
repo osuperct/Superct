@@ -247,24 +247,96 @@ function Painel() {
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <Paperclip className="size-4 text-primary" /> ANEXAR CONTRATO DE UM ALUNO
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Envie um contrato já preenchido (foto ou PDF) para o cadastro do responsável. O responsável poderá
+          ver e baixar, mas não excluir.
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <select
+            value={alunoSel}
+            onChange={(e) => setAlunoSel(e.target.value)}
+            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="">Escolha o aluno…</option>
+            {alunos.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.nome} — {perfis.find((p) => p.id === a.user_id)?.nome_responsavel || "responsável"}
+              </option>
+            ))}
+          </select>
+          <select
+            value={tipoSel}
+            onChange={(e) => setTipoSel(e.target.value)}
+            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+          >
+            <option value="contrato">Contrato assinado</option>
+            <option value="ficha">Ficha / PAR-Q</option>
+            <option value="documento">Documento pessoal</option>
+            <option value="outro">Outro</option>
+          </select>
+          <input
+            ref={inputArquivo}
+            type="file"
+            accept="image/*,application/pdf"
+            id="anexo-professor"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void anexar(f);
+            }}
+          />
+          <label
+            htmlFor="anexo-professor"
+            className="flex cursor-pointer items-center gap-2 rounded-md bg-primary px-4 py-2 font-display text-sm text-primary-foreground"
+          >
+            <Upload className="size-4" /> {enviando ? "ENVIANDO…" : "ANEXAR"}
+          </label>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-border bg-card/40 p-4">
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <FileText className="size-4 text-primary" /> CONTRATOS ASSINADOS ({docs.length})
         </h2>
         <ul className="mt-3 space-y-2">
-          {docs.map((d) => (
-            <li key={d.id} className="rounded-md border border-border bg-background/40 p-3">
-              <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                {new Date(d.created_at).toLocaleString("pt-BR")}
-              </p>
-              <p className="mt-1 text-sm">{d.nome_arquivo}</p>
-              <button
-                type="button"
-                onClick={() => void abrir(d)}
-                className="mt-2 rounded-md border border-primary px-3 py-1.5 font-display text-xs tracking-tight text-primary"
-              >
-                ABRIR PDF
-              </button>
-            </li>
-          ))}
+          {docs.map((d) => {
+            const alu = alunos.find((a) => a.id === d.aluno_id);
+            const resp = perfis.find((p) => p.id === d.user_id);
+            return (
+              <li key={d.id} className="rounded-md border border-border bg-background/40 p-3">
+                <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                  {new Date(d.created_at).toLocaleString("pt-BR")}
+                </p>
+                <p className="mt-1 text-sm font-medium text-primary">
+                  {alu?.nome ?? "Aluno não identificado"}
+                  {alu?.matricula ? ` • ${alu.matricula}` : ""}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Responsável: {resp?.nome_responsavel || "—"}
+                  {d.enviado_por_professor ? " • anexado pelo professor" : ""}
+                </p>
+                <p className="mt-1 text-sm">{d.nome_arquivo}</p>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void abrir(d)}
+                    className="rounded-md border border-primary px-3 py-1.5 font-display text-xs tracking-tight text-primary"
+                  >
+                    ABRIR PDF
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void excluir(d)}
+                    className="flex items-center gap-1 rounded-md border border-border px-3 py-1.5 font-display text-xs tracking-tight text-muted-foreground hover:border-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="size-3" /> EXCLUIR
+                  </button>
+                </div>
+              </li>
+            );
+          })}
           {docs.length === 0 && <li className="text-sm text-muted-foreground">Nenhum contrato assinado ainda.</li>}
         </ul>
       </section>
