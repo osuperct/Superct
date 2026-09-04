@@ -38,6 +38,8 @@ type Doc = {
   caminho: string;
   created_at: string;
   user_id: string;
+  aluno_id: string | null;
+  enviado_por_professor: boolean;
 };
 type Alu = { id: string; nome: string; idade: number | null; matricula: string | null; user_id: string };
 type Perfil = { id: string; nome_responsavel: string; telefone: string | null; cpf: string | null };
