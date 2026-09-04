@@ -13,29 +13,55 @@ export type CampoDoc = {
   multiplos?: { chave: string; rotulo: string; opcoes: string[] }[];
 };
 
+const SIM_NAO = ["Não", "Sim"];
+
 export const CAMPOS_FICHA: CampoDoc[] = [
   { chave: "aluno_nome", rotulo: "Nome completo do aluno" },
   { chave: "aluno_nascimento", rotulo: "Data de nascimento" },
   { chave: "aluno_idade", rotulo: "Idade" },
   { chave: "escola", rotulo: "Escola / série" },
-  { chave: "responsavel_nome", rotulo: "Nome do responsável" },
+  { chave: "responsavel_nome", rotulo: "Nome do responsável legal" },
   { chave: "responsavel_cpf", rotulo: "CPF do responsável" },
   { chave: "responsavel_rg", rotulo: "RG do responsável" },
   { chave: "endereco", rotulo: "Endereço completo" },
   { chave: "telefone", rotulo: "Telefone / WhatsApp" },
-  { chave: "contato_emergencia", rotulo: "Contato de emergência (nome e telefone)" },
-  { chave: "saude", rotulo: "Problemas de saúde, alergias ou medicamentos", longo: true },
+  { chave: "contato_emergencia", rotulo: "Telefone de emergência (nome e número)" },
+  { chave: "parq_1", rotulo: "PAR-Q 1 — Algum médico já disse que o aluno possui problema cardíaco ou restrição para exercícios?", opcoes: SIM_NAO },
+  { chave: "parq_2", rotulo: "PAR-Q 2 — O aluno sente dores no peito, falta de ar inexplicável ou tonturas ao se exercitar?", opcoes: SIM_NAO },
+  { chave: "parq_3", rotulo: "PAR-Q 3 — Possui algum problema ósseo, articular ou muscular que possa ser agravado pelo exercício?", opcoes: SIM_NAO },
+  { chave: "parq_4", rotulo: "PAR-Q 4 — Possui diagnóstico de asma, bronquite ou condição respiratória frequente?", opcoes: SIM_NAO },
+  { chave: "parq_5", rotulo: "PAR-Q 5 — O aluno toma algum medicamento de uso contínuo?", opcoes: SIM_NAO },
+  { chave: "parq_6", rotulo: "PAR-Q 6 — Existe outro motivo médico/físico para o aluno não realizar exercícios sem adaptação?", opcoes: SIM_NAO },
+  { chave: "medicamentos", rotulo: "Medicamentos de uso contínuo (se houver)", longo: true },
+  { chave: "alergias", rotulo: "Alergias conhecidas (medicamentos, alimentos, insetos)", longo: true },
+  { chave: "saude", rotulo: "Restrições médicas, neurológicas, ortopédicas ou comportamentais", longo: true },
+  { chave: "experiencia", rotulo: "Já praticou atividade física ou esportes antes? Quais?", longo: true },
+  {
+    chave: "objetivo",
+    rotulo: "Objetivo principal",
+    opcoes: ["Condicionamento físico", "Desenvolvimento motor", "Recreação", "Socialização"],
+  },
   { chave: "plano", rotulo: "Convênio / plano de saúde" },
   { chave: "turma", rotulo: "Turma e horário desejados" },
 ];
 
 export const CAMPOS_CONTRATO: CampoDoc[] = [
-  { chave: "contratante", rotulo: "Nome do contratante (responsável)" },
+  { chave: "contratada", rotulo: "Contratada", fixo: "Super CT — Desenvolvimento e Recreação Infantil | CNPJ 61.251.274/0001-48" },
+  {
+    chave: "profissional",
+    rotulo: "Profissional responsável",
+    fixo: "Victor Hugo Jorge de Siqueira | CREF 057790-G/MG | CPF 097.854.576-13",
+  },
+  { chave: "contratante", rotulo: "Nome do responsável legal (contratante)" },
   { chave: "cpf", rotulo: "CPF do contratante" },
-  { chave: "endereco", rotulo: "Endereço do contratante" },
-  { chave: "aluno", rotulo: "Nome do aluno" },
+  { chave: "rg", rotulo: "RG do contratante" },
+  { chave: "telefone", rotulo: "Telefone / WhatsApp" },
+  { chave: "endereco", rotulo: "Endereço completo" },
+  { chave: "aluno", rotulo: "Nome do aluno(a)" },
+  { chave: "aluno_nascimento", rotulo: "Data de nascimento do aluno" },
   { chave: "servico", rotulo: "Serviço contratado (modalidade / evento)", fixo: "Treinamento funcional e recreação" },
   { chave: "data_inicio", rotulo: "Data de início" },
+  { chave: "matricula", rotulo: "Taxa de matrícula / cadastro (R$)" },
   {
     chave: "dias_horarios",
     rotulo: "Dias e horários",
