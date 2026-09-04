@@ -440,7 +440,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         />
         <span>
           Declaro que as informações são verdadeiras e autorizo o uso de imagem do(a) aluno(a) conforme o termo:{" "}
-          {TERMO_IMAGEM}
+          {TERMO_IMAGEM} <span className="text-primary">*obrigatório</span>
         </span>
       </label>
 
@@ -455,7 +455,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             />
             <span>
               Li todas as cláusulas e regras acima e estou ciente e de acordo, inclusive com as condições de
-              pagamento e as normas de convivência e segurança do Super CT.
+              pagamento e as normas de convivência e segurança do Super CT. <span className="text-primary">*obrigatório</span>
             </span>
           </label>
           <h2 className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
