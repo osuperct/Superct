@@ -393,7 +393,7 @@ function JogoPage() {
     if (ativo && seguro.current) {
       const agora = performance.now();
       const toqueAnterior = ultimoToqueBaixo.current;
-      if (toqueAnterior !== null && agora - toqueAnterior <= 1500) {
+      if (toqueAnterior !== null && agora - toqueAnterior <= 2000) {
         seguro.current = false;
         noAr.current = true;
         vy.current = -2;
