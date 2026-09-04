@@ -750,7 +750,17 @@ function JogoPage() {
       setHalteres((prev) => {
         const restantes: Haltere[] = [];
         for (const h of prev) {
-          const ny = h.caindo ? Math.max(0, h.y - 2.4) : h.y;
+          let ny = h.y;
+          if (h.caindo) {
+            ny = h.y - 2.4;
+            /* apoio: chão ou topo de caixa/step abaixo do haltere */
+            let apoio = 0;
+            for (const s of ARENA_SOLIDOS) {
+              const sobrepoe = h.x + 24 > s.x && h.x < s.x + s.w;
+              if (sobrepoe && h.y >= s.h && s.h > apoio) apoio = s.h;
+            }
+            if (ny <= apoio) ny = apoio;
+          }
           const pegou =
             x.current + HEROI_W > h.x - 4 &&
             x.current < h.x + 24 &&
@@ -761,10 +771,11 @@ function JogoPage() {
             setCarga(cargaRef.current);
             continue;
           }
-          restantes.push({ ...h, y: ny, caindo: ny > 0 });
+          restantes.push({ ...h, y: ny, caindo: h.caindo && ny > 0 && ny !== h.y });
         }
         return restantes;
       });
+
 
       /* bolas de tênis */
       let acertos = 0;
