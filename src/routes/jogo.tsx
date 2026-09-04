@@ -154,7 +154,7 @@ type Chefao = { x: number; y: number; vx: number; vy: number; hp: number; hpMax:
 type Modo = "corrida" | "intervalo" | "chefao" | "fase-vencida";
 
 const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_H);
-const dificuldade = (fase: number) => 0.75 + (fase - 1) * 0.24;
+const dificuldade = (fase: number) => 0.525 + (fase - 1) * 0.168;
 const chefaoTamanho = (fase: number) => 78 + fase * 4;
 
 function JogoPage() {
