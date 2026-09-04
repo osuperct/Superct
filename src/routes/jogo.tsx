@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Medal, RotateCcw, Zap } from "lucide-react";
+import { ChevronUp, Medal, RotateCcw, Zap } from "lucide-react";
 import mascote from "@/assets/mascote-menino.jpg.asset.json";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
