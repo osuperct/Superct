@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Skull } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Gamepad2 } from "lucide-react";
+import { VILOES } from "@/data/viloes";
 
 const TITLE = "Vilões do Super CT — Conheça os desafios | Professor Tio Victor";
 const DESCRIPTION =
-  "Conheça os vilões do Super CT: os personagens que desafiam as crianças nos treinos do Professor Tio Victor.";
+  "Conheça os vilões do Super CT: Lorde Lag, Sonekão, Choralina, Tropecildo, Doceman e Respondão — os inimigos que as crianças derrotam no treino.";
 
 export const Route = createFileRoute("/viloes")({
   head: () => ({
@@ -12,6 +13,8 @@ export const Route = createFileRoute("/viloes")({
       { name: "description", content: DESCRIPTION },
       { property: "og:title", content: TITLE },
       { property: "og:description", content: DESCRIPTION },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: TITLE },
       { name: "twitter:description", content: DESCRIPTION },
     ],
@@ -27,20 +30,44 @@ function ViloesPage() {
           OS <span className="text-primary italic">VILÕES</span> DO SUPER CT
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Em breve os vilões chegam aqui com nome, poderes e o desafio que cada um traz para o treino.
+          Cada vilão representa um hábito que atrapalha as crianças. No treino, a gente derrota todos eles.
         </p>
 
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="flex aspect-square flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-border bg-card"
+        <Link
+          to="/jogo"
+          className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary bg-primary/15 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-primary"
+        >
+          <Gamepad2 className="size-4" /> Enfrentar no jogo
+        </Link>
+
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {VILOES.map((v) => (
+            <article
+              key={v.nome}
+              className="overflow-hidden rounded-xl border border-border bg-card"
+              style={{ boxShadow: `0 0 24px -12px ${v.cor}` }}
             >
-              <Skull className="size-8 text-primary/60" />
-              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                Vilão {i + 1}
-              </span>
-            </div>
+              <div className="bg-black">
+                <img
+                  src={v.img}
+                  alt={`${v.nome} — vilão do Super CT que representa ${v.poder}`}
+                  loading="lazy"
+                  className="h-auto w-full object-contain"
+                />
+              </div>
+              <div className="p-4">
+                <h2
+                  className="font-display text-2xl uppercase leading-none tracking-tight"
+                  style={{ color: v.cor }}
+                >
+                  {v.nome}
+                </h2>
+                <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  {v.poder}
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">{v.desc}</p>
+              </div>
+            </article>
           ))}
         </div>
       </main>
