@@ -472,7 +472,7 @@ function Painel({ session }: { session: Session }) {
       supabase.from("alunos").select("id, nome, idade, matricula").eq("user_id", uid).order("created_at"),
       supabase
         .from("documentos")
-        .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id")
+        .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id, enviado_por_professor")
         .eq("user_id", uid)
         .eq("oculto_responsavel", false)
         .order("created_at", { ascending: false }),
