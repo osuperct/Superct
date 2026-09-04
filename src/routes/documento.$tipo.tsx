@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Assinatura } from "@/components/Assinatura";
+import { DatePicker } from "@/components/ui/datepicker";
 import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 import { gerarDocumentoPdf } from "@/lib/documentoPdf";
 import { BUCKET, DOCS, EMAIL_SUPER_CT, TERMO_IMAGEM, type TipoDoc } from "@/lib/documentos";
@@ -171,6 +172,22 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       localStorage.setItem(rascunhoKey, JSON.stringify(prox));
       return prox;
     });
+  }
+
+  function parseDataBr(value: string): Date | undefined {
+    if (!value) return undefined;
+    const [d, m, y] = value.split("/").map(Number);
+    if (!d || !m || !y) return undefined;
+    const date = new Date(y, m - 1, d);
+    if (date.getFullYear() !== y || date.getMonth() !== m - 1 || date.getDate() !== d) return undefined;
+    return date;
+  }
+
+  function formatarDataBr(date: Date): string {
+    const d = String(date.getDate()).padStart(2, "0");
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const y = date.getFullYear();
+    return `${d}/${m}/${y}`;
   }
 
   function valorCampo(c: typeof doc.campos[number]) {
@@ -344,6 +361,24 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
                 <p className="mt-1 text-[10px] text-muted-foreground">Escolha os dias e o horário.</p>
               )}
             </div>
+          );
+        }
+
+        if (c.date) {
+          return (
+            <label key={c.chave} className="block">
+              <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                {c.rotulo}
+                {c.obrigatorio && <span className="text-primary"> *obrigatório</span>}
+              </span>
+              <div className="mt-1">
+                <DatePicker
+                  value={parseDataBr(valores[c.chave] ?? "")}
+                  onChange={(date) => set(c.chave, date ? formatarDataBr(date) : "")}
+                  placeholder="Clique para selecionar a data"
+                />
+              </div>
+            </label>
           );
         }
 

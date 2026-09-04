@@ -13,6 +13,7 @@ export type CampoDoc = {
   multiplos?: { chave: string; rotulo: string; opcoes: string[] }[];
   obrigatorio?: boolean;
   cpf?: boolean;
+  date?: boolean;
 };
 
 const SIM_NAO = ["Não", "Sim"];
@@ -62,7 +63,7 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
   { chave: "aluno", rotulo: "Nome do aluno(a)" },
   { chave: "aluno_nascimento", rotulo: "Data de nascimento do aluno" },
   { chave: "servico", rotulo: "Serviço contratado (modalidade / evento)", fixo: "Treinamento funcional e recreação" },
-  { chave: "data_inicio", rotulo: "Data de início" },
+  { chave: "data_inicio", rotulo: "Data de início", date: true, obrigatorio: true },
   { chave: "matricula", rotulo: "Taxa de matrícula / cadastro (R$)" },
   {
     chave: "dias_horarios",
