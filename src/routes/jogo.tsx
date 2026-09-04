@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronUp, Medal, RotateCcw, Zap } from "lucide-react";
+import { ChevronUp, Heart, Medal, RotateCcw, Zap } from "lucide-react";
 import mascote from "@/assets/mascote-menino.jpg.asset.json";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
@@ -152,10 +152,37 @@ type Bola = { id: number; x: number; y: number; vx: number; super: boolean };
 type Haltere = { id: number; x: number; y: number; cor: "verde" | "azul"; caindo: boolean };
 type Chefao = { x: number; y: number; vx: number; vy: number; hp: number; hpMax: number };
 type Modo = "corrida" | "intervalo" | "chefao" | "fase-vencida";
+type TipoTiro = "celular" | "batata" | "furacao" | "corda" | "donut" | "balao";
+type Tiro = {
+  id: number;
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  tipo: TipoTiro;
+  volta: boolean;
+  origem: number;
+  cor: string;
+  fase: number;
+};
+
+/* cada chefão tem seu ataque, na ordem dos vilões */
+const ATAQUE_FASE: TipoTiro[] = ["celular", "batata", "furacao", "corda", "donut", "balao"];
+const TAM_TIRO: Record<TipoTiro, { w: number; h: number }> = {
+  celular: { w: 16, h: 26 },
+  batata: { w: 20, h: 14 },
+  furacao: { w: 30, h: 42 },
+  corda: { w: 44, h: 10 },
+  donut: { w: 22, h: 22 },
+  balao: { w: 40, h: 24 },
+};
+const CORES_DONUT = ["#ec4899", "#f59e0b", "#22d3ee", "#a3e635", "#f43f5e"];
+const VIDAS_CHEFAO = 3;
 
 const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_H);
 const dificuldade = (fase: number) => 0.525 + (fase - 1) * 0.168;
 const chefaoTamanho = (fase: number) => 78 + fase * 4;
+
 
 function JogoPage() {
   const palcoRef = useRef<HTMLDivElement>(null);
@@ -167,6 +194,9 @@ function JogoPage() {
   const [bolas, setBolas] = useState<Bola[]>([]);
   const [halteres, setHalteres] = useState<Haltere[]>([]);
   const [chefao, setChefao] = useState<Chefao | null>(null);
+  const [tiros, setTiros] = useState<Tiro[]>([]);
+  const [vidas, setVidas] = useState(VIDAS_CHEFAO);
+  const [piscando, setPiscando] = useState(false);
   const [carga, setCarga] = useState(0);
   const [pontos, setPontos] = useState(0);
   const [fase, setFase] = useState(1);
@@ -208,6 +238,11 @@ function JogoPage() {
   const cargaRef = useRef(0);
   const bolasRef = useRef<Bola[]>([]);
   const chefaoRef = useRef<Chefao | null>(null);
+  const tirosRef = useRef<Tiro[]>([]);
+  const nextTiro = useRef(0);
+  const spawnTiro = useRef(90);
+  const vidasRef = useRef(VIDAS_CHEFAO);
+  const invulAte = useRef(0);
 
   useEffect(() => {
     const el = palcoRef.current;
@@ -256,6 +291,8 @@ function JogoPage() {
       cargaRef.current = 0;
       chefaoRef.current = null;
       bolasRef.current = [];
+      tirosRef.current = [];
+      setTiros([]);
       setCarga(0);
       setChefao(null);
       setBolas([]);
@@ -282,10 +319,17 @@ function JogoPage() {
     fimRef.current = false;
     tick.current = 0;
     spawnHaltere.current = 90;
+    spawnTiro.current = 70;
     cargaRef.current = 0;
+    vidasRef.current = VIDAS_CHEFAO;
+    invulAte.current = 0;
+    setVidas(VIDAS_CHEFAO);
+    setPiscando(false);
     setCarga(0);
     setBolas([]);
     bolasRef.current = [];
+    tirosRef.current = [];
+    setTiros([]);
     setHalteres([]);
     setInimigos([]);
     zerarHeroi();
@@ -635,18 +679,116 @@ function JogoPage() {
 
       setChefao({ ...boss });
 
+      /* ---- ataque próprio de cada chefão ---- */
+      const tipo = ATAQUE_FASE[Math.min(faseRef.current, TOTAL_FASES) - 1]!;
+      const corVilao = VILOES[Math.min(faseRef.current, TOTAL_FASES) - 1]!.cor;
+      spawnTiro.current -= 1;
+      if (spawnTiro.current <= 0) {
+        const base = tipo === "batata" ? 55 : tipo === "donut" ? 70 : tipo === "corda" ? 95 : 80;
+        spawnTiro.current = Math.max(28, Math.round((base - faseRef.current * 4) + Math.random() * 60));
+        const altura =
+          tipo === "furacao"
+            ? 0
+            : tipo === "corda" && Math.random() < 0.5
+              ? 0
+              : Math.random() * (ALTURA_CENA - 130);
+        const novo: Tiro = {
+          id: nextTiro.current++,
+          x: boss.x,
+          y: altura,
+          vx: -(1.9 + Math.random() * 1.1) * (0.8 + dif * 0.5),
+          vy: tipo === "celular" ? 2.2 : tipo === "donut" ? 1.2 : 0,
+          tipo,
+          volta: false,
+          origem: boss.x,
+          cor: tipo === "donut" ? CORES_DONUT[Math.floor(Math.random() * CORES_DONUT.length)]! : corVilao,
+          fase: Math.random() * Math.PI * 2,
+        };
+        tirosRef.current = [...tirosRef.current, novo];
+      }
+
+      const tirosAtuais: Tiro[] = [];
+      let levouDano = false;
+      for (const t of tirosRef.current) {
+        let nx = t.x + t.vx;
+        let ny = t.y + t.vy;
+        let nvy = t.vy;
+        let nvx = t.vx;
+        let volta = t.volta;
+
+        if (t.tipo === "celular") {
+          nvy = t.vy - 0.18;
+        } else if (t.tipo === "donut") {
+          nvy = t.vy - 0.16;
+          if (ny <= 0) {
+            ny = 0;
+            nvy = Math.abs(nvy) * 0.72;
+          }
+        } else if (t.tipo === "balao") {
+          ny = t.y + Math.sin((tick.current + t.fase * 20) / 16) * 1.2;
+        } else if (t.tipo === "furacao") {
+          const alvo = x.current;
+          nvx = nx > alvo ? -Math.abs(t.vx) * 1.15 : Math.abs(t.vx) * 1.15;
+          nx = t.x + nvx;
+          ny = Math.max(0, Math.sin((tick.current + t.fase * 20) / 12) * 8);
+        } else if (t.tipo === "corda") {
+          if (!volta && (nx < x.current - 60 || t.origem - nx > 320)) volta = true;
+          if (volta) {
+            nvx = Math.abs(t.vx) * 1.5;
+            nx = t.x + nvx;
+            if (nx > boss.x - 6) continue;
+          }
+        }
+
+        if (ny < -30 || nx < -70 || nx > ARENA + 70) continue;
+
+        const dimensoes = TAM_TIRO[t.tipo];
+        const bate =
+          nx + dimensoes.w > x.current + 3 &&
+          nx < x.current + HEROI_W - 3 &&
+          ny + dimensoes.h > y.current + 3 &&
+          ny < y.current + hAlt;
+        if (bate && performance.now() > invulAte.current) {
+          levouDano = true;
+          continue;
+        }
+        tirosAtuais.push({ ...t, x: nx, y: ny, vx: nvx, vy: nvy, volta });
+      }
+      tirosRef.current = tirosAtuais;
+      setTiros(tirosAtuais);
+
       /* chefão encostou no herói */
       const bateBoss =
         x.current + HEROI_W > boss.x + 8 &&
         x.current < boss.x + tam - 8 &&
         y.current + hAlt > boss.y + 8 &&
         y.current < boss.y + tam - 8;
-      if (bateBoss) {
-        fimRef.current = true;
-        setFim(true);
-        setDerrotado(faseRef.current - 1);
+
+      if (levouDano || (bateBoss && performance.now() > invulAte.current)) {
+        vidasRef.current -= 1;
+        setVidas(vidasRef.current);
+        invulAte.current = performance.now() + 1600;
+        setPiscando(true);
+        window.setTimeout(() => setPiscando(false), 1600);
+        if (vidasRef.current <= 0) {
+          fimRef.current = true;
+          setFim(true);
+          setDerrotado(Math.min(faseRef.current, TOTAL_FASES) - 1);
+          return;
+        }
+        /* volta para o começo da arena após perder uma vida */
+        x.current = 60;
+        y.current = 0;
+        vy.current = 0;
+        noAr.current = false;
+        seguro.current = false;
+        setHeroX(60);
+        setHeroY(0);
+        tirosRef.current = [];
+        setTiros([]);
         return;
       }
+
 
       /* chefão derrotado */
       if (boss.hp <= 0) {
@@ -657,6 +799,8 @@ function JogoPage() {
         setChefao(null);
         setBolas([]);
         setHalteres([]);
+        tirosRef.current = [];
+        setTiros([]);
         if (faseRef.current >= TOTAL_FASES) {
           fimRef.current = true;
           setVenceu(true);
@@ -1100,6 +1244,82 @@ function JogoPage() {
                 }}
               />
             )}
+            {/* ataques do chefão */}
+            {tiros.map((t) => {
+              const d = TAM_TIRO[t.tipo];
+              const comum = {
+                left: t.x,
+                bottom: 40 + t.y,
+                width: d.w,
+                height: d.h,
+              } as const;
+              if (t.tipo === "celular")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute rounded-[3px] border border-white/60 bg-[#1e293b]"
+                    style={{ ...comum, boxShadow: `0 0 10px ${t.cor}` }}
+                  >
+                    <span className="absolute inset-[2px] rounded-[2px] bg-[#38bdf8]/70" />
+                  </div>
+                );
+              if (t.tipo === "batata")
+                return (
+                  <div key={`t-${t.id}`} className="absolute flex items-end gap-[2px]" style={comum}>
+                    {[0, 1, 2, 3].map((i) => (
+                      <span
+                        key={i}
+                        className="w-[3px] rounded-sm bg-[#fbbf24]"
+                        style={{ height: 8 + i * 2, boxShadow: "0 0 6px #fbbf24" }}
+                      />
+                    ))}
+                  </div>
+                );
+              if (t.tipo === "donut")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute rounded-full border-[6px]"
+                    style={{ ...comum, borderColor: t.cor, boxShadow: `0 0 10px ${t.cor}` }}
+                  />
+                );
+              if (t.tipo === "balao")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute flex items-center justify-center rounded-md border bg-white/90 font-mono text-[10px] font-bold text-black"
+                    style={{ ...comum, borderColor: t.cor, boxShadow: `0 0 10px ${t.cor}` }}
+                  >
+                    @#!#!
+                  </div>
+                );
+              if (t.tipo === "corda")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute rounded-full"
+                    style={{
+                      ...comum,
+                      background: "repeating-linear-gradient(90deg,#d97706 0 6px,#92400e 6px 12px)",
+                      boxShadow: "0 0 8px #d97706",
+                    }}
+                  />
+                );
+              return (
+                <div
+                  key={`t-${t.id}`}
+                  className="absolute"
+                  style={{
+                    ...comum,
+                    background: `conic-gradient(from 0deg, transparent, ${t.cor}, transparent, ${t.cor})`,
+                    clipPath: "polygon(0 0,100% 0,72% 100%,28% 100%)",
+                    borderRadius: "50% 50% 40% 40%",
+                    boxShadow: `0 0 14px ${t.cor}`,
+                    opacity: 0.9,
+                  }}
+                />
+              );
+            })}
           </div>
 
           {emChefao && (
@@ -1107,6 +1327,28 @@ function JogoPage() {
               Chefão: {vilaoFase.nome}
             </span>
           )}
+
+          {emChefao && (
+            <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/70 px-2 py-1">
+              {[0, 1, 2].map((i) => (
+                <Heart
+                  key={`vida-${i}`}
+                  className="size-3"
+                  style={{
+                    color: vidas > i ? "#f43f5e" : "#3f3f46",
+                    fill: vidas > i ? "#f43f5e" : "transparent",
+                    filter: vidas > i ? "drop-shadow(0 0 6px #f43f5e)" : undefined,
+                  }}
+                />
+              ))}
+              {piscando && (
+                <span className="ml-1 font-mono text-[8px] uppercase tracking-widest text-[#f43f5e]">
+                  Perdeu uma vida!
+                </span>
+              )}
+            </span>
+          )}
+
 
           {pendurado && (
             <span className="absolute left-2 top-12 rounded-full bg-black/70 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary">
@@ -1183,7 +1425,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Joystick move (na parede, para cima/baixo sobe/desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
+          Joystick move (na parede, para cima/baixo sobe/desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola • no chefão você tem 3 vidas: desvie do ataque dele
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-3">
