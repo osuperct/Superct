@@ -141,6 +141,57 @@ function Painel() {
     else toast.error("Não foi possível abrir o arquivo.");
   }
 
+  async function excluir(doc: Doc) {
+    if (!window.confirm(`Excluir definitivamente "${doc.nome_arquivo}"?`)) return;
+    const { error } = await supabase.from("documentos").delete().eq("id", doc.id);
+    if (error) {
+      toast.error("Não foi possível excluir o documento.");
+      return;
+    }
+    await supabase.storage.from(BUCKET).remove([doc.caminho]);
+    toast.success("Documento excluído.");
+    void carregar();
+  }
+
+  async function anexar(arquivo: File) {
+    const alu = alunos.find((a) => a.id === alunoSel);
+    if (!alu) {
+      toast.error("Escolha o aluno do documento.");
+      return;
+    }
+    if (arquivo.size > 20 * 1024 * 1024) {
+      toast.error("Arquivo muito grande (máximo 20 MB).");
+      return;
+    }
+    setEnviando(true);
+    const limpo = arquivo.name.replace(/[^\w.\-]+/g, "_");
+    const caminho = `${alu.user_id}/${Date.now()}-${limpo}`;
+    const { error: erroUp } = await supabase.storage.from(BUCKET).upload(caminho, arquivo);
+    if (erroUp) {
+      setEnviando(false);
+      toast.error("Falha ao enviar o arquivo.");
+      return;
+    }
+    const { error } = await supabase.from("documentos").insert({
+      user_id: alu.user_id,
+      aluno_id: alu.id,
+      tipo: tipoSel,
+      nome_arquivo: arquivo.name,
+      caminho,
+      enviado_por_professor: true,
+    });
+    setEnviando(false);
+    if (inputArquivo.current) inputArquivo.current.value = "";
+    if (error) {
+      toast.error("Não foi possível registrar o documento.");
+      return;
+    }
+    toast.success(`Documento anexado ao cadastro de ${alu.nome}.`);
+    void carregar();
+  }
+
+
+
   if (autorizado === null) return <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>;
   if (!autorizado)
     return (
