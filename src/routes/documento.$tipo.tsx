@@ -98,7 +98,11 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
   const emailResponsavel = session.user.email ?? "";
   const rascunhoKey = `superct_rascunho_${tipo}`;
 
-  const [valores, setValores] = useState<Record<string, string>>({});
+  const valoresFixos = Object.fromEntries(
+    doc.campos.filter((c) => c.fixo !== undefined).map((c) => [c.chave, c.fixo as string]),
+  );
+
+  const [valores, setValores] = useState<Record<string, string>>(valoresFixos);
   const [aceite, setAceite] = useState(false);
   const [assinatura, setAssinatura] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
@@ -108,7 +112,8 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
     const bruto = localStorage.getItem(rascunhoKey);
     if (bruto) {
       try {
-        setValores(JSON.parse(bruto) as Record<string, string>);
+        const salvo = JSON.parse(bruto) as Record<string, string>;
+        setValores({ ...valoresFixos, ...salvo });
       } catch {
         /* rascunho inválido */
       }
