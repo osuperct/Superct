@@ -1235,6 +1235,26 @@ function JogoPage() {
               </div>
             )}
 
+            {/* corações extras suspensos bem alto */}
+            {!emChefao &&
+              coracoes.map((idx) => {
+                const c = CORACOES[idx]!;
+                return (
+                  <div
+                    key={`coracao-${idx}`}
+                    className="absolute flex size-7 items-center justify-center rounded-full border-2 border-[#f43f5e] bg-[#f43f5e]/20 animate-pulse-slow"
+                    style={{
+                      left: c.x - 14,
+                      bottom: 40 + c.y,
+                      boxShadow: "0 0 14px 4px rgba(244,63,94,0.65)",
+                    }}
+                  >
+                    <Heart className="size-4" style={{ color: "#f43f5e", fill: "#f43f5e" }} />
+                  </div>
+                );
+              })}
+
+
             {/* herói */}
             <img
               src={mascote.url}
