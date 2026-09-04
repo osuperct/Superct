@@ -471,7 +471,9 @@ function Painel({ session }: { session: Session }) {
         .from("documentos")
         .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id")
         .eq("user_id", uid)
+        .eq("oculto_responsavel", false)
         .order("created_at", { ascending: false }),
+
     ]);
     setAlunos((a ?? []) as Aluno[]);
     setDocumentos((d ?? []) as Documento[]);
