@@ -44,6 +44,39 @@ export function gerarDocumentoPdf(opcoes: {
     }
   }
 
+  if (opcoes.clausulas?.length) {
+    y += 16;
+    if (y > 700) {
+      doc.addPage();
+      y = margem;
+    }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.text("CLÁUSULAS E REGRAS DO SUPER CT (lidas e aceitas)", margem, y);
+    y += 16;
+    for (const clausula of opcoes.clausulas) {
+      if (y > 740) {
+        doc.addPage();
+        y = margem;
+      }
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9.5);
+      doc.text(clausula.titulo, margem, y);
+      y += 12;
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      for (const parte of doc.splitTextToSize(clausula.texto, largura) as string[]) {
+        if (y > 780) {
+          doc.addPage();
+          y = margem;
+        }
+        doc.text(parte, margem, y);
+        y += 11;
+      }
+      y += 8;
+    }
+  }
+
   y += 12;
   if (y > 640) {
     doc.addPage();
