@@ -376,7 +376,7 @@ function JogoPage() {
       const dif = dificuldade(faseRef.current);
 
       /* ---- segurar o analógico para baixo agacha o personagem ---- */
-      const querAgachar = dirY.current > 0.45 && !seguro.current && !noAr.current && y.current <= 0.5;
+      const querAgachar = dirY.current > 0.45 && !seguro.current && !noAr.current;
       if (querAgachar !== duck.current) {
         duck.current = querAgachar;
         setAbaixado(querAgachar);
