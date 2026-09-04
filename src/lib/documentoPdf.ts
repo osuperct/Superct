@@ -1,16 +1,39 @@
 import { jsPDF } from "jspdf";
+import assinaturaVictor from "@/assets/assinatura-victor.png.asset.json";
+import seloSuperCt from "@/assets/selo-superct.png.asset.json";
 
 export type LinhaDoc = { rotulo: string; valor: string };
 
+async function carregarDataUrl(url: string): Promise<string | null> {
+  try {
+    const resposta = await fetch(url);
+    if (!resposta.ok) return null;
+    const blob = await resposta.blob();
+    return await new Promise<string>((resolver, rejeitar) => {
+      const leitor = new FileReader();
+      leitor.onload = () => resolver(String(leitor.result));
+      leitor.onerror = () => rejeitar(leitor.error);
+      leitor.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
 /** Gera o PDF do contrato/ficha preenchido, já com a assinatura desenhada. */
-export function gerarDocumentoPdf(opcoes: {
+export async function gerarDocumentoPdf(opcoes: {
   titulo: string;
   linhas: LinhaDoc[];
   termo: string;
   assinaturaDataUrl: string | null;
   nomeAssinante: string;
   clausulas?: { titulo: string; texto: string }[];
-}): Blob {
+  /** Inclui a assinatura do Prof. Victor e o selo da empresa (contrato). */
+  assinaturaEmpresa?: boolean;
+}): Promise<Blob> {
+  const [assinaturaProf, selo] = opcoes.assinaturaEmpresa
+    ? await Promise.all([carregarDataUrl(assinaturaVictor.url), carregarDataUrl(seloSuperCt.url)])
+    : [null, null];
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const margem = 48;
   const largura = doc.internal.pageSize.getWidth() - margem * 2;
