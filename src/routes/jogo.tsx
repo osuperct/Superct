@@ -191,7 +191,7 @@ const CORACOES: { x: number; y: number }[] = [
 
 
 const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_H);
-const dificuldade = (fase: number) => 0.525 + (fase - 1) * 0.168;
+const dificuldade = (fase: number) => 0.3675 + (fase - 1) * 0.1995;
 const chefaoTamanho = (fase: number) => 78 + fase * 4;
 
 
