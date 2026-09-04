@@ -58,3 +58,64 @@ export const entrarComCpfOuEmail = createServerFn({ method: "POST" })
       refresh_token: sessao.session.refresh_token,
     };
   });
+
+const pedido = z.object({
+  identificador: z.string().trim().min(3).max(255),
+  redirectTo: z.string().url().max(500),
+});
+
+/**
+ * Envia o e-mail de redefinição de senha a partir do CPF **ou** do e-mail.
+ * Sempre responde de forma neutra para não revelar quem tem conta.
+ */
+export const pedirNovaSenha = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => pedido.parse(data))
+  .handler(async ({ data }) => {
+    const bruto = data.identificador;
+    const digitos = bruto.replace(/\D/g, "");
+    let email = bruto.includes("@") ? bruto.toLowerCase() : null;
+
+    if (!email) {
+      if (digitos.length !== 11) {
+        return { ok: false as const, erro: "Informe um e-mail válido ou um CPF com 11 números." };
+      }
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: perfil } = await supabaseAdmin
+        .from("perfis")
+        .select("id")
+        .eq("cpf", digitos)
+        .maybeSingle();
+      if (perfil) {
+        const { data: usuario } = await supabaseAdmin.auth.admin.getUserById(perfil.id);
+        email = usuario.user?.email ?? null;
+      }
+    }
+
+    if (email) {
+      const publico = createClient(
+        process.env["SUPABASE_URL"]!,
+        process.env["SUPABASE_PUBLISHABLE_KEY"]!,
+        { auth: { persistSession: false, autoRefreshToken: false } },
+      );
+      await publico.auth.resetPasswordForEmail(email, { redirectTo: data.redirectTo });
+    }
+
+    return { ok: true as const };
+  });
+
+const cpfLivre = z.object({ cpf: z.string().trim().max(20) });
+
+/** Confere se o CPF já está em uso por outra conta. */
+export const cpfDisponivel = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => cpfLivre.parse(data))
+  .handler(async ({ data }) => {
+    const digitos = data.cpf.replace(/\D/g, "");
+    if (digitos.length !== 11) return { livre: false as const };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: perfil } = await supabaseAdmin
+      .from("perfis")
+      .select("id")
+      .eq("cpf", digitos)
+      .maybeSingle();
+    return { livre: !perfil };
+  });

@@ -4,7 +4,8 @@ import type { Session } from "@supabase/supabase-js";
 import { FileText, LogOut, Paperclip, Send, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { entrarComCpfOuEmail } from "@/lib/auth.functions";
+import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
+import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Assinatura } from "@/components/Assinatura";
@@ -89,6 +90,9 @@ function Autenticacao() {
   const [aviso, setAviso] = useState<string | null>(null);
   const [credenciais, setCredenciais] = useState<{ email: string; senha: string } | null>(null);
   const entrar = useServerFn(entrarComCpfOuEmail);
+  const pedirSenha = useServerFn(pedirNovaSenha);
+  const checarCpf = useServerFn(cpfDisponivel);
+  const [recuperando, setRecuperando] = useState(false);
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -112,6 +116,15 @@ function Autenticacao() {
           setAviso("É preciso aceitar o termo de uso de imagem para concluir o cadastro.");
           return;
         }
+        if (!cpfValido(cpf)) {
+          setAviso("Confira o CPF do responsável: os números não formam um CPF válido.");
+          return;
+        }
+        const { livre } = await checarCpf({ data: { cpf } });
+        if (!livre) {
+          setAviso("Este CPF já tem uma conta no Super CT. Entre com o CPF ou peça uma nova senha.");
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password: senha,
@@ -120,7 +133,7 @@ function Autenticacao() {
             data: {
               nome_responsavel: nome.trim(),
               telefone: telefone.trim(),
-              cpf: cpf.replace(/\D/g, ""),
+              cpf: apenasDigitos(cpf),
               aluno_nome: alunoNome.trim(),
               aluno_idade: alunoIdade,
               aceite_imagem: aceite,
@@ -141,6 +154,28 @@ function Autenticacao() {
     } finally {
       setOcupado(false);
     }
+  }
+
+  async function esqueciSenha() {
+    const alvo = email.trim();
+    if (!alvo) {
+      setAviso("Digite seu CPF ou e-mail acima para receber o link de nova senha.");
+      return;
+    }
+    setRecuperando(true);
+    setAviso(null);
+    const r = await pedirSenha({
+      data: { identificador: alvo, redirectTo: `${window.location.origin}/reset-password` },
+    });
+    setRecuperando(false);
+    if (!r.ok) {
+      setAviso(r.erro);
+      return;
+    }
+    setAviso(
+      "Se existir uma conta com esse CPF ou e-mail, enviamos um link para criar uma nova senha. Confira sua caixa de entrada e o spam.",
+    );
+    toast.success("Link de nova senha enviado!");
   }
 
   const textoAcesso = credenciais
@@ -227,7 +262,14 @@ function Autenticacao() {
               maxLength={20}
               type="tel"
             />
-            <Campo label="CPF do responsável" value={cpf} onChange={setCpf} required maxLength={14} inputMode="numeric" />
+            <Campo
+              label="CPF do responsável"
+              value={cpf}
+              onChange={(v) => setCpf(formatarCpf(v))}
+              required
+              maxLength={14}
+              inputMode="numeric"
+            />
             <Campo label="Nome do aluno" value={alunoNome} onChange={setAlunoNome} required maxLength={120} />
             <Campo label="Idade do aluno" value={alunoIdade} onChange={setAlunoIdade} required type="number" />
           </>
@@ -265,6 +307,17 @@ function Autenticacao() {
         >
           {ocupado ? "AGUARDE…" : modo === "entrar" ? "ENTRAR" : "CRIAR CONTA"}
         </button>
+
+        {modo === "entrar" && (
+          <button
+            type="button"
+            onClick={() => void esqueciSenha()}
+            disabled={recuperando}
+            className="w-full font-mono text-[10px] uppercase tracking-widest text-muted-foreground underline decoration-primary/60 disabled:opacity-60"
+          >
+            {recuperando ? "Enviando…" : "Esqueci minha senha"}
+          </button>
+        )}
       </form>
     </div>
   );
