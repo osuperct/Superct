@@ -743,7 +743,7 @@ function JogoPage() {
       const bolasAtuais: Bola[] = [];
       for (const b of bolasRef.current) {
         const nx = b.x + b.vx;
-        if (nx > ARENA + 20) continue;
+        if (nx > ARENA + 20 || nx < -40) continue;
         const raio = b.super ? 26 : 12;
         const bateu =
           nx + raio > boss.x && nx < boss.x + tam && b.y + raio > boss.y && b.y < boss.y + tam;
