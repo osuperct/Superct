@@ -463,8 +463,17 @@ function JogoPage() {
           setOlhando(lado);
         }
         passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
-
       }
+
+      /* ---- animação de caminhada ---- */
+      {
+        const caminhando = dir.current !== 0 && !noAr.current && !seguro.current;
+        if (andandoRef.current !== caminhando) {
+          andandoRef.current = caminhando;
+          setAndando(caminhando);
+        }
+      }
+
 
       /* ---- impulso lateral do salto ao soltar aparelho ---- */
       if (vxAr.current !== 0) {
