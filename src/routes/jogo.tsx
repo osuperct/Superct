@@ -1422,26 +1422,25 @@ function JogoPage() {
             </span>
           )}
 
-          {emChefao && (
-            <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/70 px-2 py-1">
-              {[0, 1, 2].map((i) => (
-                <Heart
-                  key={`vida-${i}`}
-                  className="size-3"
-                  style={{
-                    color: vidas > i ? "#f43f5e" : "#3f3f46",
-                    fill: vidas > i ? "#f43f5e" : "transparent",
-                    filter: vidas > i ? "drop-shadow(0 0 6px #f43f5e)" : undefined,
-                  }}
-                />
-              ))}
-              {piscando && (
-                <span className="ml-1 font-mono text-[8px] uppercase tracking-widest text-[#f43f5e]">
-                  Perdeu uma vida!
-                </span>
-              )}
-            </span>
-          )}
+          <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/70 px-2 py-1">
+            {Array.from({ length: Math.max(VIDAS_CHEFAO, vidas) }).map((_, i) => (
+              <Heart
+                key={`vida-${i}`}
+                className="size-3"
+                style={{
+                  color: vidas > i ? "#f43f5e" : "#3f3f46",
+                  fill: vidas > i ? "#f43f5e" : "transparent",
+                  filter: vidas > i ? "drop-shadow(0 0 6px #f43f5e)" : undefined,
+                }}
+              />
+            ))}
+            {piscando && (
+              <span className="ml-1 font-mono text-[8px] uppercase tracking-widest text-[#f43f5e]">
+                Perdeu uma vida — voltou ao checkpoint!
+              </span>
+            )}
+          </span>
+
 
 
           {pendurado && (
