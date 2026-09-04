@@ -186,7 +186,6 @@ function JogoPage() {
   const subindo = useRef(false);
   const descendoParede = useRef(false);
   const ultimoToqueBaixo = useRef<number | null>(null);
-  const ultimoToqueDireita = useRef<number | null>(null);
   const ultimoToqueCima = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
   const vxAr = useRef(0);
@@ -232,7 +231,6 @@ function JogoPage() {
     subindo.current = false;
     descendoParede.current = false;
     ultimoToqueBaixo.current = null;
-    ultimoToqueDireita.current = null;
     bloquearAgarreAte.current = 0;
     maxX.current = 60;
     setHeroX(60);
@@ -780,17 +778,6 @@ function JogoPage() {
 
   const mover = (valor: number) => () => {
     dir.current = valor;
-  };
-  const moverDireita = () => {
-    const agora = performance.now();
-    const anterior = ultimoToqueDireita.current;
-    if (anterior !== null && agora - anterior <= 1500) {
-      atirar();
-      ultimoToqueDireita.current = null;
-    } else {
-      ultimoToqueDireita.current = agora;
-    }
-    dir.current = 1;
   };
   const parar = () => {
     dir.current = 0;
