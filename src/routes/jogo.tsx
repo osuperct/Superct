@@ -85,7 +85,6 @@ const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_
 
 function JogoPage() {
   const palcoRef = useRef<HTMLDivElement>(null);
-  const [larguraVista, setLarguraVista] = useState(360);
 
   const [heroX, setHeroX] = useState(60);
   const [heroY, setHeroY] = useState(0);
@@ -119,7 +118,6 @@ function JogoPage() {
     const medir = () => {
       const w = el.clientWidth;
       vistaRef.current = w;
-      setLarguraVista(w);
     };
     medir();
     const ro = new ResizeObserver(medir);
@@ -547,7 +545,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Largura da academia: {MUNDO}px • tela: {larguraVista}px
+          Setas movem • ▲ pula e solta dos aparelhos • ▼ abaixa para esquivar
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
