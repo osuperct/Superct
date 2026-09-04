@@ -850,29 +850,10 @@ function JogoPage() {
         y.current < boss.y + tam - 8;
 
       if (levouDano || (bateBoss && performance.now() > invulAte.current)) {
-        vidasRef.current -= 1;
-        setVidas(vidasRef.current);
-        invulAte.current = performance.now() + 1600;
-        setPiscando(true);
-        window.setTimeout(() => setPiscando(false), 1600);
-        if (vidasRef.current <= 0) {
-          fimRef.current = true;
-          setFim(true);
-          setDerrotado(Math.min(faseRef.current, TOTAL_FASES) - 1);
-          return;
-        }
-        /* volta para o começo da arena após perder uma vida */
-        x.current = 60;
-        y.current = 0;
-        vy.current = 0;
-        noAr.current = false;
-        seguro.current = false;
-        setHeroX(60);
-        setHeroY(0);
-        tirosRef.current = [];
-        setTiros([]);
+        perderVida(Math.min(faseRef.current, TOTAL_FASES) - 1);
         return;
       }
+
 
 
       /* chefão derrotado */
