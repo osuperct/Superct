@@ -1518,7 +1518,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Joystick move (na parede, para cima/baixo sobe/desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola • no chefão você tem 3 vidas: desvie do ataque dele
+          Joystick move; segure para baixo para agachar (na parede, cima/baixo sobe e desce) • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira o poder para o lado do chefão • 3 halteres = super bola • pegue os 2 corações de cada fase para ganhar vidas • ao perder uma vida você volta ao checkpoint da fase
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-3">
