@@ -152,10 +152,19 @@ function Painel() {
 
   return (
     <div className="mt-6 space-y-6">
+      <section className="rounded-lg border border-primary/50 bg-primary/5 p-4">
+        <h2 className="font-display text-lg tracking-tight text-primary">PROFESSOR RESPONSÁVEL</h2>
+        <p className="mt-2 text-sm font-medium">Victor Hugo Jorge de Siqueira</p>
+        <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          CREF 057790-G/MG
+        </p>
+      </section>
+
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <Users className="size-4 text-primary" /> ALUNOS MATRICULADOS ({alunos.length})
         </h2>
+
         <ul className="mt-3 space-y-2">
           {alunos.map((a) => {
             const perfil = perfis.find((p) => p.id === a.user_id);
