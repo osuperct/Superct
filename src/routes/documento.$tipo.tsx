@@ -212,7 +212,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         toast.error("Digite um CPF válido do responsável.");
         return;
       }
-      if (!c.cpf && apenasDigitos(v).length < 10) {
+      if (c.chave === "telefone" && apenasDigitos(v).length < 10) {
         toast.error("Digite um telefone de contato válido com DDD.");
         return;
       }
