@@ -497,24 +497,6 @@ function Painel({ session }: { session: Session }) {
   }, [uid]);
 
 
-  async function adicionarAluno(e: React.FormEvent) {
-    e.preventDefault();
-    const nome = novoAluno.trim();
-    if (!nome) return;
-    const { error } = await supabase.from("alunos").insert({
-      user_id: uid,
-      nome,
-      idade: novaIdade ? Number(novaIdade) : null,
-    });
-    if (error) {
-      toast.error("Não foi possível salvar o aluno.");
-      return;
-    }
-    setNovoAluno("");
-    setNovaIdade("");
-    toast.success("Aluno adicionado!");
-    void recarregar();
-  }
 
   async function excluirAluno(id: string) {
     const { error } = await supabase.from("alunos").delete().eq("id", id).eq("user_id", uid);
