@@ -283,12 +283,14 @@ function Campo({
   type?: string;
   required?: boolean;
   maxLength?: number;
+  inputMode?: "numeric" | "text" | "tel" | "email";
 }) {
   return (
     <label className="block">
       <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</span>
       <input
         type={type}
+        inputMode={inputMode}
         value={value}
         required={required}
         maxLength={maxLength}
