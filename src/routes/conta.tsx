@@ -801,13 +801,15 @@ function Painel({ session }: { session: Session }) {
                   >
                     Ver
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => remover(d)}
-                    className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
-                  >
-                    Excluir
-                  </button>
+                  {!d.enviado_por_professor && (
+                    <button
+                      type="button"
+                      onClick={() => remover(d)}
+                      className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                    >
+                      Excluir
+                    </button>
+                  )}
                 </div>
               </li>
             ))}
