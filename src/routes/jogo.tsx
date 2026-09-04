@@ -489,7 +489,7 @@ function JogoPage() {
           } else seguro.current = false;
         }
         if (seguro.current) {
-          y.current = Math.min(ALTURA_CENA - alt, apoio);
+          y.current = Math.min(TETO - alt, apoio);
           vy.current = 0;
           noAr.current = false;
         } else {
@@ -505,8 +505,8 @@ function JogoPage() {
           subindoDesde.current = null;
         }
         let prox = y.current + vy.current;
-        if (prox + alt > ALTURA_CENA) {
-          prox = ALTURA_CENA - alt;
+        if (prox + alt > TETO) {
+          prox = TETO - alt;
           vy.current = 0;
           subindoDesde.current = null;
         }
