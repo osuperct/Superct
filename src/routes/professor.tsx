@@ -111,6 +111,10 @@ function Painel() {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [alunos, setAlunos] = useState<Alu[]>([]);
   const [perfis, setPerfis] = useState<Perfil[]>([]);
+  const [alunoSel, setAlunoSel] = useState("");
+  const [tipoSel, setTipoSel] = useState("contrato");
+  const [enviando, setEnviando] = useState(false);
+  const inputArquivo = useRef<HTMLInputElement>(null);
 
   const carregar = useCallback(async () => {
     const { data: papeis } = await supabase.from("user_roles").select("role");
