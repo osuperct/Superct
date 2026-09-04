@@ -1196,6 +1196,9 @@ function JogoPage() {
 
         <div className="mt-6 flex items-end justify-between gap-3">
           <div className="flex flex-col items-center gap-2">
+            <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
+              <ChevronUp className="size-6" />
+            </ControlButton>
             <div className="flex gap-2">
               <ControlButton onStart={mover(-1)} onEnd={parar} label="Mover para a esquerda">
                 <ArrowLeft className="size-6" />
@@ -1209,9 +1212,6 @@ function JogoPage() {
             </ControlButton>
           </div>
           <div className="flex gap-2">
-            <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
-              <ChevronUp className="size-6" />
-            </ControlButton>
             <ControlButton onStart={atirar} label="Atirar bola de tênis no chefão">
               <Zap className="size-6" />
             </ControlButton>
