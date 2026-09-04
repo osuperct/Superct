@@ -121,6 +121,49 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
     }
   }, [rascunhoKey]);
 
+  /** Traz os dados já cadastrados (responsável, aluno e ficha) para dentro do documento. */
+  useEffect(() => {
+    let ativo = true;
+    void (async () => {
+      const [{ data: perfil }, { data: alunos }, { data: fichas }] = await Promise.all([
+        supabase.from("perfis").select("nome_responsavel, telefone, cpf, endereco").eq("id", uid).maybeSingle(),
+        supabase.from("alunos").select("nome, idade, nascimento").eq("user_id", uid).order("created_at").limit(1),
+        supabase.from("fichas").select("dados").eq("user_id", uid).order("created_at", { ascending: false }).limit(1),
+      ]);
+      if (!ativo) return;
+      const aluno = alunos?.[0];
+      const daFicha = (fichas?.[0]?.dados ?? {}) as Record<string, string>;
+      const sugestoes: Record<string, string> = {
+        contratante: perfil?.nome_responsavel || daFicha["responsavel_nome"] || "",
+        responsavel_nome: perfil?.nome_responsavel || daFicha["responsavel_nome"] || "",
+        cpf: formatarCpf(perfil?.cpf ?? "") || daFicha["responsavel_cpf"] || "",
+        responsavel_cpf: formatarCpf(perfil?.cpf ?? "") || daFicha["responsavel_cpf"] || "",
+        endereco: perfil?.endereco || daFicha["endereco"] || "",
+        telefone: perfil?.telefone || daFicha["telefone"] || "",
+        aluno: aluno?.nome || daFicha["aluno_nome"] || "",
+        aluno_nome: aluno?.nome || daFicha["aluno_nome"] || "",
+        aluno_idade: aluno?.idade != null ? String(aluno.idade) : daFicha["aluno_idade"] || "",
+        aluno_nascimento: aluno?.nascimento || daFicha["aluno_nascimento"] || "",
+        escola: daFicha["escola"] || "",
+        contato_emergencia: daFicha["contato_emergencia"] || "",
+        plano: daFicha["plano"] || "",
+        saude: daFicha["saude"] || "",
+      };
+      setValores((atual) => {
+        const prox = { ...atual };
+        for (const c of doc.campos) {
+          const sugestao = sugestoes[c.chave];
+          if (c.fixo === undefined && sugestao && !prox[c.chave]) prox[c.chave] = sugestao;
+        }
+        return prox;
+      });
+    })();
+    return () => {
+      ativo = false;
+    };
+  }, [uid, tipo]);
+
+
   function set(chave: string, v: string) {
     setValores((atual) => {
       const prox = { ...atual, [chave]: v };
