@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Medal, RotateCcw } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Medal, RotateCcw, Zap } from "lucide-react";
 import mascote from "@/assets/mascote-menino.jpg.asset.json";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
@@ -186,7 +186,6 @@ function JogoPage() {
   const subindo = useRef(false);
   const descendoParede = useRef(false);
   const ultimoToqueBaixo = useRef<number | null>(null);
-  const ultimoToqueDireita = useRef<number | null>(null);
   const ultimoToqueCima = useRef<number | null>(null);
   const bloquearAgarreAte = useRef(0);
   const vxAr = useRef(0);
@@ -232,7 +231,6 @@ function JogoPage() {
     subindo.current = false;
     descendoParede.current = false;
     ultimoToqueBaixo.current = null;
-    ultimoToqueDireita.current = null;
     bloquearAgarreAte.current = 0;
     maxX.current = 60;
     setHeroX(60);
@@ -781,17 +779,6 @@ function JogoPage() {
   const mover = (valor: number) => () => {
     dir.current = valor;
   };
-  const moverDireita = () => {
-    const agora = performance.now();
-    const anterior = ultimoToqueDireita.current;
-    if (anterior !== null && agora - anterior <= 1500) {
-      atirar();
-      ultimoToqueDireita.current = null;
-    } else {
-      ultimoToqueDireita.current = agora;
-    }
-    dir.current = 1;
-  };
   const parar = () => {
     dir.current = 0;
   };
@@ -820,8 +807,8 @@ function JogoPage() {
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Atravesse a academia, pegue a medalha de bronze suspensa no fim do percurso e encare o chefão da
-          fase. Toque duas vezes em até 1,5 s na seta da direita para jogar bolas de tênis e pegue 3 halteres
-          para soltar a super bola.
+          fase. Use o botão de poder para jogar bolas de tênis no chefão e junte 3 halteres para soltar a
+          super bola.
         </p>
 
         <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
@@ -1204,24 +1191,27 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▶ 2x em 1,5s joga bola de tênis • ▲ pula baixo, ▲▲ rápido pula alto • ▼ 2x em 2s solta • 3 halteres = super bola
+          ◀ ▶ ▼ movem e esquivam • ▲ pula baixo, ▲▲ rápido pula alto • ⚡ atira a bola no chefão • 3 halteres = super bola
         </p>
 
-        <div className="mt-6 flex items-end justify-between gap-4">
-          <div className="flex gap-3">
+        <div className="mt-6 flex items-end justify-between gap-3">
+          <div className="flex gap-2">
             <ControlButton onStart={mover(-1)} onEnd={parar} label="Mover para a esquerda">
-              <ArrowLeft className="size-7" />
+              <ArrowLeft className="size-6" />
             </ControlButton>
-            <ControlButton onStart={moverDireita} onEnd={parar} label="Mover para a direita e atirar bola (toque duplo em 1,5 s)">
-              <ArrowRight className="size-7" />
+            <ControlButton onStart={mover(1)} onEnd={parar} label="Mover para a direita">
+              <ArrowRight className="size-6" />
+            </ControlButton>
+            <ControlButton onStart={descer(true)} onEnd={descer(false)} label="Abaixar e esquivar">
+              <ChevronDown className="size-6" />
             </ControlButton>
           </div>
-          <div className="flex gap-3">
-            <ControlButton onStart={descer(true)} onEnd={descer(false)} label="Abaixar e esquivar">
-              <ChevronDown className="size-7" />
-            </ControlButton>
+          <div className="flex gap-2">
             <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
-              <ChevronUp className="size-7" />
+              <ChevronUp className="size-6" />
+            </ControlButton>
+            <ControlButton onStart={atirar} label="Atirar bola de tênis no chefão">
+              <Zap className="size-6" />
             </ControlButton>
           </div>
         </div>
@@ -1249,7 +1239,7 @@ function ControlButton({
       onPointerUp={onEnd}
       onPointerLeave={onEnd}
       onPointerCancel={onEnd}
-      className="flex size-16 select-none touch-none items-center justify-center rounded-full border border-border bg-card text-primary active:scale-95 active:bg-primary/20"
+      className="flex size-12 select-none touch-none items-center justify-center rounded-full border border-border bg-card text-primary active:scale-95 active:bg-primary/20"
     >
       {children}
     </button>
