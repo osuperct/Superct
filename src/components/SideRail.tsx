@@ -1,11 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { Home, Gamepad2, Skull } from "lucide-react";
+import { Home, Gamepad2, Skull, Shield } from "lucide-react";
 
 const itens = [
   { to: "/", label: "Início", icon: Home },
   { to: "/jogo", label: "Jogo", icon: Gamepad2 },
+  { to: "/herois", label: "Heróis", icon: Shield },
   { to: "/viloes", label: "Vilões", icon: Skull },
 ] as const;
+
 
 export function SideRail() {
   return (
