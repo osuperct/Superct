@@ -566,8 +566,8 @@ function Painel({ session }: { session: Session }) {
       <div className="mt-5 flex gap-2">
         {(
           [
-            ["documentos", "ANEXAR DOCUMENTOS"],
             ["online", "PREENCHER ONLINE"],
+            ["documentos", "ANEXAR DOCUMENTOS"],
           ] as const
         ).map(([id, rotulo]) => (
           <button
