@@ -291,6 +291,8 @@ function JogoPage() {
       cargaRef.current = 0;
       chefaoRef.current = null;
       bolasRef.current = [];
+      tirosRef.current = [];
+      setTiros([]);
       setCarga(0);
       setChefao(null);
       setBolas([]);
@@ -317,10 +319,17 @@ function JogoPage() {
     fimRef.current = false;
     tick.current = 0;
     spawnHaltere.current = 90;
+    spawnTiro.current = 70;
     cargaRef.current = 0;
+    vidasRef.current = VIDAS_CHEFAO;
+    invulAte.current = 0;
+    setVidas(VIDAS_CHEFAO);
+    setPiscando(false);
     setCarga(0);
     setBolas([]);
     bolasRef.current = [];
+    tirosRef.current = [];
+    setTiros([]);
     setHalteres([]);
     setInimigos([]);
     zerarHeroi();
