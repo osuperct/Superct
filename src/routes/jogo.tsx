@@ -252,7 +252,9 @@ function JogoPage() {
   const nextTiro = useRef(0);
   const spawnTiro = useRef(90);
   const vidasRef = useRef(VIDAS_CHEFAO);
+  const coracoesRef = useRef<number[]>(CORACOES.map((_, i) => i));
   const invulAte = useRef(0);
+
 
   useEffect(() => {
     const el = palcoRef.current;
