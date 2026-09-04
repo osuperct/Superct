@@ -104,6 +104,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
 
   const [valores, setValores] = useState<Record<string, string>>(valoresFixos);
   const [aceite, setAceite] = useState(false);
+  const [aceiteClausulas, setAceiteClausulas] = useState(false);
   const [assinatura, setAssinatura] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [pdfPronto, setPdfPronto] = useState<{ url: string; nome: string } | null>(null);
