@@ -55,7 +55,7 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
     rotulo: "Profissional responsável",
     fixo: "Victor Hugo Jorge de Siqueira | CREF 057790-G/MG | CPF 097.854.576-13",
   },
-  { chave: "contratante", rotulo: "Nome do responsável legal (contratante)" },
+  { chave: "contratante", rotulo: "Nome do responsável legal (contratante)", obrigatorio: true },
   { chave: "cpf", rotulo: "CPF do contratante", obrigatorio: true, cpf: true },
   { chave: "rg", rotulo: "RG do contratante" },
   { chave: "telefone", rotulo: "Telefone / WhatsApp", obrigatorio: true },
