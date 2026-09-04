@@ -13,6 +13,7 @@ export type CampoDoc = {
   multiplos?: { chave: string; rotulo: string; opcoes: string[] }[];
   obrigatorio?: boolean;
   cpf?: boolean;
+  date?: boolean;
 };
 
 const SIM_NAO = ["Não", "Sim"];
