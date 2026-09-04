@@ -503,6 +503,17 @@ function Painel({ session }: { session: Session }) {
     void recarregar();
   }
 
+  async function excluirAluno(id: string) {
+    const { error } = await supabase.from("alunos").delete().eq("id", id).eq("user_id", uid);
+    if (error) {
+      toast.error("Não foi possível excluir o aluno.");
+      return;
+    }
+    toast.success("Aluno removido.");
+    void recarregar();
+  }
+
+
   async function anexar(arquivo: File) {
     if (arquivo.size > 20 * 1024 * 1024) {
       toast.error("Arquivo muito grande (máximo 20 MB).");
