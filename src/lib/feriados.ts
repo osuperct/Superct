@@ -45,6 +45,7 @@ export function marcacoesDoAno(ano: number): Marcacao[] {
   const base: Marcacao[] = [
     { data: iso(ano, 1, 1), nome: "Confraternização Universal", tipo: "nacional" },
     { data: iso(ano, 1, 20), nome: "São Sebastião — padroeiro da cidade", tipo: "local" },
+    { data: iso(ano, 10, 25), nome: "Aniversário de São Sebastião do Paraíso", tipo: "local" },
     { data: somaDias(p, -48), nome: "Carnaval (segunda)", tipo: "nacional" },
     { data: somaDias(p, -47), nome: "Carnaval", tipo: "nacional" },
     { data: somaDias(p, -46), nome: "Quarta-feira de Cinzas (até o meio-dia)", tipo: "nacional" },
