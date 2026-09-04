@@ -393,7 +393,7 @@ function JogoPage() {
     if (ativo && seguro.current) {
       const agora = performance.now();
       const toqueAnterior = ultimoToqueBaixo.current;
-      if (toqueAnterior !== null && agora - toqueAnterior <= 1500) {
+      if (toqueAnterior !== null && agora - toqueAnterior <= 2000) {
         seguro.current = false;
         noAr.current = true;
         vy.current = -2;
@@ -610,7 +610,7 @@ function JogoPage() {
 
           {pendurado && (
             <span className="absolute left-2 top-12 rounded-full bg-black/70 px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary">
-              {pendurado === "corda" ? "Subindo — pule para a próxima" : "Pendurado"} • ▼ duas vezes para soltar
+              {pendurado === "corda" ? "Subindo — pule para a próxima" : "Pendurado"} • ▼ 2x em 2s para soltar
             </span>
           )}
 
@@ -638,7 +638,7 @@ function JogoPage() {
         </div>
 
         <p className="mt-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-          Setas movem • ▲ pula entre aparelhos • ▼ duas vezes solta • jump impulsiona sozinho
+          Setas movem • ▲ pula entre aparelhos • ▼ 2x em 2s solta • jump impulsiona sozinho
         </p>
 
         <div className="mt-6 flex items-end justify-between gap-4">
