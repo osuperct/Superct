@@ -106,10 +106,13 @@ export const cadastrarProfessor = createServerFn({ method: "POST" })
     });
     if (error || !criado.user) {
       const msg = (error?.message ?? "").toLowerCase();
-      return {
-        ok: false as const,
-        erro: msg.includes("already") ? "Já existe uma conta com este e-mail." : "Não foi possível criar a conta.",
-      };
+      let erro = "Não foi possível criar a conta.";
+      if (msg.includes("already") || msg.includes("registered")) erro = "Já existe uma conta com este e-mail.";
+      else if (msg.includes("perfis_cpf") || msg.includes("cpf"))
+        erro = "Este CPF já está cadastrado em outra conta. Use o CPF do novo professor.";
+      else if (msg.includes("password")) erro = "Senha inválida, tente novamente.";
+      else if (error?.message) erro = `Não foi possível criar a conta: ${error.message}`;
+      return { ok: false as const, erro };
     }
 
     await supabaseAdmin
