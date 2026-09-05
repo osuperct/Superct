@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Megaphone, Send, Trash2 } from "lucide-react";
+import { ImagePlus, Megaphone, Send, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { type Aviso, dataCurta, enviarAviso, excluirAviso, listarAvisos } from "@/lib/avisos";
@@ -9,6 +9,14 @@ export function AvisosProfessor({ uid }: { uid: string }) {
   const [titulo, setTitulo] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [imagem, setImagem] = useState<File | null>(null);
+  const [previa, setPrevia] = useState<string | null>(null);
+
+  function escolherImagem(file: File | null) {
+    if (previa) URL.revokeObjectURL(previa);
+    setImagem(file);
+    setPrevia(file ? URL.createObjectURL(file) : null);
+  }
 
   const carregar = useCallback(async () => {
     setLista(await listarAvisos());
@@ -25,9 +33,10 @@ export function AvisosProfessor({ uid }: { uid: string }) {
     }
     setEnviando(true);
     try {
-      await enviarAviso(uid, titulo, mensagem);
+      await enviarAviso(uid, titulo, mensagem, imagem);
       setTitulo("");
       setMensagem("");
+      escolherImagem(null);
       await carregar();
       toast.success("Aviso enviado para todos os responsáveis.");
     } catch {
@@ -69,6 +78,35 @@ export function AvisosProfessor({ uid }: { uid: string }) {
         rows={4}
         className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
       />
+      <div className="mt-2 flex items-center gap-2">
+        <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-md border border-border bg-background px-3 py-2 font-display text-xs tracking-tight text-muted-foreground">
+          <ImagePlus className="size-4" /> {imagem ? "TROCAR FOTO" : "ANEXAR FOTO"}
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => escolherImagem(e.target.files?.[0] ?? null)}
+          />
+        </label>
+        {previa && (
+          <button
+            type="button"
+            onClick={() => escolherImagem(null)}
+            aria-label="Remover foto"
+            className="shrink-0 rounded-md border border-border p-2 text-muted-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+      </div>
+      {previa && (
+        <img
+          src={previa}
+          alt="Prévia da foto do aviso"
+          className="mt-2 max-h-48 w-full rounded-md border border-border object-contain"
+        />
+      )}
+
       <button
         type="button"
         disabled={enviando}
@@ -94,6 +132,14 @@ export function AvisosProfessor({ uid }: { uid: string }) {
                 </button>
               </div>
               <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
+              {a.imagem && (
+                <img
+                  src={a.imagem}
+                  alt={`Foto do aviso ${a.titulo}`}
+                  loading="lazy"
+                  className="mt-2 max-h-56 w-full rounded-md border border-border object-contain"
+                />
+              )}
               <span className="mt-1 block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                 {dataCurta(a.created_at)}
               </span>

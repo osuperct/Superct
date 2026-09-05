@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   type Aviso,
   type EstadoNotificacao,
+  comImagens,
   dataCurta,
   estadoNotificacao,
   listarAvisos,
@@ -35,8 +36,11 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
     const canal = supabase
       .channel("avisos-responsavel")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "avisos" }, (payload) => {
-        const novo = payload.new as Aviso;
-        setLista((atual) => [novo, ...atual.filter((a) => a.id !== novo.id)]);
+        const bruto = payload.new as Aviso;
+        void comImagens([bruto]).then(([novo]) => {
+          setLista((atual) => [novo, ...atual.filter((a) => a.id !== novo.id)]);
+        });
+        const novo = bruto;
         toast.info(novo.titulo, { description: novo.mensagem });
         notificarAparelho(`Super CT — ${novo.titulo}`, novo.mensagem);
       })
