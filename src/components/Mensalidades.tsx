@@ -15,6 +15,58 @@ import {
 
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
+const VALORES = [185, 160, 150, 135];
+
+function CampoValor({
+  valor,
+  onChange,
+}: {
+  valor: number | null;
+  onChange: (valor: number | null) => void;
+}) {
+  const preset = valor !== null && VALORES.includes(Number(valor));
+  const [manual, setManual] = useState(valor !== null && !preset);
+
+  return (
+    <>
+      <select
+        value={manual ? "outro" : preset ? String(Number(valor)) : ""}
+        onChange={(e) => {
+          if (e.target.value === "outro") {
+            setManual(true);
+            return;
+          }
+          setManual(false);
+          onChange(e.target.value === "" ? null : Number(e.target.value));
+        }}
+        className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+      >
+        <option value="">Mensalidade…</option>
+        {VALORES.map((v) => (
+          <option key={v} value={String(v)}>
+            {formatarValor(v)}
+          </option>
+        ))}
+        <option value="outro">Outro valor</option>
+      </select>
+      {manual && (
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="Valor (R$)"
+          defaultValue={valor ?? ""}
+          onBlur={(e) => {
+            const v = e.target.value === "" ? null : Number(e.target.value);
+            if (v !== valor) onChange(v);
+          }}
+          className="w-28 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+        />
+      )}
+    </>
+  );
+}
+
 export function Mensalidades({
   alunos,
   mensalidades,
