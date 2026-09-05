@@ -238,6 +238,27 @@ function Acessos() {
     await carregar();
   }
 
+  async function apagar(conta: ContaAcesso) {
+    const nome = conta.nome || conta.email;
+    if (!window.confirm(`Excluir definitivamente o cadastro de ${nome}?`)) return;
+    setOcupado(`${conta.id}-excluir`);
+    try {
+      const r = await excluir({ data: { userId: conta.id } });
+      if (!r.ok) {
+        toast.error(r.erro);
+        return;
+      }
+      toast.success("Cadastro excluído.");
+      await carregar();
+    } catch {
+      toast.error("Não foi possível excluir o cadastro.");
+    } finally {
+      setOcupado(null);
+    }
+  }
+
+
+
   const filtradas = (contas ?? []).filter((c) => {
     const t = busca.trim().toLowerCase();
     if (!t) return true;
