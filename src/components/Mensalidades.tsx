@@ -95,6 +95,8 @@ export function Mensalidades({
   recarregar: () => void;
 }) {
   const [salvando, setSalvando] = useState<string | null>(null);
+  const [abertos, setAbertos] = useState<Set<string>>(new Set(ordenados.map((a) => a.id)));
+  const [todosAbertos, setTodosAbertos] = useState(true);
   const mesAtual = refMes();
   const mesProximo = refMes(new Date(), 1);
 
