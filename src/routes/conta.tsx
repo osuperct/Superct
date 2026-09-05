@@ -656,11 +656,13 @@ function Painel({ session }: { session: Session }) {
                             {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
                             {d.enviado_por_professor ? " • enviado pelo professor" : ""}
                           </span>
-                          {!d.liberado && (
-                            <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                              Aguardando liberação
-                            </span>
-                          )}
+                          <span
+                            className={`mt-0.5 block font-mono text-[9px] uppercase tracking-widest ${
+                              d.liberado ? "text-primary" : "text-muted-foreground"
+                            }`}
+                          >
+                            {d.liberado ? "Conferido" : "Aguardando liberação"}
+                          </span>
                         </span>
                         {d.liberado && (
                           <button
