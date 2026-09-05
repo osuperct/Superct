@@ -14,7 +14,9 @@ import {
   refMes,
 } from "@/lib/mensalidade";
 import {
+  diffMeses,
   parcelaNoMes,
+  refSomando,
   vencimentoNoMes,
   type FormaContrato,
   type PlanoContrato,
@@ -145,9 +147,23 @@ export function Mensalidades({
 
   const planoDoAluno = (alunoId: string) => planos.find((p) => p.alunoId === alunoId);
 
+  // Meses disponíveis na projeção: do próximo mês até a última parcela dos planos.
+  const mesesProjecao = useMemo(() => {
+    let ultimo = refSomando(mesAtual, 12);
+    for (const p of planos) {
+      const fim = parcelaNoMes(p, mesAtual).fim;
+      if (fim && fim > ultimo) ultimo = fim;
+    }
+    const lista: string[] = [];
+    for (let i = 1; i <= diffMeses(mesAtual, ultimo); i++) lista.push(refSomando(mesAtual, i));
+    return lista;
+  }, [planos, mesAtual]);
+
+  const [mesProjecao, setMesProjecao] = useState(mesProximo);
+
   const projecao = ativosMes.map((a) => {
     const plano = planoDoAluno(a.id);
-    const parcela = plano ? parcelaNoMes(plano, mesProximo) : null;
+    const parcela = plano ? parcelaNoMes(plano, mesProjecao) : null;
     const valorPlano = plano?.valor ?? null;
     const encerrado = parcela?.encerrado ?? false;
     const valor = encerrado ? 0 : Number(valorPlano ?? doMes(a.id)?.valor ?? 0);
@@ -381,11 +397,22 @@ export function Mensalidades({
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <TrendingUp className="size-4 text-primary" /> PROJEÇÃO — {mesExtensoRef(mesProximo).toUpperCase()}
+          <TrendingUp className="size-4 text-primary" /> PROJEÇÃO — {mesExtensoRef(mesProjecao).toUpperCase()}
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Alunos com matrícula ativa e valor previsto a receber.
         </p>
+        <select
+          value={mesProjecao}
+          onChange={(e) => setMesProjecao(e.target.value)}
+          className="mt-2 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+        >
+          {mesesProjecao.map((m) => (
+            <option key={m} value={m}>
+              {mesExtensoRef(m)}
+            </option>
+          ))}
+        </select>
         <ul className="mt-3 space-y-1.5">
           {projecao.map((p) => (
             <li
@@ -406,7 +433,7 @@ export function Mensalidades({
                     : ""}
                   {p.parcela?.fim ? ` • termina em ${mesExtensoRef(p.parcela.fim)}` : ""}
                   {p.plano.vencimento
-                    ? ` • vence ${vencimentoNoMes(p.plano.vencimento, mesProximo)}`
+                    ? ` • vence ${vencimentoNoMes(p.plano.vencimento, mesProjecao)}`
                     : ""}
                   {p.encerrado ? " • PLANO ENCERRADO" : ""}
                 </p>
