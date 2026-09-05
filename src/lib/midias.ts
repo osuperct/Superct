@@ -5,6 +5,9 @@ export const BUCKET_MIDIAS = "app-midias";
 /** Vitrine de vídeos da página inicial. */
 export const GRUPO_VIDEOS = "VIDEOS";
 
+/** Fotos da seção NOSSO QG. */
+export const GRUPO_QG = "NOSSO QG";
+
 /** Logo principal da página inicial. */
 export const GRUPO_LOGO = "LOGO";
 
