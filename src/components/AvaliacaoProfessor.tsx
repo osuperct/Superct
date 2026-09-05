@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ClipboardCheck, ChevronLeft } from "lucide-react";
+import { ClipboardCheck, ChevronLeft, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,7 @@ import {
   mesExtenso,
   referenciaMesAtual,
 } from "@/lib/avaliacao";
+
 
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
