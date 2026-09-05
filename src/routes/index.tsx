@@ -4,7 +4,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { supabase } from "@/integrations/supabase/client";
 
-import { VideoShowcase } from "@/components/VideoShowcase";
+import { VideoShowcase, type VideoApp } from "@/components/VideoShowcase";
+import { GRUPO_VIDEOS, listarMidias, type Midia } from "@/lib/midias";
 
 import logoAsset from "@/assets/super-ct-logo.asset.json";
 
@@ -247,6 +248,29 @@ const galeria = [
 function Index() {
   const [fotosAbertas, setFotosAbertas] = useState<Modalidade["fotos"] | null>(null);
   const [logado, setLogado] = useState(false);
+  const [midias, setMidias] = useState<Midia[]>([]);
+
+  useEffect(() => {
+    void listarMidias().then(setMidias);
+  }, []);
+
+  const videosApp: VideoApp[] = midias
+    .filter((m) => m.tipo === "video" && m.grupo === GRUPO_VIDEOS && m.url)
+    .map((m) => ({ url: m.url!, com_som: m.com_som, inicio: Number(m.inicio) || 0, fim: m.fim === null ? null : Number(m.fim) }));
+
+  // Capas e fotos enviadas pela Área ADM entram no lugar (ou junto) das originais.
+  const cards: Modalidade[] = modalidades.map((m) => {
+    const capa = midias.find((x) => x.tipo === "capa" && x.grupo === m.nome && x.url);
+    const extras = midias
+      .filter((x) => x.tipo === "foto" && x.grupo === m.nome && x.url)
+      .map((x) => ({ src: x.url!, alt: x.descricao ?? `Foto do Super CT — ${m.nome}` }));
+    return {
+      ...m,
+      imagem: capa?.url ?? m.imagem,
+      alt: capa ? (capa.descricao ?? m.alt) : m.alt,
+      fotos: [...(m.fotos ?? []), ...extras],
+    };
+  });
 
   useEffect(() => {
     let ativo = true;
@@ -314,7 +338,7 @@ function Index() {
           </div>
         </section>
 
-        <VideoShowcase />
+        <VideoShowcase videos={videosApp} />
 
         <section className="px-4 py-12">
           <div className="mb-8 flex items-center gap-2">
@@ -323,7 +347,7 @@ function Index() {
           </div>
 
           <div className="grid grid-cols-2 gap-2">
-            {modalidades.map((m, i) => {
+            {cards.map((m, i) => {
               const abrivel = Boolean(m.clicavel && m.fotos?.length);
               const Card = abrivel ? "button" : "div";
               return (
