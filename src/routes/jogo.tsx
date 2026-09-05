@@ -1801,7 +1801,8 @@ function JogoPage() {
             <span className="text-primary">▲</span> pula baixo, <span className="text-primary">▲▲</span> rápido pula alto •{" "}
             <span className="text-primary">⚡</span> atira o poder para o lado do chefão •{" "}
             <span className="text-primary">3 halteres</span> = super bola •{" "}
-            <span className="text-primary">2 corações</span> de cada fase para ganhar vidas •{" "}
+            <span className="text-primary">2 corações</span> de cada fase dão vida e 10 pontos •{" "}
+            <span className="text-primary">cones</span> valem 5 pontos, medalha 30 e chefão derrotado 50 •{" "}
             ao perder uma vida você volta ao <span className="text-primary">checkpoint</span> da fase
           </p>
         </div>
