@@ -303,6 +303,51 @@ export type Database = {
           },
         ]
       }
+      midias_app: {
+        Row: {
+          ativo: boolean
+          caminho: string
+          com_som: boolean
+          created_at: string
+          descricao: string | null
+          fim: number | null
+          grupo: string
+          id: string
+          inicio: number
+          ordem: number
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          caminho: string
+          com_som?: boolean
+          created_at?: string
+          descricao?: string | null
+          fim?: number | null
+          grupo: string
+          id?: string
+          inicio?: number
+          ordem?: number
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          caminho?: string
+          com_som?: boolean
+          created_at?: string
+          descricao?: string | null
+          fim?: number | null
+          grupo?: string
+          id?: string
+          inicio?: number
+          ordem?: number
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       perfis: {
         Row: {
           aceite_imagem: boolean
