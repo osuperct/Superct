@@ -1987,7 +1987,7 @@ function JogoPage() {
             {/* corações extras suspensos bem alto */}
             {!emChefao &&
               coracoes.map((idx) => {
-                const c = CORACOES[idx]!;
+                const c = layAtual.coracoes[idx]!;
                 return (
                   <div
                     key={`coracao-${idx}`}
