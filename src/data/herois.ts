@@ -1,11 +1,11 @@
 import kael from "@/assets/heroi-kael.png";
 import kaelAnda1 from "@/assets/heroi-kael-anda1-atual.png";
-import kaelAnda2 from "@/assets/heroi-kael-anda2-atual.png";
+import kaelAnda2 from "@/assets/heroi-kael-anda2-novo.png";
 import kaelEscala from "@/assets/heroi-kael-escala-costas-atual.png";
 import kaelTrepaTrepa from "@/assets/heroi-kael-trepa-trepa.png";
 import miah from "@/assets/heroi-miah.png";
 import miahAnda1 from "@/assets/heroi-miah-anda1.png";
-import miahAnda2 from "@/assets/heroi-miah-anda2.png";
+import miahAnda2 from "@/assets/heroi-miah-anda2-novo.png";
 import miahEscala from "@/assets/heroi-miah-escala-costas-atual.png";
 import miahTrepaTrepa from "@/assets/heroi-miah-trepa-trepa.png";
 
