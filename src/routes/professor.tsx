@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
+import { AvisosProfessor } from "@/components/AvisosProfessor";
 
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
@@ -331,6 +332,8 @@ function Painel({ professorId }: { professorId: string }) {
         </ul>
       </section>
 
+
+      <AvisosProfessor uid={professorId} />
 
       <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
 
