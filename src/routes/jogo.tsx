@@ -1758,7 +1758,7 @@ function JogoPage() {
           )}
 
           {!heroiSel && (
-            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center gap-3 bg-black/90 px-4 text-center">
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-black/90 px-4 text-center">
               <p className="font-display text-xl uppercase tracking-tight text-primary">Escolha seu herói</p>
               <div className="flex items-end gap-6">
                 {HEROIS.map((h) => (
@@ -1789,7 +1789,7 @@ function JogoPage() {
 
           {modo === "intervalo" && !fim && (
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
               <Medal className="size-8 text-amber-400" />
               <p className="font-display text-xl uppercase tracking-tight text-primary">
                 Medalha de bronze da fase {fase}!
@@ -1811,7 +1811,7 @@ function JogoPage() {
           )}
 
           {modo === "fase-vencida" && !fim && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
               <p className="font-display text-xl uppercase tracking-tight text-primary">
                 {vilaoFase.nome} derrotado!
               </p>
@@ -1829,7 +1829,7 @@ function JogoPage() {
           )}
 
           {fim && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden bg-black/85 px-6 text-center">
+            <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-2 overflow-hidden bg-black/85 px-6 text-center">
               {!venceu && (
                 <img
                   src={VILOES[2]!.img}
