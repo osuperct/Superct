@@ -264,12 +264,12 @@ function Index() {
     const extras = midias
       .filter((x) => x.tipo === "foto" && x.grupo === m.nome && x.url)
       .map((x) => ({ src: x.url!, alt: x.descricao ?? `Foto do Super CT — ${m.nome}` }));
-    return {
-      ...m,
-      imagem: capa?.url ?? m.imagem,
-      alt: capa ? (capa.descricao ?? m.alt) : m.alt,
-      fotos: [...(m.fotos ?? []), ...extras],
-    };
+    const imagem = capa?.url ?? m.imagem;
+    const alt = (capa ? (capa.descricao ?? m.alt) : m.alt) ?? undefined;
+    const base: Modalidade = { ...m, fotos: [...(m.fotos ?? []), ...extras] };
+    if (imagem) base.imagem = imagem;
+    if (alt) base.alt = alt;
+    return base;
   });
 
   useEffect(() => {
