@@ -190,11 +190,11 @@ export function Mensalidades({
                   >
                     {m?.pago ? "PAGO" : "NÃO RECEBIDO"}
                   </button>
-                  {m?.pago && (
+                  {(
                     <>
                       <div className="w-40">
                         <DatePicker
-                          value={m.pago_em ? new Date(`${m.pago_em}T12:00:00`) : undefined}
+                          value={m?.pago_em ? new Date(`${m.pago_em}T12:00:00`) : undefined}
                           placeholder="Dia do pagamento"
                           onChange={(d) => {
                             if (!d) return;
@@ -204,7 +204,7 @@ export function Mensalidades({
                         />
                       </div>
                       <select
-                        value={m.forma ?? FORMAS[0]!}
+                        value={m?.forma ?? FORMAS[0]!}
                         onChange={(e) => void salvar(a, { forma: e.target.value })}
                         className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
                       >
