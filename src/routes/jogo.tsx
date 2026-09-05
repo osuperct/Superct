@@ -1513,14 +1513,20 @@ function JogoPage() {
   const alt = alturaHeroi(abaixado);
   const emChefao = modo === "chefao";
   const mundoAtual = emChefao ? ARENA : MUNDO;
-  const solidos = emChefao ? ARENA_SOLIDOS : SOLIDOS;
-  const barras = emChefao ? ARENA_BARRAS : BARRAS;
-  const argolas = emChefao ? ARENA_ARGOLAS : ARGOLAS;
-  const cordas = emChefao ? [] : CORDAS;
-  const jumps = emChefao ? [] : JUMPS;
-  const paredes = emChefao ? ARENA_PAREDES : PAREDES;
-  const pinos = emChefao ? PINOS_ARENA : PINOS;
-  const cones = emChefao ? CONES_ARENA : CONES;
+  const layAtual = layoutFase(fase);
+  const solidos: Solido[] = emChefao ? ARENA_SOLIDOS : layAtual.solidos;
+  const barras: Barra[] = emChefao ? ARENA_BARRAS : layAtual.barras;
+  const argolas: Argola[] = emChefao ? ARENA_ARGOLAS : layAtual.argolas;
+  const cordas: Corda[] = emChefao ? [] : layAtual.cordas;
+  const jumps: Jump[] = emChefao ? [] : layAtual.jumps;
+  const paredes: Parede[] = emChefao ? ARENA_PAREDES : layAtual.paredes;
+  const pinos: Pino[][] = emChefao
+    ? PINOS_ARENA
+    : PINOS_POR_FASE[(fase - 1) % PINOS_POR_FASE.length]!;
+  const cones: number[] = emChefao ? CONES_ARENA : layAtual.cones;
+  const lavaAtual: Lava[] = emChefao ? [] : layAtual.lava;
+  const telasAtuais: Tela[] = emChefao ? [] : layAtual.telas;
+
   const tema = CENARIOS[(fase - 1) % CENARIOS.length]!;
   const vilaoFase = VILOES[Math.min(fase, TOTAL_FASES) - 1]!;
   const tamBoss = chefaoTamanho(fase);
