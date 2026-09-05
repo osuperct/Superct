@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { ImagePlus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import { ChevronDown, ChevronUp, ImagePlus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
