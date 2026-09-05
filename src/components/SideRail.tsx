@@ -32,7 +32,16 @@ export function SideRail() {
   useEffect(() => {
     let ativo = true;
     async function checar() {
-      const { data } = await supabase.from("user_roles").select("role");
+      const { data: sessao } = await supabase.auth.getUser();
+      const uid = sessao.user?.id;
+      if (!uid) {
+        if (ativo) {
+          setProfessor(false);
+          setAdm(false);
+        }
+        return;
+      }
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", uid);
       if (!ativo) return;
       setProfessor((data ?? []).some((p) => p.role === "professor"));
       setAdm((data ?? []).some((p) => p.role === "adm"));

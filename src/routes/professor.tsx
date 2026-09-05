@@ -132,7 +132,12 @@ function Painel({ professorId }: { professorId: string }) {
   const inputArquivo = useRef<HTMLInputElement>(null);
 
   const carregar = useCallback(async () => {
-    const { data: papeis } = await supabase.from("user_roles").select("role");
+    const { data: sessaoAtual } = await supabase.auth.getUser();
+    const uidAtual = sessaoAtual.user?.id ?? "";
+    const { data: papeis } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", uidAtual);
     const ehProfessor = (papeis ?? []).some((p) => p.role === "professor");
     setAutorizado(ehProfessor);
     setEhAdm((papeis ?? []).some((p) => p.role === "adm"));
