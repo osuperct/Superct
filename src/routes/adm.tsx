@@ -166,7 +166,10 @@ function AdmPage() {
 
       <Acessos />
 
+      <ProdutosAdm />
+
       <Cadastros />
+
 
     </Casca>
   );
