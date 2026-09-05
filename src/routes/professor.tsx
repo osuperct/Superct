@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { FileText, GraduationCap, Paperclip, Trash2, Upload, Users } from "lucide-react";
+import { CircleDollarSign, FileText, GraduationCap, Paperclip, Trash2, Upload, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
-import { Mensalidades } from "@/components/Mensalidades";
+
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
 
@@ -315,7 +315,20 @@ function Painel({ professorId }: { professorId: string }) {
         </ul>
       </section>
 
-      <Mensalidades alunos={alunos} mensalidades={mensalidades} recarregar={() => void carregar()} />
+      <section className="rounded-lg border border-border bg-card/40 p-4">
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <CircleDollarSign className="size-4 text-primary" /> MATRÍCULAS ATIVAS OU INATIVAS
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Situação de cada matrícula no mês, recebimento das mensalidades e projeção do próximo mês.
+        </p>
+        <Link
+          to="/financeiro"
+          className="mt-3 inline-block rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground"
+        >
+          ABRIR MATRÍCULAS E MENSALIDADES
+        </Link>
+      </section>
 
       <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
 
