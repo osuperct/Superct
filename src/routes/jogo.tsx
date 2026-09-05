@@ -62,8 +62,52 @@ type Corda = { x: number; base: number; topo: number };
 type Jump = { x: number; w: number; h: number };
 type Parede = { x: number; w: number; h: number };
 type Pino = { x: number; y: number; cor: string };
+type Lava = { x: number; w: number };
+type Tela = { x: number; w: number };
+type Faixa = { x0: number; x1: number };
+type Layout = {
+  solidos: Solido[];
+  barras: Barra[];
+  argolas: Argola[];
+  cordas: Corda[];
+  jumps: Jump[];
+  paredes: Parede[];
+  lava: Lava[];
+  telas: Tela[];
+  cones: number[];
+  coracoes: { x: number; y: number }[];
+  chuvaBatata: Faixa[];
+  donuts: boolean;
+};
 
-const SOLIDOS: Solido[] = [
+const VELOCIDADE_ESCALADA = 2.2;
+const CORES_PINO = ["#f97316", "#22d3ee", "#a855f7", "#84cc16", "#f43f5e", "#facc15"];
+const gerarPinos = (paredes: Parede[], quantidade: number): Pino[][] =>
+  paredes.map((p, pi) =>
+    Array.from({ length: quantidade }).map((_, i) => ({
+      x: 14 + ((i * 37 + pi * 19) % (p.w - 28)),
+      y: 16 + ((i * 29 + pi * 11) % (p.h - 30)),
+      cor: CORES_PINO[(i + pi) % CORES_PINO.length]!,
+    })),
+  );
+
+/* medalha de bronze suspensa no fim do percurso */
+const MEDALHA = { x: MUNDO - 190, y: 118 };
+
+const CONES_BASE: number[] = [
+  180, 340, 560, 820, 900, 1100, 1340, 1500, 1700, 1900, 2050, 2300, 2560, 2750,
+  2900, 3100, 3260, 3480, 3720, 3900, 4050,
+];
+/* cones só ficam onde dá para pisar (fora da lava e longe das telas) */
+const conesSeguros = (lava: Lava[], telas: Tela[]) =>
+  CONES_BASE.filter(
+    (cx) =>
+      !lava.some((l) => cx + 16 > l.x && cx < l.x + l.w) &&
+      !telas.some((t) => cx + 16 > t.x - 20 && cx < t.x + t.w + 20),
+  );
+
+/* ---------- FASE 1: academia clássica ---------- */
+const L1_SOLIDOS: Solido[] = [
   { x: 430, w: 72, h: 56, tipo: "caixa" },
   { x: 640, w: 58, h: 22, tipo: "step" },
   { x: 706, w: 58, h: 40, tipo: "step" },
@@ -78,38 +122,311 @@ const SOLIDOS: Solido[] = [
   { x: 3320, w: 58, h: 26, tipo: "step" },
   { x: 3600, w: 88, h: 86, tipo: "caixa" },
 ];
-
-const BARRAS: Barra[] = [
-  { x: 250, w: 230, y: 150 },
-  { x: 1980, w: 210, y: 152 },
-  { x: 3420, w: 200, y: 148 },
-];
-
-const ARGOLAS: Argola[] = [
-  { x: 1280, y: 132 },
-  { x: 1372, y: 140 },
-  { x: 1464, y: 132 },
-  { x: 2680, y: 138 },
-  { x: 2776, y: 146 },
-  { x: 2872, y: 138 },
-];
-
-const CORDAS: Corda[] = [
-  { x: 3125, base: 26, topo: 205 },
-  { x: 3235, base: 34, topo: 205 },
-];
-
-const JUMPS: Jump[] = [{ x: 3870, w: 86, h: 18 }];
-
-/* paredes de escalada (pretas com pinos coloridos) */
-const PAREDES: Parede[] = [
+const L1_PAREDES: Parede[] = [
   { x: 790, w: 150, h: 200 },
   { x: 3700, w: 160, h: 210 },
 ];
-const VELOCIDADE_ESCALADA = 2.2;
+const FASE1: Layout = {
+  solidos: L1_SOLIDOS,
+  barras: [
+    { x: 250, w: 230, y: 150 },
+    { x: 1980, w: 210, y: 152 },
+    { x: 3420, w: 200, y: 148 },
+  ],
+  argolas: [
+    { x: 1280, y: 132 },
+    { x: 1372, y: 140 },
+    { x: 1464, y: 132 },
+    { x: 2680, y: 138 },
+    { x: 2776, y: 146 },
+    { x: 2872, y: 138 },
+  ],
+  cordas: [
+    { x: 3125, base: 26, topo: 205 },
+    { x: 3235, base: 34, topo: 205 },
+  ],
+  jumps: [{ x: 3870, w: 86, h: 18 }],
+  paredes: L1_PAREDES,
+  lava: [],
+  telas: [],
+  cones: conesSeguros([], []),
+  coracoes: [
+    { x: 1372, y: 150 },
+    { x: 3560, y: 158 },
+  ],
+  chuvaBatata: [],
+  donuts: false,
+};
 
-/* medalha de bronze suspensa no fim do percurso */
-const MEDALHA = { x: MUNDO - 190, y: 118 };
+/* ---------- FASE 2: chão de lava com steps ---------- */
+const L2_LAVA: Lava[] = [
+  { x: 600, w: 340 },
+  { x: 1500, w: 420 },
+  { x: 2600, w: 480 },
+  { x: 3400, w: 300 },
+];
+const FASE2: Layout = {
+  solidos: [
+    { x: 300, w: 72, h: 54, tipo: "caixa" },
+    { x: 636, w: 62, h: 36, tipo: "step" },
+    { x: 756, w: 62, h: 58, tipo: "step" },
+    { x: 872, w: 62, h: 36, tipo: "step" },
+    { x: 1120, w: 84, h: 78, tipo: "caixa" },
+    { x: 1538, w: 62, h: 40, tipo: "step" },
+    { x: 1656, w: 62, h: 64, tipo: "step" },
+    { x: 1776, w: 62, h: 44, tipo: "step" },
+    { x: 1878, w: 62, h: 30, tipo: "step" },
+    { x: 2200, w: 90, h: 90, tipo: "caixa" },
+    { x: 2636, w: 62, h: 38, tipo: "step" },
+    { x: 2756, w: 62, h: 62, tipo: "step" },
+    { x: 2876, w: 62, h: 40, tipo: "step" },
+    { x: 2996, w: 62, h: 66, tipo: "step" },
+    { x: 3436, w: 62, h: 42, tipo: "step" },
+    { x: 3552, w: 62, h: 64, tipo: "step" },
+    { x: 3648, w: 62, h: 38, tipo: "step" },
+    { x: 3900, w: 82, h: 82, tipo: "caixa" },
+  ],
+  barras: [
+    { x: 1000, w: 200, y: 150 },
+    { x: 2300, w: 200, y: 152 },
+  ],
+  argolas: [
+    { x: 1980, y: 136 },
+    { x: 2070, y: 144 },
+    { x: 3140, y: 138 },
+    { x: 3230, y: 146 },
+  ],
+  cordas: [{ x: 2450, base: 30, topo: 205 }],
+  jumps: [{ x: 1240, w: 86, h: 18 }],
+  paredes: [{ x: 4020, w: 140, h: 200 }],
+  lava: L2_LAVA,
+  telas: [],
+  cones: conesSeguros(L2_LAVA, []),
+  coracoes: [
+    { x: 1700, y: 150 },
+    { x: 3010, y: 156 },
+  ],
+  chuvaBatata: [],
+  donuts: false,
+};
+
+/* ---------- FASE 3: percurso aéreo (argolas, cordas navais e caixas) ---------- */
+const L3_ARGOLAS: Argola[] = [
+  { x: 320, y: 140 },
+  { x: 410, y: 132 },
+  { x: 500, y: 144 },
+  { x: 700, y: 138 },
+  { x: 790, y: 130 },
+  { x: 880, y: 142 },
+  { x: 1080, y: 136 },
+  { x: 1170, y: 146 },
+  { x: 1550, y: 140 },
+  { x: 1640, y: 132 },
+  { x: 1730, y: 144 },
+  { x: 1920, y: 138 },
+  { x: 2010, y: 130 },
+  { x: 2100, y: 142 },
+  { x: 2300, y: 136 },
+  { x: 2390, y: 146 },
+  { x: 2770, y: 140 },
+  { x: 2860, y: 132 },
+  { x: 2950, y: 144 },
+  { x: 3140, y: 138 },
+  { x: 3230, y: 130 },
+  { x: 3320, y: 142 },
+  { x: 3520, y: 136 },
+  { x: 3610, y: 146 },
+  { x: 3800, y: 138 },
+  { x: 3890, y: 132 },
+];
+const L3_LAVA: Lava[] = [
+  { x: 300, w: 240 },
+  { x: 680, w: 250 },
+  { x: 1060, w: 150 },
+  { x: 1330, w: 180 },
+  { x: 1530, w: 240 },
+  { x: 1900, w: 250 },
+  { x: 2280, w: 150 },
+  { x: 2550, w: 180 },
+  { x: 2750, w: 250 },
+  { x: 3120, w: 240 },
+  { x: 3500, w: 160 },
+  { x: 3780, w: 180 },
+];
+const FASE3: Layout = {
+  solidos: [
+    { x: 570, w: 70, h: 80, tipo: "caixa" },
+    { x: 1240, w: 70, h: 86, tipo: "caixa" },
+    { x: 1810, w: 76, h: 84, tipo: "caixa" },
+    { x: 2450, w: 70, h: 82, tipo: "caixa" },
+    { x: 3020, w: 72, h: 88, tipo: "caixa" },
+    { x: 3690, w: 78, h: 90, tipo: "caixa" },
+    { x: 4000, w: 80, h: 76, tipo: "caixa" },
+  ],
+  barras: [{ x: 2150, w: 120, y: 152 }],
+  argolas: L3_ARGOLAS,
+  cordas: [
+    { x: 980, base: 26, topo: 205 },
+    { x: 1360, base: 30, topo: 205 },
+    { x: 1460, base: 26, topo: 205 },
+    { x: 2200, base: 34, topo: 205 },
+    { x: 2570, base: 26, topo: 205 },
+    { x: 2670, base: 32, topo: 205 },
+    { x: 3420, base: 28, topo: 205 },
+  ],
+  jumps: [],
+  paredes: [],
+  lava: L3_LAVA,
+  telas: [],
+  cones: conesSeguros(L3_LAVA, []),
+  coracoes: [
+    { x: 1460, y: 168 },
+    { x: 3420, y: 172 },
+  ],
+  chuvaBatata: [],
+  donuts: false,
+};
+
+/* ---------- FASE 4: corredores com chuva de batata frita ---------- */
+const FASE4: Layout = {
+  solidos: [
+    { x: 380, w: 58, h: 26, tipo: "step" },
+    { x: 520, w: 80, h: 74, tipo: "caixa" },
+    { x: 900, w: 58, h: 30, tipo: "step" },
+    { x: 1020, w: 58, h: 52, tipo: "step" },
+    { x: 1400, w: 88, h: 88, tipo: "caixa" },
+    { x: 1720, w: 58, h: 28, tipo: "step" },
+    { x: 2100, w: 76, h: 62, tipo: "caixa" },
+    { x: 2460, w: 58, h: 34, tipo: "step" },
+    { x: 2800, w: 90, h: 92, tipo: "caixa" },
+    { x: 3180, w: 58, h: 26, tipo: "step" },
+    { x: 3300, w: 58, h: 50, tipo: "step" },
+    { x: 3760, w: 84, h: 80, tipo: "caixa" },
+  ],
+  barras: [
+    { x: 640, w: 210, y: 148 },
+    { x: 2540, w: 220, y: 152 },
+  ],
+  argolas: [
+    { x: 1180, y: 134 },
+    { x: 1272, y: 142 },
+    { x: 3420, y: 136 },
+    { x: 3512, y: 144 },
+  ],
+  cordas: [{ x: 2280, base: 28, topo: 205 }],
+  jumps: [{ x: 1620, w: 86, h: 18 }],
+  paredes: [{ x: 3900, w: 150, h: 205 }],
+  lava: [],
+  telas: [],
+  cones: conesSeguros([], []),
+  coracoes: [
+    { x: 1272, y: 158 },
+    { x: 3512, y: 160 },
+  ],
+  chuvaBatata: [
+    { x0: 820, x1: 1600 },
+    { x0: 2350, x1: 3200 },
+  ],
+  donuts: false,
+};
+
+/* ---------- FASE 5: vilões atirando donuts ---------- */
+const FASE5: Layout = {
+  solidos: [
+    { x: 320, w: 76, h: 64, tipo: "caixa" },
+    { x: 700, w: 58, h: 24, tipo: "step" },
+    { x: 820, w: 58, h: 48, tipo: "step" },
+    { x: 1150, w: 90, h: 90, tipo: "caixa" },
+    { x: 1520, w: 58, h: 28, tipo: "step" },
+    { x: 1900, w: 78, h: 70, tipo: "caixa" },
+    { x: 2280, w: 58, h: 32, tipo: "step" },
+    { x: 2400, w: 58, h: 56, tipo: "step" },
+    { x: 2760, w: 86, h: 84, tipo: "caixa" },
+    { x: 3150, w: 58, h: 26, tipo: "step" },
+    { x: 3520, w: 80, h: 76, tipo: "caixa" },
+    { x: 3960, w: 76, h: 66, tipo: "caixa" },
+  ],
+  barras: [
+    { x: 950, w: 180, y: 150 },
+    { x: 2950, w: 180, y: 148 },
+  ],
+  argolas: [
+    { x: 1650, y: 136 },
+    { x: 1742, y: 144 },
+    { x: 1834, y: 136 },
+    { x: 3280, y: 138 },
+    { x: 3372, y: 146 },
+  ],
+  cordas: [
+    { x: 2560, base: 26, topo: 205 },
+    { x: 2660, base: 32, topo: 205 },
+  ],
+  jumps: [{ x: 2050, w: 86, h: 18 }],
+  paredes: [{ x: 1280, w: 140, h: 200 }],
+  lava: [],
+  telas: [],
+  cones: conesSeguros([], []),
+  coracoes: [
+    { x: 1742, y: 162 },
+    { x: 3372, y: 164 },
+  ],
+  chuvaBatata: [],
+  donuts: true,
+};
+
+/* ---------- FASE 6: sala de computadores (não passe na frente das telas) ---------- */
+const L6_TELAS: Tela[] = [
+  { x: 700, w: 46 },
+  { x: 1320, w: 46 },
+  { x: 1900, w: 46 },
+  { x: 2520, w: 46 },
+  { x: 3080, w: 46 },
+  { x: 3660, w: 46 },
+];
+const FASE6: Layout = {
+  solidos: [
+    { x: 620, w: 60, h: 62, tipo: "step" },
+    { x: 760, w: 60, h: 62, tipo: "step" },
+    { x: 1000, w: 84, h: 80, tipo: "caixa" },
+    { x: 1240, w: 60, h: 66, tipo: "step" },
+    { x: 1380, w: 60, h: 66, tipo: "step" },
+    { x: 1660, w: 58, h: 30, tipo: "step" },
+    { x: 1820, w: 60, h: 68, tipo: "step" },
+    { x: 1960, w: 60, h: 68, tipo: "step" },
+    { x: 2240, w: 88, h: 86, tipo: "caixa" },
+    { x: 2440, w: 60, h: 66, tipo: "step" },
+    { x: 2580, w: 60, h: 66, tipo: "step" },
+    { x: 3000, w: 60, h: 70, tipo: "step" },
+    { x: 3140, w: 60, h: 70, tipo: "step" },
+    { x: 3580, w: 60, h: 68, tipo: "step" },
+    { x: 3720, w: 60, h: 68, tipo: "step" },
+    { x: 3960, w: 80, h: 78, tipo: "caixa" },
+  ],
+  barras: [
+    { x: 1420, w: 200, y: 150 },
+    { x: 2660, w: 200, y: 152 },
+  ],
+  argolas: [
+    { x: 2900, y: 136 },
+    { x: 2992, y: 144 },
+    { x: 3400, y: 138 },
+  ],
+  cordas: [{ x: 2100, base: 28, topo: 205 }],
+  jumps: [{ x: 1120, w: 86, h: 18 }],
+  paredes: [{ x: 3200, w: 140, h: 205 }],
+  lava: [],
+  telas: L6_TELAS,
+  cones: conesSeguros([], L6_TELAS),
+  coracoes: [
+    { x: 2992, y: 160 },
+    { x: 3400, y: 164 },
+  ],
+  chuvaBatata: [],
+  donuts: false,
+};
+
+const LAYOUTS: Layout[] = [FASE1, FASE2, FASE3, FASE4, FASE5, FASE6];
+const layoutFase = (fase: number) => LAYOUTS[(fase - 1) % LAYOUTS.length]!;
 
 /* arena do chefão: mesmos elementos, cenário mais curto */
 const ARENA_SOLIDOS: Solido[] = [
@@ -123,25 +440,10 @@ const ARENA_ARGOLAS: Argola[] = [
   { x: 520, y: 142 },
 ];
 const ARENA_PAREDES: Parede[] = [{ x: 620, w: 90, h: 170 }];
-
-const CORES_PINO = ["#f97316", "#22d3ee", "#a855f7", "#84cc16", "#f43f5e", "#facc15"];
-const gerarPinos = (paredes: Parede[], quantidade: number): Pino[][] =>
-  paredes.map((p, pi) =>
-    Array.from({ length: quantidade }).map((_, i) => ({
-      x: 14 + ((i * 37 + pi * 19) % (p.w - 28)),
-      y: 16 + ((i * 29 + pi * 11) % (p.h - 30)),
-      cor: CORES_PINO[(i + pi) % CORES_PINO.length]!,
-    })),
-  );
-const PINOS = gerarPinos(PAREDES, 26);
+const PINOS_POR_FASE = LAYOUTS.map((l) => gerarPinos(l.paredes, 26));
 const PINOS_ARENA = gerarPinos(ARENA_PAREDES, 14);
-
-/* cones no tatame: cada um vale 5 pontos ao ser tocado */
-const CONES: number[] = [
-  180, 340, 560, 820, 900, 1100, 1340, 1500, 1700, 1900, 2050, 2300, 2560, 2750,
-  2900, 3100, 3260, 3480, 3720, 3900, 4050,
-];
 const CONES_ARENA: number[] = [70, 230, 400, 480, 600, 680];
+
 
 /* paleta do cenário por fase (mesmos elementos, cores diferentes) */
 const CENARIOS = [
