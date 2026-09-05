@@ -519,6 +519,8 @@ function Cadastros() {
           ))}
         </ul>
       )}
+        </>
+      )}
     </section>
   );
 }
