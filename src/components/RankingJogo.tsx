@@ -12,11 +12,13 @@ type Props = {
   fase: number;
   /** true quando a partida acabou — dispara o registro no ranking */
   fim: boolean;
+  /** chamado após salvar o apelido, para direcionar ao jogo */
+  onApelidoSalvo?: () => void;
 };
 
 const MEDALHAS = ["text-amber-400", "text-slate-300", "text-amber-700"];
 
-export default function RankingJogo({ pontos, fase, fim }: Props) {
+export default function RankingJogo({ pontos, fase, fim, onApelidoSalvo }: Props) {
   const [userId, setUserId] = useState<string | null>(null);
   const [apelido, setApelido] = useState<string | null>(null);
   const [rascunho, setRascunho] = useState("");
@@ -72,6 +74,7 @@ export default function RankingJogo({ pontos, fase, fim }: Props) {
       setRascunho("");
       toast.success(`Apelido salvo: ${novo}`);
       carregarLista();
+      onApelidoSalvo?.();
     } catch {
       toast.error("Não foi possível salvar o apelido");
     } finally {
