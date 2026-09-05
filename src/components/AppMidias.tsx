@@ -26,6 +26,7 @@ export function AppMidias() {
   const [lista, setLista] = useState<Midia[]>([]);
   const [grupo, setGrupo] = useState<string>(GRUPOS_CARDS[0]);
   const [ocupado, setOcupado] = useState(false);
+  const [aberto, setAberto] = useState(false);
 
   const carregar = useCallback(async () => {
     setLista(await listarMidiasAdm());
