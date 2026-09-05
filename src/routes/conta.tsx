@@ -716,32 +716,20 @@ function Painel({ session }: { session: Session }) {
         >
           PREENCHER CONTRATO DE UM ALUNO <Send className="size-4 shrink-0" />
         </Link>
+        <Link
+          to="/documento/$tipo"
+          params={{ tipo: "ficha" }}
+          className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+        >
+          PREENCHER FICHA PAR-Q DO ALUNO <Send className="size-4 shrink-0" />
+        </Link>
       </section>
 
       <AvaliacaoResponsavel uid={uid} alunos={alunos} />
 
-      <div className="mt-5 flex gap-2">
-        {(
-          [
-            ["online", "PREENCHER ONLINE"],
-            ["documentos", "ANEXAR DOCUMENTOS"],
-          ] as const
-        ).map(([id, rotulo]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setAba(id)}
-            className={`flex-1 rounded-md px-3 py-2 font-display text-xs tracking-tight ${
-              aba === id ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"
-            }`}
-          >
-            {rotulo}
-          </button>
-        ))}
-      </div>
-
-      {aba === "documentos" ? (
+      {(
         <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
+
           <div className="flex items-start justify-between gap-2">
             <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
               <Paperclip className="size-4 text-primary" /> DOCUMENTOS DO ALUNO ({documentos.length})
