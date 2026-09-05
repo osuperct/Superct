@@ -764,14 +764,16 @@ function JogoPage() {
       const xAntesDoQuadro = x.current;
 
       const emChefao = modoRef.current === "chefao";
+      const lay = layoutFase(faseRef.current);
       const mundo = emChefao ? ARENA : MUNDO;
-      const solidos = emChefao ? ARENA_SOLIDOS : SOLIDOS;
-      const barras = emChefao ? ARENA_BARRAS : BARRAS;
-      const argolas = emChefao ? ARENA_ARGOLAS : ARGOLAS;
-      const cordas = emChefao ? [] : CORDAS;
-      const jumps = emChefao ? [] : JUMPS;
-      const paredes = emChefao ? ARENA_PAREDES : PAREDES;
+      const solidos: Solido[] = emChefao ? ARENA_SOLIDOS : lay.solidos;
+      const barras: Barra[] = emChefao ? ARENA_BARRAS : lay.barras;
+      const argolas: Argola[] = emChefao ? ARENA_ARGOLAS : lay.argolas;
+      const cordas: Corda[] = emChefao ? [] : lay.cordas;
+      const jumps: Jump[] = emChefao ? [] : lay.jumps;
+      const paredes: Parede[] = emChefao ? ARENA_PAREDES : lay.paredes;
       const dif = dificuldade(faseRef.current);
+
 
       /* ---- segurar o analógico para baixo agacha o personagem ---- */
       const querAgachar = dirY.current > 0.45 && !seguro.current && !noAr.current;
