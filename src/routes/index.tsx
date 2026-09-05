@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 import { VideoShowcase, type VideoApp } from "@/components/VideoShowcase";
 import { GRUPO_VIDEOS, listarMidias, type Midia } from "@/lib/midias";
+import { listarTextos, type Textos } from "@/lib/textos";
 
 import logoAsset from "@/assets/super-ct-logo.asset.json";
 
@@ -249,10 +250,16 @@ function Index() {
   const [fotosAbertas, setFotosAbertas] = useState<Modalidade["fotos"] | null>(null);
   const [logado, setLogado] = useState(false);
   const [midias, setMidias] = useState<Midia[]>([]);
+  const [textos, setTextos] = useState<Textos>({});
 
   useEffect(() => {
     void listarMidias().then(setMidias);
+    void listarTextos().then(setTextos);
   }, []);
+
+  const logoApp = midias.find((m) => m.tipo === "logo" && m.url)?.url ?? logo;
+  const heroTitulo = textos["hero_titulo"]?.trim();
+  const heroSubtitulo = textos["hero_subtitulo"]?.trim();
 
   const videosApp: VideoApp[] = midias
     .filter((m) => m.tipo === "video" && m.grupo === GRUPO_VIDEOS && m.url)
@@ -318,10 +325,8 @@ function Index() {
           <div className="animate-reveal [animation-delay:100ms]">
             <div className="mx-auto -mb-6 w-full max-w-[200px]">
               <img
-                src={logo}
+                src={logoApp}
                 alt="Logo Super CT"
-                width={1024}
-                height={1536}
                 className="h-auto w-full object-contain"
               />
             </div>
@@ -329,11 +334,17 @@ function Index() {
 
 
             <h1 className="mb-4 text-pretty text-center font-display text-5xl uppercase leading-[0.9] tracking-tighter">
-              SUA CRIANÇA VIRA <span className="text-primary italic">SUPER!</span>
+              {heroTitulo ? (
+                heroTitulo
+              ) : (
+                <>
+                  SUA CRIANÇA VIRA <span className="text-primary italic">SUPER!</span>
+                </>
+              )}
             </h1>
             <p className="mx-auto max-w-[30ch] text-center text-sm text-muted-foreground">
-              Treinamento funcional infantil e recreativo, ginástica, esportes e circuitos com o
-              Professor Tio Victor.
+              {heroSubtitulo ||
+                "Treinamento funcional infantil e recreativo, ginástica, esportes e circuitos com o Professor Tio Victor."}
             </p>
           </div>
         </section>
