@@ -1140,6 +1140,8 @@ function JogoPage() {
       noAr.current = true;
       vy.current = duploToque ? IMPULSO : IMPULSO * 0.85;
       if (vy.current > 0) subindoDesde.current = performance.now();
+      /* impulso leve para frente ao soltar do aparelho */
+      vxAr.current = olhandoRef.current * VELOCIDADE * 1.3;
       return;
     }
 
@@ -1148,6 +1150,8 @@ function JogoPage() {
       noAr.current = true;
       vy.current = IMPULSO;
       if (vy.current > 0) subindoDesde.current = performance.now();
+      /* salto alto mais inclinado para frente */
+      vxAr.current = olhandoRef.current * VELOCIDADE * 1.55;
       return;
     }
 
@@ -1155,6 +1159,8 @@ function JogoPage() {
     noAr.current = true;
     vy.current = IMPULSO_BAIXO;
     if (vy.current > 0) subindoDesde.current = performance.now();
+    /* salto normal com leve inclinação para frente */
+    vxAr.current = olhandoRef.current * VELOCIDADE * 1.25;
   };
 
 
