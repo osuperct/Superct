@@ -1,6 +1,6 @@
 import { DatePicker } from "@/components/ui/datepicker";
-import { useMemo, useState } from "react";
-import { CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { BellRing, CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +22,7 @@ import {
 
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
-const VALORES = [185, 160, 150, 135];
+const VALORES = [185, 160, 150, 140, 135];
 
 function CampoValor({
   valor,
@@ -155,8 +155,78 @@ export function Mensalidades({
   });
   const totalProjecao = projecao.reduce((s, p) => s + p.valor, 0);
 
+  /** Lança automaticamente o valor do plano (anual/semestral) no mês vigente. */
+  const lancados = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    void (async () => {
+      for (const a of ordenados) {
+        const plano = planos.find((p) => p.alunoId === a.id);
+        if (!plano || plano.parcelas <= 1 || plano.valor === null) continue;
+        const parcela = parcelaNoMes(plano, mesAtual);
+        if (parcela.encerrado) continue;
+        const m = mensalidades.find((x) => x.aluno_id === a.id && x.referencia === mesAtual);
+        const precisa = !m || Number(m.valor ?? 0) !== plano.valor || !m.ativo;
+        const chave = `${a.id}:${mesAtual}:${plano.valor}`;
+        if (!precisa || lancados.current.has(chave)) continue;
+        lancados.current.add(chave);
+        const { error } = await supabase.from("mensalidades").upsert(
+          {
+            aluno_id: a.id,
+            user_id: a.user_id,
+            referencia: mesAtual,
+            ativo: true,
+            valor: plano.valor,
+            pago: m?.pago ?? false,
+            pago_em: m?.pago_em ?? null,
+            forma: m?.forma ?? plano.forma,
+          },
+          { onConflict: "aluno_id,referencia" },
+        );
+        if (!error) recarregar();
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [planos, mensalidades, ordenados, mesAtual]);
+
+  /** Planos cuja última parcela cai neste mês ou no próximo — hora de renovar. */
+  const renovacoes = ordenados
+    .map((a) => {
+      const plano = planos.find((p) => p.alunoId === a.id);
+      if (!plano || plano.parcelas <= 1) return null;
+      const atual = parcelaNoMes(plano, mesAtual);
+      const prox = parcelaNoMes(plano, mesProximo);
+      const ultimaAgora = atual.numero === atual.total;
+      const ultimaProximo = prox.numero === prox.total;
+      if (!ultimaAgora && !ultimaProximo) return null;
+      return { aluno: a, plano, quando: ultimaAgora ? mesAtual : mesProximo };
+    })
+    .filter((x): x is { aluno: Alu; plano: PlanoContrato; quando: string } => x !== null);
+
+
   return (
     <>
+      {renovacoes.length > 0 && (
+        <section className="rounded-lg border border-destructive/60 bg-destructive/10 p-4">
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight text-destructive">
+            <BellRing className="size-4" /> RENOVAÇÃO DE CONTRATO ({renovacoes.length})
+          </h2>
+          <ul className="mt-2 space-y-1.5">
+            {renovacoes.map((r) => (
+              <li
+                key={r.aluno.id}
+                className="rounded-md border border-destructive/40 bg-background/40 px-3 py-2 text-xs"
+              >
+                <span className="font-medium">{r.aluno.nome}</span>
+                <span className="block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                  {r.plano.planoTexto} • última parcela em {mesExtensoRef(r.quando)}
+                  {r.plano.vencimento ? ` • vence ${vencimentoNoMes(r.plano.vencimento, r.quando)}` : ""}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <CircleDollarSign className="size-4 text-primary" /> MATRÍCULAS E MENSALIDADES
