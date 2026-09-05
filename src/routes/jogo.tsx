@@ -498,11 +498,9 @@ const CORES_DONUT = ["#ec4899", "#f59e0b", "#22d3ee", "#a3e635", "#f43f5e"];
 const VIDAS_CHEFAO = 3;
 const VIDAS_MAX = 5;
 
-/* dois corações por fase, bem altos mas antes do limite do teto — só alcançáveis pulando dos aparelhos */
-const CORACOES: { x: number; y: number }[] = [
-  { x: 1372, y: 150 },
-  { x: 3560, y: 158 },
-];
+/* dois corações por fase, bem altos — só alcançáveis pulando dos aparelhos */
+const CORACOES: { x: number; y: number }[] = FASE1.coracoes;
+
 
 
 const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_H);
