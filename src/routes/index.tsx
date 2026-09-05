@@ -247,7 +247,21 @@ const galeria = [
   { src: fachada.url, legenda: "Nossa Fachada", alt: "Fachada do Super CT com logo na vitrine de vidro" },
 ];
 
+// Mantém as palavras "super" em laranja, mesmo quando o título é editado na Área ADM.
+function destacarSuper(texto: string) {
+  return texto.split(/(\s+)/).map((parte, i) =>
+    /super/i.test(parte) ? (
+      <span key={i} className="text-primary italic">
+        {parte}
+      </span>
+    ) : (
+      parte
+    ),
+  );
+}
+
 function Index() {
+
   const [fotosAbertas, setFotosAbertas] = useState<Modalidade["fotos"] | null>(null);
   const [logado, setLogado] = useState(false);
   const [midias, setMidias] = useState<Midia[]>([]);
@@ -343,12 +357,13 @@ function Index() {
 
             <h1 className="mb-4 text-pretty text-center font-display text-5xl uppercase leading-[0.9] tracking-tighter">
               {heroTitulo ? (
-                heroTitulo
+                destacarSuper(heroTitulo)
               ) : (
                 <>
                   SUA CRIANÇA VIRA <span className="text-primary italic">SUPER!</span>
                 </>
               )}
+
             </h1>
             <p className="mx-auto max-w-[30ch] text-center text-sm text-muted-foreground">
               {heroSubtitulo ||
