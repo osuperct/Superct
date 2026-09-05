@@ -1216,9 +1216,10 @@ function JogoPage() {
     if (fim) pararMusica();
     else if (somRef.current && heroiSel) {
       acordarAudio();
-      iniciarMusica();
+      iniciarMusica(fase, modo === "chefao");
     }
-  }, [fim, heroiSel]);
+  }, [fim, heroiSel, fase, modo]);
+
 
   const escolherHeroi = (id: HeroiId) => {
     heroiRef.current = id;
