@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { ImagePlus, Megaphone, Send, Trash2, X } from "lucide-react";
+import { ChevronDown, ChevronUp, ImagePlus, Megaphone, Send, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { type Aviso, dataCurta, enviarAviso, excluirAviso, listarAvisos } from "@/lib/avisos";
+import { type Aviso, agruparPorMes, dataCurta, enviarAviso, excluirAviso, listarAvisos, mesAtual } from "@/lib/avisos";
 
 export function AvisosProfessor({ uid }: { uid: string }) {
   const [lista, setLista] = useState<Aviso[]>([]);
@@ -11,6 +11,7 @@ export function AvisosProfessor({ uid }: { uid: string }) {
   const [enviando, setEnviando] = useState(false);
   const [imagem, setImagem] = useState<File | null>(null);
   const [previa, setPrevia] = useState<string | null>(null);
+  const [abertos, setAbertos] = useState<Set<string>>(new Set([mesAtual()]));
 
   function escolherImagem(file: File | null) {
     if (previa) URL.revokeObjectURL(previa);
@@ -54,6 +55,17 @@ export function AvisosProfessor({ uid }: { uid: string }) {
       toast.error("Não foi possível excluir o aviso.");
     }
   }
+
+  function toggleMes(chave: string) {
+    setAbertos((atual) => {
+      const proximo = new Set(atual);
+      if (proximo.has(chave)) proximo.delete(chave);
+      else proximo.add(chave);
+      return proximo;
+    });
+  }
+
+  const porMes = agruparPorMes(lista);
 
   return (
     <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
@@ -117,35 +129,55 @@ export function AvisosProfessor({ uid }: { uid: string }) {
       </button>
 
       {lista.length > 0 && (
-        <ul className="mt-3 space-y-2">
-          {lista.map((a) => (
-            <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
-              <div className="flex items-start justify-between gap-2">
-                <p className="font-display text-sm tracking-tight">{a.titulo}</p>
+        <div className="mt-3 space-y-2">
+          {porMes.map((grupo) => {
+            const aberto = abertos.has(grupo.chave);
+            return (
+              <div key={grupo.chave} className="rounded-md border border-border bg-background/40">
                 <button
                   type="button"
-                  onClick={() => void remover(a.id)}
-                  aria-label="Excluir aviso"
-                  className="shrink-0 rounded-md border border-border p-1 text-muted-foreground"
+                  onClick={() => toggleMes(grupo.chave)}
+                  className="flex w-full items-center justify-between gap-2 p-3 text-left"
+                  aria-expanded={aberto}
                 >
-                  <Trash2 className="size-3" />
+                  <span className="font-display text-sm tracking-tight">{grupo.rotulo}</span>
+                  {aberto ? <ChevronUp className="size-4 text-muted-foreground" /> : <ChevronDown className="size-4 text-muted-foreground" />}
                 </button>
+                {aberto && (
+                  <ul className="space-y-2 border-t border-border px-3 pb-3 pt-2">
+                    {grupo.avisos.map((a) => (
+                      <li key={a.id} className="rounded-md border border-border bg-background/60 p-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="font-display text-sm tracking-tight">{a.titulo}</p>
+                          <button
+                            type="button"
+                            onClick={() => void remover(a.id)}
+                            aria-label="Excluir aviso"
+                            className="shrink-0 rounded-md border border-border p-1 text-muted-foreground"
+                          >
+                            <Trash2 className="size-3" />
+                          </button>
+                        </div>
+                        <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
+                        {a.imagem && (
+                          <img
+                            src={a.imagem}
+                            alt={`Foto do aviso ${a.titulo}`}
+                            loading="lazy"
+                            className="mt-2 max-h-56 w-full rounded-md border border-border object-contain"
+                          />
+                        )}
+                        <span className="mt-1 block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                          {dataCurta(a.created_at)}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
-              {a.imagem && (
-                <img
-                  src={a.imagem}
-                  alt={`Foto do aviso ${a.titulo}`}
-                  loading="lazy"
-                  className="mt-2 max-h-56 w-full rounded-md border border-border object-contain"
-                />
-              )}
-              <span className="mt-1 block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                {dataCurta(a.created_at)}
-              </span>
-            </li>
-          ))}
-        </ul>
+            );
+          })}
+        </div>
       )}
     </section>
   );
