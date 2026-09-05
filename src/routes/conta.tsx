@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { FileText, GraduationCap, LogOut, Paperclip, Send, Trash2, Upload, UserPlus } from "lucide-react";
+import { Eye, EyeOff, FileText, GraduationCap, LogOut, Paperclip, Send, Trash2, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -465,6 +465,8 @@ function Painel({ session }: { session: Session }) {
   const [enviandoArquivo, setEnviandoArquivo] = useState(false);
   const [aba, setAba] = useState<"documentos" | "online">("online");
   const inputArquivo = useRef<HTMLInputElement>(null);
+  const [mostrarDocs, setMostrarDocs] = useState(false);
+  const [alunoDocsAberto, setAlunoDocsAberto] = useState<string | null>(null);
 
   const [entregues, setEntregues] = useState<{ tipo: string; aluno_id: string | null }[]>([]);
 
@@ -635,40 +637,52 @@ function Painel({ session }: { session: Session }) {
                     <Trash2 className="size-4" />
                   </button>
                 </div>
-                <ul className="mt-2 space-y-1">
-                  {docsAluno.map((d) => (
-                    <li key={d.id} className="flex items-center justify-between gap-2">
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-mono text-[10px] uppercase tracking-widest text-primary">
-                          {DESCRICAO_DOC[d.tipo] ?? "Documento anexado"}
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {docsAluno.length} {docsAluno.length === 1 ? "arquivo" : "arquivos"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setAlunoDocsAberto(alunoDocsAberto === a.id ? null : a.id)}
+                    className="flex items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                  >
+                    {alunoDocsAberto === a.id ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+                    {alunoDocsAberto === a.id ? "OCULTAR" : "VER ARQUIVOS"}
+                  </button>
+                </div>
+                {alunoDocsAberto === a.id && (
+                  <ul className="mt-2 space-y-1">
+                    {docsAluno.map((d) => (
+                      <li key={d.id} className="flex items-center justify-between gap-2">
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-mono text-[10px] uppercase tracking-widest text-primary">
+                            {DESCRICAO_DOC[d.tipo] ?? "Documento anexado"}
+                          </span>
+                          <span className="block truncate text-[11px] text-muted-foreground">
+                            {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                            {d.enviado_por_professor ? " • enviado pelo professor" : ""}
+                          </span>
                         </span>
-                        <span className="block truncate text-[11px] text-muted-foreground">
-                          {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
-                          {d.enviado_por_professor ? " • enviado pelo professor" : ""}
-                        </span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => abrir(d)}
-                        className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
-                      >
-                        Ver
-                      </button>
-                      {!d.enviado_por_professor && (
                         <button
                           type="button"
-                          onClick={() => remover(d)}
-                          className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                          onClick={() => abrir(d)}
+                          className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
                         >
-                          Excluir
+                          Ver
                         </button>
-                      )}
-                    </li>
-                  ))}
-                  {docsAluno.length === 0 && (
-                    <li className="text-[11px] text-muted-foreground">Nenhum documento deste aluno ainda.</li>
-                  )}
-                </ul>
+                        {!d.enviado_por_professor && (
+                          <button
+                            type="button"
+                            onClick={() => remover(d)}
+                            className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                          >
+                            Excluir
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 {faltando.length > 0 && (
                   <div className="mt-3 rounded-md border border-primary/60 bg-primary/10 p-3">
                     <p className="text-[11px]">
@@ -734,9 +748,21 @@ function Painel({ session }: { session: Session }) {
 
       {aba === "documentos" ? (
         <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
-          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-            <Paperclip className="size-4 text-primary" /> DOCUMENTOS DO ALUNO
-          </h2>
+          <div className="flex items-start justify-between gap-2">
+            <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+              <Paperclip className="size-4 text-primary" /> DOCUMENTOS DO ALUNO ({documentos.length})
+            </h2>
+            {documentos.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setMostrarDocs(!mostrarDocs)}
+                className="flex shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+              >
+                {mostrarDocs ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+                {mostrarDocs ? "OCULTAR" : "VER ARQUIVOS"}
+              </button>
+            )}
+          </div>
           <p className="mt-1 text-xs text-muted-foreground">
             Anexe aqui o contrato de prestação de serviço e a ficha do aluno preenchidos à mão e escaneados
             (foto ou PDF). Escolha de qual aluno é o documento — ele aparece junto do nome dele na lista de
@@ -785,41 +811,46 @@ function Painel({ session }: { session: Session }) {
             </label>
           </div>
 
-          <ul className="mt-4 space-y-2">
-            {documentos.map((d) => (
-              <li key={d.id} className="flex items-center justify-between gap-2 rounded-md border border-border p-3">
-                <div className="min-w-0">
-                  <p className="truncate text-sm">{d.nome_arquivo}</p>
-                  <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    {DESCRICAO_DOC[d.tipo] ?? "Documento"} •{" "}
-                    {alunos.find((a) => a.id === d.aluno_id)?.nome ?? "sem aluno"} •{" "}
-                    {new Date(d.created_at).toLocaleDateString("pt-BR")}
-                  </p>
-                </div>
-                <div className="flex shrink-0 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => abrir(d)}
-                    className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
-                  >
-                    Ver
-                  </button>
-                  {!d.enviado_por_professor && (
+          {mostrarDocs && (
+            <ul className="mt-4 space-y-2">
+              {documentos.map((d) => (
+                <li key={d.id} className="flex items-center justify-between gap-2 rounded-md border border-border p-3">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm">{d.nome_arquivo}</p>
+                    <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                      {DESCRICAO_DOC[d.tipo] ?? "Documento"} •{" "}
+                      {alunos.find((a) => a.id === d.aluno_id)?.nome ?? "sem aluno"} •{" "}
+                      {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 gap-2">
                     <button
                       type="button"
-                      onClick={() => remover(d)}
-                      className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                      onClick={() => abrir(d)}
+                      className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
                     >
-                      Excluir
+                      Ver
                     </button>
-                  )}
-                </div>
-              </li>
-            ))}
-            {documentos.length === 0 && (
-              <li className="text-sm text-muted-foreground">Nenhum documento anexado ainda.</li>
-            )}
-          </ul>
+                    {!d.enviado_por_professor && (
+                      <button
+                        type="button"
+                        onClick={() => remover(d)}
+                        className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                      >
+                        Excluir
+                      </button>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+          {!mostrarDocs && documentos.length > 0 && (
+            <p className="mt-4 text-xs text-muted-foreground">Clique em “VER ARQUIVOS” para ver a lista completa.</p>
+          )}
+          {documentos.length === 0 && (
+            <p className="mt-4 text-sm text-muted-foreground">Nenhum documento anexado ainda.</p>
+          )}
         </section>
       ) : (
         <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
