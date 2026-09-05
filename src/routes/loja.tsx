@@ -107,6 +107,8 @@ function CartaoProduto({ produto }: { produto: Produto }) {
   const [tamanho, setTamanho] = useState<string | null>(null);
   const [quantidade, setQuantidade] = useState(1);
   const [pagando, setPagando] = useState(false);
+  const [aguardando, setAguardando] = useState(false);
+
 
   const total = produto.preco * quantidade;
 
@@ -122,6 +124,30 @@ function CartaoProduto({ produto }: { produto: Produto }) {
   }
 
   const linkPagamento = produto.link_pagamento ?? LINK_INFINITEPAY;
+
+  const linkWhats = `https://wa.me/5535988223596?text=${encodeURIComponent(
+    `Olá! Concluí o pagamento no app do Super CT: ${quantidade}x ${produto.nome}${
+      tamanho ? ` — tamanho ${tamanho}` : ""
+    } — total ${brl(total)}.`,
+  )}`;
+
+  useEffect(() => {
+    if (!aguardando) return;
+    function aoVoltar() {
+      if (document.visibilityState !== "visible") return;
+      setAguardando(false);
+      setPagando(false);
+      toast.success("Enviando a confirmação do seu pedido no WhatsApp…");
+      window.location.href = linkWhats;
+    }
+    window.addEventListener("focus", aoVoltar);
+    document.addEventListener("visibilitychange", aoVoltar);
+    return () => {
+      window.removeEventListener("focus", aoVoltar);
+      document.removeEventListener("visibilitychange", aoVoltar);
+    };
+  }, [aguardando, linkWhats]);
+
 
 
   return (
@@ -228,24 +254,31 @@ function CartaoProduto({ produto }: { produto: Produto }) {
                 href={linkPagamento}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() => setAguardando(true)}
                 className="block w-full rounded-md bg-primary px-4 py-2.5 text-center font-display text-xs tracking-tight text-primary-foreground"
               >
                 IR PARA O PAGAMENTO — {brl(total)}
               </a>
-              <p className="text-[11px] text-muted-foreground">
-                Depois de pagar, confirme o pedido no WhatsApp{" "}
-                <a
-                  href={`https://wa.me/5535988223596?text=${encodeURIComponent(
-                    `Olá! Comprei ${quantidade}x ${produto.nome}${tamanho ? ` tamanho ${tamanho}` : ""} — ${brl(total)}.`,
-                  )}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-primary underline"
-                >
-                  35 98822-3596
-                </a>{" "}
-                para informar o tamanho e a quantidade.
-              </p>
+              {aguardando ? (
+                <>
+                  <p className="text-[11px] text-muted-foreground">
+                    Assim que concluir o pagamento, volte para o app: a mensagem com o produto, o tamanho e a
+                    quantidade é enviada automaticamente no WhatsApp do Super CT.
+                  </p>
+                  <a
+                    href={linkWhats}
+                    className="block w-full rounded-md border border-primary px-4 py-2.5 text-center font-display text-xs tracking-tight text-primary"
+                  >
+                    JÁ CONCLUÍ O PAGAMENTO — ENVIAR NO WHATSAPP
+                  </a>
+                </>
+              ) : (
+                <p className="text-[11px] text-muted-foreground">
+                  Ao concluir o pagamento, você é levado ao WhatsApp 35 98822-3596 com a mensagem do pedido
+                  já pronta.
+                </p>
+              )}
+
             </div>
 
 
