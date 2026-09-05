@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Clock, Film, Image as ImageIcon, Smartphone, Trash2, Type, Upload, Volume2, VolumeX } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock, Film, Image as ImageIcon, Smartphone, Trash2, Type, Upload, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 
 import { CortarImagem } from "@/components/CortarImagem";
