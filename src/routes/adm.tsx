@@ -47,17 +47,17 @@ function Casca({ children }: { children: React.ReactNode }) {
           ← Início
         </Link>
         <h1 className="mt-3 flex items-center gap-3 font-display text-2xl leading-tight tracking-tighter">
-          <img
-            src={logoAdm.url}
-            alt="Super CT"
-            className="h-10 w-auto rounded-md object-contain"
-          />
           <span className="flex items-center gap-2">
             <ShieldCheck className="size-6 shrink-0 text-primary" />
             <span>
               ÁREA <span className="text-primary">ADM</span>
             </span>
           </span>
+          <img
+            src={logoAdm.url}
+            alt="Super CT"
+            className="h-10 w-auto rounded-md object-contain"
+          />
         </h1>
         <div className="mt-6 space-y-6">{children}</div>
       </main>
