@@ -1038,7 +1038,7 @@ function JogoPage() {
 
       /* ---- cones: 5 pontos cada ---- */
       {
-        const lista = emChefao ? CONES_ARENA : CONES;
+        const lista = emChefao ? CONES_ARENA : lay.cones;
         let ganhouCone = false;
         for (let i = 0; i < lista.length; i += 1) {
           if (conesRef.current.includes(i)) continue;
