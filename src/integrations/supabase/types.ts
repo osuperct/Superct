@@ -286,6 +286,51 @@ export type Database = {
         }
         Relationships: []
       }
+      produtos: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string | null
+          id: string
+          imagem_url: string | null
+          link_pagamento: string | null
+          nome: string
+          ordem: number
+          pede_tamanho: boolean
+          preco: number
+          tamanhos: string[]
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          link_pagamento?: string | null
+          nome: string
+          ordem?: number
+          pede_tamanho?: boolean
+          preco?: number
+          tamanhos?: string[]
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          imagem_url?: string | null
+          link_pagamento?: string | null
+          nome?: string
+          ordem?: number
+          pede_tamanho?: boolean
+          preco?: number
+          tamanhos?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       ranking_jogo: {
         Row: {
           apelido: string
