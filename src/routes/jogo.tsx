@@ -1750,17 +1750,28 @@ function JogoPage() {
           )}
 
           {fim && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-black/85 px-6 text-center">
-              <p className="font-display text-2xl uppercase tracking-tight text-primary">
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 overflow-hidden bg-black/85 px-6 text-center">
+              {!venceu && (
+                <img
+                  src={VILOES[2]!.img}
+                  alt="Choralina"
+                  className="pointer-events-none absolute bottom-6 left-1/2 h-40 w-auto animate-boss-charge select-none"
+                  style={{ filter: `drop-shadow(0 0 24px ${VILOES[2]!.cor})` }}
+                />
+              )}
+              <p
+                className={`relative font-display text-2xl uppercase tracking-tight text-primary ${venceu ? "" : "animate-game-over"}`}
+              >
                 {venceu
                   ? "Você venceu todos os chefões!"
                   : derrotado !== null
-                    ? `${VILOES[derrotado]!.nome} te pegou!`
-                    : "Fim de jogo"}
+                    ? `Game Over — ${VILOES[derrotado]!.nome} te pegou!`
+                    : "Game Over"}
               </p>
-              <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              <p className="relative font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 Pontos: {pontos} • Fase {fase}
               </p>
+
               <button
                 type="button"
                 onClick={reiniciar}
