@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CreditCard, Copy, ShoppingBag, QrCode, ImageIcon } from "lucide-react";
+import { CreditCard, ShoppingBag, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { listarProdutos, type Produto } from "@/lib/loja.functions";
-import { gerarPix, PIX_CHAVE_EXIBICAO } from "@/lib/pix";
+
+const LINK_INFINITEPAY = "https://checkout.infinitepay.io/super_ct/gF9RQ9e7qg";
+
 
 export const Route = createFileRoute("/loja")({
   head: () => ({
@@ -107,7 +109,6 @@ function CartaoProduto({ produto }: { produto: Produto }) {
   const [pagando, setPagando] = useState(false);
 
   const total = produto.preco * quantidade;
-  const pix = useMemo(() => gerarPix(total, produto.nome), [total, produto.nome]);
 
   const infantis = produto.tamanhos.filter((t) => INFANTIS.has(t));
   const adultos = produto.tamanhos.filter((t) => !INFANTIS.has(t));
@@ -120,16 +121,8 @@ function CartaoProduto({ produto }: { produto: Produto }) {
     setPagando(true);
   }
 
-  async function copiarPix() {
-    try {
-      await navigator.clipboard.writeText(pix);
-      toast.success("Código Pix copiado. Cole no app do seu banco.");
-    } catch {
-      toast.error("Não foi possível copiar. Use a chave Pix do telefone.");
-    }
-  }
+  const linkPagamento = produto.link_pagamento ?? LINK_INFINITEPAY;
 
-  const linkCartao = produto.link_pagamento;
 
   return (
     <article className="overflow-hidden rounded-lg border border-border bg-card/40">
@@ -225,53 +218,36 @@ function CartaoProduto({ produto }: { produto: Produto }) {
 
             <div className="space-y-2 rounded-md border border-border bg-background/60 p-3">
               <p className="flex items-center gap-2 font-display text-xs tracking-tight">
-                <QrCode className="size-4 text-primary" /> PAGAR COM PIX
+                <CreditCard className="size-4 text-primary" /> PAGAR COM PIX OU CARTÃO
               </p>
               <p className="text-xs text-muted-foreground">
-                Chave Pix (telefone): <span className="text-primary">{PIX_CHAVE_EXIBICAO}</span>
+                O pagamento é feito na InfinitePay do Super CT: escolha Pix ou cartão de crédito na própria
+                tela de pagamento.
               </p>
-              <button
-                type="button"
-                onClick={() => void copiarPix()}
-                className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-2.5 font-display text-xs tracking-tight text-primary-foreground"
+              <a
+                href={linkPagamento}
+                target="_blank"
+                rel="noreferrer"
+                className="block w-full rounded-md bg-primary px-4 py-2.5 text-center font-display text-xs tracking-tight text-primary-foreground"
               >
-                <Copy className="size-4" /> COPIAR CÓDIGO PIX DE {brl(total)}
-              </button>
+                IR PARA O PAGAMENTO — {brl(total)}
+              </a>
               <p className="text-[11px] text-muted-foreground">
-                Depois de pagar, envie o comprovante no WhatsApp{" "}
+                Depois de pagar, confirme o pedido no WhatsApp{" "}
                 <a
                   href={`https://wa.me/5535988223596?text=${encodeURIComponent(
-                    `Olá! Comprei ${quantidade}x ${produto.nome}${tamanho ? ` tamanho ${tamanho}` : ""} — ${brl(total)} via Pix.`,
+                    `Olá! Comprei ${quantidade}x ${produto.nome}${tamanho ? ` tamanho ${tamanho}` : ""} — ${brl(total)}.`,
                   )}`}
                   target="_blank"
                   rel="noreferrer"
                   className="text-primary underline"
                 >
                   35 98822-3596
-                </a>
-                .
+                </a>{" "}
+                para informar o tamanho e a quantidade.
               </p>
             </div>
 
-            <div className="space-y-2 rounded-md border border-border bg-background/60 p-3">
-              <p className="flex items-center gap-2 font-display text-xs tracking-tight">
-                <CreditCard className="size-4 text-primary" /> PAGAR COM CARTÃO DE CRÉDITO
-              </p>
-              {linkCartao ? (
-                <a
-                  href={linkCartao}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block w-full rounded-md bg-primary px-4 py-2.5 text-center font-display text-xs tracking-tight text-primary-foreground"
-                >
-                  ABRIR PAGAMENTO NO CARTÃO
-                </a>
-              ) : (
-                <p className="text-[11px] text-muted-foreground">
-                  O link de pagamento no cartão deste produto ainda não foi cadastrado na área ADM.
-                </p>
-              )}
-            </div>
 
             <button
               type="button"
