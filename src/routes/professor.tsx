@@ -228,6 +228,22 @@ function Painel({ professorId }: { professorId: string }) {
 
 
 
+  const mesRef = refMes();
+  const estaAtivo = (alunoId: string) =>
+    mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
+  const limite = Date.now() - 15 * 24 * 60 * 60 * 1000;
+  const porNome = [...alunos].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  const alunosFiltrados: Alu[] =
+    filtroAlunos === "recentes"
+      ? [...alunos]
+          .filter((a) => new Date(a.created_at).getTime() >= limite)
+          .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      : filtroAlunos === "ativos"
+        ? porNome.filter((a) => estaAtivo(a.id))
+        : filtroAlunos === "inativos"
+          ? porNome.filter((a) => !estaAtivo(a.id))
+          : porNome;
+
   if (autorizado === null) return <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>;
   if (!autorizado)
     return (
