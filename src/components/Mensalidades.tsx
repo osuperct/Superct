@@ -105,6 +105,7 @@ export function Mensalidades({
 
   const [abertos, setAbertos] = useState<Set<string>>(new Set(ordenados.map((a) => a.id)));
   const [todosAbertos, setTodosAbertos] = useState(true);
+  const [listaVisivel, setListaVisivel] = useState(true);
 
   const toggleAluno = (id: string) => {
     setAbertos((prev) => {
@@ -116,7 +117,8 @@ export function Mensalidades({
   };
 
   const toggleTodos = () => {
-    const proximo = !todosAbertos;
+    const proximo = !listaVisivel;
+    setListaVisivel(proximo);
     setTodosAbertos(proximo);
     setAbertos(
       proximo ? new Set(ordenados.map((a) => a.id)) : new Set(),
