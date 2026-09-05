@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 export type LinhaRanking = {
-  user_id: string;
+  user_id?: string;
   apelido: string;
   pontos: number;
   fase: number;
@@ -10,8 +10,8 @@ export type LinhaRanking = {
 /** Ranking público: melhores pontuações, em ordem. */
 export async function listarRanking(limite = 20): Promise<LinhaRanking[]> {
   const { data, error } = await supabase
-    .from("ranking_jogo")
-    .select("user_id, apelido, pontos, fase")
+    .from("ranking_publico")
+    .select("apelido, pontos, fase")
     .order("pontos", { ascending: false })
     .order("updated_at", { ascending: true })
     .limit(limite);

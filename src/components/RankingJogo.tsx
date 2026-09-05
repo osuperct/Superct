@@ -82,7 +82,7 @@ export default function RankingJogo({ pontos, fase, fim, onApelidoSalvo }: Props
     }
   };
 
-  const minhaPosicao = userId ? lista.findIndex((l) => l.user_id === userId) + 1 : 0;
+  const minhaPosicao = apelido ? lista.findIndex((l) => l.apelido === apelido) + 1 : 0;
 
   const compartilhar = async () => {
     const topo = lista
@@ -180,9 +180,9 @@ export default function RankingJogo({ pontos, fase, fim, onApelidoSalvo }: Props
         )}
         {lista.map((l, i) => (
           <li
-            key={l.user_id}
+            key={`${l.apelido}-${i}`}
             className={`flex items-center justify-between gap-2 rounded-md px-2 py-1.5 font-mono text-[10px] uppercase tracking-widest ${
-              l.user_id === userId ? "border border-primary/50 bg-primary/10 text-primary" : "text-muted-foreground"
+              l.apelido === apelido ? "border border-primary/50 bg-primary/10 text-primary" : "text-muted-foreground"
             }`}
           >
             <span className="flex items-center gap-2">

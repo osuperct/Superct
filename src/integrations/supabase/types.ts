@@ -339,16 +339,30 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      ranking_publico: {
+        Row: {
+          apelido: string | null
+          fase: number | null
+          pontos: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          apelido?: string | null
+          fase?: number | null
+          pontos?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          apelido?: string | null
+          fase?: number | null
+          pontos?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      has_role: {
-        Args: {
-          _role: Database["public"]["Enums"]["app_role"]
-          _user_id: string
-        }
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       app_role: "professor" | "responsavel" | "adm"

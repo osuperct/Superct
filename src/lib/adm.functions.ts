@@ -11,11 +11,24 @@ export type ContaAcesso = {
   adm: boolean;
 };
 
-async function garantirAdm(supabase: {
-  rpc: (fn: "has_role", args: { _user_id: string; _role: "adm" }) => Promise<{ data: unknown }>;
-}, userId: string) {
-  const { data } = await supabase.rpc("has_role", { _user_id: userId, _role: "adm" });
-  if (data !== true) throw new Error("Acesso restrito à administração.");
+type SupabaseComPapeis = {
+  from: (t: "user_roles") => {
+    select: (c: string) => {
+      eq: (c: string, v: string) => {
+        eq: (c: string, v: string) => { maybeSingle: () => Promise<{ data: unknown }> };
+      };
+    };
+  };
+};
+
+async function garantirAdm(supabase: SupabaseComPapeis, userId: string) {
+  const { data } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .eq("role", "adm")
+    .maybeSingle();
+  if (!data) throw new Error("Acesso restrito à administração.");
 }
 
 /** Lista as contas cadastradas com os acessos de cada uma (somente ADM). */
