@@ -524,6 +524,8 @@ function JogoPage() {
   const [coracoes, setCoracoes] = useState<number[]>(CORACOES.map((_, i) => i));
   const [conesPegos, setConesPegos] = useState<number[]>([]);
   const [piscando, setPiscando] = useState(false);
+  const [chocado, setChocado] = useState(false);
+
   const [heroiSel, setHeroiSel] = useState<HeroiId | null>(null);
   const [olhando, setOlhando] = useState<1 | -1>(1);
   const [andando, setAndando] = useState(false);
