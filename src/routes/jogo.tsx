@@ -2218,6 +2218,12 @@ function JogoPage() {
                 Perdeu uma vida — voltou ao checkpoint!
               </span>
             )}
+            {chocado && (
+              <span className="ml-1 animate-pulse font-mono text-[8px] uppercase tracking-widest text-cyan-300">
+                Choque! Preso na tela por 2s
+              </span>
+            )}
+
           </span>
 
 
