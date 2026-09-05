@@ -59,6 +59,7 @@ export function ProdutosAdm() {
   const [produtos, setProdutos] = useState<Produto[] | null>(null);
   const [editando, setEditando] = useState<Rascunho | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const [aberto, setAberto] = useState(false);
 
   const carregar = useCallback(async () => {
     try {
