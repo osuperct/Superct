@@ -41,6 +41,7 @@ type Doc = {
   user_id: string;
   aluno_id: string | null;
   enviado_por_professor: boolean;
+  liberado: boolean;
 };
 type Alu = { id: string; nome: string; idade: number | null; matricula: string | null; user_id: string };
 type Perfil = { id: string; nome_responsavel: string; telefone: string | null; cpf: string | null };
@@ -126,7 +127,7 @@ function Painel({ professorId }: { professorId: string }) {
     const [{ data: d }, { data: a }, { data: p }] = await Promise.all([
       supabase
         .from("documentos")
-        .select("id, tipo, nome_arquivo, caminho, created_at, user_id, aluno_id, enviado_por_professor")
+        .select("id, tipo, nome_arquivo, caminho, created_at, user_id, aluno_id, enviado_por_professor, liberado")
         .order("created_at", { ascending: false }),
       supabase.from("alunos").select("id, nome, idade, matricula, user_id").order("matricula"),
       supabase.from("perfis").select("id, nome_responsavel, telefone, cpf"),
@@ -158,6 +159,19 @@ function Painel({ professorId }: { professorId: string }) {
     void carregar();
   }
 
+  async function liberar(doc: Doc, liberado: boolean) {
+    const { error } = await supabase
+      .from("documentos")
+      .update({ liberado, liberado_em: liberado ? new Date().toISOString() : null })
+      .eq("id", doc.id);
+    if (error) {
+      toast.error("Não foi possível atualizar a liberação.");
+      return;
+    }
+    toast.success(liberado ? "Documento liberado para o responsável." : "Liberação cancelada.");
+    void carregar();
+  }
+
   async function anexar(arquivo: File) {
     const alu = alunos.find((a) => a.id === alunoSel);
     if (!alu) {
@@ -184,6 +198,8 @@ function Painel({ professorId }: { professorId: string }) {
       nome_arquivo: arquivo.name,
       caminho,
       enviado_por_professor: true,
+      liberado: true,
+      liberado_em: new Date().toISOString(),
     });
     setEnviando(false);
     if (inputArquivo.current) inputArquivo.current.value = "";
@@ -321,7 +337,25 @@ function Painel({ professorId }: { professorId: string }) {
                   {d.enviado_por_professor ? " • anexado pelo professor" : ""}
                 </p>
                 <p className="mt-1 text-sm">{d.nome_arquivo}</p>
-                <div className="mt-2 flex gap-2">
+                <p
+                  className={`mt-1 font-mono text-[9px] uppercase tracking-widest ${
+                    d.liberado ? "text-primary" : "text-destructive"
+                  }`}
+                >
+                  {d.liberado ? "Liberado para o responsável" : "Aguardando sua conferência"}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void liberar(d, !d.liberado)}
+                    className={`rounded-md px-3 py-1.5 font-display text-xs tracking-tight ${
+                      d.liberado
+                        ? "border border-border text-muted-foreground"
+                        : "bg-primary text-primary-foreground"
+                    }`}
+                  >
+                    {d.liberado ? "CANCELAR LIBERAÇÃO" : "CONFERIR E LIBERAR"}
+                  </button>
                   <button
                     type="button"
                     onClick={() => void abrir(d)}
