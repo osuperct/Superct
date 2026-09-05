@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CircleDollarSign, ShieldCheck, Trash2, UserCheck, UserPlus } from "lucide-react";
+import { CircleDollarSign, ShieldCheck, Trash2, UserCheck, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -164,6 +164,9 @@ function AdmPage() {
       </section>
 
       <Acessos />
+
+      <Cadastros />
+
     </Casca>
   );
 }
@@ -400,6 +403,102 @@ function Acessos() {
           {filtradas.length === 0 && (
             <li className="text-xs text-muted-foreground">Nenhuma conta encontrada.</li>
           )}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+/* ----------------------------- CADASTROS ----------------------------- */
+
+function Cadastros() {
+  const listar = useServerFn(listarAcessos);
+  const excluir = useServerFn(excluirProfessor);
+  const [contas, setContas] = useState<ContaAcesso[] | null>(null);
+  const [busca, setBusca] = useState("");
+  const [ocupado, setOcupado] = useState<string | null>(null);
+
+  const carregar = useCallback(async () => {
+    try {
+      setContas(await listar());
+    } catch {
+      setContas([]);
+    }
+  }, [listar]);
+
+  useEffect(() => {
+    void carregar();
+  }, [carregar]);
+
+  async function apagar(conta: ContaAcesso) {
+    const nome = conta.nome || conta.email;
+    if (!window.confirm(`Excluir o cadastro de ${nome}? A pessoa precisará se cadastrar novamente.`)) return;
+    const senha = window.prompt("Digite a senha para confirmar a exclusão:");
+    if (senha === null) return;
+    if (senha.trim() !== "2802") {
+      toast.error("Senha incorreta. Exclusão cancelada.");
+      return;
+    }
+    setOcupado(conta.id);
+    try {
+      const r = await excluir({ data: { userId: conta.id } });
+      if (!r.ok) {
+        toast.error(r.erro);
+        return;
+      }
+      toast.success("Cadastro excluído.");
+      await carregar();
+    } catch {
+      toast.error("Não foi possível excluir o cadastro.");
+    } finally {
+      setOcupado(null);
+    }
+  }
+
+  const filtradas = (contas ?? []).filter((c) => {
+    const t = busca.trim().toLowerCase();
+    if (!t) return true;
+    return c.nome.toLowerCase().includes(t) || c.email.toLowerCase().includes(t);
+  });
+
+  return (
+    <section className="rounded-lg border border-border bg-card/40 p-4">
+      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+        <Users className="size-4 text-primary" /> CADASTROS
+        <span className="font-mono text-xs text-muted-foreground">({(contas ?? []).length})</span>
+      </h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Nomes e e-mails já cadastrados no aplicativo. Ao excluir, a pessoa pode fazer o cadastro novamente
+        para acessar o login.
+      </p>
+
+      <input
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Buscar por nome ou e-mail"
+        className="mt-3 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary"
+      />
+
+      {contas === null ? (
+        <p className="mt-3 text-xs text-muted-foreground">Carregando…</p>
+      ) : filtradas.length === 0 ? (
+        <p className="mt-3 text-xs text-muted-foreground">Nenhum cadastro encontrado.</p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {filtradas.map((c) => (
+            <li key={c.id} className="rounded-md border border-border bg-background/60 p-3">
+              <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
+              <p className="break-all font-mono text-[11px] uppercase text-muted-foreground">{c.email}</p>
+              <button
+                type="button"
+                disabled={ocupado === c.id}
+                onClick={() => void apagar(c)}
+                className="mt-2 flex items-center gap-2 rounded-md border border-border px-3 py-2 font-display text-[11px] tracking-tight disabled:opacity-60"
+              >
+                <Trash2 className="size-4" /> {ocupado === c.id ? "EXCLUINDO…" : "EXCLUIR CADASTRO"}
+              </button>
+            </li>
+          ))}
         </ul>
       )}
     </section>
