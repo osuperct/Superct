@@ -314,6 +314,8 @@ export function AppMidias() {
 
         <EnvioVideo onFim={carregar} />
       </div>
+      </>
+    )}
     </section>
   );
 }
