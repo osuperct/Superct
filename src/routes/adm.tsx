@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CircleDollarSign, ShieldCheck } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { CircleDollarSign, ShieldCheck, UserCheck } from "lucide-react";
 import { toast } from "sonner";
 
+import { definirAcesso, listarAcessos, type ContaAcesso } from "@/lib/adm.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/adm")({
