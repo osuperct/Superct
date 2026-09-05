@@ -1775,7 +1775,7 @@ function JogoPage() {
               <button
                 type="button"
                 onClick={reiniciar}
-                className="mt-1 rounded-full border border-primary bg-primary/15 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-primary"
+                className="relative mt-1 rounded-full border border-primary bg-primary/15 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-primary"
               >
                 Jogar de novo
               </button>
