@@ -496,6 +496,7 @@ function Painel({ session }: { session: Session }) {
 
 
   const [ehProfessor, setEhProfessor] = useState(false);
+  const [ehAdm, setEhAdm] = useState(false);
 
   useEffect(() => {
     void recarregar();
@@ -506,8 +507,12 @@ function Painel({ session }: { session: Session }) {
     void supabase
       .from("user_roles")
       .select("role")
+      .eq("user_id", uid)
       .then(({ data }) => {
-        if (ativo) setEhProfessor((data ?? []).some((p) => p.role === "professor"));
+        if (ativo) {
+          setEhProfessor((data ?? []).some((p) => p.role === "professor"));
+          setEhAdm((data ?? []).some((p) => p.role === "adm"));
+        }
       });
     return () => {
       ativo = false;
@@ -592,20 +597,20 @@ function Painel({ session }: { session: Session }) {
       </div>
 
       {ehProfessor && (
-        <>
           <Link
             to="/professor"
             className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
           >
             <GraduationCap className="size-4" /> ÁREA DO PROFESSOR
           </Link>
+      )}
+      {ehAdm && (
           <Link
             to="/adm"
             className="mt-2 flex items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/5 px-4 py-3 font-display text-sm tracking-tight text-primary"
           >
             <ShieldCheck className="size-4" /> ÁREA ADM
           </Link>
-        </>
       )}
 
 
