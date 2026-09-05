@@ -1367,11 +1367,12 @@ function JogoPage() {
               const sombra = pendurado
                 ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
                 : `drop-shadow(0 0 6px ${heroiAtual.cor})`;
+              const caminhando = andando && !pendurado;
               const src = escalando
                 ? heroiAtual.escala
                 : noTrepaTrepa
                   ? heroiAtual.trepaTrepa
-                : andando
+                : caminhando
                   ? heroiAtual.anda[passoFrame]!
                   : heroiAtual.img;
               return (
@@ -1389,7 +1390,7 @@ function JogoPage() {
                     src={src}
                     alt={`${heroiAtual.nome}, herói do Super CT`}
                     className={`absolute inset-0 size-full object-contain object-bottom${
-                      escalando ? " animate-hero-climb-body" : ""
+                      escalando ? " animate-hero-climb-body" : caminhando ? " animate-hero-walk" : ""
                     }`}
                     style={{ filter: sombra }}
                   />
