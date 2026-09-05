@@ -47,12 +47,22 @@ function Casca({ children }: { children: React.ReactNode }) {
         <Link to="/" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           ← Início
         </Link>
-        <h1 className="mt-3 flex items-center gap-2 font-display text-2xl leading-tight tracking-tighter">
-          <ShoppingBag className="size-6 shrink-0 text-primary" />
-          <span>
-            LOJA <span className="text-primary">SUPER CT</span>
-          </span>
-        </h1>
+        <div className="mt-3 flex items-center gap-3">
+          <h1 className="flex items-center gap-2 font-display text-2xl leading-tight tracking-tighter">
+            <ShoppingBag className="size-6 shrink-0 text-primary" />
+            <span>
+              LOJA <span className="text-primary">SUPER CT</span>
+            </span>
+          </h1>
+          <img
+            src={mascotesLoja}
+            alt="Mascotes do Super CT com uniforme oficial segurando a garrafa coqueteleira preta"
+            width={1024}
+            height={1024}
+            loading="lazy"
+            className="size-20 shrink-0 object-contain"
+          />
+        </div>
         <div className="mt-6 space-y-6">{children}</div>
       </main>
     </div>
