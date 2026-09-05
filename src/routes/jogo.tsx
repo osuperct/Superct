@@ -811,7 +811,7 @@ function JogoPage() {
         spawn.current -= 1;
         if (spawn.current <= 0) {
           spawn.current =
-            Math.max(44, 132 - faseRef.current * 11) + Math.floor(Math.random() * 50);
+            Math.max(44, 264 - faseRef.current * 22) + Math.floor(Math.random() * 50);
           const vilao = Math.floor(Math.random() * VILOES.length);
           const r = Math.random();
           const padrao: Padrao = r < 0.4 ? "reta" : r < 0.7 ? "queda" : "zigue";
