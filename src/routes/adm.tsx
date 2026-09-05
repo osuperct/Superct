@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CircleDollarSign, ShieldCheck, UserCheck, UserPlus } from "lucide-react";
+import { CircleDollarSign, ShieldCheck, Trash2, UserCheck, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import {
   cadastrarProfessor,
   definirAcesso,
+  excluirProfessor,
   listarAcessos,
   type ContaAcesso,
 } from "@/lib/adm.functions";
