@@ -4,6 +4,8 @@ import { ChevronUp, Heart, Medal, RotateCcw, Zap } from "lucide-react";
 import { HEROIS, heroiPorId, type HeroiId } from "@/data/herois";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
+import RankingJogo from "@/components/RankingJogo";
+
 
 
 const TITLE = "Super Jogo — Fases e chefões do Super CT | Professor Tio Victor";
