@@ -323,25 +323,12 @@ function Autenticacao() {
         </button>
 
         {modo === "entrar" && (
-          <>
-            <button
-              type="button"
-              onClick={() => {
-                setEmail("");
-                setSenha("");
-                setAviso("Área do Professor: informe o e-mail e a senha do professor para entrar.");
-              }}
-              className="w-full rounded-md border border-primary/60 bg-primary/5 px-3 py-2 font-display text-xs tracking-tight text-primary"
-            >
-              ÁREA DO PROFESSOR
-            </button>
-            <Link
-              to="/adm"
-              className="flex w-full items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/5 px-3 py-2 font-display text-xs tracking-tight text-primary"
-            >
-              <ShieldCheck className="size-3.5" /> ÁREA ADM
-            </Link>
-          </>
+          <Link
+            to="/adm"
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/5 px-3 py-2 font-display text-xs tracking-tight text-primary"
+          >
+            <ShieldCheck className="size-3.5" /> ÁREA ADM
+          </Link>
         )}
 
 
