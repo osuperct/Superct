@@ -286,6 +286,36 @@ export type Database = {
         }
         Relationships: []
       }
+      ranking_jogo: {
+        Row: {
+          apelido: string
+          created_at: string
+          fase: number
+          id: string
+          pontos: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          apelido: string
+          created_at?: string
+          fase?: number
+          id?: string
+          pontos?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          apelido?: string
+          created_at?: string
+          fase?: number
+          id?: string
+          pontos?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
