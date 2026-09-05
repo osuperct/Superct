@@ -47,6 +47,68 @@ export type Database = {
         }
         Relationships: []
       }
+      avaliacoes: {
+        Row: {
+          aluno_id: string
+          comportamento: string
+          coordenacao_motora: string
+          created_at: string
+          disciplina: string
+          execucao_exercicios: string
+          forca_resistencia: string
+          id: string
+          observacoes: string | null
+          professor_id: string
+          referencia: string
+          respeito_empatia: string
+          updated_at: string
+          user_id: string
+          velocidade_agilidade: string
+        }
+        Insert: {
+          aluno_id: string
+          comportamento?: string
+          coordenacao_motora?: string
+          created_at?: string
+          disciplina?: string
+          execucao_exercicios?: string
+          forca_resistencia?: string
+          id?: string
+          observacoes?: string | null
+          professor_id: string
+          referencia: string
+          respeito_empatia?: string
+          updated_at?: string
+          user_id: string
+          velocidade_agilidade?: string
+        }
+        Update: {
+          aluno_id?: string
+          comportamento?: string
+          coordenacao_motora?: string
+          created_at?: string
+          disciplina?: string
+          execucao_exercicios?: string
+          forca_resistencia?: string
+          id?: string
+          observacoes?: string | null
+          professor_id?: string
+          referencia?: string
+          respeito_empatia?: string
+          updated_at?: string
+          user_id?: string
+          velocidade_agilidade?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos: {
         Row: {
           aluno_id: string | null
