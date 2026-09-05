@@ -159,9 +159,42 @@ function AdmPage() {
 function Acessos() {
   const listar = useServerFn(listarAcessos);
   const definir = useServerFn(definirAcesso);
+  const cadastrar = useServerFn(cadastrarProfessor);
   const [contas, setContas] = useState<ContaAcesso[] | null>(null);
   const [busca, setBusca] = useState("");
   const [ocupado, setOcupado] = useState<string | null>(null);
+  const [novo, setNovo] = useState(false);
+  const [form, setForm] = useState({ nome: "", nascimento: "", email: "", cpf: "" });
+  const [criando, setCriando] = useState(false);
+  const [senhaGerada, setSenhaGerada] = useState<{ email: string; senha: string } | null>(null);
+
+  async function criarProfessor(e: React.FormEvent) {
+    e.preventDefault();
+    const cpf = form.cpf.replace(/\D/g, "");
+    if (form.nome.trim().length < 3) return toast.error("Informe o nome completo.");
+    if (!form.nascimento) return toast.error("Informe a data de nascimento.");
+    if (cpf.length !== 11) return toast.error("CPF deve ter 11 dígitos.");
+    setCriando(true);
+    try {
+      const r = await cadastrar({
+        data: { nome: form.nome.trim(), nascimento: form.nascimento, email: form.email.trim(), cpf },
+      });
+      if (!r.ok) {
+        toast.error(r.erro);
+        return;
+      }
+      toast.success("Professor cadastrado e acesso liberado.");
+      setSenhaGerada({ email: form.email.trim().toLowerCase(), senha: r.senhaTemporaria });
+      setForm({ nome: "", nascimento: "", email: "", cpf: "" });
+      setNovo(false);
+      await carregar();
+    } catch {
+      toast.error("Não foi possível cadastrar o professor.");
+    } finally {
+      setCriando(false);
+    }
+  }
+
 
   const carregar = useCallback(async () => {
     try {
