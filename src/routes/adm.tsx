@@ -363,6 +363,14 @@ function Acessos() {
                 >
                   {c.adm ? "ADM LIBERADO" : "LIBERAR ADM"}
                 </button>
+                <button
+                  type="button"
+                  disabled={ocupado === `${c.id}-excluir`}
+                  onClick={() => void apagar(c)}
+                  className="flex items-center gap-1 rounded-md border border-destructive/60 px-3 py-1.5 font-display text-[11px] tracking-tight text-destructive disabled:opacity-60"
+                >
+                  <Trash2 className="size-3.5" /> EXCLUIR CADASTRO
+                </button>
               </div>
             </li>
           ))}
