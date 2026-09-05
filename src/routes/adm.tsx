@@ -12,6 +12,7 @@ import {
   type ContaAcesso,
 } from "@/lib/adm.functions";
 import { supabase } from "@/integrations/supabase/client";
+import logoAdm from "@/assets/super-ct-logo-adm.jpg.asset.json";
 
 export const Route = createFileRoute("/adm")({
   head: () => ({
