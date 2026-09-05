@@ -1837,6 +1837,26 @@ function JogoPage() {
               />
             ))}
 
+            {lavaAtual.map((l, i) => (
+              <div
+                key={`lava-${i}`}
+                className="absolute bottom-0 h-10 animate-pulse border-t-2 border-amber-300 bg-gradient-to-t from-[#7f1d1d] via-[#ea580c] to-[#fde047]"
+                style={{ left: l.x, width: l.w, boxShadow: "0 0 22px 8px rgba(249,115,22,0.55)" }}
+              />
+            ))}
+
+            {telasAtuais.map((t, i) => (
+              <div key={`tela-${i}`} className="absolute" style={{ left: t.x, bottom: 40 }}>
+                <div
+                  className="rounded-sm border-2 border-cyan-300/80 bg-[linear-gradient(180deg,#0e7490,#082f49)]"
+                  style={{ width: t.w, height: 34, boxShadow: "0 0 18px 5px rgba(34,211,238,0.5)" }}
+                />
+                <div className="mx-auto h-3 w-2 bg-[#3f3f46]" />
+                <div className="mx-auto h-1 w-6 rounded bg-[#52525b]" />
+              </div>
+            ))}
+
+
             {barras.map((b, i) => (
               <div key={`b-${i}`}>
                 <div
