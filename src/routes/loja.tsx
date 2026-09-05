@@ -123,6 +123,30 @@ function CartaoProduto({ produto }: { produto: Produto }) {
 
   const linkPagamento = produto.link_pagamento ?? LINK_INFINITEPAY;
 
+  const linkWhats = `https://wa.me/5535988223596?text=${encodeURIComponent(
+    `Olá! Concluí o pagamento no app do Super CT: ${quantidade}x ${produto.nome}${
+      tamanho ? ` — tamanho ${tamanho}` : ""
+    } — total ${brl(total)}.`,
+  )}`;
+
+  useEffect(() => {
+    if (!aguardando) return;
+    function aoVoltar() {
+      if (document.visibilityState !== "visible") return;
+      setAguardando(false);
+      setPagando(false);
+      toast.success("Enviando a confirmação do seu pedido no WhatsApp…");
+      window.location.href = linkWhats;
+    }
+    window.addEventListener("focus", aoVoltar);
+    document.addEventListener("visibilitychange", aoVoltar);
+    return () => {
+      window.removeEventListener("focus", aoVoltar);
+      document.removeEventListener("visibilitychange", aoVoltar);
+    };
+  }, [aguardando, linkWhats]);
+
+
 
   return (
     <article className="overflow-hidden rounded-lg border border-border bg-card/40">
