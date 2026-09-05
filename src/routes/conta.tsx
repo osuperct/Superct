@@ -75,6 +75,7 @@ function ContaPage() {
         <h1 className="mt-3 font-display text-3xl tracking-tighter">
           ÁREA DO <span className="text-primary">RESPONSÁVEL</span>
         </h1>
+        {session && <Saudacao session={session} />}
 
         {carregando ? (
           <p className="mt-6 text-sm text-muted-foreground">Carregando…</p>
