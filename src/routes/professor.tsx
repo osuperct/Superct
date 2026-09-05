@@ -247,13 +247,26 @@ function Painel({ professorId }: { professorId: string }) {
       </section>
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <Users className="size-4 text-primary" /> ALUNOS MATRICULADOS ({alunos.length})
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+            <Users className="size-4 text-primary" /> ALUNOS MATRICULADOS ({alunos.length})
+          </h2>
+          <select
+            value={filtroAlunos}
+            onChange={(e) => setFiltroAlunos(e.target.value as typeof filtroAlunos)}
+            className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+          >
+            <option value="recentes">Mais recentes (15 dias)</option>
+            <option value="todos">Todos (A–Z)</option>
+            <option value="ativos">Ativos</option>
+            <option value="inativos">Inativos</option>
+          </select>
+        </div>
 
         <ul className="mt-3 space-y-2">
-          {alunos.map((a) => {
+          {alunosFiltrados.map((a) => {
             const perfil = perfis.find((p) => p.id === a.user_id);
+            const ativo = mensalidades.find((m) => m.aluno_id === a.id && m.referencia === refMes())?.ativo ?? true;
             return (
               <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
                 <div className="flex items-center justify-between gap-2">
