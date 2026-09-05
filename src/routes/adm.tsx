@@ -193,6 +193,7 @@ function Acessos() {
   const [form, setForm] = useState({ nome: "", nascimento: "", email: "", cpf: "" });
   const [criando, setCriando] = useState(false);
   const [senhaGerada, setSenhaGerada] = useState<{ email: string; senha: string } | null>(null);
+  const [aberto, setAberto] = useState(false);
 
   async function criarProfessor(e: React.FormEvent) {
     e.preventDefault();
