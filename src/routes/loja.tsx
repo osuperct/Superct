@@ -107,7 +107,6 @@ function CartaoProduto({ produto }: { produto: Produto }) {
   const [pagando, setPagando] = useState(false);
 
   const total = produto.preco * quantidade;
-  const pix = useMemo(() => gerarPix(total, produto.nome), [total, produto.nome]);
 
   const infantis = produto.tamanhos.filter((t) => INFANTIS.has(t));
   const adultos = produto.tamanhos.filter((t) => !INFANTIS.has(t));
@@ -120,16 +119,8 @@ function CartaoProduto({ produto }: { produto: Produto }) {
     setPagando(true);
   }
 
-  async function copiarPix() {
-    try {
-      await navigator.clipboard.writeText(pix);
-      toast.success("Código Pix copiado. Cole no app do seu banco.");
-    } catch {
-      toast.error("Não foi possível copiar. Use a chave Pix do telefone.");
-    }
-  }
+  const linkPagamento = produto.link_pagamento ?? LINK_INFINITEPAY;
 
-  const linkCartao = produto.link_pagamento;
 
   return (
     <article className="overflow-hidden rounded-lg border border-border bg-card/40">
