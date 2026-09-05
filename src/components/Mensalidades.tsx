@@ -1,6 +1,6 @@
 import { DatePicker } from "@/components/ui/datepicker";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BellRing, CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
+import { BellRing, ChevronDown, ChevronUp, CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
