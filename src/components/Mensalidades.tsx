@@ -1,3 +1,4 @@
+import { DatePicker } from "@/components/ui/datepicker";
 import { useMemo, useState } from "react";
 import { CircleDollarSign, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
@@ -191,12 +192,17 @@ export function Mensalidades({
                   </button>
                   {m?.pago && (
                     <>
-                      <input
-                        type="date"
-                        value={m.pago_em ?? hojeIso()}
-                        onChange={(e) => void salvar(a, { pago_em: e.target.value })}
-                        className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
-                      />
+                      <div className="w-40">
+                        <DatePicker
+                          value={m.pago_em ? new Date(`${m.pago_em}T12:00:00`) : undefined}
+                          placeholder="Dia do pagamento"
+                          onChange={(d) => {
+                            if (!d) return;
+                            const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                            void salvar(a, { pago_em: iso });
+                          }}
+                        />
+                      </div>
                       <select
                         value={m.forma ?? FORMAS[0]!}
                         onChange={(e) => void salvar(a, { forma: e.target.value })}

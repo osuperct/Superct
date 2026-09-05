@@ -127,6 +127,7 @@ function Painel({ professorId }: { professorId: string }) {
   const [alunoSel, setAlunoSel] = useState("");
   const [tipoSel, setTipoSel] = useState("contrato");
   const [enviando, setEnviando] = useState(false);
+  const [verDocs, setVerDocs] = useState(false);
   const inputArquivo = useRef<HTMLInputElement>(null);
 
   const carregar = useCallback(async () => {
@@ -385,9 +386,22 @@ function Painel({ professorId }: { professorId: string }) {
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <FileText className="size-4 text-primary" /> DOCUMENTOS PARA CONFERIR ({docs.filter((d) => !d.liberado).length} / {docs.length})
+          <FileText className="size-4 text-primary" /> DOCUMENTOS PARA CONFERIR
+          {docs.filter((d) => !d.liberado).length > 0 && (
+            <span className="rounded-full bg-destructive px-2 py-0.5 font-mono text-[10px] text-destructive-foreground">
+              {docs.filter((d) => !d.liberado).length} pendente
+              {docs.filter((d) => !d.liberado).length > 1 ? "s" : ""}
+            </span>
+          )}
         </h2>
-        <ul className="mt-3 space-y-2">
+        <button
+          type="button"
+          onClick={() => setVerDocs((v) => !v)}
+          className="mt-3 rounded-md border border-primary px-3 py-1.5 font-display text-xs tracking-tight text-primary"
+        >
+          {verDocs ? "OCULTAR DOCUMENTOS" : `VER DOCUMENTOS (${docs.length})`}
+        </button>
+        <ul className={`mt-3 space-y-2 ${verDocs ? "" : "hidden"}`}>
           {docs.map((d) => {
             const alu = alunos.find((a) => a.id === d.aluno_id);
             const resp = perfis.find((p) => p.id === d.user_id);
