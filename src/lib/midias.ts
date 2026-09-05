@@ -81,7 +81,7 @@ export async function enviarMidia(nova: NovaMidia) {
   const ext = (nova.nomeArquivo.split(".").pop() ?? "jpg").toLowerCase();
   const caminho = `${nova.tipo}/${crypto.randomUUID()}.${ext}`;
   const up = await supabase.storage.from(BUCKET_MIDIAS).upload(caminho, nova.arquivo, {
-    contentType: nova.arquivo.type || undefined,
+    contentType: nova.arquivo.type || "application/octet-stream",
     upsert: false,
   });
   if (up.error) throw up.error;
