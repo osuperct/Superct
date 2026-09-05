@@ -746,7 +746,11 @@ function JogoPage() {
         setDerrotado(vilao);
         return;
       }
+      impactos.current = 0;
+      presoAte.current = 0;
+      setChocado(false);
       x.current = 60;
+
       y.current = 0;
       vy.current = 0;
       subindoDesde.current = null;
