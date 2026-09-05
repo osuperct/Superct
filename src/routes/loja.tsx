@@ -107,6 +107,8 @@ function CartaoProduto({ produto }: { produto: Produto }) {
   const [tamanho, setTamanho] = useState<string | null>(null);
   const [quantidade, setQuantidade] = useState(1);
   const [pagando, setPagando] = useState(false);
+  const [aguardando, setAguardando] = useState(false);
+
 
   const total = produto.preco * quantidade;
 
