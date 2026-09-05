@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronUp, Heart, Medal, RotateCcw, Zap } from "lucide-react";
+import { ChevronUp, Heart, Medal, RotateCcw, Volume2, VolumeX, Zap } from "lucide-react";
 import { HEROIS, heroiPorId, type HeroiId } from "@/data/herois";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
@@ -1209,6 +1209,16 @@ function JogoPage() {
   const progresso = emChefao ? 100 : Math.min(100, (heroX / (MUNDO - HEROI_W)) * 100);
   const heroiAtual = heroiPorId(heroiSel ?? "kael");
 
+  useEffect(() => () => pararMusica(), []);
+
+  useEffect(() => {
+    if (fim) pararMusica();
+    else if (somRef.current && heroiSel) {
+      acordarAudio();
+      iniciarMusica();
+    }
+  }, [fim, heroiSel]);
+
   const escolherHeroi = (id: HeroiId) => {
     heroiRef.current = id;
     setHeroiSel(id);
@@ -1258,6 +1268,24 @@ function JogoPage() {
             className="ml-2 inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-primary"
           >
             Trocar herói
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const novo = !somRef.current;
+              somRef.current = novo;
+              setSomLigado(novo);
+              if (novo) {
+                acordarAudio();
+                iniciarMusica();
+              } else {
+                pararMusica();
+              }
+            }}
+            aria-label={somLigado ? "Desligar som" : "Ligar som"}
+            className="ml-2 inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-primary"
+          >
+            {somLigado ? <Volume2 className="size-3" /> : <VolumeX className="size-3" />} Som
           </button>
 
         </div>
@@ -1814,8 +1842,14 @@ function JogoPage() {
           )}
         </div>
 
-        <div className="mt-6 flex items-end justify-between gap-3">
-          <Joystick onChange={(v) => { dir.current = v.x; dirY.current = v.y; }} />
+        <div className="relative z-30 mt-1 flex items-end justify-between gap-3 landscape:-mt-[104px] landscape:px-2">
+          <Joystick
+            onChange={(v) => {
+              dir.current = v.x;
+              dirY.current = v.y;
+              if (v.x !== 0 || v.y !== 0) acordarSom();
+            }}
+          />
           <div className="flex gap-2">
             <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
               <ChevronUp className="size-6" />
