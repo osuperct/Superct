@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { ClipboardCheck } from "lucide-react";
+import { ClipboardCheck, Calendar } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { CORES, CRITERIOS, type Avaliacao, classeCor, mesExtenso, rotuloCor } from "@/lib/avaliacao";
+
 
 type Alu = { id: string; nome: string };
 
