@@ -181,7 +181,7 @@ export function ProdutosAdm() {
             <input
               value={editando.nome}
               onChange={(e) => setEditando({ ...editando, nome: e.target.value })}
-              className="entrada"
+              className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
             />
           </Campo>
           <Campo rotulo="Descrição">
@@ -189,7 +189,7 @@ export function ProdutosAdm() {
               value={editando.descricao}
               onChange={(e) => setEditando({ ...editando, descricao: e.target.value })}
               rows={2}
-              className="entrada"
+              className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
             />
           </Campo>
           <Campo rotulo="Valor (R$)">
@@ -197,7 +197,7 @@ export function ProdutosAdm() {
               value={editando.preco}
               onChange={(e) => setEditando({ ...editando, preco: e.target.value })}
               inputMode="decimal"
-              className="entrada"
+              className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
             />
           </Campo>
           <Campo rotulo="Link de pagamento no cartão (InfinityPay)">
@@ -205,7 +205,7 @@ export function ProdutosAdm() {
               value={editando.link_pagamento}
               onChange={(e) => setEditando({ ...editando, link_pagamento: e.target.value })}
               placeholder="https://..."
-              className="entrada"
+              className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
             />
           </Campo>
           <Campo rotulo="Ordem de exibição">
@@ -213,7 +213,7 @@ export function ProdutosAdm() {
               value={editando.ordem}
               onChange={(e) => setEditando({ ...editando, ordem: e.target.value })}
               inputMode="numeric"
-              className="entrada"
+              className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
             />
           </Campo>
 
