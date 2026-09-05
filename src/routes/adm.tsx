@@ -164,6 +164,9 @@ function AdmPage() {
       </section>
 
       <Acessos />
+
+      <Cadastros />
+
     </Casca>
   );
 }
