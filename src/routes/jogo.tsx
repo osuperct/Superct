@@ -1168,7 +1168,14 @@ function JogoPage() {
           super bola.
         </p>
 
-        <RankingJogo pontos={pontos} fase={fase} fim={fim} />
+        <RankingJogo
+          pontos={pontos}
+          fase={fase}
+          fim={fim}
+          onApelidoSalvo={() => {
+            palcoRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
+        />
 
         <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           <span>
