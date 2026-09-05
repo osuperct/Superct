@@ -465,6 +465,8 @@ function Painel({ session }: { session: Session }) {
   const [enviandoArquivo, setEnviandoArquivo] = useState(false);
   const [aba, setAba] = useState<"documentos" | "online">("online");
   const inputArquivo = useRef<HTMLInputElement>(null);
+  const [mostrarDocs, setMostrarDocs] = useState(false);
+  const [alunoDocsAberto, setAlunoDocsAberto] = useState<string | null>(null);
 
   const [entregues, setEntregues] = useState<{ tipo: string; aluno_id: string | null }[]>([]);
 
