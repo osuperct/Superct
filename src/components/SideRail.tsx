@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
   GraduationCap,
+  ShieldCheck,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -26,12 +27,15 @@ const itens = [
 export function SideRail() {
   const [aberta, setAberta] = useState(true);
   const [professor, setProfessor] = useState(false);
+  const [adm, setAdm] = useState(false);
 
   useEffect(() => {
     let ativo = true;
     async function checar() {
       const { data } = await supabase.from("user_roles").select("role");
-      if (ativo) setProfessor((data ?? []).some((p) => p.role === "professor"));
+      if (!ativo) return;
+      setProfessor((data ?? []).some((p) => p.role === "professor"));
+      setAdm((data ?? []).some((p) => p.role === "adm"));
     }
     void checar();
     const { data: sub } = supabase.auth.onAuthStateChange(() => void checar());
@@ -41,9 +45,11 @@ export function SideRail() {
     };
   }, []);
 
-  const links = professor
-    ? [...itens, { to: "/professor", label: "Professor", icon: GraduationCap } as const]
-    : itens;
+  const links = [
+    ...itens,
+    ...(professor ? [{ to: "/professor", label: "Professor", icon: GraduationCap } as const] : []),
+    ...(adm ? [{ to: "/adm", label: "ADM", icon: ShieldCheck } as const] : []),
+  ];
 
   if (!aberta) {
     return (
