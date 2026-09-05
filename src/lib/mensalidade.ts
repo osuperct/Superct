@@ -10,7 +10,7 @@ export type Mensalidade = {
   forma: string | null;
 };
 
-export const FORMAS = ["Pix", "Dinheiro", "Cartão de débito", "Cartão de crédito", "Transferência"];
+export const FORMAS = ["Pix", "Dinheiro", "Cartão de débito", "Cartão de crédito", "Transferência", "Cartão Recorrente (link)"];
 
 /** Primeiro dia do mês, em ISO (yyyy-MM-dd). */
 export function refMes(base = new Date(), somaMeses = 0) {
