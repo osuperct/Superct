@@ -36,11 +36,11 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
     const canal = supabase
       .channel("avisos-responsavel")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "avisos" }, (payload) => {
-        const bruto = payload.new as Aviso;
-        void comImagens([bruto]).then(([novo]) => {
-          setLista((atual) => [novo, ...atual.filter((a) => a.id !== novo.id)]);
+        const novo = payload.new as Aviso;
+        void comImagens([novo]).then((prontos) => {
+          const comFoto = prontos[0] ?? novo;
+          setLista((atual) => [comFoto, ...atual.filter((a) => a.id !== comFoto.id)]);
         });
-        const novo = bruto;
         toast.info(novo.titulo, { description: novo.mensagem });
         notificarAparelho(`Super CT — ${novo.titulo}`, novo.mensagem);
       })
