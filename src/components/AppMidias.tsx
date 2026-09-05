@@ -57,15 +57,25 @@ export function AppMidias() {
 
   return (
     <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <Smartphone className="size-4 text-primary" /> APP — FOTOS E VÍDEOS
-      </h2>
+      <button
+        type="button"
+        onClick={() => setAberto((v) => !v)}
+        className="flex w-full items-center justify-between gap-2 text-left"
+        aria-expanded={aberto}
+      >
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <Smartphone className="size-4 text-primary" /> APP — FOTOS E VÍDEOS
+        </h2>
+        {aberto ? <ChevronUp className="size-5 text-primary" /> : <ChevronDown className="size-5 text-primary" />}
+      </button>
       <p className="mt-1 text-xs text-muted-foreground">
         Troque a foto de capa dos cartões, as fotos que abrem por dentro e os vídeos da página inicial. Tudo
         atualiza na página assim que você salva.
       </p>
 
-      {/* -------- CARTÕES -------- */}
+      {aberto && (
+        <>
+          {/* -------- CARTÕES -------- */}
       <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
         <p className="flex items-center gap-2 font-display text-sm tracking-tight">
           <ImageIcon className="size-4 text-primary" /> CARTÕES DA PÁGINA INICIAL
