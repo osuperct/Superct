@@ -705,8 +705,10 @@ function JogoPage() {
     spawnTiro.current = 70;
     cargaRef.current = 0;
     invulAte.current = performance.now() + 900;
-    vidasRef.current = VIDAS_CHEFAO;
-    setVidas(VIDAS_CHEFAO);
+    presoAte.current = 0;
+    impactos.current = 0;
+    setChocado(false);
+
     setPiscando(false);
     setCarga(0);
     setBolas([]);
