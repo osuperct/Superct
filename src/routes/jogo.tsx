@@ -468,7 +468,7 @@ function JogoPage() {
         if (livre) x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
       };
 
-      if (dir.current !== 0) {
+      if (dir.current !== 0 && seguro.current !== "parede") {
         const lado: 1 | -1 = dir.current > 0 ? 1 : -1;
         if (olhandoRef.current !== lado) {
           olhandoRef.current = lado;
@@ -1398,8 +1398,8 @@ function JogoPage() {
                 : noTrepaTrepa
                   ? heroiAtual.trepaTrepa
                 : caminhando
-                  ? heroiAtual.anda[passoFrame]!
-                  : heroiAtual.img;
+                  ? heroiAtual.anda[passoFrame]
+                  : heroiAtual.anda[0];
               return (
                 <div
                   className="absolute transition-[height] duration-100"
