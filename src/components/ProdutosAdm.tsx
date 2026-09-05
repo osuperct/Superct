@@ -160,21 +160,31 @@ export function ProdutosAdm() {
 
   return (
     <section className="rounded-lg border border-border bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <ShoppingBag className="size-4 text-primary" /> LOJA E PRODUTOS
-      </h2>
+      <button
+        type="button"
+        onClick={() => setAberto((v) => !v)}
+        className="flex w-full items-center justify-between gap-2 text-left"
+        aria-expanded={aberto}
+      >
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <ShoppingBag className="size-4 text-primary" /> LOJA E PRODUTOS
+        </h2>
+        {aberto ? <ChevronUp className="size-5 text-primary" /> : <ChevronDown className="size-5 text-primary" />}
+      </button>
       <p className="mt-1 text-xs text-muted-foreground">
         Cadastre uniformes, garrafas e itens personalizados. O valor alterado aqui aparece na loja assim que
         você salva.
       </p>
 
-      <button
-        type="button"
-        onClick={() => setEditando(editando && !editando.id ? null : { ...NOVO })}
-        className="mt-3 flex items-center gap-2 rounded-md bg-primary px-3 py-2 font-display text-[11px] tracking-tight text-primary-foreground"
-      >
-        <Plus className="size-4" /> {editando && !editando.id ? "FECHAR" : "NOVO PRODUTO"}
-      </button>
+      {aberto && (
+        <>
+          <button
+            type="button"
+            onClick={() => setEditando(editando && !editando.id ? null : { ...NOVO })}
+            className="mt-3 flex items-center gap-2 rounded-md bg-primary px-3 py-2 font-display text-[11px] tracking-tight text-primary-foreground"
+          >
+            <Plus className="size-4" /> {editando && !editando.id ? "FECHAR" : "NOVO PRODUTO"}
+          </button>
 
       {editando && (
         <form onSubmit={(e) => void gravar(e)} className="mt-3 space-y-2 rounded-md border border-border bg-background/60 p-3">
