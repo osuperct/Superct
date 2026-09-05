@@ -94,30 +94,165 @@ export function somVitoria() {
   [523, 659, 784, 1047].forEach((f, i) => tom(f, 0.2, "square", 0.4, i * 0.12));
 }
 
-/* --------- música de fundo estilo videogame --------- */
-const MELODIA = [
-  392, 392, 523, 392, 330, 392, 494, 523, 587, 523, 494, 392, 330, 392, 349, 392,
-];
-const BAIXO = [98, 98, 131, 98, 82, 98, 123, 131];
+/* --------- músicas de fundo estilo videogame ---------
+   Uma trilha por fase + uma trilha tensa por chefão. */
+type Trilha = {
+  melodia: number[];
+  baixo: number[];
+  intervalo: number;
+  tipoMel: OscillatorType;
+  tipoBaixo: OscillatorType;
+  volMel: number;
+  volBaixo: number;
+};
 
-export function iniciarMusica() {
-  if (ligado) return;
+const FASES: Trilha[] = [
+  {
+    melodia: [392, 392, 523, 392, 330, 392, 494, 523, 587, 523, 494, 392, 330, 392, 349, 392],
+    baixo: [98, 98, 131, 98, 82, 98, 123, 131],
+    intervalo: 200,
+    tipoMel: "square",
+    tipoBaixo: "triangle",
+    volMel: 0.12,
+    volBaixo: 0.16,
+  },
+  {
+    melodia: [440, 523, 587, 659, 587, 523, 440, 392, 440, 523, 659, 698, 659, 587, 523, 440],
+    baixo: [110, 110, 147, 147, 98, 98, 131, 131],
+    intervalo: 190,
+    tipoMel: "square",
+    tipoBaixo: "triangle",
+    volMel: 0.12,
+    volBaixo: 0.16,
+  },
+  {
+    melodia: [466, 554, 622, 554, 466, 415, 466, 622, 698, 622, 554, 466, 415, 466, 554, 622],
+    baixo: [117, 117, 156, 117, 104, 104, 139, 156],
+    intervalo: 185,
+    tipoMel: "triangle",
+    tipoBaixo: "sawtooth",
+    volMel: 0.13,
+    volBaixo: 0.14,
+  },
+  {
+    melodia: [349, 440, 523, 440, 587, 523, 440, 349, 392, 494, 587, 494, 659, 587, 494, 392],
+    baixo: [87, 87, 110, 110, 98, 98, 123, 123],
+    intervalo: 180,
+    tipoMel: "square",
+    tipoBaixo: "triangle",
+    volMel: 0.12,
+    volBaixo: 0.17,
+  },
+  {
+    melodia: [523, 494, 440, 494, 523, 587, 659, 587, 523, 494, 440, 392, 440, 494, 523, 587],
+    baixo: [131, 131, 110, 110, 147, 147, 98, 98],
+    intervalo: 175,
+    tipoMel: "square",
+    tipoBaixo: "sawtooth",
+    volMel: 0.12,
+    volBaixo: 0.14,
+  },
+  {
+    melodia: [587, 698, 784, 698, 587, 523, 587, 784, 880, 784, 698, 587, 523, 587, 698, 784],
+    baixo: [147, 147, 175, 147, 131, 131, 165, 175],
+    intervalo: 168,
+    tipoMel: "square",
+    tipoBaixo: "triangle",
+    volMel: 0.12,
+    volBaixo: 0.16,
+  },
+];
+
+/* trilhas de chefão: mais graves, rápidas e dissonantes */
+const CHEFOES: Trilha[] = [
+  {
+    melodia: [147, 156, 147, 139, 147, 185, 147, 139, 131, 139, 147, 185, 196, 185, 147, 139],
+    baixo: [73, 78, 73, 69, 65, 69, 73, 78],
+    intervalo: 150,
+    tipoMel: "sawtooth",
+    tipoBaixo: "square",
+    volMel: 0.11,
+    volBaixo: 0.18,
+  },
+  {
+    melodia: [175, 185, 175, 165, 233, 220, 175, 165, 156, 165, 175, 233, 247, 233, 175, 165],
+    baixo: [87, 92, 87, 82, 78, 82, 87, 92],
+    intervalo: 145,
+    tipoMel: "sawtooth",
+    tipoBaixo: "square",
+    volMel: 0.11,
+    volBaixo: 0.18,
+  },
+  {
+    melodia: [196, 208, 196, 185, 262, 247, 196, 185, 175, 185, 196, 262, 277, 262, 196, 185],
+    baixo: [98, 104, 98, 92, 87, 92, 98, 104],
+    intervalo: 140,
+    tipoMel: "sawtooth",
+    tipoBaixo: "triangle",
+    volMel: 0.11,
+    volBaixo: 0.19,
+  },
+  {
+    melodia: [220, 233, 220, 208, 294, 277, 220, 208, 196, 208, 220, 294, 311, 294, 220, 208],
+    baixo: [110, 117, 110, 104, 98, 104, 110, 117],
+    intervalo: 135,
+    tipoMel: "sawtooth",
+    tipoBaixo: "square",
+    volMel: 0.11,
+    volBaixo: 0.19,
+  },
+  {
+    melodia: [247, 262, 247, 233, 330, 311, 247, 233, 220, 233, 247, 330, 349, 330, 247, 233],
+    baixo: [123, 131, 123, 117, 110, 117, 123, 131],
+    intervalo: 130,
+    tipoMel: "sawtooth",
+    tipoBaixo: "square",
+    volMel: 0.11,
+    volBaixo: 0.2,
+  },
+  {
+    melodia: [277, 294, 277, 262, 370, 349, 277, 262, 247, 262, 277, 370, 392, 370, 277, 262],
+    baixo: [139, 147, 139, 131, 123, 131, 139, 147],
+    intervalo: 125,
+    tipoMel: "sawtooth",
+    tipoBaixo: "square",
+    volMel: 0.11,
+    volBaixo: 0.2,
+  },
+];
+
+let trilhaAtual = "";
+
+/** Inicia (ou troca) a música de fundo da fase / do chefão. */
+export function iniciarMusica(fase = 1, chefao = false) {
+  const lista = chefao ? CHEFOES : FASES;
+  const t = lista[(Math.max(1, fase) - 1) % lista.length]!;
+  const chave = `${chefao ? "boss" : "fase"}-${(Math.max(1, fase) - 1) % lista.length}`;
+  if (ligado && trilhaAtual === chave) return;
+  pararMusica();
   const c = audio();
   if (!c) return;
   ligado = true;
-  const intervalo = 200;
+  trilhaAtual = chave;
+  passoMusica = 0;
   musicaTimer = window.setInterval(() => {
-    const nota = MELODIA[passoMusica % MELODIA.length]!;
-    tom(nota, 0.16, "square", 0.12);
+    const nota = t.melodia[passoMusica % t.melodia.length]!;
+    tom(nota, t.intervalo / 1200, t.tipoMel, t.volMel);
     if (passoMusica % 2 === 0) {
-      tom(BAIXO[(passoMusica / 2) % BAIXO.length]!, 0.22, "triangle", 0.16);
+      tom(
+        t.baixo[(passoMusica / 2) % t.baixo.length]!,
+        t.intervalo / 900,
+        t.tipoBaixo,
+        t.volBaixo,
+      );
     }
     passoMusica += 1;
-  }, intervalo);
+  }, t.intervalo);
 }
 
 export function pararMusica() {
   ligado = false;
+  trilhaAtual = "";
   if (musicaTimer !== null) {
     window.clearInterval(musicaTimer);
     musicaTimer = null;
@@ -127,3 +262,4 @@ export function pararMusica() {
 export function musicaAtiva() {
   return ligado;
 }
+

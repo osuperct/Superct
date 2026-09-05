@@ -204,7 +204,8 @@ const CORACOES: { x: number; y: number }[] = [
 
 
 const alturaHeroi = (abaixado: boolean) => (abaixado ? HEROI_H_ABAIXADO : HEROI_H);
-const dificuldade = (fase: number) => 0.3675 + (fase - 1) * 0.1995;
+/* fase 1 com 30% menos dificuldade; sobe gradualmente a cada fase */
+const dificuldade = (fase: number) => 0.2573 + (fase - 1) * 0.18;
 const chefaoTamanho = (fase: number) => 78 + fase * 4;
 
 
@@ -252,8 +253,9 @@ function JogoPage() {
   const acordarSom = () => {
     if (!somRef.current) return;
     acordarAudio();
-    iniciarMusica();
+    iniciarMusica(faseRef.current, modoRef.current === "chefao");
   };
+
 
   const dir = useRef(0);
   const dirY = useRef(0);
@@ -343,7 +345,7 @@ function JogoPage() {
       pausaRef.current = false;
       fimRef.current = false;
       tick.current = 0;
-      spawn.current = 90;
+      spawn.current = 140;
       spawnHaltere.current = 120;
       passados.current = 0;
       cargaRef.current = 0;
@@ -801,7 +803,8 @@ function JogoPage() {
         /* inimigos do percurso (mais lentos na fase 1) */
         spawn.current -= 1;
         if (spawn.current <= 0) {
-          spawn.current = Math.max(38, 100 - faseRef.current * 6) + Math.floor(Math.random() * 50);
+          spawn.current =
+            Math.max(44, 132 - faseRef.current * 11) + Math.floor(Math.random() * 50);
           const vilao = Math.floor(Math.random() * VILOES.length);
           const r = Math.random();
           const padrao: Padrao = r < 0.4 ? "reta" : r < 0.7 ? "queda" : "zigue";
@@ -1215,9 +1218,10 @@ function JogoPage() {
     if (fim) pararMusica();
     else if (somRef.current && heroiSel) {
       acordarAudio();
-      iniciarMusica();
+      iniciarMusica(fase, modo === "chefao");
     }
-  }, [fim, heroiSel]);
+  }, [fim, heroiSel, fase, modo]);
+
 
   const escolherHeroi = (id: HeroiId) => {
     heroiRef.current = id;
@@ -1277,7 +1281,8 @@ function JogoPage() {
               setSomLigado(novo);
               if (novo) {
                 acordarAudio();
-                iniciarMusica();
+                iniciarMusica(fase, modo === "chefao");
+
               } else {
                 pararMusica();
               }
