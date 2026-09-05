@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SideRail } from "../components/SideRail";
+import { BotaoSair } from "../components/BotaoSair";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -144,6 +145,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <SideRail />
+      <BotaoSair className="fixed right-4 top-4 z-[70]" />
       <Toaster />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
