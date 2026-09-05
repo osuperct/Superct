@@ -228,11 +228,13 @@ function JogoPage() {
   const [olhando, setOlhando] = useState<1 | -1>(1);
   const [andando, setAndando] = useState(false);
   const [passoFrame, setPassoFrame] = useState<0 | 1>(0);
+  const [pulando, setPulando] = useState(false);
   const heroiRef = useRef<HeroiId | null>(null);
   const olhandoRef = useRef<1 | -1>(1);
   const andandoRef = useRef(false);
   const passoRef = useRef<0 | 1>(0);
   const passoDistancia = useRef(0);
+  const pulandoRef = useRef(false);
 
 
 
