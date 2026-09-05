@@ -178,7 +178,7 @@ export function Mensalidades({
                     onClick={() =>
                       void salvar(a, {
                         pago: !(m?.pago ?? false),
-                        pago_em: m?.pago ? null : hojeIso(),
+                        pago_em: m?.pago ? null : (m?.pago_em ?? hojeIso()),
                         forma: m?.pago ? null : (m?.forma ?? FORMAS[0]!),
                       })
                     }
@@ -190,9 +190,7 @@ export function Mensalidades({
                   >
                     {m?.pago ? "PAGO" : "NÃO RECEBIDO"}
                   </button>
-                  {(
-                    <>
-                      <div className="w-40">
+                  <div className="w-40">
                         <DatePicker
                           value={m?.pago_em ? new Date(`${m.pago_em}T12:00:00`) : undefined}
                           placeholder="Dia do pagamento"
@@ -201,9 +199,9 @@ export function Mensalidades({
                             const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
                             void salvar(a, { pago_em: iso });
                           }}
-                        />
-                      </div>
-                      <select
+                  />
+                  </div>
+                  <select
                         value={m?.forma ?? FORMAS[0]!}
                         onChange={(e) => void salvar(a, { forma: e.target.value })}
                         className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
@@ -214,8 +212,6 @@ export function Mensalidades({
                           </option>
                         ))}
                       </select>
-                    </>
-                  )}
                   {salvando === a.id && (
                     <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                       salvando…
