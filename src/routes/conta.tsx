@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { Eye, EyeOff, FileText, GraduationCap, LogOut, Paperclip, Send, Trash2, Upload, UserPlus } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, LogOut, Paperclip, Send, Trash2, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -464,7 +464,6 @@ function Painel({ session }: { session: Session }) {
   const [tipoDoc, setTipoDoc] = useState("contrato");
   const [alunoDoc, setAlunoDoc] = useState("");
   const [enviandoArquivo, setEnviandoArquivo] = useState(false);
-  const [aba, setAba] = useState<"documentos" | "online">("online");
   const inputArquivo = useRef<HTMLInputElement>(null);
   const [mostrarDocs, setMostrarDocs] = useState(false);
   const [alunoDocsAberto, setAlunoDocsAberto] = useState<string | null>(null);
@@ -716,32 +715,20 @@ function Painel({ session }: { session: Session }) {
         >
           PREENCHER CONTRATO DE UM ALUNO <Send className="size-4 shrink-0" />
         </Link>
+        <Link
+          to="/documento/$tipo"
+          params={{ tipo: "ficha" }}
+          className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+        >
+          PREENCHER FICHA PAR-Q DO ALUNO <Send className="size-4 shrink-0" />
+        </Link>
       </section>
 
       <AvaliacaoResponsavel uid={uid} alunos={alunos} />
 
-      <div className="mt-5 flex gap-2">
-        {(
-          [
-            ["online", "PREENCHER ONLINE"],
-            ["documentos", "ANEXAR DOCUMENTOS"],
-          ] as const
-        ).map(([id, rotulo]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setAba(id)}
-            className={`flex-1 rounded-md px-3 py-2 font-display text-xs tracking-tight ${
-              aba === id ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"
-            }`}
-          >
-            {rotulo}
-          </button>
-        ))}
-      </div>
-
-      {aba === "documentos" ? (
+      {(
         <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
+
           <div className="flex items-start justify-between gap-2">
             <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
               <Paperclip className="size-4 text-primary" /> DOCUMENTOS DO ALUNO ({documentos.length})
@@ -842,34 +829,8 @@ function Painel({ session }: { session: Session }) {
             <p className="mt-4 text-sm text-muted-foreground">Nenhum documento anexado ainda.</p>
           )}
         </section>
-      ) : (
-        <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
-          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-            <FileText className="size-4 text-primary" /> PREENCHER ONLINE
-          </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Cada documento abre numa página só dele: você digita os espaços em branco pelo celular, assina com a
-            canetinha e ele fica arquivado aqui nos documentos do aluno.
-          </p>
-          <div className="mt-4 space-y-2">
-            {(
-              [
-                ["contrato", "CONTRATO DE PRESTAÇÃO DE SERVIÇO"],
-                ["ficha", "FICHA DO ALUNO (ANEXO)"],
-              ] as const
-            ).map(([id, rotulo]) => (
-              <Link
-                key={id}
-                to="/documento/$tipo"
-                params={{ tipo: id }}
-                className="flex items-center justify-between gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
-              >
-                {rotulo} <Send className="size-4 shrink-0" />
-              </Link>
-            ))}
-          </div>
-        </section>
       )}
+
     </div>
   );
 }
