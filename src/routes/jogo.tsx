@@ -1347,7 +1347,7 @@ function JogoPage() {
                   style={{ filter: "drop-shadow(0 0 4px rgba(249,115,22,0.6))" }}
                 />
               </div>
-            ))}
+            )))}
 
             {solidos.map((s, i) =>
               s.tipo === "caixa" ? (
