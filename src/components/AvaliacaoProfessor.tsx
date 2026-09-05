@@ -17,7 +17,27 @@ import {
 
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
+function VisualizarAvaliacao({ avaliacao }: { avaliacao: Avaliacao }) {
+  return (
+    <div className="rounded-md border border-border bg-background/40 p-3">
+      <ul className="space-y-2">
+        {CRITERIOS.map((c) => (
+          <li key={c.chave} className="flex items-center justify-between gap-2 text-xs">
+            <span className="text-muted-foreground">{c.rotulo}</span>
+            <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+              <span className={`size-3 rounded-full ${classeCor(avaliacao[c.chave])}`} />
+              {CORES.find((x) => x.cor === avaliacao[c.chave])?.rotulo}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {avaliacao.observacoes && <p className="mt-2 border-t border-border pt-2 text-xs">{avaliacao.observacoes}</p>}
+    </div>
+  );
+}
+
 const VAZIO: Record<CriterioChave, Cor> = {
+
   coordenacao_motora: "amarelo",
   forca_resistencia: "amarelo",
   velocidade_agilidade: "amarelo",
