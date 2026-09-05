@@ -637,40 +637,52 @@ function Painel({ session }: { session: Session }) {
                     <Trash2 className="size-4" />
                   </button>
                 </div>
-                <ul className="mt-2 space-y-1">
-                  {docsAluno.map((d) => (
-                    <li key={d.id} className="flex items-center justify-between gap-2">
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-mono text-[10px] uppercase tracking-widest text-primary">
-                          {DESCRICAO_DOC[d.tipo] ?? "Documento anexado"}
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {docsAluno.length} {docsAluno.length === 1 ? "arquivo" : "arquivos"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setAlunoDocsAberto(alunoDocsAberto === a.id ? null : a.id)}
+                    className="flex items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                  >
+                    {alunoDocsAberto === a.id ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
+                    {alunoDocsAberto === a.id ? "OCULTAR" : "VER ARQUIVOS"}
+                  </button>
+                </div>
+                {alunoDocsAberto === a.id && (
+                  <ul className="mt-2 space-y-1">
+                    {docsAluno.map((d) => (
+                      <li key={d.id} className="flex items-center justify-between gap-2">
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-mono text-[10px] uppercase tracking-widest text-primary">
+                            {DESCRICAO_DOC[d.tipo] ?? "Documento anexado"}
+                          </span>
+                          <span className="block truncate text-[11px] text-muted-foreground">
+                            {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                            {d.enviado_por_professor ? " • enviado pelo professor" : ""}
+                          </span>
                         </span>
-                        <span className="block truncate text-[11px] text-muted-foreground">
-                          {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
-                          {d.enviado_por_professor ? " • enviado pelo professor" : ""}
-                        </span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => abrir(d)}
-                        className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
-                      >
-                        Ver
-                      </button>
-                      {!d.enviado_por_professor && (
                         <button
                           type="button"
-                          onClick={() => remover(d)}
-                          className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                          onClick={() => abrir(d)}
+                          className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
                         >
-                          Excluir
+                          Ver
                         </button>
-                      )}
-                    </li>
-                  ))}
-                  {docsAluno.length === 0 && (
-                    <li className="text-[11px] text-muted-foreground">Nenhum documento deste aluno ainda.</li>
-                  )}
-                </ul>
+                        {!d.enviado_por_professor && (
+                          <button
+                            type="button"
+                            onClick={() => remover(d)}
+                            className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                          >
+                            Excluir
+                          </button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )}
                 {faltando.length > 0 && (
                   <div className="mt-3 rounded-md border border-primary/60 bg-primary/10 p-3">
                     <p className="text-[11px]">
