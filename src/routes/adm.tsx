@@ -166,7 +166,8 @@ function Acessos() {
   const listar = useServerFn(listarAcessos);
   const definir = useServerFn(definirAcesso);
   const cadastrar = useServerFn(cadastrarProfessor);
-  const [contas, setContas] = useState<ContaAcesso[] | null>(null);
+  const excluir = useServerFn(excluirProfessor);
+
   const [busca, setBusca] = useState("");
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [novo, setNovo] = useState(false);
