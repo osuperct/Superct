@@ -282,7 +282,7 @@ export function Mensalidades({
             onClick={toggleTodos}
             className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground"
           >
-            {todosAbertos ? (
+            {listaVisivel ? (
               <>
                 <ChevronUp className="size-3" /> RECOLHER TODOS
               </>
