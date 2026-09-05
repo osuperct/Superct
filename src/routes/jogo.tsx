@@ -721,6 +721,11 @@ function JogoPage() {
       setHeroX(x.current);
       setHeroY(y.current);
       setPendurado(seguro.current);
+      const ar = noAr.current && !seguro.current;
+      if (ar !== pulandoRef.current) {
+        pulandoRef.current = ar;
+        setPulando(ar);
+      }
 
       /* ---- câmera ---- */
       const vista = vistaRef.current;
