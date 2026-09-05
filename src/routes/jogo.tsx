@@ -1754,6 +1754,9 @@ function JogoPage() {
             ao perder uma vida você volta ao <span className="text-primary">checkpoint</span> da fase
           </p>
         </div>
+
+        <RankingJogo pontos={pontos} fase={fase} fim={fim} />
+
       </main>
     </div>
   );
