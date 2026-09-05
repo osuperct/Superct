@@ -67,7 +67,9 @@ export function AvaliacaoResponsavel({ uid, alunos }: { uid: string; alunos: Alu
             if (!a) return null;
             return (
               <div className="rounded-md border border-border bg-background/40 p-3">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{mesExtenso(a.referencia)}</p>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                  {alunos.find((al) => al.id === a.aluno_id)?.nome ?? "Aluno"} — {mesExtenso(a.referencia)}
+                </p>
                 <div className="mt-2 space-y-1">
                   {CRITERIOS.map((c) => (
                     <div key={c.chave} className="flex items-center justify-between gap-2 text-xs">
