@@ -468,14 +468,31 @@ function JogoPage() {
         if (livre) x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
       };
 
-      if (dir.current !== 0 && seguro.current !== "parede") {
+      if (dir.current !== 0) {
         const lado: 1 | -1 = dir.current > 0 ? 1 : -1;
         if (olhandoRef.current !== lado) {
           olhandoRef.current = lado;
           setOlhando(lado);
         }
-        passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
+        if (seguro.current === "parede") {
+          /* na parede: desliza para os lados e sai da parede ao passar da borda */
+          const cx = x.current + HEROI_W / 2;
+          const p = paredes.find((pp) => cx > pp.x - 6 && cx < pp.x + pp.w + 6);
+          const alvo = x.current + dir.current * VELOCIDADE * 0.7;
+          if (p && alvo + HEROI_W / 2 > p.x - 4 && alvo + HEROI_W / 2 < p.x + p.w + 4) {
+            x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
+          } else {
+            /* saiu da parede: volta imediatamente para a caminhada / queda */
+            seguro.current = false;
+            bloquearAgarreAte.current = performance.now() + 320;
+            noAr.current = y.current > 0;
+            x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
+          }
+        } else {
+          passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
+        }
       }
+
 
       /* ---- impulso lateral do salto ao soltar aparelho ---- */
       if (vxAr.current !== 0) {
