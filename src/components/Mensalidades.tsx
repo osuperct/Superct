@@ -433,7 +433,7 @@ export function Mensalidades({
                     : ""}
                   {p.parcela?.fim ? ` • termina em ${mesExtensoRef(p.parcela.fim)}` : ""}
                   {p.plano.vencimento
-                    ? ` • vence ${vencimentoNoMes(p.plano.vencimento, mesProximo)}`
+                    ? ` • vence ${vencimentoNoMes(p.plano.vencimento, mesProjecao)}`
                     : ""}
                   {p.encerrado ? " • PLANO ENCERRADO" : ""}
                 </p>
