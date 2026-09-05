@@ -1544,6 +1544,7 @@ function JogoPage() {
                 : caminhando
                   ? heroiAtual.anda[passoFrame]
                   : heroiAtual.anda[0];
+              const inclinacao = pulando && !escalando ? olhando * 14 : 0;
               return (
                 <div
                   className="absolute transition-[height] duration-100"
@@ -1552,7 +1553,8 @@ function JogoPage() {
                     width: HEROI_W,
                     height: alt,
                     bottom: 40 + heroY,
-                    transform: escalando ? "none" : `scaleX(${olhando})`,
+                    transform: escalando ? "none" : `scaleX(${olhando}) rotate(${inclinacao}deg)`,
+                    transformOrigin: "bottom center",
                   }}
                 >
                   <img
