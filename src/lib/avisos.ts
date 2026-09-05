@@ -78,6 +78,24 @@ export function dataCurta(iso: string) {
   });
 }
 
+export function agruparPorMes(avisos: Aviso[]) {
+  const grupos = new Map<string, { chave: string; rotulo: string; avisos: Aviso[] }>();
+  for (const a of avisos) {
+    const d = new Date(a.created_at);
+    const chave = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const rotuloBase = d.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+    const rotulo = rotuloBase.charAt(0).toUpperCase() + rotuloBase.slice(1);
+    if (!grupos.has(chave)) grupos.set(chave, { chave, rotulo, avisos: [] });
+    grupos.get(chave)!.avisos.push(a);
+  }
+  return Array.from(grupos.values()).sort((a, b) => b.chave.localeCompare(a.chave));
+}
+
+export function mesAtual() {
+  const agora = new Date();
+  return `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, "0")}`;
+}
+
 /** Situação das notificações do aparelho. */
 export type EstadoNotificacao = "indisponivel" | "abrir-em-nova-aba" | "permitido" | "negado" | "pendente";
 
