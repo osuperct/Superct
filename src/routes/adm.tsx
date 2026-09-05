@@ -64,7 +64,7 @@ function AdmPage() {
       return;
     }
     const { data } = await supabase.from("user_roles").select("role");
-    setAutorizado((data ?? []).some((p) => p.role === "professor"));
+    setAutorizado((data ?? []).some((p) => p.role === "adm"));
   }, []);
 
   useEffect(() => {
