@@ -7,6 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
 import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 
+import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
 import { supabase } from "@/integrations/supabase/client";
 
 const BUCKET = "documentos-alunos";
@@ -708,6 +709,8 @@ function Painel({ session }: { session: Session }) {
           PREENCHER CONTRATO DE UM ALUNO <Send className="size-4 shrink-0" />
         </Link>
       </section>
+
+      <AvaliacaoResponsavel uid={uid} alunos={alunos} />
 
       <div className="mt-5 flex gap-2">
         {(

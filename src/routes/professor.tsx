@@ -5,6 +5,7 @@ import { FileText, GraduationCap, Paperclip, Trash2, Upload, Users } from "lucid
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
+import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
 import { formatarCpf } from "@/lib/cpf";
 
 export const Route = createFileRoute("/professor")({
@@ -89,7 +90,7 @@ function ProfessorPage() {
         {carregando ? (
           <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>
         ) : session ? (
-          <Painel />
+          <Painel professorId={session.user.id} />
         ) : (
           <div className="mt-8">
             <p className="text-sm text-muted-foreground">Entre com a conta do Super CT para ver este painel.</p>
@@ -106,7 +107,7 @@ function ProfessorPage() {
   );
 }
 
-function Painel() {
+function Painel({ professorId }: { professorId: string }) {
   const [autorizado, setAutorizado] = useState<boolean | null>(null);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [alunos, setAlunos] = useState<Alu[]>([]);
@@ -244,6 +245,8 @@ function Painel() {
           {alunos.length === 0 && <li className="text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</li>}
         </ul>
       </section>
+
+      <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
