@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { CircleDollarSign, FileText, GraduationCap, Paperclip, Trash2, Upload, Users } from "lucide-react";
+import { FileText, GraduationCap, Paperclip, Trash2, Upload, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
