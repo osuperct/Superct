@@ -599,6 +599,10 @@ function JogoPage() {
   const coracoesRef = useRef<number[]>(CORACOES.map((_, i) => i));
   const conesRef = useRef<number[]>([]);
   const invulAte = useRef(0);
+  const presoAte = useRef(0);
+  const spawnQueda = useRef(60);
+  const impactos = useRef(0);
+
 
 
   useEffect(() => {
