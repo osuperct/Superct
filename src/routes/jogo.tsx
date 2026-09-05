@@ -217,7 +217,7 @@ function JogoPage() {
   const olhandoRef = useRef<1 | -1>(1);
   const andandoRef = useRef(false);
   const passoRef = useRef<0 | 1>(0);
-  const passoTempo = useRef(0);
+  const passoDistancia = useRef(0);
 
 
 
@@ -426,6 +426,7 @@ function JogoPage() {
       raf = requestAnimationFrame(loop);
       if (fimRef.current || pausaRef.current || !heroiRef.current) return;
       tick.current += 1;
+      const xAntesDoQuadro = x.current;
 
       const emChefao = modoRef.current === "chefao";
       const mundo = emChefao ? ARENA : MUNDO;
@@ -659,22 +660,24 @@ function JogoPage() {
         if (!apoiado) noAr.current = true;
       }
 
-      /* sincroniza a caminhada somente depois de resolver parede e chão */
+      /* sincroniza os passos com a distância realmente percorrida */
       {
-        const caminhandoAgora = dir.current !== 0 && !noAr.current && !seguro.current;
+        const distanciaPercorrida = Math.abs(x.current - xAntesDoQuadro);
+        const caminhandoAgora = distanciaPercorrida > 0.05 && !noAr.current && !seguro.current;
         if (andandoRef.current !== caminhandoAgora) {
           andandoRef.current = caminhandoAgora;
           setAndando(caminhandoAgora);
-          passoTempo.current = 0;
+          passoDistancia.current = 0;
         }
-        const agoraMs = performance.now();
         if (caminhandoAgora) {
-          if (agoraMs - passoTempo.current > 130) {
-            passoTempo.current = agoraMs;
+          passoDistancia.current += distanciaPercorrida;
+          if (passoDistancia.current >= 9) {
+            passoDistancia.current = 0;
             passoRef.current = passoRef.current === 0 ? 1 : 0;
             setPassoFrame(passoRef.current);
           }
         } else if (passoRef.current !== 0) {
+          passoDistancia.current = 0;
           passoRef.current = 0;
           setPassoFrame(0);
         }
@@ -1409,17 +1412,17 @@ function JogoPage() {
               })}
 
 
-            {/* herói (vira para o movimento; escala de costas e se pendura de lado no trepa-trepa) */}
+            {/* herói (vira para o movimento; escala de costas e ergue os braços nos aparelhos) */}
             {(() => {
               const escalando = pendurado === "parede";
-              const noTrepaTrepa = pendurado === "barra";
+              const comBracosNoAlto = pendurado === "barra" || pendurado === "argola";
               const sombra = pendurado
                 ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
                 : `drop-shadow(0 0 6px ${heroiAtual.cor})`;
               const caminhando = andando && !pendurado;
               const src = escalando
                 ? heroiAtual.escala
-                : noTrepaTrepa
+                : comBracosNoAlto
                   ? heroiAtual.trepaTrepa
                 : caminhando
                   ? heroiAtual.anda[passoFrame]
