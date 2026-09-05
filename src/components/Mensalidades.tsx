@@ -106,6 +106,23 @@ export function Mensalidades({
   const [abertos, setAbertos] = useState<Set<string>>(new Set(ordenados.map((a) => a.id)));
   const [todosAbertos, setTodosAbertos] = useState(true);
 
+  const toggleAluno = (id: string) => {
+    setAbertos((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleTodos = () => {
+    const proximo = !todosAbertos;
+    setTodosAbertos(proximo);
+    setAbertos(
+      proximo ? new Set(ordenados.map((a) => a.id)) : new Set(),
+    );
+  };
+
   const doMes = (alunoId: string, ref = mesAtual) =>
     mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === ref);
 
