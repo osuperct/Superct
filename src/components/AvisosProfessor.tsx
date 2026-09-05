@@ -56,6 +56,17 @@ export function AvisosProfessor({ uid }: { uid: string }) {
     }
   }
 
+  function toggleMes(chave: string) {
+    setAbertos((atual) => {
+      const proximo = new Set(atual);
+      if (proximo.has(chave)) proximo.delete(chave);
+      else proximo.add(chave);
+      return proximo;
+    });
+  }
+
+  const porMes = agruparPorMes(lista);
+
   return (
     <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
       <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
