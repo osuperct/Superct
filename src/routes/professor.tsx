@@ -282,7 +282,7 @@ function Painel({ professorId }: { professorId: string }) {
         <ul className="mt-3 space-y-2">
           {alunosFiltrados.map((a) => {
             const perfil = perfis.find((p) => p.id === a.user_id);
-            const ativo = mensalidades.find((m) => m.aluno_id === a.id && m.referencia === refMes())?.ativo ?? true;
+            const ativo = estaAtivo(a.id);
             return (
               <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
                 <div className="flex items-center justify-between gap-2">
@@ -299,12 +299,23 @@ function Painel({ professorId }: { professorId: string }) {
                   {perfil?.telefone ? ` • ${perfil.telefone}` : ""}
                   {perfil?.cpf ? ` • CPF ${formatarCpf(perfil.cpf)}` : ""}
                 </p>
+                <p
+                  className={`mt-1 font-mono text-[9px] uppercase tracking-widest ${
+                    ativo ? "text-primary" : "text-destructive"
+                  }`}
+                >
+                  Matrícula {ativo ? "ativa" : "inativa"}
+                </p>
               </li>
             );
           })}
-          {alunos.length === 0 && <li className="text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</li>}
+          {alunosFiltrados.length === 0 && (
+            <li className="text-sm text-muted-foreground">Nenhum aluno nesta seleção.</li>
+          )}
         </ul>
       </section>
+
+      <Mensalidades alunos={alunos} mensalidades={mensalidades} recarregar={() => void carregar()} />
 
       <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
 
