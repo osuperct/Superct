@@ -356,6 +356,8 @@ export function ProdutosAdm() {
           {produtos.length === 0 && <li className="text-xs text-muted-foreground">Nenhum produto cadastrado.</li>}
         </ul>
       )}
+        </>
+      )}
     </section>
   );
 }
