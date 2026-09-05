@@ -5,6 +5,7 @@ import { CircleDollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Mensalidades } from "@/components/Mensalidades";
 import type { Mensalidade } from "@/lib/mensalidade";
+import { planoDoContrato, type PlanoContrato } from "@/lib/planoContrato";
 
 export const Route = createFileRoute("/financeiro")({
   head: () => ({
@@ -57,6 +58,7 @@ function FinanceiroPage() {
   const [autorizado, setAutorizado] = useState<boolean | null>(null);
   const [alunos, setAlunos] = useState<Alu[]>([]);
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
+  const [planos, setPlanos] = useState<PlanoContrato[]>([]);
 
   const carregar = useCallback(async () => {
     const { data: papeis } = await supabase.from("user_roles").select("role");
@@ -64,14 +66,34 @@ function FinanceiroPage() {
     setAutorizado(ehProfessor);
     if (!ehProfessor) return;
 
-    const [{ data: a }, { data: m }] = await Promise.all([
+    const [{ data: a }, { data: m }, { data: f }, { data: docs }] = await Promise.all([
       supabase.from("alunos").select("id, nome, matricula, user_id").order("nome"),
       supabase
         .from("mensalidades")
         .select("id, aluno_id, user_id, referencia, ativo, valor, pago, pago_em, forma"),
+      supabase
+        .from("fichas")
+        .select("aluno_id, dados, created_at")
+        .eq("tipo", "contrato")
+        .order("created_at", { ascending: false }),
+      supabase.from("documentos").select("aluno_id, tipo, liberado").eq("tipo", "contrato"),
     ]);
     setAlunos((a ?? []) as Alu[]);
     setMensalidades((m ?? []) as Mensalidade[]);
+
+    // Só entram na lista os alunos cujo contrato já foi conferido e liberado.
+    const conferidos = new Set(
+      (docs ?? []).filter((d) => d.liberado && d.aluno_id).map((d) => d.aluno_id as string),
+    );
+    const vistos = new Set<string>();
+    const lista: PlanoContrato[] = [];
+    for (const ficha of f ?? []) {
+      const alunoId = ficha.aluno_id;
+      if (!alunoId || vistos.has(alunoId) || !conferidos.has(alunoId)) continue;
+      vistos.add(alunoId);
+      lista.push(planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>));
+    }
+    setPlanos(lista);
   }, []);
 
   useEffect(() => {
@@ -102,7 +124,12 @@ function FinanceiroPage() {
 
   return (
     <Casca>
-      <Mensalidades alunos={alunos} mensalidades={mensalidades} recarregar={() => void carregar()} />
+      <Mensalidades
+        alunos={alunos}
+        mensalidades={mensalidades}
+        planos={planos}
+        recarregar={() => void carregar()}
+      />
     </Casca>
   );
 }
