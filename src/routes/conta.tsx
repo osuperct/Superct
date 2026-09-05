@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { Eye, EyeOff, GraduationCap, Paperclip, Send, ShieldCheck, Trash2, Upload, UserPlus } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, Paperclip, Send, ShieldCheck, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -547,15 +547,6 @@ function Painel({ session }: { session: Session }) {
 
 
 
-  async function excluirAluno(id: string) {
-    const { error } = await supabase.from("alunos").delete().eq("id", id).eq("user_id", uid);
-    if (error) {
-      toast.error("Não foi possível excluir o aluno.");
-      return;
-    }
-    toast.success("Aluno removido.");
-    void recarregar();
-  }
 
 
   async function anexar(arquivo: File) {
@@ -645,7 +636,7 @@ function Painel({ session }: { session: Session }) {
 
             return (
               <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
-                <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start gap-2">
                   <span className="min-w-0 flex-1 text-sm">
                     {a.nome}
                     {a.idade ? ` — ${a.idade} anos` : ""}
@@ -655,14 +646,6 @@ function Painel({ session }: { session: Session }) {
                       </span>
                     )}
                   </span>
-                  <button
-                    type="button"
-                    onClick={() => excluirAluno(a.id)}
-                    title="Excluir aluno"
-                    className="shrink-0 rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
                 </div>
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <span className="text-xs text-muted-foreground">
