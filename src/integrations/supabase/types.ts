@@ -197,6 +197,56 @@ export type Database = {
           },
         ]
       }
+      mensalidades: {
+        Row: {
+          aluno_id: string
+          ativo: boolean
+          created_at: string
+          forma: string | null
+          id: string
+          pago: boolean
+          pago_em: string | null
+          referencia: string
+          updated_at: string
+          user_id: string
+          valor: number | null
+        }
+        Insert: {
+          aluno_id: string
+          ativo?: boolean
+          created_at?: string
+          forma?: string | null
+          id?: string
+          pago?: boolean
+          pago_em?: string | null
+          referencia: string
+          updated_at?: string
+          user_id: string
+          valor?: number | null
+        }
+        Update: {
+          aluno_id?: string
+          ativo?: boolean
+          created_at?: string
+          forma?: string | null
+          id?: string
+          pago?: boolean
+          pago_em?: string | null
+          referencia?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mensalidades_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       perfis: {
         Row: {
           aceite_imagem: boolean

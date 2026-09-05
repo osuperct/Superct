@@ -6,7 +6,9 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
+import { Mensalidades } from "@/components/Mensalidades";
 import { formatarCpf } from "@/lib/cpf";
+import { type Mensalidade, refMes } from "@/lib/mensalidade";
 
 export const Route = createFileRoute("/professor")({
   head: () => ({
@@ -43,7 +45,14 @@ type Doc = {
   enviado_por_professor: boolean;
   liberado: boolean;
 };
-type Alu = { id: string; nome: string; idade: number | null; matricula: string | null; user_id: string };
+type Alu = {
+  id: string;
+  nome: string;
+  idade: number | null;
+  matricula: string | null;
+  user_id: string;
+  created_at: string;
+};
 type Perfil = { id: string; nome_responsavel: string; telefone: string | null; cpf: string | null };
 
 function Aviso({ texto }: { texto: string }) {
@@ -113,6 +122,8 @@ function Painel({ professorId }: { professorId: string }) {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [alunos, setAlunos] = useState<Alu[]>([]);
   const [perfis, setPerfis] = useState<Perfil[]>([]);
+  const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
+  const [filtroAlunos, setFiltroAlunos] = useState<"recentes" | "todos" | "ativos" | "inativos">("todos");
   const [alunoSel, setAlunoSel] = useState("");
   const [tipoSel, setTipoSel] = useState("contrato");
   const [enviando, setEnviando] = useState(false);
@@ -124,17 +135,21 @@ function Painel({ professorId }: { professorId: string }) {
     setAutorizado(ehProfessor);
     if (!ehProfessor) return;
 
-    const [{ data: d }, { data: a }, { data: p }] = await Promise.all([
+    const [{ data: d }, { data: a }, { data: p }, { data: m }] = await Promise.all([
       supabase
         .from("documentos")
         .select("id, tipo, nome_arquivo, caminho, created_at, user_id, aluno_id, enviado_por_professor, liberado")
         .order("created_at", { ascending: false }),
-      supabase.from("alunos").select("id, nome, idade, matricula, user_id").order("matricula"),
+      supabase.from("alunos").select("id, nome, idade, matricula, user_id, created_at").order("matricula"),
       supabase.from("perfis").select("id, nome_responsavel, telefone, cpf"),
+      supabase
+        .from("mensalidades")
+        .select("id, aluno_id, user_id, referencia, ativo, valor, pago, pago_em, forma"),
     ]);
     setDocs((d ?? []) as Doc[]);
     setAlunos((a ?? []) as Alu[]);
     setPerfis((p ?? []) as Perfil[]);
+    setMensalidades((m ?? []) as Mensalidade[]);
   }, []);
 
   useEffect(() => {
@@ -213,6 +228,22 @@ function Painel({ professorId }: { professorId: string }) {
 
 
 
+  const mesRef = refMes();
+  const estaAtivo = (alunoId: string) =>
+    mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
+  const limite = Date.now() - 15 * 24 * 60 * 60 * 1000;
+  const porNome = [...alunos].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  const alunosFiltrados: Alu[] =
+    filtroAlunos === "recentes"
+      ? [...alunos]
+          .filter((a) => new Date(a.created_at).getTime() >= limite)
+          .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      : filtroAlunos === "ativos"
+        ? porNome.filter((a) => estaAtivo(a.id))
+        : filtroAlunos === "inativos"
+          ? porNome.filter((a) => !estaAtivo(a.id))
+          : porNome;
+
   if (autorizado === null) return <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>;
   if (!autorizado)
     return (
@@ -232,13 +263,26 @@ function Painel({ professorId }: { professorId: string }) {
       </section>
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <Users className="size-4 text-primary" /> ALUNOS MATRICULADOS ({alunos.length})
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+            <Users className="size-4 text-primary" /> ALUNOS MATRICULADOS ({alunos.length})
+          </h2>
+          <select
+            value={filtroAlunos}
+            onChange={(e) => setFiltroAlunos(e.target.value as typeof filtroAlunos)}
+            className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+          >
+            <option value="recentes">Mais recentes (15 dias)</option>
+            <option value="todos">Todos (A–Z)</option>
+            <option value="ativos">Ativos</option>
+            <option value="inativos">Inativos</option>
+          </select>
+        </div>
 
         <ul className="mt-3 space-y-2">
-          {alunos.map((a) => {
+          {alunosFiltrados.map((a) => {
             const perfil = perfis.find((p) => p.id === a.user_id);
+            const ativo = estaAtivo(a.id);
             return (
               <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
                 <div className="flex items-center justify-between gap-2">
@@ -255,12 +299,23 @@ function Painel({ professorId }: { professorId: string }) {
                   {perfil?.telefone ? ` • ${perfil.telefone}` : ""}
                   {perfil?.cpf ? ` • CPF ${formatarCpf(perfil.cpf)}` : ""}
                 </p>
+                <p
+                  className={`mt-1 font-mono text-[9px] uppercase tracking-widest ${
+                    ativo ? "text-primary" : "text-destructive"
+                  }`}
+                >
+                  Matrícula {ativo ? "ativa" : "inativa"}
+                </p>
               </li>
             );
           })}
-          {alunos.length === 0 && <li className="text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</li>}
+          {alunosFiltrados.length === 0 && (
+            <li className="text-sm text-muted-foreground">Nenhum aluno nesta seleção.</li>
+          )}
         </ul>
       </section>
+
+      <Mensalidades alunos={alunos} mensalidades={mensalidades} recarregar={() => void carregar()} />
 
       <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
 
