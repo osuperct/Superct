@@ -77,3 +77,52 @@ export const definirAcesso = createServerFn({ method: "POST" })
     }
     return { ok: true as const };
   });
+
+const entradaProfessor = z.object({
+  nome: z.string().trim().min(3).max(120),
+  nascimento: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/),
+  email: z.string().trim().email().max(255),
+  cpf: z.string().trim().transform((v) => v.replace(/\D/g, "")).refine((v) => v.length === 11, {
+    message: "CPF inválido",
+  }),
+});
+
+/** Cria a conta de um novo professor e já libera o acesso dele (somente ADM). */
+export const cadastrarProfessor = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => entradaProfessor.parse(data))
+  .handler(async ({ data, context }) => {
+    await garantirAdm(context.supabase as never, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const email = data.email.toLowerCase();
+    const senhaTemporaria = `SCT-${data.cpf.slice(0, 6)}-${Math.random().toString(36).slice(2, 6)}`;
+
+    const { data: criado, error } = await supabaseAdmin.auth.admin.createUser({
+      email,
+      password: senhaTemporaria,
+      email_confirm: true,
+      user_metadata: { nome_responsavel: data.nome, cpf: data.cpf },
+    });
+    if (error || !criado.user) {
+      const msg = (error?.message ?? "").toLowerCase();
+      return {
+        ok: false as const,
+        erro: msg.includes("already") ? "Já existe uma conta com este e-mail." : "Não foi possível criar a conta.",
+      };
+    }
+
+    await supabaseAdmin
+      .from("perfis")
+      .upsert(
+        { id: criado.user.id, nome_responsavel: data.nome, cpf: data.cpf, nascimento: data.nascimento },
+        { onConflict: "id" },
+      );
+
+    const { error: erroPapel } = await supabaseAdmin
+      .from("user_roles")
+      .upsert({ user_id: criado.user.id, role: "professor" }, { onConflict: "user_id,role" });
+    if (erroPapel) return { ok: false as const, erro: "Conta criada, mas não foi possível liberar o acesso." };
+
+    return { ok: true as const, senhaTemporaria };
+  });

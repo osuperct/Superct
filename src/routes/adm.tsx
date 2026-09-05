@@ -1,10 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CircleDollarSign, ShieldCheck, UserCheck } from "lucide-react";
+import { CircleDollarSign, ShieldCheck, UserCheck, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
-import { definirAcesso, listarAcessos, type ContaAcesso } from "@/lib/adm.functions";
+import {
+  cadastrarProfessor,
+  definirAcesso,
+  listarAcessos,
+  type ContaAcesso,
+} from "@/lib/adm.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/adm")({
@@ -159,9 +164,51 @@ function AdmPage() {
 function Acessos() {
   const listar = useServerFn(listarAcessos);
   const definir = useServerFn(definirAcesso);
+  const cadastrar = useServerFn(cadastrarProfessor);
   const [contas, setContas] = useState<ContaAcesso[] | null>(null);
   const [busca, setBusca] = useState("");
   const [ocupado, setOcupado] = useState<string | null>(null);
+  const [novo, setNovo] = useState(false);
+  const [form, setForm] = useState({ nome: "", nascimento: "", email: "", cpf: "" });
+  const [criando, setCriando] = useState(false);
+  const [senhaGerada, setSenhaGerada] = useState<{ email: string; senha: string } | null>(null);
+
+  async function criarProfessor(e: React.FormEvent) {
+    e.preventDefault();
+    const cpf = form.cpf.replace(/\D/g, "");
+    if (form.nome.trim().length < 3) {
+      toast.error("Informe o nome completo.");
+      return;
+    }
+    if (!form.nascimento) {
+      toast.error("Informe a data de nascimento.");
+      return;
+    }
+    if (cpf.length !== 11) {
+      toast.error("CPF deve ter 11 dígitos.");
+      return;
+    }
+    setCriando(true);
+    try {
+      const r = await cadastrar({
+        data: { nome: form.nome.trim(), nascimento: form.nascimento, email: form.email.trim(), cpf },
+      });
+      if (!r.ok) {
+        toast.error(r.erro);
+        return;
+      }
+      toast.success("Professor cadastrado e acesso liberado.");
+      setSenhaGerada({ email: form.email.trim().toLowerCase(), senha: r.senhaTemporaria });
+      setForm({ nome: "", nascimento: "", email: "", cpf: "" });
+      setNovo(false);
+      await carregar();
+    } catch {
+      toast.error("Não foi possível cadastrar o professor.");
+    } finally {
+      setCriando(false);
+    }
+  }
+
 
   const carregar = useCallback(async () => {
     try {
@@ -203,6 +250,56 @@ function Acessos() {
         O novo professor cria a conta normalmente na área do responsável. Depois, libere aqui o acesso dele
         para entrar na área do professor.
       </p>
+
+      <button
+        type="button"
+        onClick={() => setNovo((v) => !v)}
+        className="mt-3 flex items-center gap-2 rounded-md bg-primary px-3 py-2 font-display text-[11px] tracking-tight text-primary-foreground"
+      >
+        <UserPlus className="size-4" /> {novo ? "FECHAR CADASTRO" : "CADASTRAR NOVO PROFESSOR"}
+      </button>
+
+      {novo && (
+        <form onSubmit={(e) => void criarProfessor(e)} className="mt-3 space-y-2 rounded-md border border-border bg-background/60 p-3">
+          {[
+            { k: "nome", rotulo: "Nome completo", tipo: "text" },
+            { k: "nascimento", rotulo: "Data de nascimento", tipo: "date" },
+            { k: "email", rotulo: "E-mail", tipo: "email" },
+            { k: "cpf", rotulo: "CPF", tipo: "text" },
+          ].map((c) => (
+            <label key={c.k} className="block space-y-1">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                {c.rotulo}
+              </span>
+              <input
+                type={c.tipo}
+                required
+                value={form[c.k as keyof typeof form]}
+                onChange={(e) => setForm((f) => ({ ...f, [c.k]: e.target.value }))}
+                className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+          ))}
+          <button
+            type="submit"
+            disabled={criando}
+            className="w-full rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground disabled:opacity-60"
+          >
+            {criando ? "CADASTRANDO…" : "CADASTRAR E LIBERAR PROFESSOR"}
+          </button>
+        </form>
+      )}
+
+      {senhaGerada && (
+        <div className="mt-3 rounded-md border border-primary/60 bg-primary/10 p-3 text-xs">
+          <p className="font-display tracking-tight">ACESSO CRIADO</p>
+          <p className="mt-1 text-muted-foreground">
+            Entregue estes dados ao professor: e-mail <span className="text-primary">{senhaGerada.email}</span> e
+            senha provisória <span className="text-primary">{senhaGerada.senha}</span>. Ele já pode entrar na
+            área do professor e trocar a senha depois.
+          </p>
+        </div>
+      )}
 
       <input
         value={busca}
