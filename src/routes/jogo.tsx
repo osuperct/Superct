@@ -216,6 +216,8 @@ function JogoPage() {
   const heroiRef = useRef<HeroiId | null>(null);
   const olhandoRef = useRef<1 | -1>(1);
   const andandoRef = useRef(false);
+  const passoRef = useRef<0 | 1>(0);
+  const passoTempo = useRef(0);
 
 
 
@@ -282,15 +284,8 @@ function JogoPage() {
     return () => ro.disconnect();
   }, []);
 
-  /* troca os quadros da caminhada */
-  useEffect(() => {
-    if (!andando) {
-      setPassoFrame(0);
-      return;
-    }
-    const t = setInterval(() => setPassoFrame((f) => (f === 0 ? 1 : 0)), 170);
-    return () => clearInterval(t);
-  }, [andando]);
+  /* os quadros da caminhada são trocados dentro do loop do jogo (sincronizados) */
+
 
 
   const zerarHeroi = useCallback(() => {
@@ -468,14 +463,31 @@ function JogoPage() {
         if (livre) x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
       };
 
-      if (dir.current !== 0 && seguro.current !== "parede") {
+      if (dir.current !== 0) {
         const lado: 1 | -1 = dir.current > 0 ? 1 : -1;
         if (olhandoRef.current !== lado) {
           olhandoRef.current = lado;
           setOlhando(lado);
         }
-        passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
+        if (seguro.current === "parede") {
+          /* na parede: desliza para os lados e sai da parede ao passar da borda */
+          const cx = x.current + HEROI_W / 2;
+          const p = paredes.find((pp) => cx > pp.x - 6 && cx < pp.x + pp.w + 6);
+          const alvo = x.current + dir.current * VELOCIDADE * 0.7;
+          if (p && alvo + HEROI_W / 2 > p.x - 4 && alvo + HEROI_W / 2 < p.x + p.w + 4) {
+            x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
+          } else {
+            /* saiu da parede: volta imediatamente para a caminhada / queda */
+            seguro.current = false;
+            bloquearAgarreAte.current = performance.now() + 320;
+            noAr.current = y.current > 0;
+            x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
+          }
+        } else {
+          passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
+        }
       }
+
 
       /* ---- impulso lateral do salto ao soltar aparelho ---- */
       if (vxAr.current !== 0) {
@@ -653,6 +665,18 @@ function JogoPage() {
         if (andandoRef.current !== caminhandoAgora) {
           andandoRef.current = caminhandoAgora;
           setAndando(caminhandoAgora);
+          passoTempo.current = 0;
+        }
+        const agoraMs = performance.now();
+        if (caminhandoAgora) {
+          if (agoraMs - passoTempo.current > 130) {
+            passoTempo.current = agoraMs;
+            passoRef.current = passoRef.current === 0 ? 1 : 0;
+            setPassoFrame(passoRef.current);
+          }
+        } else if (passoRef.current !== 0) {
+          passoRef.current = 0;
+          setPassoFrame(0);
         }
       }
 
