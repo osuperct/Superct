@@ -22,6 +22,7 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
   const [lista, setLista] = useState<Aviso[]>([]);
   const [lidos, setLidos] = useState<Set<string>>(new Set());
   const [permissao, setPermissao] = useState<EstadoNotificacao>("pendente");
+  const [abertos, setAbertos] = useState<Set<string>>(new Set([mesAtual()]));
 
   const carregar = useCallback(async () => {
     const [avisos, jaLidos] = await Promise.all([listarAvisos(), listarLidos(uid)]);
