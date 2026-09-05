@@ -3,6 +3,12 @@ import { z } from "zod";
 
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
+/** Confere a senha de confirmação das ações destrutivas (validada só no servidor). */
+export function conferirPinAdm(senha: string) {
+  const esperado = process.env["ADM_CONFIRM_PIN"] ?? "";
+  return esperado.length > 0 && senha.trim() === esperado;
+}
+
 export type ContaAcesso = {
   id: string;
   email: string;
@@ -62,6 +68,7 @@ const entradaPapel = z.object({
   userId: z.string().uuid(),
   papel: z.enum(["professor", "adm"]),
   liberar: z.boolean(),
+  senha: z.string().max(64).optional(),
 });
 
 /** Libera ou remove o acesso de professor / ADM de uma conta (somente ADM). */
@@ -70,6 +77,9 @@ export const definirAcesso = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => entradaPapel.parse(data))
   .handler(async ({ data, context }) => {
     await garantirAdm(context.supabase as never, context.userId);
+    if (!data.liberar && !conferirPinAdm(data.senha ?? "")) {
+      return { ok: false as const, erro: "Senha incorreta. Ação cancelada." };
+    }
     if (!data.liberar && data.userId === context.userId && data.papel === "adm") {
       return { ok: false as const, erro: "Você não pode remover o seu próprio acesso ADM." };
     }
@@ -143,7 +153,7 @@ export const cadastrarProfessor = createServerFn({ method: "POST" })
     return { ok: true as const, senhaTemporaria };
   });
 
-const entradaExclusao = z.object({ userId: z.string().uuid() });
+const entradaExclusao = z.object({ userId: z.string().uuid(), senha: z.string().max(64) });
 
 /** Exclui definitivamente a conta de um professor cadastrado (somente ADM). */
 export const excluirProfessor = createServerFn({ method: "POST" })
@@ -151,6 +161,9 @@ export const excluirProfessor = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => entradaExclusao.parse(data))
   .handler(async ({ data, context }) => {
     await garantirAdm(context.supabase as never, context.userId);
+    if (!conferirPinAdm(data.senha)) {
+      return { ok: false as const, erro: "Senha incorreta. Exclusão cancelada." };
+    }
     if (data.userId === context.userId) {
       return { ok: false as const, erro: "Você não pode excluir a sua própria conta." };
     }

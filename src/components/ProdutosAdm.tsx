@@ -115,12 +115,8 @@ export function ProdutosAdm() {
     if (!window.confirm(`Excluir o produto ${p.nome}?`)) return;
     const senha = window.prompt("Digite a senha de exclusão:");
     if (senha === null) return;
-    if (senha.trim() !== "2802") {
-      toast.error("Senha incorreta. Exclusão cancelada.");
-      return;
-    }
     try {
-      await excluir({ data: { id: p.id } });
+      await excluir({ data: { id: p.id, senha } });
       toast.success("Produto excluído.");
       await carregar();
     } catch {

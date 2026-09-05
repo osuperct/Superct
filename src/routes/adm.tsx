@@ -246,16 +246,14 @@ function Acessos() {
   }, [carregar]);
 
   async function alternar(conta: ContaAcesso, papel: "professor" | "adm", liberar: boolean) {
+    let pin = "";
     if (!liberar) {
       const senha = window.prompt(`Digite a senha para remover o acesso de ${papel.toUpperCase()}:`);
       if (senha === null) return;
-      if (senha.trim() !== "2802") {
-        toast.error("Senha incorreta. Ação cancelada.");
-        return;
-      }
+      pin = senha;
     }
     setOcupado(`${conta.id}-${papel}`);
-    const r = await definir({ data: { userId: conta.id, papel, liberar } });
+    const r = await definir({ data: { userId: conta.id, papel, liberar, senha: pin } });
     setOcupado(null);
     if (!r.ok) {
       toast.error(r.erro);
@@ -270,14 +268,10 @@ function Acessos() {
     if (!window.confirm(`Excluir definitivamente o cadastro de ${nome}?`)) return;
     const senha = window.prompt("Digite a senha de exclusão:");
     if (senha === null) return;
-    if (senha.trim() !== "2802") {
-      toast.error("Senha incorreta. Exclusão cancelada.");
-      return;
-    }
     setOcupado(`${conta.id}-excluir`);
 
     try {
-      const r = await excluir({ data: { userId: conta.id } });
+      const r = await excluir({ data: { userId: conta.id, senha } });
       if (!r.ok) {
         toast.error(r.erro);
         return;
@@ -456,13 +450,9 @@ function Cadastros() {
     if (!window.confirm(`Excluir o cadastro de ${nome}? A pessoa precisará se cadastrar novamente.`)) return;
     const senha = window.prompt("Digite a senha para confirmar a exclusão:");
     if (senha === null) return;
-    if (senha.trim() !== "2802") {
-      toast.error("Senha incorreta. Exclusão cancelada.");
-      return;
-    }
     setOcupado(conta.id);
     try {
-      const r = await excluir({ data: { userId: conta.id } });
+      const r = await excluir({ data: { userId: conta.id, senha } });
       if (!r.ok) {
         toast.error(r.erro);
         return;

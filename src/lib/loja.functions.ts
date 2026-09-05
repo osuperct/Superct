@@ -134,9 +134,15 @@ export const salvarProduto = createServerFn({ method: "POST" })
 /** Exclui um produto (somente ADM). */
 export const excluirProduto = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
+  .inputValidator((d: unknown) =>
+    z.object({ id: z.string().uuid(), senha: z.string().max(64) }).parse(d),
+  )
   .handler(async ({ data, context }) => {
     await garantirAdm(context.supabase, context.userId);
+    const esperado = process.env["ADM_CONFIRM_PIN"] ?? "";
+    if (!esperado || data.senha.trim() !== esperado) {
+      throw new Error("Senha incorreta. Exclusão cancelada.");
+    }
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("produtos").delete().eq("id", data.id);
     if (error) throw new Error("Não foi possível excluir o produto.");
