@@ -145,9 +145,23 @@ export function Mensalidades({
 
   const planoDoAluno = (alunoId: string) => planos.find((p) => p.alunoId === alunoId);
 
+  // Meses disponíveis na projeção: do próximo mês até a última parcela dos planos.
+  const mesesProjecao = useMemo(() => {
+    let ultimo = refSomando(mesAtual, 12);
+    for (const p of planos) {
+      const fim = parcelaNoMes(p, mesAtual).fim;
+      if (fim && fim > ultimo) ultimo = fim;
+    }
+    const lista: string[] = [];
+    for (let i = 1; i <= diffMeses(mesAtual, ultimo); i++) lista.push(refSomando(mesAtual, i));
+    return lista;
+  }, [planos, mesAtual]);
+
+  const [mesProjecao, setMesProjecao] = useState(mesProximo);
+
   const projecao = ativosMes.map((a) => {
     const plano = planoDoAluno(a.id);
-    const parcela = plano ? parcelaNoMes(plano, mesProximo) : null;
+    const parcela = plano ? parcelaNoMes(plano, mesProjecao) : null;
     const valorPlano = plano?.valor ?? null;
     const encerrado = parcela?.encerrado ?? false;
     const valor = encerrado ? 0 : Number(valorPlano ?? doMes(a.id)?.valor ?? 0);
