@@ -1,6 +1,6 @@
 import { DatePicker } from "@/components/ui/datepicker";
-import { useMemo, useState } from "react";
-import { CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { BellRing, CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -22,7 +22,7 @@ import {
 
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
-const VALORES = [185, 160, 150, 135];
+const VALORES = [185, 160, 150, 140, 135];
 
 function CampoValor({
   valor,
