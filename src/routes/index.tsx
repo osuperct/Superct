@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronRight, MapPin, Phone, UserRound } from "lucide-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+
+import { supabase } from "@/integrations/supabase/client";
 
 import { VideoShowcase } from "@/components/VideoShowcase";
 
