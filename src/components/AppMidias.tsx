@@ -142,14 +142,68 @@ export function AppMidias() {
         />
       </div>
 
+      {/* -------- LOGO -------- */}
+      <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
+        <p className="flex items-center gap-2 font-display text-sm tracking-tight">
+          <ImageIcon className="size-4 text-primary" /> LOGO PRINCIPAL
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Enquanto não houver logo aqui, a página mostra a logo original.
+        </p>
+        {logo?.url && (
+          <div className="mt-2 flex items-center gap-2">
+            <img
+              src={logo.url}
+              alt="Logo atual da página inicial"
+              className="h-24 w-24 rounded-md border border-border object-contain"
+            />
+            <button
+              type="button"
+              disabled={ocupado}
+              onClick={() => void remover(logo)}
+              className="rounded-md border border-border p-2 text-muted-foreground"
+              aria-label="Remover logo"
+            >
+              <Trash2 className="size-4" />
+            </button>
+          </div>
+        )}
+        <EnvioImagem
+          rotulo={logo ? "TROCAR LOGO PRINCIPAL" : "ANEXAR NOVA LOGO"}
+          aspecto={1}
+          onEnviar={async (blob, nome, descricao) => {
+            await enviarMidia({ tipo: "logo", grupo: GRUPO_LOGO, arquivo: blob, nomeArquivo: nome, descricao });
+            await carregar();
+          }}
+        />
+      </div>
+
+      {/* -------- TEXTOS -------- */}
+      <TextosPagina />
+
       {/* -------- VÍDEOS -------- */}
       <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
         <p className="flex items-center gap-2 font-display text-sm tracking-tight">
-          <Film className="size-4 text-primary" /> VÍDEOS DA PÁGINA INICIAL
+          <Film className="size-4 text-primary" /> SUPER CT EM AÇÃO — VÍDEOS
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Enquanto não houver vídeo aqui, a página mostra os vídeos originais.
+          Estes são os vídeos que aparecem em “SUPER CT EM AÇÃO”. Ao anexar um vídeo novo, ele entra no lugar dos
+          vídeos originais.
         </p>
+
+        {videos.length === 0 && (
+          <ul className="mt-2 space-y-2">
+            {VIDEOS_ORIGINAIS.map((src, i) => (
+              <li key={src} className="rounded-md border border-border bg-background/60 p-2">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Vídeo original {i + 1}
+                </p>
+                <video src={src} controls playsInline preload="metadata" className="mt-1 w-full rounded-md" />
+              </li>
+            ))}
+          </ul>
+        )}
+
 
         {videos.length > 0 && (
           <ul className="mt-2 space-y-3">
