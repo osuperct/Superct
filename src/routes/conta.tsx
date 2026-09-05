@@ -462,7 +462,7 @@ function Saudacao({ session }: { session: Session }) {
 
   useEffect(() => {
     const meta = session.user.user_metadata;
-    const nomeMeta = typeof meta?.nome_responsavel === "string" ? meta.nome_responsavel : "";
+    const nomeMeta = typeof meta?.["nome_responsavel"] === "string" ? meta["nome_responsavel"] : "";
     if (nomeMeta) {
       setNome(primeiroNome(nomeMeta));
       return;
@@ -470,11 +470,11 @@ function Saudacao({ session }: { session: Session }) {
     let ativo = true;
     void supabase
       .from("perfis")
-      .select("nome")
-      .eq("user_id", session.user.id)
+      .select("nome_responsavel")
+      .eq("id", session.user.id)
       .single()
       .then(({ data }) => {
-        if (ativo && data?.nome) setNome(primeiroNome(data.nome));
+        if (ativo && data?.nome_responsavel) setNome(primeiroNome(data.nome_responsavel));
       });
     return () => {
       ativo = false;
