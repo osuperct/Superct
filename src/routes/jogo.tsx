@@ -252,8 +252,9 @@ function JogoPage() {
   const acordarSom = () => {
     if (!somRef.current) return;
     acordarAudio();
-    iniciarMusica();
+    iniciarMusica(faseRef.current, modoRef.current === "chefao");
   };
+
 
   const dir = useRef(0);
   const dirY = useRef(0);
