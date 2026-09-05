@@ -5,6 +5,7 @@ import { CreditCard, ShoppingBag, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { listarProdutos, type Produto } from "@/lib/loja.functions";
+import mascotesLoja from "@/assets/loja-mascotes.png";
 
 const LINK_INFINITEPAY = "https://checkout.infinitepay.io/super_ct/gF9RQ9e7qg";
 
