@@ -71,6 +71,17 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
     await marcarLido(uid, id);
   }
 
+  function toggleMes(chave: string) {
+    setAbertos((atual) => {
+      const proximo = new Set(atual);
+      if (proximo.has(chave)) proximo.delete(chave);
+      else proximo.add(chave);
+      return proximo;
+    });
+  }
+
+  const porMes = agruparPorMes(lista);
+
   return (
     <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
       <div className="flex items-start justify-between gap-2">
