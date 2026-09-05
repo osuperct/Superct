@@ -575,10 +575,6 @@ function Painel({ session }: { session: Session }) {
   }
 
 
-  async function sair() {
-    await supabase.auth.signOut();
-  }
-
   return (
     <div className="mt-6">
       <LembreteAcesso />
