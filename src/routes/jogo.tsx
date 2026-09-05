@@ -216,6 +216,8 @@ function JogoPage() {
   const heroiRef = useRef<HeroiId | null>(null);
   const olhandoRef = useRef<1 | -1>(1);
   const andandoRef = useRef(false);
+  const passoRef = useRef<0 | 1>(0);
+  const passoTempo = useRef(0);
 
 
 
@@ -663,6 +665,18 @@ function JogoPage() {
         if (andandoRef.current !== caminhandoAgora) {
           andandoRef.current = caminhandoAgora;
           setAndando(caminhandoAgora);
+          passoTempo.current = 0;
+        }
+        const agoraMs = performance.now();
+        if (caminhandoAgora) {
+          if (agoraMs - passoTempo.current > 130) {
+            passoTempo.current = agoraMs;
+            passoRef.current = passoRef.current === 0 ? 1 : 0;
+            setPassoFrame(passoRef.current);
+          }
+        } else if (passoRef.current !== 0) {
+          passoRef.current = 0;
+          setPassoFrame(0);
         }
       }
 
