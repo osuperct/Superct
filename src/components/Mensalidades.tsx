@@ -105,6 +105,7 @@ export function Mensalidades({
 
   const [abertos, setAbertos] = useState<Set<string>>(new Set(ordenados.map((a) => a.id)));
   const [todosAbertos, setTodosAbertos] = useState(true);
+  const [listaVisivel, setListaVisivel] = useState(true);
 
   const toggleAluno = (id: string) => {
     setAbertos((prev) => {
@@ -116,7 +117,8 @@ export function Mensalidades({
   };
 
   const toggleTodos = () => {
-    const proximo = !todosAbertos;
+    const proximo = !listaVisivel;
+    setListaVisivel(proximo);
     setTodosAbertos(proximo);
     setAbertos(
       proximo ? new Set(ordenados.map((a) => a.id)) : new Set(),
@@ -280,7 +282,7 @@ export function Mensalidades({
             onClick={toggleTodos}
             className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground"
           >
-            {todosAbertos ? (
+            {listaVisivel ? (
               <>
                 <ChevronUp className="size-3" /> RECOLHER TODOS
               </>
@@ -292,109 +294,116 @@ export function Mensalidades({
           </button>
         </div>
 
-        <ul className="space-y-2">
-          {ordenados.map((a) => {
-            const m = doMes(a.id);
-            const ativo = m?.ativo ?? true;
-            const expandido = abertos.has(a.id);
-            return (
-              <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
-                <button
-                  type="button"
-                  onClick={() => toggleAluno(a.id)}
-                  className="flex w-full items-center justify-between gap-2 text-left"
-                >
-                  <span className="flex items-center gap-2">
-                    {expandido ? (
-                      <ChevronUp className="size-4 text-primary" />
-                    ) : (
-                      <ChevronDown className="size-4 text-muted-foreground" />
-                    )}
-                    <span className="text-sm font-medium">{a.nome}</span>
-                  </span>
-                  <span className="shrink-0 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
-                    {a.matricula ?? "—"}
-                  </span>
-                </button>
+        {!listaVisivel ? (
+          <p className="rounded-md border border-border bg-background/40 p-3 text-sm text-muted-foreground">
+            {ordenados.length} aluno{ordenados.length === 1 ? "" : "s"} matriculado{ordenados.length === 1 ? "" : "s"}.
+            Clique em <span className="text-primary">ABRIR TODOS</span> para ver a lista.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {ordenados.map((a) => {
+              const m = doMes(a.id);
+              const ativo = m?.ativo ?? true;
+              const expandido = abertos.has(a.id);
+              return (
+                <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
+                  <button
+                    type="button"
+                    onClick={() => toggleAluno(a.id)}
+                    className="flex w-full items-center justify-between gap-2 text-left"
+                  >
+                    <span className="flex items-center gap-2">
+                      {expandido ? (
+                        <ChevronUp className="size-4 text-primary" />
+                      ) : (
+                        <ChevronDown className="size-4 text-muted-foreground" />
+                      )}
+                      <span className="text-sm font-medium">{a.nome}</span>
+                    </span>
+                    <span className="shrink-0 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
+                      {a.matricula ?? "—"}
+                    </span>
+                  </button>
 
-                {expandido && (
-                  <div className="mt-3 space-y-2 border-t border-border pt-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <select
-                        value={ativo ? "ativo" : "inativo"}
-                        onChange={(e) => void salvar(a, { ativo: e.target.value === "ativo" })}
-                        className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
-                      >
-                        <option value="ativo">Matrícula ativa</option>
-                        <option value="inativo">Matrícula inativa</option>
-                      </select>
-                      <CampoValor
-                        valor={m?.valor ?? null}
-                        onChange={(valor) => void salvar(a, { valor })}
-                      />
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          void salvar(a, {
-                            pago: !(m?.pago ?? false),
-                            pago_em: m?.pago ? null : (m?.pago_em ?? hojeIso()),
-                            forma: m?.pago ? null : (m?.forma ?? FORMAS[0]!),
-                          })
-                        }
-                        className={`rounded-md px-3 py-1.5 font-display text-xs tracking-tight ${
-                          m?.pago
-                            ? "bg-primary text-primary-foreground"
-                            : "border border-border text-muted-foreground"
-                        }`}
-                      >
-                        {m?.pago ? "PAGO" : "NÃO RECEBIDO"}
-                      </button>
-                      <div className="w-40">
-                        <DatePicker
-                          value={m?.pago_em ? new Date(`${m.pago_em}T12:00:00`) : undefined}
-                          placeholder="Dia do pagamento"
-                          onChange={(d) => {
-                            if (!d) return;
-                            const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-                            void salvar(a, { pago_em: iso });
-                          }}
+                  {expandido && (
+                    <div className="mt-3 space-y-2 border-t border-border pt-3">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <select
+                          value={ativo ? "ativo" : "inativo"}
+                          onChange={(e) => void salvar(a, { ativo: e.target.value === "ativo" })}
+                          className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+                        >
+                          <option value="ativo">Matrícula ativa</option>
+                          <option value="inativo">Matrícula inativa</option>
+                        </select>
+                        <CampoValor
+                          valor={m?.valor ?? null}
+                          onChange={(valor) => void salvar(a, { valor })}
                         />
                       </div>
-                      <select
-                        value={m?.forma ?? FORMAS[0]!}
-                        onChange={(e) => void salvar(a, { forma: e.target.value })}
-                        className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
-                      >
-                        {FORMAS.map((f) => (
-                          <option key={f} value={f}>
-                            {f}
-                          </option>
-                        ))}
-                      </select>
-                      {salvando === a.id && (
-                        <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                          salvando…
-                        </span>
+
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            void salvar(a, {
+                              pago: !(m?.pago ?? false),
+                              pago_em: m?.pago ? null : (m?.pago_em ?? hojeIso()),
+                              forma: m?.pago ? null : (m?.forma ?? FORMAS[0]!),
+                            })
+                          }
+                          className={`rounded-md px-3 py-1.5 font-display text-xs tracking-tight ${
+                            m?.pago
+                              ? "bg-primary text-primary-foreground"
+                              : "border border-border text-muted-foreground"
+                          }`}
+                        >
+                          {m?.pago ? "PAGO" : "NÃO RECEBIDO"}
+                        </button>
+                        <div className="w-40">
+                          <DatePicker
+                            value={m?.pago_em ? new Date(`${m.pago_em}T12:00:00`) : undefined}
+                            placeholder="Dia do pagamento"
+                            onChange={(d) => {
+                              if (!d) return;
+                              const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+                              void salvar(a, { pago_em: iso });
+                            }}
+                          />
+                        </div>
+                        <select
+                          value={m?.forma ?? FORMAS[0]!}
+                          onChange={(e) => void salvar(a, { forma: e.target.value })}
+                          className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+                        >
+                          {FORMAS.map((f) => (
+                            <option key={f} value={f}>
+                              {f}
+                            </option>
+                          ))}
+                        </select>
+                        {salvando === a.id && (
+                          <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                            salvando…
+                          </span>
+                        )}
+                      </div>
+
+                      {m?.pago && (
+                        <p className="font-mono text-[9px] uppercase tracking-widest text-primary">
+                          Recebido em {formatarDataIso(m.pago_em)} • {m.forma ?? "—"} • {formatarValor(m.valor)}
+                        </p>
                       )}
                     </div>
-
-                    {m?.pago && (
-                      <p className="font-mono text-[9px] uppercase tracking-widest text-primary">
-                        Recebido em {formatarDataIso(m.pago_em)} • {m.forma ?? "—"} • {formatarValor(m.valor)}
-                      </p>
-                    )}
-                  </div>
-                )}
-              </li>
-            );
-          })}
-          {ordenados.length === 0 && (
-            <li className="text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</li>
-          )}
-        </ul>
+                  )}
+                </li>
+              );
+            })}
+            {ordenados.length === 0 && (
+              <li className="text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</li>
+            )}
+          </ul>
+        )}
       </section>
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
