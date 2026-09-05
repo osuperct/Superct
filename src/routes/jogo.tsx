@@ -468,7 +468,7 @@ function JogoPage() {
         if (livre) x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
       };
 
-      if (dir.current !== 0) {
+      if (dir.current !== 0 && seguro.current !== "parede") {
         const lado: 1 | -1 = dir.current > 0 ? 1 : -1;
         if (olhandoRef.current !== lado) {
           olhandoRef.current = lado;
@@ -476,16 +476,6 @@ function JogoPage() {
         }
         passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
       }
-
-      /* ---- animação de caminhada ---- */
-      {
-        const caminhando = dir.current !== 0 && !noAr.current && !seguro.current;
-        if (andandoRef.current !== caminhando) {
-          andandoRef.current = caminhando;
-          setAndando(caminhando);
-        }
-      }
-
 
       /* ---- impulso lateral do salto ao soltar aparelho ---- */
       if (vxAr.current !== 0) {
@@ -499,6 +489,24 @@ function JogoPage() {
           passo(vxAr.current);
           vxAr.current *= 0.94;
           if (Math.abs(vxAr.current) < 0.25) vxAr.current = 0;
+        }
+      }
+
+      /* encostou na parede: troca para a pose de escalada no mesmo quadro */
+      if (!seguro.current && performance.now() >= bloquearAgarreAte.current) {
+        const cx = x.current + HEROI_W / 2;
+        const paredeEncostada = paredes.find(
+          (p) => cx >= p.x && cx <= p.x + p.w && y.current >= 0 && y.current < p.h - alt,
+        );
+        if (paredeEncostada && (dir.current !== 0 || dirY.current !== 0 || noAr.current)) {
+          seguro.current = "parede";
+          x.current = Math.min(
+            paredeEncostada.x + paredeEncostada.w - HEROI_W,
+            Math.max(paredeEncostada.x, x.current),
+          );
+          vy.current = 0;
+          noAr.current = false;
+          subindoDesde.current = null;
         }
       }
 
@@ -522,7 +530,15 @@ function JogoPage() {
             const querSubir = subindo.current || dirY.current < -0.3;
             const querDescer = descendoParede.current || dirY.current > 0.3;
             const delta = querSubir ? VELOCIDADE_ESCALADA : querDescer ? -VELOCIDADE_ESCALADA : 0;
-            apoio = Math.min(p.h - alt, Math.max(0, y.current + delta));
+            const proximaAltura = Math.min(p.h - alt, Math.max(0, y.current + delta));
+            if (querDescer && proximaAltura <= 0) {
+              y.current = 0;
+              seguro.current = false;
+              noAr.current = false;
+              descendoParede.current = false;
+            } else {
+              apoio = proximaAltura;
+            }
           } else seguro.current = false;
         } else {
           const corda = cordas.find((c) => Math.abs(c.x - (x.current + HEROI_W / 2)) < 28);
@@ -536,7 +552,7 @@ function JogoPage() {
           vy.current = 0;
           noAr.current = false;
         } else {
-          noAr.current = true;
+          noAr.current = y.current > 0;
         }
       } else if (noAr.current || y.current > 0) {
         const anterior = y.current;
@@ -629,6 +645,15 @@ function JogoPage() {
           (s) => x.current + HEROI_W > s.x + 2 && x.current < s.x + s.w - 2 && Math.abs(y.current - s.h) < 3,
         );
         if (!apoiado) noAr.current = true;
+      }
+
+      /* sincroniza a caminhada somente depois de resolver parede e chão */
+      {
+        const caminhandoAgora = dir.current !== 0 && !noAr.current && !seguro.current;
+        if (andandoRef.current !== caminhandoAgora) {
+          andandoRef.current = caminhandoAgora;
+          setAndando(caminhandoAgora);
+        }
       }
 
       setHeroX(x.current);
@@ -1373,8 +1398,8 @@ function JogoPage() {
                 : noTrepaTrepa
                   ? heroiAtual.trepaTrepa
                 : caminhando
-                  ? heroiAtual.anda[passoFrame]!
-                  : heroiAtual.img;
+                  ? heroiAtual.anda[passoFrame]
+                  : heroiAtual.anda[0];
               return (
                 <div
                   className="absolute transition-[height] duration-100"
