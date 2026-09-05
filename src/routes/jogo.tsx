@@ -4,6 +4,8 @@ import { ChevronUp, Heart, Medal, RotateCcw, Zap } from "lucide-react";
 import { HEROIS, heroiPorId, type HeroiId } from "@/data/herois";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
+import RankingJogo from "@/components/RankingJogo";
+
 
 
 const TITLE = "Super Jogo — Fases e chefões do Super CT | Professor Tio Victor";
@@ -1754,6 +1756,9 @@ function JogoPage() {
             ao perder uma vida você volta ao <span className="text-primary">checkpoint</span> da fase
           </p>
         </div>
+
+        <RankingJogo pontos={pontos} fase={fase} fim={fim} />
+
       </main>
     </div>
   );
