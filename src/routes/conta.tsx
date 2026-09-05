@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { Eye, EyeOff, GraduationCap, LogOut, Paperclip, Send, ShieldCheck, Trash2, Upload, UserPlus } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, Paperclip, Send, ShieldCheck, Trash2, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -575,25 +575,12 @@ function Painel({ session }: { session: Session }) {
   }
 
 
-  async function sair() {
-    await supabase.auth.signOut();
-  }
-
   return (
     <div className="mt-6">
       <LembreteAcesso />
-      <div className="flex items-center justify-between rounded-md border border-border bg-card/50 p-3">
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
-          <p className="text-sm">{session.user.email}</p>
-        </div>
-        <button
-          type="button"
-          onClick={sair}
-          className="flex items-center gap-1 rounded-md border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
-        >
-          <LogOut className="size-3" /> Sair
-        </button>
+      <div className="rounded-md border border-border bg-card/50 p-3">
+        <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
+        <p className="text-sm">{session.user.email}</p>
       </div>
 
       {ehProfessor && (
