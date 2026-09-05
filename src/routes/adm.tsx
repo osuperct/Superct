@@ -301,21 +301,31 @@ function Acessos() {
 
   return (
     <section className="rounded-lg border border-border bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <UserCheck className="size-4 text-primary" /> LIBERAR ACESSO DE PROFESSOR
-      </h2>
+      <button
+        type="button"
+        onClick={() => setAberto((v) => !v)}
+        className="flex w-full items-center justify-between gap-2 text-left"
+        aria-expanded={aberto}
+      >
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <UserCheck className="size-4 text-primary" /> LIBERAR ACESSO DE PROFESSOR
+        </h2>
+        {aberto ? <ChevronUp className="size-5 text-primary" /> : <ChevronDown className="size-5 text-primary" />}
+      </button>
       <p className="mt-1 text-xs text-muted-foreground">
         O novo professor cria a conta normalmente na área do responsável. Depois, libere aqui o acesso dele
         para entrar na área do professor.
       </p>
 
-      <button
-        type="button"
-        onClick={() => setNovo((v) => !v)}
-        className="mt-3 flex items-center gap-2 rounded-md bg-primary px-3 py-2 font-display text-[11px] tracking-tight text-primary-foreground"
-      >
-        <UserPlus className="size-4" /> {novo ? "FECHAR CADASTRO" : "CADASTRAR NOVO PROFESSOR"}
-      </button>
+      {aberto && (
+        <>
+          <button
+            type="button"
+            onClick={() => setNovo((v) => !v)}
+            className="mt-3 flex items-center gap-2 rounded-md bg-primary px-3 py-2 font-display text-[11px] tracking-tight text-primary-foreground"
+          >
+            <UserPlus className="size-4" /> {novo ? "FECHAR CADASTRO" : "CADASTRAR NOVO PROFESSOR"}
+          </button>
 
       {novo && (
         <form onSubmit={(e) => void criarProfessor(e)} className="mt-3 space-y-2 rounded-md border border-border bg-background/60 p-3">
