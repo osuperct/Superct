@@ -130,6 +130,16 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
                   )}
                 </div>
                 <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
+                {a.imagem && (
+                  <a href={a.imagem} target="_blank" rel="noreferrer">
+                    <img
+                      src={a.imagem}
+                      alt={`Foto do aviso ${a.titulo}`}
+                      loading="lazy"
+                      className="mt-2 max-h-64 w-full rounded-md border border-border object-contain"
+                    />
+                  </a>
+                )}
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                     {dataCurta(a.created_at)}
