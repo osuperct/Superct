@@ -343,12 +343,13 @@ function Index() {
 
             <h1 className="mb-4 text-pretty text-center font-display text-5xl uppercase leading-[0.9] tracking-tighter">
               {heroTitulo ? (
-                heroTitulo
+                destacarSuper(heroTitulo)
               ) : (
                 <>
                   SUA CRIANÇA VIRA <span className="text-primary italic">SUPER!</span>
                 </>
               )}
+
             </h1>
             <p className="mx-auto max-w-[30ch] text-center text-sm text-muted-foreground">
               {heroSubtitulo ||
