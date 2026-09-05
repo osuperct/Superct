@@ -227,6 +227,14 @@ function Acessos() {
   }, [carregar]);
 
   async function alternar(conta: ContaAcesso, papel: "professor" | "adm", liberar: boolean) {
+    if (!liberar) {
+      const senha = window.prompt(`Digite a senha para remover o acesso de ${papel.toUpperCase()}:`);
+      if (senha === null) return;
+      if (senha.trim() !== "2802") {
+        toast.error("Senha incorreta. Ação cancelada.");
+        return;
+      }
+    }
     setOcupado(`${conta.id}-${papel}`);
     const r = await definir({ data: { userId: conta.id, papel, liberar } });
     setOcupado(null);
