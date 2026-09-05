@@ -118,7 +118,7 @@ export default function RankingJogo({ pontos, fase, fim, onApelidoSalvo }: Props
           setAberto(true);
           carregarLista();
         }}
-        className="group flex w-full items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 px-4 py-3 text-left active:scale-[0.98]"
+        className="group mt-8 flex w-full items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 px-4 py-3 text-left active:scale-[0.98]"
       >
         <span className="flex items-center gap-2 font-display text-sm uppercase tracking-tight text-primary">
           <Trophy className="size-4" /> Ranking dos jogadores
