@@ -146,6 +146,108 @@ function AdmPage() {
           ABRIR MATRÍCULAS E MENSALIDADES
         </Link>
       </section>
+
+      <Acessos />
     </Casca>
+  );
+}
+
+/* ----------------------------- LIBERAÇÃO DE ACESSOS ----------------------------- */
+
+function Acessos() {
+  const listar = useServerFn(listarAcessos);
+  const definir = useServerFn(definirAcesso);
+  const [contas, setContas] = useState<ContaAcesso[] | null>(null);
+  const [busca, setBusca] = useState("");
+  const [ocupado, setOcupado] = useState<string | null>(null);
+
+  const carregar = useCallback(async () => {
+    try {
+      setContas(await listar());
+    } catch {
+      toast.error("Não foi possível carregar as contas.");
+      setContas([]);
+    }
+  }, [listar]);
+
+  useEffect(() => {
+    void carregar();
+  }, [carregar]);
+
+  async function alternar(conta: ContaAcesso, papel: "professor" | "adm", liberar: boolean) {
+    setOcupado(`${conta.id}-${papel}`);
+    const r = await definir({ data: { userId: conta.id, papel, liberar } });
+    setOcupado(null);
+    if (!r.ok) {
+      toast.error(r.erro);
+      return;
+    }
+    toast.success(liberar ? "Acesso liberado." : "Acesso removido.");
+    await carregar();
+  }
+
+  const filtradas = (contas ?? []).filter((c) => {
+    const t = busca.trim().toLowerCase();
+    if (!t) return true;
+    return c.nome.toLowerCase().includes(t) || c.email.toLowerCase().includes(t);
+  });
+
+  return (
+    <section className="rounded-lg border border-border bg-card/40 p-4">
+      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+        <UserCheck className="size-4 text-primary" /> LIBERAR ACESSO DE PROFESSOR
+      </h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        O novo professor cria a conta normalmente na área do responsável. Depois, libere aqui o acesso dele
+        para entrar na área do professor.
+      </p>
+
+      <input
+        value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        placeholder="Buscar por nome ou e-mail"
+        className="mt-3 w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+      />
+
+      {contas === null ? (
+        <p className="mt-3 text-xs text-muted-foreground">Carregando contas…</p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {filtradas.map((c) => (
+            <li key={c.id} className="rounded-md border border-border bg-background/60 p-3">
+              <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
+              <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{c.email}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  disabled={ocupado === `${c.id}-professor`}
+                  onClick={() => void alternar(c, "professor", !c.professor)}
+                  className={`rounded-md px-3 py-1.5 font-display text-[11px] tracking-tight disabled:opacity-60 ${
+                    c.professor
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border text-muted-foreground"
+                  }`}
+                >
+                  {c.professor ? "PROFESSOR LIBERADO" : "LIBERAR PROFESSOR"}
+                </button>
+                <button
+                  type="button"
+                  disabled={ocupado === `${c.id}-adm`}
+                  onClick={() => void alternar(c, "adm", !c.adm)}
+                  className={`rounded-md px-3 py-1.5 font-display text-[11px] tracking-tight disabled:opacity-60 ${
+                    c.adm ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"
+                  }`}
+                >
+                  {c.adm ? "ADM LIBERADO" : "LIBERAR ADM"}
+                </button>
+              </div>
+            </li>
+          ))}
+          {filtradas.length === 0 && (
+            <li className="text-xs text-muted-foreground">Nenhuma conta encontrada.</li>
+          )}
+        </ul>
+      )}
+    </section>
   );
 }
