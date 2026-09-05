@@ -113,17 +113,9 @@ export function Mensalidades({
                     <option value="ativo">Matrícula ativa</option>
                     <option value="inativo">Matrícula inativa</option>
                   </select>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="Mensalidade (R$)"
-                    defaultValue={m?.valor ?? ""}
-                    onBlur={(e) => {
-                      const v = e.target.value === "" ? null : Number(e.target.value);
-                      if (v !== (m?.valor ?? null)) void salvar(a, { valor: v });
-                    }}
-                    className="w-32 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+                  <CampoValor
+                    valor={m?.valor ?? null}
+                    onChange={(valor) => void salvar(a, { valor })}
                   />
                 </div>
 
