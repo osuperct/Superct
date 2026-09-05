@@ -4,30 +4,33 @@ import video1 from "@/assets/video1.mp4.asset.json";
 import video2 from "@/assets/video2.mp4.asset.json";
 import video3 from "@/assets/video3.mp4.asset.json";
 
-const PADRAO = [video2.url, video1.url, video3.url];
-
 export type VideoApp = { url: string; com_som: boolean; inicio: number; fim: number | null };
 
+const PADRAO: VideoApp[] = [video2.url, video1.url, video3.url].map((url) => ({
+  url,
+  com_som: false,
+  inicio: 0,
+  fim: null,
+}));
+
 export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
-  const lista: VideoApp[] =
-    videos && videos.length > 0
-      ? videos
-      : PADRAO.map((url) => ({ url, com_som: false, inicio: 0, fim: null }));
-  const VIDEOS = lista.map((v) => v.url);
-  const item = lista[atualSeguro(0, lista.length)];
+  const lista = videos && videos.length > 0 ? videos : PADRAO;
   const [atual, setAtual] = useState(0);
   const ref = useRef<HTMLVideoElement>(null);
-  void item;
+  const item = lista[Math.min(atual, lista.length - 1)]!;
+
+  const proximo = () => setAtual((i) => (i + 1) % lista.length);
 
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    v.muted = true;
+    v.muted = !item.com_som;
+    if (item.inicio > 0) v.currentTime = item.inicio;
     const tocar = () => v.play().catch(() => {});
     tocar();
     v.addEventListener("canplay", tocar);
     return () => v.removeEventListener("canplay", tocar);
-  }, [atual]);
+  }, [atual, item.com_som, item.inicio]);
 
   return (
     <section className="px-4 pt-4">
@@ -39,23 +42,34 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
       <div className="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-lg border border-border bg-surface">
         <video
           ref={ref}
-          key={atual}
-          src={VIDEOS[atual]}
+          key={item.url}
+          src={item.url}
           className="h-full w-full object-cover"
           autoPlay
-          loop={VIDEOS.length === 1}
-          muted
+          loop={lista.length === 1 && !item.fim}
+          muted={!item.com_som}
           playsInline
           preload="auto"
           controls
-          onEnded={() => setAtual((i) => (i + 1) % VIDEOS.length)}
+          onTimeUpdate={(e) => {
+            const v = e.currentTarget;
+            if (item.fim && v.currentTime >= item.fim) {
+              if (lista.length === 1) {
+                v.currentTime = item.inicio;
+                void v.play();
+              } else {
+                proximo();
+              }
+            }
+          }}
+          onEnded={proximo}
         />
 
-        {VIDEOS.length > 1 && (
+        {lista.length > 1 && (
           <div className="pointer-events-none absolute bottom-2 left-2 flex gap-1">
-            {VIDEOS.map((v, i) => (
+            {lista.map((v, i) => (
               <span
-                key={v}
+                key={v.url}
                 className={`h-1 w-6 rounded-full ${i === atual ? "bg-primary" : "bg-border"}`}
               />
             ))}
