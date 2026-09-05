@@ -11,6 +11,7 @@ import {
   listarAcessos,
   type ContaAcesso,
 } from "@/lib/adm.functions";
+import { AppMidias } from "@/components/AppMidias";
 import { ProdutosAdm } from "@/components/ProdutosAdm";
 import { supabase } from "@/integrations/supabase/client";
 import logoAdm from "@/assets/super-ct-logo-adm.jpg.asset.json";
@@ -165,6 +166,8 @@ function AdmPage() {
       </section>
 
       <Acessos />
+
+      <AppMidias />
 
       <ProdutosAdm />
 

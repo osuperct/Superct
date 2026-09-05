@@ -4,11 +4,20 @@ import video1 from "@/assets/video1.mp4.asset.json";
 import video2 from "@/assets/video2.mp4.asset.json";
 import video3 from "@/assets/video3.mp4.asset.json";
 
-const VIDEOS = [video2.url, video1.url, video3.url];
+const PADRAO = [video2.url, video1.url, video3.url];
 
-export function VideoShowcase() {
+export type VideoApp = { url: string; com_som: boolean; inicio: number; fim: number | null };
+
+export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
+  const lista: VideoApp[] =
+    videos && videos.length > 0
+      ? videos
+      : PADRAO.map((url) => ({ url, com_som: false, inicio: 0, fim: null }));
+  const VIDEOS = lista.map((v) => v.url);
+  const item = lista[atualSeguro(0, lista.length)];
   const [atual, setAtual] = useState(0);
   const ref = useRef<HTMLVideoElement>(null);
+  void item;
 
   useEffect(() => {
     const v = ref.current;
