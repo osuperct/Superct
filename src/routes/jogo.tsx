@@ -661,12 +661,15 @@ function JogoPage() {
       bolasRef.current = [];
       tirosRef.current = [];
       invulAte.current = performance.now() + 900;
-      vidasRef.current = VIDAS_CHEFAO;
-      setVidas(VIDAS_CHEFAO);
+      presoAte.current = 0;
+      impactos.current = 0;
+      spawnQueda.current = 60;
+      setChocado(false);
       if (reporCoracoes) {
-        coracoesRef.current = CORACOES.map((_, i) => i);
+        coracoesRef.current = layoutFase(novaFase).coracoes.map((_, i) => i);
         setCoracoes(coracoesRef.current);
       }
+
       setTiros([]);
       setCarga(0);
       setChefao(null);
