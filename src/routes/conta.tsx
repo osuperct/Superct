@@ -830,34 +830,8 @@ function Painel({ session }: { session: Session }) {
             <p className="mt-4 text-sm text-muted-foreground">Nenhum documento anexado ainda.</p>
           )}
         </section>
-      ) : (
-        <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
-          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-            <FileText className="size-4 text-primary" /> PREENCHER ONLINE
-          </h2>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Cada documento abre numa página só dele: você digita os espaços em branco pelo celular, assina com a
-            canetinha e ele fica arquivado aqui nos documentos do aluno.
-          </p>
-          <div className="mt-4 space-y-2">
-            {(
-              [
-                ["contrato", "CONTRATO DE PRESTAÇÃO DE SERVIÇO"],
-                ["ficha", "FICHA DO ALUNO (ANEXO)"],
-              ] as const
-            ).map(([id, rotulo]) => (
-              <Link
-                key={id}
-                to="/documento/$tipo"
-                params={{ tipo: id }}
-                className="flex items-center justify-between gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
-              >
-                {rotulo} <Send className="size-4 shrink-0" />
-              </Link>
-            ))}
-          </div>
-        </section>
       )}
+
     </div>
   );
 }
