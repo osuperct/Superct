@@ -241,7 +241,14 @@ function Acessos() {
   async function apagar(conta: ContaAcesso) {
     const nome = conta.nome || conta.email;
     if (!window.confirm(`Excluir definitivamente o cadastro de ${nome}?`)) return;
+    const senha = window.prompt("Digite a senha de exclusão:");
+    if (senha === null) return;
+    if (senha.trim() !== "2802") {
+      toast.error("Senha incorreta. Exclusão cancelada.");
+      return;
+    }
     setOcupado(`${conta.id}-excluir`);
+
     try {
       const r = await excluir({ data: { userId: conta.id } });
       if (!r.ok) {
