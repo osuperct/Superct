@@ -304,7 +304,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
 
       localStorage.removeItem(rascunhoKey);
       setPdfPronto({ url: URL.createObjectURL(blob), nome: nomeArquivo });
-      toast.success("Documento assinado e arquivado nos documentos do aluno!");
+      toast.success("Documento assinado e enviado para conferência do professor!");
     } catch {
       toast.error("Não foi possível salvar o documento.");
     } finally {
@@ -519,8 +519,9 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       {pdfPronto && (
         <div className="space-y-2 rounded-md border border-primary/60 bg-primary/10 p-3">
           <p className="text-xs">
-            Documento assinado e arquivado nos documentos do aluno. Você pode baixar o PDF ou enviar uma cópia
-            por e-mail.
+            Documento assinado e enviado para a conferência do professor. Assim que ele liberar, o arquivo fica
+            salvo na matrícula do aluno na sua área, para ver e baixar quando quiser. Se quiser, guarde já uma
+            cópia agora.
           </p>
           <a
             href={pdfPronto.url}

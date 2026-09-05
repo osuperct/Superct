@@ -116,6 +116,8 @@ export type Database = {
           created_at: string
           enviado_por_professor: boolean
           id: string
+          liberado: boolean
+          liberado_em: string | null
           nome_arquivo: string
           oculto_responsavel: boolean
           tipo: string
@@ -127,6 +129,8 @@ export type Database = {
           created_at?: string
           enviado_por_professor?: boolean
           id?: string
+          liberado?: boolean
+          liberado_em?: string | null
           nome_arquivo: string
           oculto_responsavel?: boolean
           tipo?: string
@@ -138,6 +142,8 @@ export type Database = {
           created_at?: string
           enviado_por_professor?: boolean
           id?: string
+          liberado?: boolean
+          liberado_em?: string | null
           nome_arquivo?: string
           oculto_responsavel?: boolean
           tipo?: string

@@ -43,6 +43,7 @@ type Documento = {
   created_at: string;
   aluno_id: string | null;
   enviado_por_professor: boolean;
+  liberado: boolean;
 };
 
 const DESCRICAO_DOC: Record<string, string> = {
@@ -475,7 +476,7 @@ function Painel({ session }: { session: Session }) {
       supabase.from("alunos").select("id, nome, idade, matricula").eq("user_id", uid).order("created_at"),
       supabase
         .from("documentos")
-        .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id, enviado_por_professor")
+        .select("id, tipo, nome_arquivo, caminho, created_at, aluno_id, enviado_por_professor, liberado")
         .eq("user_id", uid)
         .eq("oculto_responsavel", false)
         .order("created_at", { ascending: false }),
@@ -552,6 +553,10 @@ function Painel({ session }: { session: Session }) {
   }
 
   async function abrir(doc: Documento) {
+    if (!doc.liberado) {
+      toast.info("Este documento está em conferência com o professor. Assim que ele liberar, você poderá ver e baixar.");
+      return;
+    }
     const { data } = await supabase.storage.from(BUCKET).createSignedUrl(doc.caminho, 60);
     if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
     else toast.error("Não foi possível abrir o arquivo.");
@@ -662,15 +667,22 @@ function Painel({ session }: { session: Session }) {
                             {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
                             {d.enviado_por_professor ? " • enviado pelo professor" : ""}
                           </span>
+                          {!d.liberado && (
+                            <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                              Em conferência com o professor
+                            </span>
+                          )}
                         </span>
-                        <button
-                          type="button"
-                          onClick={() => abrir(d)}
-                          className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
-                        >
-                          Ver
-                        </button>
-                        {!d.enviado_por_professor && (
+                        {d.liberado && (
+                          <button
+                            type="button"
+                            onClick={() => abrir(d)}
+                            className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
+                          >
+                            Ver
+                          </button>
+                        )}
+                        {!d.enviado_por_professor && !d.liberado && (
                           <button
                             type="button"
                             onClick={() => remover(d)}
@@ -764,7 +776,9 @@ function Painel({ session }: { session: Session }) {
             )}
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Anexe aqui o contrato de prestação de serviço e a ficha do aluno preenchidos à mão e escaneados
+            Todo documento passa pela conferência do professor: depois que ele liberar, o arquivo fica salvo aqui
+            na matrícula do aluno para ver e baixar sempre que quiser. Anexe aqui o contrato de prestação de
+            serviço e a ficha do aluno preenchidos à mão e escaneados
             (foto ou PDF). Escolha de qual aluno é o documento — ele aparece junto do nome dele na lista de
             alunos.
           </p>
@@ -821,17 +835,20 @@ function Painel({ session }: { session: Session }) {
                       {DESCRICAO_DOC[d.tipo] ?? "Documento"} •{" "}
                       {alunos.find((a) => a.id === d.aluno_id)?.nome ?? "sem aluno"} •{" "}
                       {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                      {d.liberado ? "" : " • em conferência com o professor"}
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
-                    <button
-                      type="button"
-                      onClick={() => abrir(d)}
-                      className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
-                    >
-                      Ver
-                    </button>
-                    {!d.enviado_por_professor && (
+                    {d.liberado && (
+                      <button
+                        type="button"
+                        onClick={() => abrir(d)}
+                        className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
+                      >
+                        Ver
+                      </button>
+                    )}
+                    {!d.enviado_por_professor && !d.liberado && (
                       <button
                         type="button"
                         onClick={() => remover(d)}
