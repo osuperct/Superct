@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
-import { ImagePlus, Megaphone, Send, Trash2, X } from "lucide-react";
+import { ChevronDown, ChevronUp, ImagePlus, Megaphone, Send, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { type Aviso, dataCurta, enviarAviso, excluirAviso, listarAvisos } from "@/lib/avisos";
+import { type Aviso, agruparPorMes, dataCurta, enviarAviso, excluirAviso, listarAvisos, mesAtual } from "@/lib/avisos";
 
 export function AvisosProfessor({ uid }: { uid: string }) {
   const [lista, setLista] = useState<Aviso[]>([]);
