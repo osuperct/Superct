@@ -1360,14 +1360,17 @@ function JogoPage() {
               })}
 
 
-            {/* herói (recortado, vira para o lado do movimento; escala de costas na parede) */}
+            {/* herói (vira para o movimento; escala de costas e se pendura de lado no trepa-trepa) */}
             {(() => {
               const escalando = pendurado === "parede";
+              const noTrepaTrepa = pendurado === "barra";
               const sombra = pendurado
                 ? "drop-shadow(0 0 8px rgba(255,140,0,0.9))"
                 : `drop-shadow(0 0 6px ${heroiAtual.cor})`;
               const src = escalando
                 ? heroiAtual.escala
+                : noTrepaTrepa
+                  ? heroiAtual.trepaTrepa
                 : andando
                   ? heroiAtual.anda[passoFrame]!
                   : heroiAtual.img;
