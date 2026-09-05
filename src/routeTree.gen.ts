@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as ContaRouteImport } from './routes/conta'
+import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as HeroisRouteImport } from './routes/herois'
 import { Route as JogoRouteImport } from './routes/jogo'
 import { Route as ProfessorRouteImport } from './routes/professor'
@@ -32,6 +33,11 @@ const CalendarioRoute = CalendarioRouteImport.update({
 const ContaRoute = ContaRouteImport.update({
   id: '/conta',
   path: '/conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FinanceiroRoute = FinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HeroisRoute = HeroisRouteImport.update({
@@ -69,6 +75,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
+  '/financeiro': typeof FinanceiroRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/professor': typeof ProfessorRoute
@@ -80,6 +87,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
+  '/financeiro': typeof FinanceiroRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/professor': typeof ProfessorRoute
@@ -92,6 +100,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
+  '/financeiro': typeof FinanceiroRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
   '/professor': typeof ProfessorRoute
@@ -105,6 +114,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calendario'
     | '/conta'
+    | '/financeiro'
     | '/herois'
     | '/jogo'
     | '/professor'
@@ -116,6 +126,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calendario'
     | '/conta'
+    | '/financeiro'
     | '/herois'
     | '/jogo'
     | '/professor'
@@ -127,6 +138,7 @@ export interface FileRouteTypes {
     | '/'
     | '/calendario'
     | '/conta'
+    | '/financeiro'
     | '/herois'
     | '/jogo'
     | '/professor'
@@ -139,6 +151,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalendarioRoute: typeof CalendarioRoute
   ContaRoute: typeof ContaRoute
+  FinanceiroRoute: typeof FinanceiroRoute
   HeroisRoute: typeof HeroisRoute
   JogoRoute: typeof JogoRoute
   ProfessorRoute: typeof ProfessorRoute
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/conta'
       fullPath: '/conta'
       preLoaderRoute: typeof ContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/financeiro': {
+      id: '/financeiro'
+      path: '/financeiro'
+      fullPath: '/financeiro'
+      preLoaderRoute: typeof FinanceiroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/herois': {
@@ -219,6 +239,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalendarioRoute: CalendarioRoute,
   ContaRoute: ContaRoute,
+  FinanceiroRoute: FinanceiroRoute,
   HeroisRoute: HeroisRoute,
   JogoRoute: JogoRoute,
   ProfessorRoute: ProfessorRoute,
