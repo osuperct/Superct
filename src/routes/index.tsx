@@ -5,8 +5,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 import { VideoShowcase, type VideoApp } from "@/components/VideoShowcase";
-import { GRUPO_VIDEOS, listarMidias, type Midia } from "@/lib/midias";
+import { GRUPO_QG, GRUPO_VIDEOS, listarMidias, type Midia } from "@/lib/midias";
 import { listarTextos, type Textos } from "@/lib/textos";
+import { listarTurmas, type Turma } from "@/lib/turmas";
 
 import logoAsset from "@/assets/super-ct-logo.asset.json";
 
@@ -251,13 +252,20 @@ function Index() {
   const [logado, setLogado] = useState(false);
   const [midias, setMidias] = useState<Midia[]>([]);
   const [textos, setTextos] = useState<Textos>({});
+  const [turmasApp, setTurmasApp] = useState<Turma[]>([]);
 
   useEffect(() => {
     void listarMidias().then(setMidias);
     void listarTextos().then(setTextos);
+    void listarTurmas().then(setTurmasApp);
   }, []);
 
   const logoApp = midias.find((m) => m.tipo === "logo" && m.url)?.url ?? logo;
+  const fotosQg = midias
+    .filter((m) => m.tipo === "foto" && m.grupo === GRUPO_QG && m.url)
+    .map((m) => ({ src: m.url!, legenda: m.descricao ?? "Nosso QG", alt: m.descricao ?? "Foto da estrutura do Super CT" }));
+  const galeriaApp = fotosQg.length > 0 ? fotosQg : galeria;
+  const turmasLista = turmasApp.length > 0 ? turmasApp.map((t) => ({ ...t })) : turmas;
   const heroTitulo = textos["hero_titulo"]?.trim();
   const heroSubtitulo = textos["hero_subtitulo"]?.trim();
 
@@ -438,7 +446,7 @@ function Index() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {turmas.map((t) => (
+                {turmasLista.map((t) => (
                   <tr key={t.turma}>
                     <td className="px-3 py-3 font-display text-secondary">{t.turma}</td>
                     <td className="px-3 py-3 font-mono text-xs">{t.horario}</td>
@@ -458,7 +466,7 @@ function Index() {
           </div>
 
           <div className="no-scrollbar flex snap-x gap-4 overflow-x-auto px-4 pb-6">
-            {galeria.map((foto) => (
+            {galeriaApp.map((foto) => (
               <figure key={foto.legenda} className="w-64 flex-none snap-center">
                 <img
                   src={foto.src}

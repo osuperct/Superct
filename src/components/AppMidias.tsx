@@ -1,16 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Film, Image as ImageIcon, Smartphone, Trash2, Type, Upload, Volume2, VolumeX } from "lucide-react";
+import { Clock, Film, Image as ImageIcon, Smartphone, Trash2, Type, Upload, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 
 import { CortarImagem } from "@/components/CortarImagem";
 import video1 from "@/assets/video1.mp4.asset.json";
 import video2 from "@/assets/video2.mp4.asset.json";
 import video3 from "@/assets/video3.mp4.asset.json";
+import { criarTurma, excluirTurma, listarTurmas, salvarTurma, type Turma } from "@/lib/turmas";
 import { CHAVES_TEXTO, listarTextos, salvarTexto, type Textos } from "@/lib/textos";
 import {
   type Midia,
   GRUPOS_CARDS,
   GRUPO_LOGO,
+  GRUPO_QG,
   GRUPO_VIDEOS,
   atualizarMidia,
   enviarMidia,
@@ -37,6 +39,7 @@ export function AppMidias() {
   const fotos = lista.filter((m) => m.tipo === "foto" && m.grupo === grupo);
   const videos = lista.filter((m) => m.tipo === "video");
   const logo = lista.find((m) => m.tipo === "logo") ?? null;
+  const fotosQg = lista.filter((m) => m.tipo === "foto" && m.grupo === GRUPO_QG);
 
   async function remover(m: Midia) {
     setOcupado(true);
@@ -149,6 +152,58 @@ export function AppMidias() {
           }}
         />
       </div>
+
+      {/* -------- NOSSO QG -------- */}
+      <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
+        <p className="flex items-center gap-2 font-display text-sm tracking-tight">
+          <ImageIcon className="size-4 text-primary" /> FOTOS DO NOSSO QG
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Enquanto não houver foto aqui, a página mostra as fotos originais do QG. A descrição aparece como legenda.
+        </p>
+        {fotosQg.length > 0 && (
+          <ul className="mt-2 grid grid-cols-3 gap-2">
+            {fotosQg.map((f) => (
+              <li key={f.id} className="relative">
+                {f.url && (
+                  <img
+                    src={f.url}
+                    alt={f.descricao ?? "Foto do QG"}
+                    className="h-20 w-full rounded-md border border-border object-cover"
+                  />
+                )}
+                <button
+                  type="button"
+                  disabled={ocupado}
+                  onClick={() => void remover(f)}
+                  aria-label="Remover foto do QG"
+                  className="absolute right-1 top-1 rounded-md bg-background/80 p-1 text-muted-foreground"
+                >
+                  <Trash2 className="size-3" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <EnvioImagem
+          rotulo="ANEXAR FOTO DO QG"
+          aspecto={4 / 3}
+          onEnviar={async (blob, nome, descricao) => {
+            await enviarMidia({
+              tipo: "foto",
+              grupo: GRUPO_QG,
+              arquivo: blob,
+              nomeArquivo: nome,
+              descricao,
+              ordem: fotosQg.length,
+            });
+            await carregar();
+          }}
+        />
+      </div>
+
+      {/* -------- HORÁRIOS -------- */}
+      <TabelaTurmas />
 
       {/* -------- LOGO -------- */}
       <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
@@ -504,6 +559,129 @@ function TextosPagina() {
           </button>
         </div>
       ))}
+    </div>
+  );
+}
+
+/* ------------------------------ HORÁRIOS DAS TURMAS ------------------------------ */
+
+function TabelaTurmas() {
+  const [turmas, setTurmas] = useState<Turma[]>([]);
+  const [ocupado, setOcupado] = useState(false);
+
+  const carregar = useCallback(async () => {
+    setTurmas(await listarTurmas());
+  }, []);
+
+  useEffect(() => {
+    void carregar();
+  }, [carregar]);
+
+  async function salvar(t: Turma) {
+    setOcupado(true);
+    try {
+      await salvarTurma(t.id, { turma: t.turma, horario: t.horario, idade: t.idade, dias: t.dias });
+      toast.success("Horário atualizado na página.");
+    } catch {
+      toast.error("Não foi possível salvar o horário.");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function adicionar() {
+    setOcupado(true);
+    try {
+      await criarTurma(turmas.length + 1);
+      await carregar();
+    } catch {
+      toast.error("Não foi possível adicionar a turma.");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  async function remover(id: string) {
+    setOcupado(true);
+    try {
+      await excluirTurma(id);
+      await carregar();
+      toast.success("Turma removida da página.");
+    } catch {
+      toast.error("Não foi possível remover a turma.");
+    } finally {
+      setOcupado(false);
+    }
+  }
+
+  const campos: { campo: keyof Turma; rotulo: string }[] = [
+    { campo: "turma", rotulo: "Turma" },
+    { campo: "horario", rotulo: "Horário" },
+    { campo: "idade", rotulo: "Idade" },
+    { campo: "dias", rotulo: "Dias" },
+  ];
+
+  return (
+    <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
+      <p className="flex items-center gap-2 font-display text-sm tracking-tight">
+        <Clock className="size-4 text-primary" /> HORÁRIOS DAS TURMAS
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Altere turma, horário, idade e dias. A tabela da página inicial muda assim que você salva.
+      </p>
+
+      <ul className="mt-3 space-y-3">
+        {turmas.map((t) => (
+          <li key={t.id} className="rounded-md border border-border bg-background/60 p-2">
+            <div className="grid grid-cols-2 gap-2">
+              {campos.map((c) => (
+                <label key={c.campo} className="block">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {c.rotulo}
+                  </span>
+                  <input
+                    value={String(t[c.campo] ?? "")}
+                    onChange={(e) =>
+                      setTurmas((lista) =>
+                        lista.map((x) => (x.id === t.id ? { ...x, [c.campo]: e.target.value } : x)),
+                      )
+                    }
+                    className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                  />
+                </label>
+              ))}
+            </div>
+            <div className="mt-2 flex items-center gap-2">
+              <button
+                type="button"
+                disabled={ocupado}
+                onClick={() => void salvar(t)}
+                className="flex-1 rounded-md border border-primary px-3 py-2 font-display text-xs tracking-tight text-primary disabled:opacity-60"
+              >
+                SALVAR
+              </button>
+              <button
+                type="button"
+                disabled={ocupado}
+                onClick={() => void remover(t.id)}
+                aria-label="Remover turma"
+                className="rounded-md border border-border p-2 text-muted-foreground"
+              >
+                <Trash2 className="size-4" />
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <button
+        type="button"
+        disabled={ocupado}
+        onClick={() => void adicionar()}
+        className="mt-3 w-full rounded-md bg-primary px-3 py-2 font-display text-xs tracking-tight text-primary-foreground disabled:opacity-60"
+      >
+        ADICIONAR TURMA
+      </button>
     </div>
   );
 }

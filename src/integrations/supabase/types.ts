@@ -483,6 +483,39 @@ export type Database = {
         }
         Relationships: []
       }
+      turmas_app: {
+        Row: {
+          created_at: string
+          dias: string
+          horario: string
+          id: string
+          idade: string
+          ordem: number
+          turma: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dias?: string
+          horario?: string
+          id?: string
+          idade?: string
+          ordem?: number
+          turma?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dias?: string
+          horario?: string
+          id?: string
+          idade?: string
+          ordem?: number
+          turma?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
