@@ -58,26 +58,30 @@ export function AvaliacaoProfessor({ alunos, professorId }: { alunos: Alu[]; pro
         <ClipboardCheck className="size-4 text-primary" /> AVALIAÇÃO DO ALUNO
       </h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        Clique no nome do aluno para abrir a ficha individual. A avaliação do mês vigente fica disponível para o
-        responsável apenas para visualização.
+        Selecione o aluno no campo abaixo para abrir a ficha individual. A avaliação do mês vigente fica disponível
+        para o responsável apenas para visualização.
       </p>
-      <ul className="mt-3 space-y-2">
-        {alunos.map((a) => (
-          <li key={a.id}>
-            <button
-              type="button"
-              onClick={() => setSel(a)}
-              className="flex w-full items-center justify-between gap-2 rounded-md border border-border bg-background/40 p-3 text-left hover:border-primary"
-            >
-              <span className="text-sm font-medium">{a.nome}</span>
-              <span className="shrink-0 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
-                {a.matricula ?? "avaliar"}
-              </span>
-            </button>
-          </li>
-        ))}
-        {alunos.length === 0 && <li className="text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</li>}
-      </ul>
+      <div className="mt-3">
+        <select
+          value=""
+          onChange={(e) => {
+            const id = e.target.value;
+            if (!id) return;
+            const aluno = alunos.find((a) => a.id === id) ?? null;
+            setSel(aluno);
+            e.target.value = "";
+          }}
+          className="w-full appearance-none rounded-md border border-border bg-background px-3 py-3 text-sm"
+        >
+          <option value="">Selecione o aluno</option>
+          {alunos.map((a) => (
+            <option key={a.id} value={a.id}>
+              {a.nome} {a.matricula ? `— ${a.matricula}` : "— avaliar"}
+            </option>
+          ))}
+        </select>
+        {alunos.length === 0 && <p className="mt-2 text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</p>}
+      </div>
     </section>
   );
 }
