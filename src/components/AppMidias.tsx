@@ -1,17 +1,24 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Film, Image as ImageIcon, Smartphone, Trash2, Upload, Volume2, VolumeX } from "lucide-react";
+import { Film, Image as ImageIcon, Smartphone, Trash2, Type, Upload, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 
 import { CortarImagem } from "@/components/CortarImagem";
+import video1 from "@/assets/video1.mp4.asset.json";
+import video2 from "@/assets/video2.mp4.asset.json";
+import video3 from "@/assets/video3.mp4.asset.json";
+import { CHAVES_TEXTO, listarTextos, salvarTexto, type Textos } from "@/lib/textos";
 import {
   type Midia,
   GRUPOS_CARDS,
+  GRUPO_LOGO,
   GRUPO_VIDEOS,
   atualizarMidia,
   enviarMidia,
   excluirMidia,
   listarMidiasAdm,
 } from "@/lib/midias";
+
+const VIDEOS_ORIGINAIS: string[] = [video2.url, video1.url, video3.url];
 
 export function AppMidias() {
   const [lista, setLista] = useState<Midia[]>([]);
@@ -29,6 +36,7 @@ export function AppMidias() {
   const capa = lista.find((m) => m.tipo === "capa" && m.grupo === grupo) ?? null;
   const fotos = lista.filter((m) => m.tipo === "foto" && m.grupo === grupo);
   const videos = lista.filter((m) => m.tipo === "video");
+  const logo = lista.find((m) => m.tipo === "logo") ?? null;
 
   async function remover(m: Midia) {
     setOcupado(true);
@@ -142,14 +150,68 @@ export function AppMidias() {
         />
       </div>
 
+      {/* -------- LOGO -------- */}
+      <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
+        <p className="flex items-center gap-2 font-display text-sm tracking-tight">
+          <ImageIcon className="size-4 text-primary" /> LOGO PRINCIPAL
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Enquanto não houver logo aqui, a página mostra a logo original.
+        </p>
+        {logo?.url && (
+          <div className="mt-2 flex items-center gap-2">
+            <img
+              src={logo.url}
+              alt="Logo atual da página inicial"
+              className="h-24 w-24 rounded-md border border-border object-contain"
+            />
+            <button
+              type="button"
+              disabled={ocupado}
+              onClick={() => void remover(logo)}
+              className="rounded-md border border-border p-2 text-muted-foreground"
+              aria-label="Remover logo"
+            >
+              <Trash2 className="size-4" />
+            </button>
+          </div>
+        )}
+        <EnvioImagem
+          rotulo={logo ? "TROCAR LOGO PRINCIPAL" : "ANEXAR NOVA LOGO"}
+          aspecto={1}
+          onEnviar={async (blob, nome, descricao) => {
+            await enviarMidia({ tipo: "logo", grupo: GRUPO_LOGO, arquivo: blob, nomeArquivo: nome, descricao });
+            await carregar();
+          }}
+        />
+      </div>
+
+      {/* -------- TEXTOS -------- */}
+      <TextosPagina />
+
       {/* -------- VÍDEOS -------- */}
       <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
         <p className="flex items-center gap-2 font-display text-sm tracking-tight">
-          <Film className="size-4 text-primary" /> VÍDEOS DA PÁGINA INICIAL
+          <Film className="size-4 text-primary" /> SUPER CT EM AÇÃO — VÍDEOS
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Enquanto não houver vídeo aqui, a página mostra os vídeos originais.
+          Estes são os vídeos que aparecem em “SUPER CT EM AÇÃO”. Ao anexar um vídeo novo, ele entra no lugar dos
+          vídeos originais.
         </p>
+
+        {videos.length === 0 && (
+          <ul className="mt-2 space-y-2">
+            {VIDEOS_ORIGINAIS.map((src, i) => (
+              <li key={src} className="rounded-md border border-border bg-background/60 p-2">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Vídeo original {i + 1}
+                </p>
+                <video src={src} controls playsInline preload="metadata" className="mt-1 w-full rounded-md" />
+              </li>
+            ))}
+          </ul>
+        )}
+
 
         {videos.length > 0 && (
           <ul className="mt-2 space-y-3">
@@ -388,6 +450,60 @@ function TrechoVideo({ midia, onSalvo }: { midia: Midia; onSalvo: () => Promise<
       >
         {salvando ? "SALVANDO…" : "SALVAR TRECHO"}
       </button>
+    </div>
+  );
+}
+
+/* ------------------------------ TEXTOS DA PÁGINA ------------------------------ */
+
+function TextosPagina() {
+  const [textos, setTextos] = useState<Textos>({});
+  const [salvando, setSalvando] = useState<string | null>(null);
+
+  useEffect(() => {
+    void listarTextos().then(setTextos);
+  }, []);
+
+  async function salvar(chave: string) {
+    setSalvando(chave);
+    try {
+      await salvarTexto(chave, textos[chave] ?? "");
+      toast.success("Texto atualizado na página.");
+    } catch {
+      toast.error("Não foi possível salvar o texto.");
+    } finally {
+      setSalvando(null);
+    }
+  }
+
+  return (
+    <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
+      <p className="flex items-center gap-2 font-display text-sm tracking-tight">
+        <Type className="size-4 text-primary" /> TEXTOS DA PÁGINA INICIAL
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Escreva o título e o texto que aparecem abaixo da logo principal.
+      </p>
+
+      {CHAVES_TEXTO.map((t) => (
+        <div key={t.chave} className="mt-3">
+          <label className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{t.rotulo}</label>
+          <textarea
+            value={textos[t.chave] ?? ""}
+            onChange={(e) => setTextos((v) => ({ ...v, [t.chave]: e.target.value }))}
+            rows={t.chave === "hero_titulo" ? 2 : 3}
+            className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+          />
+          <button
+            type="button"
+            disabled={salvando === t.chave}
+            onClick={() => void salvar(t.chave)}
+            className="mt-1 w-full rounded-md border border-primary px-3 py-2 font-display text-xs tracking-tight text-primary disabled:opacity-60"
+          >
+            {salvando === t.chave ? "SALVANDO…" : "SALVAR TEXTO"}
+          </button>
+        </div>
+      ))}
     </div>
   );
 }

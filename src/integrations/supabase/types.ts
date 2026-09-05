@@ -462,6 +462,27 @@ export type Database = {
         }
         Relationships: []
       }
+      textos_app: {
+        Row: {
+          chave: string
+          created_at: string
+          updated_at: string
+          valor: string
+        }
+        Insert: {
+          chave: string
+          created_at?: string
+          updated_at?: string
+          valor?: string
+        }
+        Update: {
+          chave?: string
+          created_at?: string
+          updated_at?: string
+          valor?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

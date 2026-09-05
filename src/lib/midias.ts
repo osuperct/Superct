@@ -5,6 +5,9 @@ export const BUCKET_MIDIAS = "app-midias";
 /** Vitrine de vídeos da página inicial. */
 export const GRUPO_VIDEOS = "VIDEOS";
 
+/** Logo principal da página inicial. */
+export const GRUPO_LOGO = "LOGO";
+
 /** Cartões da página inicial que podem ter foto de capa e fotos internas. */
 export const GRUPOS_CARDS = [
   "FUNCIONAL INFANTIL",
@@ -16,7 +19,7 @@ export const GRUPOS_CARDS = [
   "COLÔNIA DE FÉRIAS E ACAMPAMENTO INDOOR",
 ] as const;
 
-export type TipoMidia = "capa" | "foto" | "video";
+export type TipoMidia = "capa" | "foto" | "video" | "logo";
 
 export type Midia = {
   id: string;
@@ -87,8 +90,8 @@ export async function enviarMidia(nova: NovaMidia) {
   if (up.error) throw up.error;
 
   // Cada cartão tem apenas uma capa: a antiga sai de cena.
-  if (nova.tipo === "capa") {
-    const antigas = await supabase.from("midias_app").select("id, caminho").eq("tipo", "capa").eq("grupo", nova.grupo);
+  if (nova.tipo === "capa" || nova.tipo === "logo") {
+    const antigas = await supabase.from("midias_app").select("id, caminho").eq("tipo", nova.tipo).eq("grupo", nova.grupo);
     for (const a of (antigas.data ?? []) as { id: string; caminho: string }[]) {
       await excluirMidia(a.id, a.caminho);
     }
