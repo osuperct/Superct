@@ -9,8 +9,10 @@ type Alu = { id: string; nome: string };
 
 export function AvaliacaoResponsavel({ uid, alunos }: { uid: string; alunos: Alu[] }) {
   const [lista, setLista] = useState<Avaliacao[]>([]);
+  const [mesSelecionado, setMesSelecionado] = useState<string>("");
 
   useEffect(() => {
+
     let ativo = true;
     void supabase
       .from("avaliacoes")
