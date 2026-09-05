@@ -554,23 +554,12 @@ function Painel({ session }: { session: Session }) {
 
   async function abrir(doc: Documento) {
     if (!doc.liberado) {
-      toast.info("Este documento está em conferência com o professor. Assim que ele liberar, você poderá ver e baixar.");
+      toast.info("Documento aguardando liberação do professor. Assim que ele conferir, você poderá ver e baixar.");
       return;
     }
     const { data } = await supabase.storage.from(BUCKET).createSignedUrl(doc.caminho, 60);
     if (data?.signedUrl) window.open(data.signedUrl, "_blank", "noopener");
     else toast.error("Não foi possível abrir o arquivo.");
-  }
-
-  async function remover(doc: Documento) {
-    /** Some da área do responsável, mas a cópia continua guardada na área do professor. */
-    const { error } = await supabase.from("documentos").update({ oculto_responsavel: true }).eq("id", doc.id);
-    if (error) {
-      toast.error("Não foi possível remover o documento.");
-      return;
-    }
-    toast.success("Documento removido da sua lista. A cópia fica arquivada com o professor.");
-    void recarregar();
   }
 
 
@@ -669,7 +658,7 @@ function Painel({ session }: { session: Session }) {
                           </span>
                           {!d.liberado && (
                             <span className="mt-0.5 block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                              Em conferência com o professor
+                              Aguardando liberação
                             </span>
                           )}
                         </span>
@@ -680,15 +669,6 @@ function Painel({ session }: { session: Session }) {
                             className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
                           >
                             Ver
-                          </button>
-                        )}
-                        {!d.enviado_por_professor && !d.liberado && (
-                          <button
-                            type="button"
-                            onClick={() => remover(d)}
-                            className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
-                          >
-                            Excluir
                           </button>
                         )}
                       </li>
@@ -835,7 +815,7 @@ function Painel({ session }: { session: Session }) {
                       {DESCRICAO_DOC[d.tipo] ?? "Documento"} •{" "}
                       {alunos.find((a) => a.id === d.aluno_id)?.nome ?? "sem aluno"} •{" "}
                       {new Date(d.created_at).toLocaleDateString("pt-BR")}
-                      {d.liberado ? "" : " • em conferência com o professor"}
+                      {d.liberado ? " • conferido" : " • aguardando liberação"}
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
@@ -846,15 +826,6 @@ function Painel({ session }: { session: Session }) {
                         className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
                       >
                         Ver
-                      </button>
-                    )}
-                    {!d.enviado_por_professor && !d.liberado && (
-                      <button
-                        type="button"
-                        onClick={() => remover(d)}
-                        className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
-                      >
-                        Excluir
                       </button>
                     )}
                   </div>
