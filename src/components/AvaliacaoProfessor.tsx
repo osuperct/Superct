@@ -87,7 +87,9 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
   const [notas, setNotas] = useState<Record<CriterioChave, Cor>>(VAZIO);
   const [observacoes, setObservacoes] = useState("");
   const [historico, setHistorico] = useState<Avaliacao[]>([]);
+  const [mesSelecionado, setMesSelecionado] = useState<string>("");
   const [salvando, setSalvando] = useState(false);
+
 
   const carregar = useCallback(async () => {
     const { data } = await supabase
