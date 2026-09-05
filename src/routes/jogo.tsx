@@ -1279,7 +1279,8 @@ function JogoPage() {
               setSomLigado(novo);
               if (novo) {
                 acordarAudio();
-                iniciarMusica();
+                iniciarMusica(fase, modo === "chefao");
+
               } else {
                 pararMusica();
               }
