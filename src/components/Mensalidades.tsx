@@ -397,11 +397,22 @@ export function Mensalidades({
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <TrendingUp className="size-4 text-primary" /> PROJEÇÃO — {mesExtensoRef(mesProximo).toUpperCase()}
+          <TrendingUp className="size-4 text-primary" /> PROJEÇÃO — {mesExtensoRef(mesProjecao).toUpperCase()}
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Alunos com matrícula ativa e valor previsto a receber.
         </p>
+        <select
+          value={mesProjecao}
+          onChange={(e) => setMesProjecao(e.target.value)}
+          className="mt-2 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+        >
+          {mesesProjecao.map((m) => (
+            <option key={m} value={m}>
+              {mesExtensoRef(m)}
+            </option>
+          ))}
+        </select>
         <ul className="mt-3 space-y-1.5">
           {projecao.map((p) => (
             <li
