@@ -1,10 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { ChevronUp, Heart, Medal, RotateCcw, Zap } from "lucide-react";
+import { ChevronUp, Heart, Medal, RotateCcw, Volume2, VolumeX, Zap } from "lucide-react";
 import { HEROIS, heroiPorId, type HeroiId } from "@/data/herois";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
 import RankingJogo from "@/components/RankingJogo";
+import {
+  acordarAudio,
+  iniciarMusica,
+  pararMusica,
+  somDano,
+  somGameOver,
+  somMoeda,
+  somPoder,
+  somPulo,
+  somVitoria,
+} from "@/lib/sons";
 
 
 
@@ -233,6 +244,16 @@ function JogoPage() {
   const [fim, setFim] = useState(false);
   const [venceu, setVenceu] = useState(false);
   const [derrotado, setDerrotado] = useState<number | null>(null);
+  const [somLigado, setSomLigado] = useState(true);
+  const somRef = useRef(true);
+  const sfx = (fn: () => void) => {
+    if (somRef.current) fn();
+  };
+  const acordarSom = () => {
+    if (!somRef.current) return;
+    acordarAudio();
+    iniciarMusica();
+  };
 
   const dir = useRef(0);
   const dirY = useRef(0);
@@ -399,11 +420,13 @@ function JogoPage() {
       if (fimRef.current || performance.now() <= invulAte.current) return;
       vidasRef.current -= 1;
       setVidas(vidasRef.current);
+      sfx(somDano);
       invulAte.current = performance.now() + 1800;
       setPiscando(true);
       window.setTimeout(() => setPiscando(false), 1600);
       if (vidasRef.current <= 0) {
         fimRef.current = true;
+        sfx(somGameOver);
         setFim(true);
         setDerrotado(vilao);
         return;
@@ -720,6 +743,7 @@ function JogoPage() {
           }
         }
         if (ganhouCone) {
+          sfx(somMoeda);
           setConesPegos(conesRef.current);
           setPontos(pontosRef.current);
         }
@@ -751,6 +775,7 @@ function JogoPage() {
             setVidas(vidasRef.current);
             pontosRef.current += 10;
             setPontos(pontosRef.current);
+            sfx(somMoeda);
           }
         }
 
@@ -762,6 +787,7 @@ function JogoPage() {
           y.current < MEDALHA.y + 26;
         if (pegouMedalha) {
           const ganho = passados.current + Math.floor((maxX.current - 60) / 60) + 30;
+          sfx(somVitoria);
           pontosRef.current += ganho;
           setPontos(pontosRef.current);
           pausaRef.current = true;
@@ -893,6 +919,7 @@ function JogoPage() {
           if (pegou) {
             cargaRef.current = Math.min(3, cargaRef.current + 1);
             setCarga(cargaRef.current);
+            sfx(somMoeda);
             continue;
           }
           restantes.push({ ...h, y: ny, caindo: h.caindo && ny > 0 && ny !== h.y });
@@ -1021,6 +1048,7 @@ function JogoPage() {
 
       /* chefão derrotado */
       if (boss.hp <= 0) {
+        sfx(somVitoria);
         pontosRef.current += 50;
         setPontos(pontosRef.current);
         pausaRef.current = true;
@@ -1046,6 +1074,7 @@ function JogoPage() {
 
   const atirar = useCallback(() => {
     if (modoRef.current !== "chefao" || fimRef.current || pausaRef.current) return;
+    if (somRef.current) somPoder();
     const ehSuper = cargaRef.current >= 3;
     if (ehSuper) {
       cargaRef.current = 0;
@@ -1072,6 +1101,8 @@ function JogoPage() {
 
   const pular = () => {
     if (fimRef.current) return;
+    acordarSom();
+    sfx(somPulo);
     const agora = performance.now();
     const toqueAnterior = ultimoToqueCima.current;
     const duploToque = toqueAnterior !== null && agora - toqueAnterior <= TOQUE_DUPLO_CIMA_MS;
@@ -1178,6 +1209,16 @@ function JogoPage() {
   const progresso = emChefao ? 100 : Math.min(100, (heroX / (MUNDO - HEROI_W)) * 100);
   const heroiAtual = heroiPorId(heroiSel ?? "kael");
 
+  useEffect(() => () => pararMusica(), []);
+
+  useEffect(() => {
+    if (fim) pararMusica();
+    else if (somRef.current && heroiSel) {
+      acordarAudio();
+      iniciarMusica();
+    }
+  }, [fim, heroiSel]);
+
   const escolherHeroi = (id: HeroiId) => {
     heroiRef.current = id;
     setHeroiSel(id);
@@ -1227,6 +1268,24 @@ function JogoPage() {
             className="ml-2 inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-primary"
           >
             Trocar herói
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const novo = !somRef.current;
+              somRef.current = novo;
+              setSomLigado(novo);
+              if (novo) {
+                acordarAudio();
+                iniciarMusica();
+              } else {
+                pararMusica();
+              }
+            }}
+            aria-label={somLigado ? "Desligar som" : "Ligar som"}
+            className="ml-2 inline-flex items-center gap-1 rounded-full border border-border px-3 py-1 text-primary"
+          >
+            {somLigado ? <Volume2 className="size-3" /> : <VolumeX className="size-3" />} Som
           </button>
 
         </div>
@@ -1783,8 +1842,14 @@ function JogoPage() {
           )}
         </div>
 
-        <div className="mt-6 flex items-end justify-between gap-3">
-          <Joystick onChange={(v) => { dir.current = v.x; dirY.current = v.y; }} />
+        <div className="relative z-30 mt-1 flex items-end justify-between gap-3 landscape:-mt-[104px] landscape:px-2">
+          <Joystick
+            onChange={(v) => {
+              dir.current = v.x;
+              dirY.current = v.y;
+              if (v.x !== 0 || v.y !== 0) acordarSom();
+            }}
+          />
           <div className="flex gap-2">
             <ControlButton onStart={pular} onEnd={pararSubida} label="Pular baixo (1 toque) ou alto (2 toques rápidos)">
               <ChevronUp className="size-6" />
