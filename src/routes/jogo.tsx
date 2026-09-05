@@ -1068,10 +1068,136 @@ function JogoPage() {
           setPontos(pontosRef.current + ganho);
         }
 
+        /* ---- chão de lava: cair nele custa uma vida ---- */
+        if (lay.lava.length > 0 && !seguro.current && y.current <= 2) {
+          const naLava = lay.lava.some(
+            (l) => x.current + HEROI_W > l.x + 4 && x.current < l.x + l.w - 4,
+          );
+          if (naLava) {
+            perderVida(null);
+            return;
+          }
+        }
+
+        /* ---- telas de computador: passar na frente prende e dá choque ---- */
+        if (
+          lay.telas.length > 0 &&
+          performance.now() >= presoAte.current &&
+          performance.now() > invulAte.current
+        ) {
+          const tela = lay.telas.find(
+            (t) => x.current + HEROI_W > t.x - 2 && x.current < t.x + t.w + 2 && y.current < 52,
+          );
+          if (tela) {
+            presoAte.current = performance.now() + 2000;
+            setChocado(true);
+            sfx(somDano);
+            window.setTimeout(() => {
+              setChocado(false);
+              perderVida(null);
+            }, 2000);
+          }
+        }
+
+        /* ---- chuva de batata frita (fase 4) ---- */
+        if (lay.chuvaBatata.length > 0) {
+          spawnQueda.current -= 1;
+          if (spawnQueda.current <= 0) {
+            spawnQueda.current = 22 + Math.floor(Math.random() * 26);
+            const faixa = lay.chuvaBatata[Math.floor(Math.random() * lay.chuvaBatata.length)]!;
+            const px = faixa.x0 + Math.random() * (faixa.x1 - faixa.x0);
+            if (px > cam - 30 && px < cam + vista + 60) {
+              tirosRef.current = [
+                ...tirosRef.current,
+                {
+                  id: nextTiro.current++,
+                  x: px,
+                  y: ALTURA_CENA - 70,
+                  vx: 0,
+                  vy: -2.6 - dif,
+                  tipo: "batata",
+                  volta: false,
+                  origem: px,
+                  cor: "#fbbf24",
+                  fase: Math.random() * Math.PI * 2,
+                },
+              ];
+            }
+          }
+        }
+
+        /* ---- vilões atirando donuts (fase 5) ---- */
+        if (lay.donuts) {
+          spawnQueda.current -= 1;
+          if (spawnQueda.current <= 0) {
+            spawnQueda.current = 46 + Math.floor(Math.random() * 40);
+            tirosRef.current = [
+              ...tirosRef.current,
+              {
+                id: nextTiro.current++,
+                x: cam + vista + 20,
+                y: 12 + Math.random() * 90,
+                vx: -(2.4 + Math.random() * 1.2),
+                vy: 0.8,
+                tipo: "donut",
+                volta: false,
+                origem: cam + vista + 20,
+                cor: CORES_DONUT[Math.floor(Math.random() * CORES_DONUT.length)]!,
+                fase: Math.random() * Math.PI * 2,
+              },
+            ];
+          }
+        }
+
+        /* ---- movimento dos perigos da corrida: 2 acertos = uma vida ---- */
+        if (tirosRef.current.length > 0) {
+          const restantes: Tiro[] = [];
+          let acertou = false;
+          for (const t of tirosRef.current) {
+            let ny = t.y + t.vy;
+            let nvy = t.vy;
+            const nx = t.x + t.vx;
+            if (t.tipo === "batata") {
+              nvy = t.vy - 0.12;
+              if (ny <= 0) continue;
+            } else {
+              nvy = t.vy - 0.14;
+              if (ny <= 0) {
+                ny = 0;
+                nvy = Math.abs(nvy) * 0.7;
+              }
+            }
+            if (nx < cam - 120 || nx > mundo + 80) continue;
+            const d = TAM_TIRO[t.tipo];
+            const bate =
+              nx + d.w > x.current + 3 &&
+              nx < x.current + HEROI_W - 3 &&
+              ny + d.h > y.current + 3 &&
+              ny < y.current + hAlt;
+            if (bate && performance.now() > invulAte.current) {
+              acertou = true;
+              continue;
+            }
+            restantes.push({ ...t, x: nx, y: ny, vy: nvy });
+          }
+          tirosRef.current = restantes;
+          setTiros(restantes);
+          if (acertou) {
+            impactos.current += 1;
+            sfx(somDano);
+            invulAte.current = performance.now() + 650;
+            if (impactos.current >= 2) {
+              impactos.current = 0;
+              perderVida(null);
+              return;
+            }
+          }
+        }
+
         /* corações escondidos no alto: cada um vale uma vida extra */
         if (coracoesRef.current.length > 0) {
           const pego = coracoesRef.current.find((idx) => {
-            const c = CORACOES[idx]!;
+            const c = lay.coracoes[idx]!;
             return (
               x.current + HEROI_W > c.x - 12 &&
               x.current < c.x + 12 &&
@@ -1089,6 +1215,7 @@ function JogoPage() {
             sfx(somMoeda);
           }
         }
+
 
         /* medalha de bronze suspensa: pegar pulando */
         const pegouMedalha =
