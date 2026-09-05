@@ -8,6 +8,7 @@ import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.f
 import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 
 import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
+import { AvisosResponsavel } from "@/components/AvisosResponsavel";
 import { supabase } from "@/integrations/supabase/client";
 
 const BUCKET = "documentos-alunos";
@@ -740,6 +741,8 @@ function Painel({ session }: { session: Session }) {
           PREENCHER FICHA PAR-Q DO ALUNO <Send className="size-4 shrink-0" />
         </Link>
       </section>
+
+      <AvisosResponsavel uid={uid} />
 
       <AvaliacaoResponsavel uid={uid} alunos={alunos} />
 
