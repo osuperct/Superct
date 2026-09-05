@@ -14,7 +14,9 @@ import {
   refMes,
 } from "@/lib/mensalidade";
 import {
+  diffMeses,
   parcelaNoMes,
+  refSomando,
   vencimentoNoMes,
   type FormaContrato,
   type PlanoContrato,
