@@ -114,6 +114,7 @@ export type Database = {
           autor_id: string
           created_at: string
           id: string
+          imagem_url: string | null
           mensagem: string
           titulo: string
         }
@@ -121,6 +122,7 @@ export type Database = {
           autor_id: string
           created_at?: string
           id?: string
+          imagem_url?: string | null
           mensagem: string
           titulo: string
         }
@@ -128,6 +130,7 @@ export type Database = {
           autor_id?: string
           created_at?: string
           id?: string
+          imagem_url?: string | null
           mensagem?: string
           titulo?: string
         }

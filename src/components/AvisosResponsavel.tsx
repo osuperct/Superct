@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   type Aviso,
   type EstadoNotificacao,
+  comImagens,
   dataCurta,
   estadoNotificacao,
   listarAvisos,
@@ -36,7 +37,10 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
       .channel("avisos-responsavel")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "avisos" }, (payload) => {
         const novo = payload.new as Aviso;
-        setLista((atual) => [novo, ...atual.filter((a) => a.id !== novo.id)]);
+        void comImagens([novo]).then((prontos) => {
+          const comFoto = prontos[0] ?? novo;
+          setLista((atual) => [comFoto, ...atual.filter((a) => a.id !== comFoto.id)]);
+        });
         toast.info(novo.titulo, { description: novo.mensagem });
         notificarAparelho(`Super CT — ${novo.titulo}`, novo.mensagem);
       })
@@ -126,6 +130,16 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
                   )}
                 </div>
                 <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
+                {a.imagem && (
+                  <a href={a.imagem} target="_blank" rel="noreferrer">
+                    <img
+                      src={a.imagem}
+                      alt={`Foto do aviso ${a.titulo}`}
+                      loading="lazy"
+                      className="mt-2 max-h-64 w-full rounded-md border border-border object-contain"
+                    />
+                  </a>
+                )}
                 <div className="mt-2 flex items-center justify-between gap-2">
                   <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                     {dataCurta(a.created_at)}
