@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CircleDollarSign, ShieldCheck, UserCheck, UserPlus } from "lucide-react";
+import { CircleDollarSign, ShieldCheck, Trash2, UserCheck, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import {
   cadastrarProfessor,
   definirAcesso,
+  excluirProfessor,
   listarAcessos,
   type ContaAcesso,
 } from "@/lib/adm.functions";
@@ -165,7 +166,9 @@ function Acessos() {
   const listar = useServerFn(listarAcessos);
   const definir = useServerFn(definirAcesso);
   const cadastrar = useServerFn(cadastrarProfessor);
+  const excluir = useServerFn(excluirProfessor);
   const [contas, setContas] = useState<ContaAcesso[] | null>(null);
+
   const [busca, setBusca] = useState("");
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [novo, setNovo] = useState(false);
@@ -234,6 +237,27 @@ function Acessos() {
     toast.success(liberar ? "Acesso liberado." : "Acesso removido.");
     await carregar();
   }
+
+  async function apagar(conta: ContaAcesso) {
+    const nome = conta.nome || conta.email;
+    if (!window.confirm(`Excluir definitivamente o cadastro de ${nome}?`)) return;
+    setOcupado(`${conta.id}-excluir`);
+    try {
+      const r = await excluir({ data: { userId: conta.id } });
+      if (!r.ok) {
+        toast.error(r.erro);
+        return;
+      }
+      toast.success("Cadastro excluído.");
+      await carregar();
+    } catch {
+      toast.error("Não foi possível excluir o cadastro.");
+    } finally {
+      setOcupado(null);
+    }
+  }
+
+
 
   const filtradas = (contas ?? []).filter((c) => {
     const t = busca.trim().toLowerCase();
@@ -338,6 +362,14 @@ function Acessos() {
                   }`}
                 >
                   {c.adm ? "ADM LIBERADO" : "LIBERAR ADM"}
+                </button>
+                <button
+                  type="button"
+                  disabled={ocupado === `${c.id}-excluir`}
+                  onClick={() => void apagar(c)}
+                  className="flex items-center gap-1 rounded-md border border-destructive/60 px-3 py-1.5 font-display text-[11px] tracking-tight text-destructive disabled:opacity-60"
+                >
+                  <Trash2 className="size-3.5" /> EXCLUIR CADASTRO
                 </button>
               </div>
             </li>
