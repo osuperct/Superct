@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdmRouteImport } from './routes/adm'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as ContaRouteImport } from './routes/conta'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
@@ -23,6 +24,11 @@ import { Route as DocumentoTipoRouteImport } from './routes/documento.$tipo'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdmRoute = AdmRouteImport.update({
+  id: '/adm',
+  path: '/adm',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CalendarioRoute = CalendarioRouteImport.update({
@@ -73,6 +79,7 @@ const DocumentoTipoRoute = DocumentoTipoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/adm': typeof AdmRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
   '/financeiro': typeof FinanceiroRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/adm': typeof AdmRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
   '/financeiro': typeof FinanceiroRoute
@@ -98,6 +106,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/adm': typeof AdmRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
   '/financeiro': typeof FinanceiroRoute
@@ -112,6 +121,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/adm'
     | '/calendario'
     | '/conta'
     | '/financeiro'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/adm'
     | '/calendario'
     | '/conta'
     | '/financeiro'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/adm'
     | '/calendario'
     | '/conta'
     | '/financeiro'
@@ -149,6 +161,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdmRoute: typeof AdmRoute
   CalendarioRoute: typeof CalendarioRoute
   ContaRoute: typeof ContaRoute
   FinanceiroRoute: typeof FinanceiroRoute
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/adm': {
+      id: '/adm'
+      path: '/adm'
+      fullPath: '/adm'
+      preLoaderRoute: typeof AdmRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/calendario': {
@@ -237,6 +257,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdmRoute: AdmRoute,
   CalendarioRoute: CalendarioRoute,
   ContaRoute: ContaRoute,
   FinanceiroRoute: FinanceiroRoute,
