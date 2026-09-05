@@ -39,8 +39,8 @@ function Casca({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background pl-16 text-foreground">
       <main className="mx-auto max-w-screen-md px-5 py-8">
-        <Link to="/professor" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-          ← Área do professor
+        <Link to="/adm" className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          ← Área ADM
         </Link>
         <h1 className="mt-3 flex items-center gap-2 font-display text-2xl leading-tight tracking-tighter">
           <CircleDollarSign className="size-6 shrink-0 text-primary" />
