@@ -452,6 +452,44 @@ function LembreteAcesso() {
   );
 }
 
+function primeiroNome(nome?: string | null) {
+  if (!nome) return "";
+  return nome.trim().split(" ")[0] ?? nome;
+}
+
+function Saudacao({ session }: { session: Session }) {
+  const [nome, setNome] = useState<string>("");
+
+  useEffect(() => {
+    const meta = session.user.user_metadata;
+    const nomeMeta = typeof meta?.nome_responsavel === "string" ? meta.nome_responsavel : "";
+    if (nomeMeta) {
+      setNome(primeiroNome(nomeMeta));
+      return;
+    }
+    let ativo = true;
+    void supabase
+      .from("perfis")
+      .select("nome")
+      .eq("user_id", session.user.id)
+      .single()
+      .then(({ data }) => {
+        if (ativo && data?.nome) setNome(primeiroNome(data.nome));
+      });
+    return () => {
+      ativo = false;
+    };
+  }, [session]);
+
+  if (!nome) return null;
+
+  return (
+    <p className="mt-1 font-body text-sm text-muted-foreground">
+      Olá, <span className="font-semibold text-foreground">{nome}</span>!
+    </p>
+  );
+}
+
 function Painel({ session }: { session: Session }) {
   const uid = session.user.id;
   const [alunos, setAlunos] = useState<Aluno[]>([]);
