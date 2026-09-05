@@ -1168,6 +1168,8 @@ function JogoPage() {
           super bola.
         </p>
 
+        <RankingJogo pontos={pontos} fase={fase} fim={fim} />
+
         <div className="mt-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           <span>
             Fase <span className="text-primary">{fase}</span>/{TOTAL_FASES} • Pontos:{" "}
@@ -1756,8 +1758,6 @@ function JogoPage() {
             ao perder uma vida você volta ao <span className="text-primary">checkpoint</span> da fase
           </p>
         </div>
-
-        <RankingJogo pontos={pontos} fase={fase} fim={fim} />
 
       </main>
     </div>
