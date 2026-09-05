@@ -317,7 +317,7 @@ function Painel({ professorId }: { professorId: string }) {
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <FileText className="size-4 text-primary" /> CONTRATOS ASSINADOS ({docs.length})
+          <FileText className="size-4 text-primary" /> DOCUMENTOS PARA CONFERIR ({docs.filter((d) => !d.liberado).length} / {docs.length})
         </h2>
         <ul className="mt-3 space-y-2">
           {docs.map((d) => {
@@ -374,7 +374,7 @@ function Painel({ professorId }: { professorId: string }) {
               </li>
             );
           })}
-          {docs.length === 0 && <li className="text-sm text-muted-foreground">Nenhum contrato assinado ainda.</li>}
+          {docs.length === 0 && <li className="text-sm text-muted-foreground">Nenhum documento enviado ainda.</li>}
         </ul>
       </section>
     </div>
