@@ -1,11 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { CreditCard, Copy, ShoppingBag, QrCode, ImageIcon } from "lucide-react";
+import { CreditCard, ShoppingBag, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { listarProdutos, type Produto } from "@/lib/loja.functions";
-import { gerarPix, PIX_CHAVE_EXIBICAO } from "@/lib/pix";
+
+const LINK_INFINITEPAY = "https://checkout.infinitepay.io/super_ct/gF9RQ9e7qg";
+
 
 export const Route = createFileRoute("/loja")({
   head: () => ({
