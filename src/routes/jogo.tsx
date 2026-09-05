@@ -228,11 +228,13 @@ function JogoPage() {
   const [olhando, setOlhando] = useState<1 | -1>(1);
   const [andando, setAndando] = useState(false);
   const [passoFrame, setPassoFrame] = useState<0 | 1>(0);
+  const [pulando, setPulando] = useState(false);
   const heroiRef = useRef<HeroiId | null>(null);
   const olhandoRef = useRef<1 | -1>(1);
   const andandoRef = useRef(false);
   const passoRef = useRef<0 | 1>(0);
   const passoDistancia = useRef(0);
+  const pulandoRef = useRef(false);
 
 
 
@@ -719,6 +721,11 @@ function JogoPage() {
       setHeroX(x.current);
       setHeroY(y.current);
       setPendurado(seguro.current);
+      const ar = noAr.current && !seguro.current;
+      if (ar !== pulandoRef.current) {
+        pulandoRef.current = ar;
+        setPulando(ar);
+      }
 
       /* ---- câmera ---- */
       const vista = vistaRef.current;
@@ -1140,6 +1147,8 @@ function JogoPage() {
       noAr.current = true;
       vy.current = duploToque ? IMPULSO : IMPULSO * 0.85;
       if (vy.current > 0) subindoDesde.current = performance.now();
+      /* impulso leve para frente ao soltar do aparelho */
+      vxAr.current = olhandoRef.current * VELOCIDADE * 1.3;
       return;
     }
 
@@ -1148,6 +1157,8 @@ function JogoPage() {
       noAr.current = true;
       vy.current = IMPULSO;
       if (vy.current > 0) subindoDesde.current = performance.now();
+      /* salto alto mais inclinado para frente */
+      vxAr.current = olhandoRef.current * VELOCIDADE * 1.55;
       return;
     }
 
@@ -1155,6 +1166,8 @@ function JogoPage() {
     noAr.current = true;
     vy.current = IMPULSO_BAIXO;
     if (vy.current > 0) subindoDesde.current = performance.now();
+    /* salto normal com leve inclinação para frente */
+    vxAr.current = olhandoRef.current * VELOCIDADE * 1.25;
   };
 
 
@@ -1531,6 +1544,7 @@ function JogoPage() {
                 : caminhando
                   ? heroiAtual.anda[passoFrame]
                   : heroiAtual.anda[0];
+              const inclinacao = pulando && !escalando ? olhando * 14 : 0;
               return (
                 <div
                   className="absolute transition-[height] duration-100"
@@ -1539,7 +1553,8 @@ function JogoPage() {
                     width: HEROI_W,
                     height: alt,
                     bottom: 40 + heroY,
-                    transform: escalando ? "none" : `scaleX(${olhando})`,
+                    transform: escalando ? "none" : `scaleX(${olhando}) rotate(${inclinacao}deg)`,
+                    transformOrigin: "bottom center",
                   }}
                 >
                   <img
