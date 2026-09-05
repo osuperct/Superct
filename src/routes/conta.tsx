@@ -582,18 +582,9 @@ function Painel({ session }: { session: Session }) {
   return (
     <div className="mt-6">
       <LembreteAcesso />
-      <div className="flex items-center justify-between rounded-md border border-border bg-card/50 p-3">
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
-          <p className="text-sm">{session.user.email}</p>
-        </div>
-        <button
-          type="button"
-          onClick={sair}
-          className="flex items-center gap-1 rounded-md border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
-        >
-          <LogOut className="size-3" /> Sair
-        </button>
+      <div className="rounded-md border border-border bg-card/50 p-3">
+        <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
+        <p className="text-sm">{session.user.email}</p>
       </div>
 
       {ehProfessor && (
