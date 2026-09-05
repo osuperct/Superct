@@ -11,6 +11,7 @@ import {
   ChevronRight,
   GraduationCap,
   ShieldCheck,
+  ShoppingBag,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,7 @@ const itens = [
   { to: "/", label: "Início", icon: Home },
   { to: "/conta", label: "Conta", icon: UserRound },
   { to: "/calendario", label: "Agenda", icon: CalendarDays },
+  { to: "/loja", label: "Loja", icon: ShoppingBag },
   { to: "/jogo", label: "Jogo", icon: Gamepad2 },
   { to: "/herois", label: "Heróis", icon: Shield },
   { to: "/viloes", label: "Vilões", icon: Skull },
