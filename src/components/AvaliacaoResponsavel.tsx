@@ -43,33 +43,50 @@ export function AvaliacaoResponsavel({ uid, alunos }: { uid: string; alunos: Alu
         ))}
       </div>
 
-      <ul className="mt-3 space-y-2">
-        {lista.map((a) => (
-          <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
-            <p className="text-sm font-medium">
-              {alunos.find((al) => al.id === a.aluno_id)?.nome ?? "Aluno"}
-            </p>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{mesExtenso(a.referencia)}</p>
-            <div className="mt-2 space-y-1">
-              {CRITERIOS.map((c) => (
-                <div key={c.chave} className="flex items-center justify-between gap-2 text-xs">
-                  <span className="flex items-center gap-2">
-                    <span className={`size-3 shrink-0 rounded-full ${classeCor(a[c.chave])}`} />
-                    <span className="text-muted-foreground">{c.rotulo}</span>
-                  </span>
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    {rotuloCor(a[c.chave])}
-                  </span>
-                </div>
+      {lista.length === 0 ? (
+        <p className="mt-3 text-sm text-muted-foreground">Nenhuma avaliação disponível ainda.</p>
+      ) : (
+        <div className="mt-3 space-y-2">
+          <div className="relative">
+            <Calendar className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <select
+              value={mesSelecionado}
+              onChange={(e) => setMesSelecionado(e.target.value)}
+              className="w-full appearance-none rounded-md border border-border bg-background py-2 pl-9 pr-3 text-sm"
+            >
+              <option value="">Selecione o mês</option>
+              {lista.map((a) => (
+                <option key={a.id} value={a.referencia}>
+                  {alunos.find((al) => al.id === a.aluno_id)?.nome ?? "Aluno"} — {mesExtenso(a.referencia)}
+                </option>
               ))}
-            </div>
-            {a.observacoes && <p className="mt-2 text-xs">{a.observacoes}</p>}
-          </li>
-        ))}
-        {lista.length === 0 && (
-          <li className="text-sm text-muted-foreground">Nenhuma avaliação disponível ainda.</li>
-        )}
-      </ul>
+            </select>
+          </div>
+          {mesSelecionado && (() => {
+            const a = lista.find((x) => x.referencia === mesSelecionado)!;
+            return (
+              <div className="rounded-md border border-border bg-background/40 p-3">
+                <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{mesExtenso(a.referencia)}</p>
+                <div className="mt-2 space-y-1">
+                  {CRITERIOS.map((c) => (
+                    <div key={c.chave} className="flex items-center justify-between gap-2 text-xs">
+                      <span className="flex items-center gap-2">
+                        <span className={`size-3 shrink-0 rounded-full ${classeCor(a[c.chave])}`} />
+                        <span className="text-muted-foreground">{c.rotulo}</span>
+                      </span>
+                      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                        {rotuloCor(a[c.chave])}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                {a.observacoes && <p className="mt-2 border-t border-border pt-2 text-xs">{a.observacoes}</p>}
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
     </section>
   );
 }
