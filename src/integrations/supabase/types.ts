@@ -109,6 +109,59 @@ export type Database = {
           },
         ]
       }
+      avisos: {
+        Row: {
+          autor_id: string
+          created_at: string
+          id: string
+          mensagem: string
+          titulo: string
+        }
+        Insert: {
+          autor_id: string
+          created_at?: string
+          id?: string
+          mensagem: string
+          titulo: string
+        }
+        Update: {
+          autor_id?: string
+          created_at?: string
+          id?: string
+          mensagem?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
+      avisos_lidos: {
+        Row: {
+          aviso_id: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          aviso_id: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          aviso_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avisos_lidos_aviso_id_fkey"
+            columns: ["aviso_id"]
+            isOneToOne: false
+            referencedRelation: "avisos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documentos: {
         Row: {
           aluno_id: string | null
