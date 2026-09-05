@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { ClipboardCheck, ChevronLeft } from "lucide-react";
+import { ClipboardCheck, ChevronLeft, Calendar } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -14,9 +14,30 @@ import {
   referenciaMesAtual,
 } from "@/lib/avaliacao";
 
+
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
+function VisualizarAvaliacao({ avaliacao }: { avaliacao: Avaliacao }) {
+  return (
+    <div className="rounded-md border border-border bg-background/40 p-3">
+      <ul className="space-y-2">
+        {CRITERIOS.map((c) => (
+          <li key={c.chave} className="flex items-center justify-between gap-2 text-xs">
+            <span className="text-muted-foreground">{c.rotulo}</span>
+            <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+              <span className={`size-3 rounded-full ${classeCor(avaliacao[c.chave])}`} />
+              {CORES.find((x) => x.cor === avaliacao[c.chave])?.rotulo}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {avaliacao.observacoes && <p className="mt-2 border-t border-border pt-2 text-xs">{avaliacao.observacoes}</p>}
+    </div>
+  );
+}
+
 const VAZIO: Record<CriterioChave, Cor> = {
+
   coordenacao_motora: "amarelo",
   forca_resistencia: "amarelo",
   velocidade_agilidade: "amarelo",
@@ -66,7 +87,9 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
   const [notas, setNotas] = useState<Record<CriterioChave, Cor>>(VAZIO);
   const [observacoes, setObservacoes] = useState("");
   const [historico, setHistorico] = useState<Avaliacao[]>([]);
+  const [mesSelecionado, setMesSelecionado] = useState<string>("");
   const [salvando, setSalvando] = useState(false);
+
 
   const carregar = useCallback(async () => {
     const { data } = await supabase
@@ -174,23 +197,33 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
       </button>
 
       <h3 className="mt-6 font-display text-sm tracking-tight">HISTÓRICO</h3>
-      <ul className="mt-2 space-y-2">
-        {historico.map((a) => (
-          <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{mesExtenso(a.referencia)}</p>
-            <div className="mt-2 space-y-1">
-              {CRITERIOS.map((c) => (
-                <div key={c.chave} className="flex items-center gap-2 text-xs">
-                  <span className={`size-3 shrink-0 rounded-full ${classeCor(a[c.chave])}`} />
-                  <span className="text-muted-foreground">{c.rotulo}</span>
-                </div>
+      {historico.length === 0 ? (
+        <p className="mt-2 text-sm text-muted-foreground">Nenhuma avaliação registrada.</p>
+      ) : (
+        <div className="mt-2 space-y-2">
+          <div className="relative">
+            <Calendar className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <select
+              value={mesSelecionado}
+              onChange={(e) => setMesSelecionado(e.target.value)}
+              className="w-full appearance-none rounded-md border border-border bg-background py-2 pl-9 pr-3 text-sm"
+            >
+              <option value="">Selecione o mês</option>
+              {historico.map((a) => (
+                <option key={a.id} value={a.referencia}>
+                  {mesExtenso(a.referencia)}
+                </option>
               ))}
-            </div>
-            {a.observacoes && <p className="mt-2 text-xs">{a.observacoes}</p>}
-          </li>
-        ))}
-        {historico.length === 0 && <li className="text-sm text-muted-foreground">Nenhuma avaliação registrada.</li>}
-      </ul>
+            </select>
+          </div>
+          {mesSelecionado && (
+            <VisualizarAvaliacao
+              avaliacao={historico.find((a) => a.referencia === mesSelecionado)!}
+            />
+          )}
+        </div>
+      )}
+
     </section>
   );
 }
