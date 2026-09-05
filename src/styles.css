@@ -252,3 +252,45 @@
 @utility animate-hero-climb-body {
   animation: heroClimbBody 0.7s infinite ease-in-out;
 }
+
+@keyframes bossCharge {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.25);
+  }
+  35% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(0.9);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1.7);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(2.6);
+  }
+}
+
+@utility animate-boss-charge {
+  animation: bossCharge 2.4s ease-in both;
+}
+
+@keyframes gameOverPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  60% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@utility animate-game-over {
+  animation: gameOverPop 2.6s ease-out both;
+}
