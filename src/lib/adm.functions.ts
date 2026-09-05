@@ -129,3 +129,22 @@ export const cadastrarProfessor = createServerFn({ method: "POST" })
 
     return { ok: true as const, senhaTemporaria };
   });
+
+const entradaExclusao = z.object({ userId: z.string().uuid() });
+
+/** Exclui definitivamente a conta de um professor cadastrado (somente ADM). */
+export const excluirProfessor = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => entradaExclusao.parse(data))
+  .handler(async ({ data, context }) => {
+    await garantirAdm(context.supabase as never, context.userId);
+    if (data.userId === context.userId) {
+      return { ok: false as const, erro: "Você não pode excluir a sua própria conta." };
+    }
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    await supabaseAdmin.from("user_roles").delete().eq("user_id", data.userId);
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(data.userId);
+    if (error) return { ok: false as const, erro: "Não foi possível excluir o cadastro." };
+    return { ok: true as const };
+  });
