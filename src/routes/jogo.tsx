@@ -788,6 +788,12 @@ function JogoPage() {
       const jumps: Jump[] = emChefao ? [] : lay.jumps;
       const paredes: Parede[] = emChefao ? ARENA_PAREDES : lay.paredes;
       const dif = dificuldade(faseRef.current);
+      const preso = !emChefao && performance.now() < presoAte.current;
+      if (preso) {
+        dir.current = 0;
+        dirY.current = 0;
+      }
+
 
 
       /* ---- segurar o analógico para baixo agacha o personagem ---- */
