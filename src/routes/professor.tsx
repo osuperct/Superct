@@ -6,7 +6,9 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
+import { Mensalidades } from "@/components/Mensalidades";
 import { formatarCpf } from "@/lib/cpf";
+import { type Mensalidade, refMes } from "@/lib/mensalidade";
 
 export const Route = createFileRoute("/professor")({
   head: () => ({
@@ -43,7 +45,14 @@ type Doc = {
   enviado_por_professor: boolean;
   liberado: boolean;
 };
-type Alu = { id: string; nome: string; idade: number | null; matricula: string | null; user_id: string };
+type Alu = {
+  id: string;
+  nome: string;
+  idade: number | null;
+  matricula: string | null;
+  user_id: string;
+  created_at: string;
+};
 type Perfil = { id: string; nome_responsavel: string; telefone: string | null; cpf: string | null };
 
 function Aviso({ texto }: { texto: string }) {
