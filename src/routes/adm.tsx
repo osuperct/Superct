@@ -471,21 +471,31 @@ function Cadastros() {
 
   return (
     <section className="rounded-lg border border-border bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <Users className="size-4 text-primary" /> CADASTROS
-        <span className="font-mono text-xs text-muted-foreground">({(contas ?? []).length})</span>
-      </h2>
+      <button
+        type="button"
+        onClick={() => setAberto((v) => !v)}
+        className="flex w-full items-center justify-between gap-2 text-left"
+        aria-expanded={aberto}
+      >
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <Users className="size-4 text-primary" /> CADASTROS
+          <span className="font-mono text-xs text-muted-foreground">({(contas ?? []).length})</span>
+        </h2>
+        {aberto ? <ChevronUp className="size-5 text-primary" /> : <ChevronDown className="size-5 text-primary" />}
+      </button>
       <p className="mt-1 text-xs text-muted-foreground">
         Nomes e e-mails já cadastrados no aplicativo. Ao excluir, a pessoa pode fazer o cadastro novamente
         para acessar o login.
       </p>
 
-      <input
-        value={busca}
-        onChange={(e) => setBusca(e.target.value)}
-        placeholder="Buscar por nome ou e-mail"
-        className="mt-3 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary"
-      />
+      {aberto && (
+        <>
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar por nome ou e-mail"
+            className="mt-3 w-full rounded-md border border-border bg-background/60 px-3 py-2 text-sm outline-none focus:border-primary"
+          />
 
       {contas === null ? (
         <p className="mt-3 text-xs text-muted-foreground">Carregando…</p>
