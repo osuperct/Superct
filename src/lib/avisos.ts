@@ -70,11 +70,7 @@ export async function pedirPermissao(): Promise<EstadoNotificacao> {
 export function notificarAparelho(titulo: string, corpo: string) {
   if (estadoNotificacao() !== "permitido") return;
   try {
-    void navigator.serviceWorker?.ready
-      .then((reg) => reg.showNotification(titulo, { body: corpo, icon: "/favicon.png", tag: "aviso-super-ct" }))
-      .catch(() => {
-        new Notification(titulo, { body: corpo, icon: "/favicon.png" });
-      });
+    new Notification(titulo, { body: corpo, icon: "/favicon.png" });
   } catch {
     /* sem notificação disponível */
   }
