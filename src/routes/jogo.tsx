@@ -125,7 +125,7 @@ const gerarPinos = (paredes: Parede[], quantidade: number): Pino[][] =>
 const PINOS = gerarPinos(PAREDES, 26);
 const PINOS_ARENA = gerarPinos(ARENA_PAREDES, 14);
 
-/* cones decorativos no tatame (não colidem) */
+/* cones no tatame: cada um vale 5 pontos ao ser tocado */
 const CONES: number[] = [
   180, 340, 560, 820, 900, 1100, 1340, 1500, 1700, 1900, 2050, 2300, 2560, 2750,
   2900, 3100, 3260, 3480, 3720, 3900, 4050,
@@ -210,6 +210,7 @@ function JogoPage() {
   const [tiros, setTiros] = useState<Tiro[]>([]);
   const [vidas, setVidas] = useState(VIDAS_CHEFAO);
   const [coracoes, setCoracoes] = useState<number[]>(CORACOES.map((_, i) => i));
+  const [conesPegos, setConesPegos] = useState<number[]>([]);
   const [piscando, setPiscando] = useState(false);
   const [heroiSel, setHeroiSel] = useState<HeroiId | null>(null);
   const [olhando, setOlhando] = useState<1 | -1>(1);
@@ -271,6 +272,7 @@ function JogoPage() {
   const spawnTiro = useRef(90);
   const vidasRef = useRef(VIDAS_CHEFAO);
   const coracoesRef = useRef<number[]>(CORACOES.map((_, i) => i));
+  const conesRef = useRef<number[]>([]);
   const invulAte = useRef(0);
 
 
@@ -344,6 +346,8 @@ function JogoPage() {
       setVenceu(false);
       setFim(false);
       setPiscando(false);
+      conesRef.current = [];
+      setConesPegos([]);
       zerarHeroi();
     },
     [zerarHeroi],
@@ -377,6 +381,8 @@ function JogoPage() {
     setTiros([]);
     setHalteres([]);
     setInimigos([]);
+    conesRef.current = [];
+    setConesPegos([]);
     zerarHeroi();
     const hpMax = 6 + faseRef.current * 2;
     const boss: Chefao = { x: ARENA - 200, y: 60, vx: -1.1, vy: 0.9, hp: hpMax, hpMax };
@@ -696,6 +702,29 @@ function JogoPage() {
 
       const hAlt = alturaHeroi(duck.current);
 
+      /* ---- cones: 5 pontos cada ---- */
+      {
+        const lista = emChefao ? CONES_ARENA : CONES;
+        let ganhouCone = false;
+        for (let i = 0; i < lista.length; i += 1) {
+          if (conesRef.current.includes(i)) continue;
+          const cx = lista[i]!;
+          if (
+            x.current + HEROI_W > cx - 4 &&
+            x.current < cx + 20 &&
+            y.current < 30
+          ) {
+            conesRef.current = [...conesRef.current, i];
+            pontosRef.current += 5;
+            ganhouCone = true;
+          }
+        }
+        if (ganhouCone) {
+          setConesPegos(conesRef.current);
+          setPontos(pontosRef.current);
+        }
+      }
+
       /* =================== FASE DE CORRIDA =================== */
       if (!emChefao) {
         if (x.current > maxX.current) {
@@ -720,7 +749,7 @@ function JogoPage() {
             setCoracoes(coracoesRef.current);
             vidasRef.current = Math.min(VIDAS_MAX, vidasRef.current + 1);
             setVidas(vidasRef.current);
-            pontosRef.current += 15;
+            pontosRef.current += 10;
             setPontos(pontosRef.current);
           }
         }
@@ -732,7 +761,7 @@ function JogoPage() {
           y.current + hAlt > MEDALHA.y - 6 &&
           y.current < MEDALHA.y + 26;
         if (pegouMedalha) {
-          const ganho = passados.current + Math.floor((maxX.current - 60) / 60) + 40;
+          const ganho = passados.current + Math.floor((maxX.current - 60) / 60) + 30;
           pontosRef.current += ganho;
           setPontos(pontosRef.current);
           pausaRef.current = true;
@@ -992,7 +1021,7 @@ function JogoPage() {
 
       /* chefão derrotado */
       if (boss.hp <= 0) {
-        pontosRef.current += 60;
+        pontosRef.current += 50;
         setPontos(pontosRef.current);
         pausaRef.current = true;
         chefaoRef.current = null;
@@ -1310,7 +1339,7 @@ function JogoPage() {
               />
             ))}
 
-            {cones.map((cx, i) => (
+            {cones.map((cx, i) => (conesPegos.includes(i) ? null : (
               <div key={`c-${i}`} className="absolute" style={{ left: cx, bottom: 38 }}>
                 <div className="h-[3px] w-4 rounded-full bg-[#f97316]/70" />
                 <div
