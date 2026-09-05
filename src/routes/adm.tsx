@@ -424,6 +424,7 @@ function Cadastros() {
   const [contas, setContas] = useState<ContaAcesso[] | null>(null);
   const [busca, setBusca] = useState("");
   const [ocupado, setOcupado] = useState<string | null>(null);
+  const [aberto, setAberto] = useState(false);
 
   const carregar = useCallback(async () => {
     try {
