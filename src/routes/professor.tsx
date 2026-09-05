@@ -6,7 +6,7 @@ import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
-import { Mensalidades } from "@/components/Mensalidades";
+
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
 
