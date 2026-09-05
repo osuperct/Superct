@@ -129,49 +129,77 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
       {lista.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">Nenhum aviso por enquanto.</p>
       ) : (
-        <ul className="mt-3 space-y-2">
-          {lista.map((a) => {
-            const novo = !lidos.has(a.id);
+        <div className="mt-3 space-y-2">
+          {porMes.map((grupo) => {
+            const aberto = abertos.has(grupo.chave);
+            const naoLidosMes = grupo.avisos.filter((a) => !lidos.has(a.id)).length;
             return (
-              <li
-                key={a.id}
-                className={`rounded-md border p-3 ${novo ? "border-primary/60 bg-primary/5" : "border-border bg-background/40"}`}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <p className="font-display text-sm tracking-tight">{a.titulo}</p>
-                  {novo && (
-                    <span className="mt-0.5 size-2 shrink-0 rounded-full bg-primary" aria-label="Não lido" />
-                  )}
-                </div>
-                <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
-                {a.imagem && (
-                  <a href={a.imagem} target="_blank" rel="noreferrer">
-                    <img
-                      src={a.imagem}
-                      alt={`Foto do aviso ${a.titulo}`}
-                      loading="lazy"
-                      className="mt-2 max-h-64 w-full rounded-md border border-border object-contain"
-                    />
-                  </a>
-                )}
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                    {dataCurta(a.created_at)}
+              <div key={grupo.chave} className="rounded-md border border-border bg-background/40">
+                <button
+                  type="button"
+                  onClick={() => toggleMes(grupo.chave)}
+                  className="flex w-full items-center justify-between gap-2 p-3 text-left"
+                  aria-expanded={aberto}
+                >
+                  <span className="flex items-center gap-2 font-display text-sm tracking-tight">
+                    {grupo.rotulo}
+                    {naoLidosMes > 0 && (
+                      <span className="rounded-full bg-primary px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary-foreground">
+                        {naoLidosMes} nova{naoLidosMes > 1 ? "s" : ""}
+                      </span>
+                    )}
                   </span>
-                  {novo && (
-                    <button
-                      type="button"
-                      onClick={() => void marcar(a.id)}
-                      className="flex items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
-                    >
-                      <Check className="size-3" /> MARCAR COMO LIDO
-                    </button>
-                  )}
-                </div>
-              </li>
+                  {aberto ? <ChevronUp className="size-4 text-muted-foreground" /> : <ChevronDown className="size-4 text-muted-foreground" />}
+                </button>
+                {aberto && (
+                  <ul className="space-y-2 border-t border-border px-3 pb-3 pt-2">
+                    {grupo.avisos.map((a) => {
+                      const novo = !lidos.has(a.id);
+                      return (
+                        <li
+                          key={a.id}
+                          className={`rounded-md border p-3 ${novo ? "border-primary/60 bg-primary/5" : "border-border bg-background/60"}`}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <p className="font-display text-sm tracking-tight">{a.titulo}</p>
+                            {novo && (
+                              <span className="mt-0.5 size-2 shrink-0 rounded-full bg-primary" aria-label="Não lido" />
+                            )}
+                          </div>
+                          <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
+                          {a.imagem && (
+                            <a href={a.imagem} target="_blank" rel="noreferrer">
+                              <img
+                                src={a.imagem}
+                                alt={`Foto do aviso ${a.titulo}`}
+                                loading="lazy"
+                                className="mt-2 max-h-64 w-full rounded-md border border-border object-contain"
+                              />
+                            </a>
+                          )}
+                          <div className="mt-2 flex items-center justify-between gap-2">
+                            <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                              {dataCurta(a.created_at)}
+                            </span>
+                            {novo && (
+                              <button
+                                type="button"
+                                onClick={() => void marcar(a.id)}
+                                className="flex items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                              >
+                                <Check className="size-3" /> MARCAR COMO LIDO
+                              </button>
+                            )}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
             );
           })}
-        </ul>
+        </div>
       )}
     </section>
   );
