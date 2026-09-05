@@ -1,6 +1,6 @@
 import { DatePicker } from "@/components/ui/datepicker";
 import { useMemo, useState } from "react";
-import { CircleDollarSign, TrendingUp } from "lucide-react";
+import { CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,12 @@ import {
   mesExtensoRef,
   refMes,
 } from "@/lib/mensalidade";
+import {
+  parcelaNoMes,
+  vencimentoNoMes,
+  type FormaContrato,
+  type PlanoContrato,
+} from "@/lib/planoContrato";
 
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
@@ -68,13 +74,22 @@ function CampoValor({
   );
 }
 
+const GRUPOS: { forma: FormaContrato; rotulo: string }[] = [
+  { forma: "Pix / dinheiro", rotulo: "PIX / DINHEIRO" },
+  { forma: "Cartão", rotulo: "CARTÃO" },
+  { forma: "Cartão Recorrente (link)", rotulo: "CARTÃO RECORRENTE (LINK)" },
+  { forma: "Não informado", rotulo: "SEM FORMA INFORMADA" },
+];
+
 export function Mensalidades({
   alunos,
   mensalidades,
+  planos = [],
   recarregar,
 }: {
   alunos: Alu[];
   mensalidades: Mensalidade[];
+  planos?: PlanoContrato[];
   recarregar: () => void;
 }) {
   const [salvando, setSalvando] = useState<string | null>(null);
@@ -128,7 +143,16 @@ export function Mensalidades({
     .filter((m) => m.ativo && !m.pago && m.referencia < mesAtual)
     .sort((a, b) => a.referencia.localeCompare(b.referencia));
 
-  const projecao = ativosMes.map((a) => ({ aluno: a, valor: Number(doMes(a.id)?.valor ?? 0) }));
+  const planoDoAluno = (alunoId: string) => planos.find((p) => p.alunoId === alunoId);
+
+  const projecao = ativosMes.map((a) => {
+    const plano = planoDoAluno(a.id);
+    const parcela = plano ? parcelaNoMes(plano, mesProximo) : null;
+    const valorPlano = plano?.valor ?? null;
+    const encerrado = parcela?.encerrado ?? false;
+    const valor = encerrado ? 0 : Number(valorPlano ?? doMes(a.id)?.valor ?? 0);
+    return { aluno: a, valor, plano: plano ?? null, parcela, encerrado };
+  });
   const totalProjecao = projecao.reduce((s, p) => s + p.valor, 0);
 
   return (
@@ -235,6 +259,58 @@ export function Mensalidades({
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <CreditCard className="size-4 text-primary" /> FORMAS DE PAGAMENTO
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Alunos ativos com contrato conferido, valor do plano e vencimento em {mesExtensoRef(mesAtual)}.
+        </p>
+        <div className="mt-3 space-y-3">
+          {GRUPOS.map((g) => {
+            const itens = ativosMes
+              .map((a) => ({ aluno: a, plano: planos.find((p) => p.alunoId === a.id) }))
+              .filter((i) => i.plano && i.plano.forma === g.forma);
+            if (itens.length === 0) return null;
+            return (
+              <div key={g.forma}>
+                <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                  {g.rotulo} ({itens.length})
+                </h3>
+                <ul className="mt-1.5 space-y-1.5">
+                  {itens.map((i) => (
+                    <li
+                      key={i.aluno.id}
+                      className="flex items-center justify-between gap-2 rounded-md border border-border bg-background/40 px-3 py-2 text-xs"
+                    >
+                      <span>
+                        {i.aluno.nome}
+                        <span className="ml-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                          {i.plano!.planoTexto}
+                        </span>
+                      </span>
+                      <span className="shrink-0 text-right">
+                        <span className="font-mono text-[10px] tracking-widest text-primary">
+                          {formatarValor(i.plano!.valor)}
+                        </span>
+                        <span className="block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                          vence {vencimentoNoMes(i.plano!.vencimento, mesAtual) ?? "—"}
+                        </span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+          {planos.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              Nenhum contrato conferido ainda — libere os contratos para ver as formas de pagamento.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-border bg-card/40 p-4">
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <TrendingUp className="size-4 text-primary" /> PROJEÇÃO — {mesExtensoRef(mesProximo).toUpperCase()}
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
@@ -244,12 +320,27 @@ export function Mensalidades({
           {projecao.map((p) => (
             <li
               key={p.aluno.id}
-              className="flex items-center justify-between gap-2 rounded-md border border-border bg-background/40 px-3 py-2 text-xs"
+              className="rounded-md border border-border bg-background/40 px-3 py-2 text-xs"
             >
-              <span>{p.aluno.nome}</span>
-              <span className="font-mono text-[10px] tracking-widest text-primary">
-                {formatarValor(p.valor)}
-              </span>
+              <div className="flex items-center justify-between gap-2">
+                <span>{p.aluno.nome}</span>
+                <span className="font-mono text-[10px] tracking-widest text-primary">
+                  {formatarValor(p.valor)}
+                </span>
+              </div>
+              {p.plano?.planoTexto && (
+                <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                  {p.plano.planoTexto}
+                  {p.parcela?.numero
+                    ? ` • parcela ${p.parcela.numero}/${p.parcela.total}`
+                    : ""}
+                  {p.parcela?.fim ? ` • termina em ${mesExtensoRef(p.parcela.fim)}` : ""}
+                  {p.plano.vencimento
+                    ? ` • vence ${vencimentoNoMes(p.plano.vencimento, mesProximo)}`
+                    : ""}
+                  {p.encerrado ? " • PLANO ENCERRADO" : ""}
+                </p>
+              )}
             </li>
           ))}
           {projecao.length === 0 && (
