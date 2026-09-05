@@ -246,6 +246,22 @@ const galeria = [
 
 function Index() {
   const [fotosAbertas, setFotosAbertas] = useState<Modalidade["fotos"] | null>(null);
+  const [logado, setLogado] = useState(false);
+
+  useEffect(() => {
+    let ativo = true;
+    async function checar() {
+      const { data } = await supabase.auth.getSession();
+      if (!ativo) return;
+      setLogado(!!data.session);
+    }
+    void checar();
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setLogado(!!s));
+    return () => {
+      ativo = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -257,13 +273,15 @@ function Index() {
               São Sebastião do Paraíso
             </span>
           </div>
-          <Link
-            to="/conta"
-            className="animate-pulse-slow flex items-center gap-1.5 rounded-sm bg-primary px-4 py-2 font-display text-sm text-primary-foreground transition-transform active:scale-95"
-          >
-            <UserRound className="size-4" />
-            LOGIN
-          </Link>
+          {!logado && (
+            <Link
+              to="/conta"
+              className="animate-pulse-slow flex items-center gap-1.5 rounded-sm bg-primary px-4 py-2 font-display text-sm text-primary-foreground transition-transform active:scale-95"
+            >
+              <UserRound className="size-4" />
+              LOGIN
+            </Link>
+          )}
         </div>
       </nav>
 
