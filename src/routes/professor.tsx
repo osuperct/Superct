@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { FileText, GraduationCap, Paperclip, Trash2, Upload, Users } from "lucide-react";
+import { FileText, GraduationCap, Paperclip, ShieldCheck, Trash2, Upload, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -119,6 +119,7 @@ function ProfessorPage() {
 
 function Painel({ professorId }: { professorId: string }) {
   const [autorizado, setAutorizado] = useState<boolean | null>(null);
+  const [ehAdm, setEhAdm] = useState(false);
   const [docs, setDocs] = useState<Doc[]>([]);
   const [alunos, setAlunos] = useState<Alu[]>([]);
   const [perfis, setPerfis] = useState<Perfil[]>([]);
@@ -134,6 +135,7 @@ function Painel({ professorId }: { professorId: string }) {
     const { data: papeis } = await supabase.from("user_roles").select("role");
     const ehProfessor = (papeis ?? []).some((p) => p.role === "professor");
     setAutorizado(ehProfessor);
+    setEhAdm((papeis ?? []).some((p) => p.role === "adm"));
     if (!ehProfessor) return;
 
     const [{ data: d }, { data: a }, { data: p }, { data: m }] = await Promise.all([
@@ -261,6 +263,14 @@ function Painel({ professorId }: { professorId: string }) {
         <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           CREF 057790-G/MG
         </p>
+        {ehAdm ? (
+          <Link
+            to="/adm"
+            className="mt-3 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground active:scale-95"
+          >
+            <ShieldCheck className="size-4" /> ÁREA ADM
+          </Link>
+        ) : null}
       </section>
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
