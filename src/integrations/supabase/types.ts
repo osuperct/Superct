@@ -255,6 +255,7 @@ export type Database = {
           created_at: string
           endereco: string | null
           id: string
+          nascimento: string | null
           nome_responsavel: string
           telefone: string | null
           updated_at: string
@@ -266,6 +267,7 @@ export type Database = {
           created_at?: string
           endereco?: string | null
           id: string
+          nascimento?: string | null
           nome_responsavel?: string
           telefone?: string | null
           updated_at?: string
@@ -277,6 +279,7 @@ export type Database = {
           created_at?: string
           endereco?: string | null
           id?: string
+          nascimento?: string | null
           nome_responsavel?: string
           telefone?: string | null
           updated_at?: string
