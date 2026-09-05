@@ -1,17 +1,19 @@
 import { useCallback, useEffect, useState } from "react";
-import { Bell, BellRing, Check } from "lucide-react";
+import { Bell, BellRing, Check, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
   type Aviso,
   type EstadoNotificacao,
+  agruparPorMes,
   comImagens,
   dataCurta,
   estadoNotificacao,
   listarAvisos,
   listarLidos,
   marcarLido,
+  mesAtual,
   notificarAparelho,
   pedirPermissao,
 } from "@/lib/avisos";
