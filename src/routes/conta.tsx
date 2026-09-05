@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { Eye, EyeOff, GraduationCap, LogOut, Paperclip, Send, Trash2, Upload, UserPlus } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, LogOut, Paperclip, Send, ShieldCheck, Trash2, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -584,12 +584,20 @@ function Painel({ session }: { session: Session }) {
       </div>
 
       {ehProfessor && (
-        <Link
-          to="/professor"
-          className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
-        >
-          <GraduationCap className="size-4" /> ÁREA DO PROFESSOR
-        </Link>
+        <>
+          <Link
+            to="/professor"
+            className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+          >
+            <GraduationCap className="size-4" /> ÁREA DO PROFESSOR
+          </Link>
+          <Link
+            to="/adm"
+            className="mt-2 flex items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/5 px-4 py-3 font-display text-sm tracking-tight text-primary"
+          >
+            <ShieldCheck className="size-4" /> ÁREA ADM
+          </Link>
+        </>
       )}
 
 
