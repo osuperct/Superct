@@ -122,6 +122,8 @@ function Painel({ professorId }: { professorId: string }) {
   const [docs, setDocs] = useState<Doc[]>([]);
   const [alunos, setAlunos] = useState<Alu[]>([]);
   const [perfis, setPerfis] = useState<Perfil[]>([]);
+  const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
+  const [filtroAlunos, setFiltroAlunos] = useState<"recentes" | "todos" | "ativos" | "inativos">("todos");
   const [alunoSel, setAlunoSel] = useState("");
   const [tipoSel, setTipoSel] = useState("contrato");
   const [enviando, setEnviando] = useState(false);
@@ -133,17 +135,21 @@ function Painel({ professorId }: { professorId: string }) {
     setAutorizado(ehProfessor);
     if (!ehProfessor) return;
 
-    const [{ data: d }, { data: a }, { data: p }] = await Promise.all([
+    const [{ data: d }, { data: a }, { data: p }, { data: m }] = await Promise.all([
       supabase
         .from("documentos")
         .select("id, tipo, nome_arquivo, caminho, created_at, user_id, aluno_id, enviado_por_professor, liberado")
         .order("created_at", { ascending: false }),
-      supabase.from("alunos").select("id, nome, idade, matricula, user_id").order("matricula"),
+      supabase.from("alunos").select("id, nome, idade, matricula, user_id, created_at").order("matricula"),
       supabase.from("perfis").select("id, nome_responsavel, telefone, cpf"),
+      supabase
+        .from("mensalidades")
+        .select("id, aluno_id, user_id, referencia, ativo, valor, pago, pago_em, forma"),
     ]);
     setDocs((d ?? []) as Doc[]);
     setAlunos((a ?? []) as Alu[]);
     setPerfis((p ?? []) as Perfil[]);
+    setMensalidades((m ?? []) as Mensalidade[]);
   }, []);
 
   useEffect(() => {
