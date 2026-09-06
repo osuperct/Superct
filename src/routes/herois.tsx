@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Gamepad2 } from "lucide-react";
 import { HEROIS } from "@/data/herois";
 
-const TITLE = "Heróis Miah e Kael — Super CT | Professor Tio Victor";
+const TITLE = "Heróis Miah e Kal-El — Super CT | Professor Tio Victor";
 const DESCRIPTION =
-  "Conheça Miah e Kael, os heróis do Super CT: em pose de herói, prontos para encarar os vilões da academia em cada fase do Super Jogo.";
+  "Conheça Miah e Kal-El, os heróis do Super CT: em pose de herói, prontos para encarar os vilões da academia em cada fase do Super Jogo.";
 
 export const Route = createFileRoute("/herois")({
   head: () => ({
@@ -30,7 +30,7 @@ function HeroisPage() {
           NOSSOS <span className="text-primary italic">HERÓIS</span>
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Miah e Kael treinam no Super CT e enfrentam os vilões que atrapalham a saúde das crianças.
+          Miah e Kal-El treinam no Super CT e enfrentam os vilões que atrapalham a saúde das crianças.
           Escolha o seu antes de começar o jogo.
         </p>
 
@@ -65,7 +65,7 @@ function HeroisPage() {
           to="/jogo"
           className="mt-6 inline-flex items-center gap-2 rounded-full border border-primary bg-primary/15 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-primary"
         >
-          <Gamepad2 className="size-4" /> Jogar com Miah ou Kael
+          <Gamepad2 className="size-4" /> Jogar com Miah ou Kal-El
         </Link>
       </main>
     </div>

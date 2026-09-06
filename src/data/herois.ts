@@ -26,10 +26,10 @@ export type Heroi = {
 export const HEROIS: Heroi[] = [
   {
     id: "kael",
-    nome: "Kael",
+    nome: "Kal-El",
     poder: "Força elétrica",
     descricao:
-      "Explosivo e destemido, Kael atravessa qualquer circuito e acerta bolas de tênis com precisão de campeão.",
+      "Explosivo e destemido, Kal-El atravessa qualquer circuito e acerta bolas de tênis com precisão de campeão.",
     cor: "#38bdf8",
     img: kael,
     anda: [kaelAnda1, kaelAnda2],
