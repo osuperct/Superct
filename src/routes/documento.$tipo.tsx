@@ -136,7 +136,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       if (!ativo) return;
       const temFicha = (fichas ?? []).some((f) => {
         const dados = f.dados as Record<string, unknown> | null;
-        return f.tipo === "ficha" && dados?.assinado_online === true;
+        return f.tipo === "ficha" && dados?.["assinado_online"] === true;
       });
       setFichaPendente(!temFicha);
       const aluno = alunos?.[0];
