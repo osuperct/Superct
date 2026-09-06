@@ -107,7 +107,7 @@ export function SideRail() {
     <aside className="fixed left-0 top-1/2 z-[60] -translate-y-1/2">
       <nav
         className={`flex flex-col gap-1 rounded-r-lg border border-l-0 border-border bg-background/70 py-2 pl-1 pr-1.5 backdrop-blur-md transition-transform duration-300 ease-out ${
-          recolhida ? "-translate-x-[calc(100%-10px)]" : "translate-x-0"
+          recolhida ? "-translate-x-[calc(100%_-_10px)]" : "translate-x-0"
         }`}
       >
         {links.map((item) => (
