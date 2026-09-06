@@ -1,8 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Clock } from "lucide-react";
 
 import { DIAS_SEMANA, MESES, diaExtenso, marcacoesDoAno } from "@/lib/feriados";
+import { listarTurmas, type Turma } from "@/lib/turmas";
+import { assetUrl } from "@/lib/assetUrl";
+import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
+import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
+
+const turmasPadrao = [
+  { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
+  { turma: "2", horario: "15:45 às 17:45", idade: "07 a 14 anos", dias: "Segunda a sexta" },
+  { turma: "3", horario: "17:45 às 18:45", idade: "04 a 07 anos", dias: "Segunda a quinta" },
+  { turma: "4", horario: "18:45 às 19:45", idade: "08 a 14 anos", dias: "Segunda a quinta" },
+];
 
 export const Route = createFileRoute("/calendario")({
   head: () => ({
@@ -28,6 +39,13 @@ function CalendarioPage() {
   const anoVigente = hoje.getFullYear();
   const [ano, setAno] = useState(anoVigente);
   const [mes, setMes] = useState(hoje.getMonth());
+  const [turmasApp, setTurmasApp] = useState<Turma[]>([]);
+
+  useEffect(() => {
+    void listarTurmas().then(setTurmasApp);
+  }, []);
+
+  const turmasLista = turmasApp.length > 0 ? turmasApp : turmasPadrao;
 
   const marcacoes = useMemo(() => marcacoesDoAno(ano), [ano]);
   const porData = useMemo(() => new Map(marcacoes.map((m) => [m.data, m])), [marcacoes]);
@@ -164,6 +182,54 @@ function CalendarioPage() {
             Dia laranja cheio = feriado • contorno laranja = emenda de feriado (feriado na terça ou na
             sexta, o dia anterior também é recesso)
           </p>
+        </section>
+
+        <section className="mt-8">
+          <div className="mb-2 flex items-center gap-2">
+            <Clock className="size-4 text-primary" />
+            <h2 className="font-display text-xl tracking-tight">TURMAS E HORÁRIOS</h2>
+          </div>
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-primary">
+            Aulas de segunda a sexta
+          </p>
+
+          <div className="mb-4 flex items-end justify-center gap-2">
+            <img
+              src={assetUrl(mascoteMenino)}
+              alt="Mascote menino do Super CT com o polegar para cima"
+              loading="lazy"
+              className="h-28 w-auto"
+            />
+            <img
+              src={assetUrl(mascoteMenina)}
+              alt="Mascote menina do Super CT fazendo um coração com as mãos"
+              loading="lazy"
+              className="h-28 w-auto"
+            />
+          </div>
+
+          <div className="overflow-hidden rounded-lg border border-border bg-surface">
+            <table className="w-full text-sm">
+              <thead className="bg-primary/10 text-left font-display uppercase tracking-wide text-primary">
+                <tr>
+                  <th className="px-3 py-3">Turma</th>
+                  <th className="px-3 py-3">Horário</th>
+                  <th className="px-3 py-3">Idade</th>
+                  <th className="px-3 py-3">Dias</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {turmasLista.map((t) => (
+                  <tr key={t.turma}>
+                    <td className="px-3 py-3 font-display text-secondary">{t.turma}</td>
+                    <td className="px-3 py-3 font-mono text-xs">{t.horario}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{t.idade}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{t.dias}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </section>
       </main>
     </div>
