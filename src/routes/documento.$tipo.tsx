@@ -538,13 +538,18 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             <Send className="size-4" /> ENVIAR CÓPIA POR E-MAIL
           </button>
           {tipo === "contrato" ? (
-            <Link
-              to="/documento/$tipo"
-              params={{ tipo: "ficha" }}
-              className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-xs tracking-tight text-primary-foreground"
-            >
-              <FileText className="size-4" /> AGORA PREENCHA A FICHA / PAR-Q
-            </Link>
+            <div className="space-y-1.5">
+              <p className="text-center text-[11px] font-medium text-primary">
+                Falta só um passo: a ficha de saúde (PAR-Q) do aluno.
+              </p>
+              <Link
+                to="/documento/$tipo"
+                params={{ tipo: "ficha" }}
+                className="flex animate-pulse items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-xs tracking-tight text-primary-foreground shadow-[0_0_20px_rgba(255,255,255,0.15)] ring-2 ring-primary/60"
+              >
+                <FileText className="size-4" /> AGORA PREENCHA A FICHA / PAR-Q
+              </Link>
+            </div>
           ) : (
             <Link
               to="/documento/$tipo"
