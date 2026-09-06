@@ -50,12 +50,14 @@ const NOVO: Rascunho = {
   ordem: "0",
 };
 
-export function ProdutosAdm() {
-  const listar = useServerFn(listarProdutos);
-  const salvar = useServerFn(salvarProduto);
-  const excluir = useServerFn(excluirProduto);
-  const enviarFoto = useServerFn(enviarFotoProduto);
+async function carregarFoto(caminho: string | null): Promise<string | null> {
+  if (!caminho) return null;
+  const { data, error } = await supabase.storage.from(BUCKET_PRODUTOS).download(caminho);
+  if (error || !data) return null;
+  return URL.createObjectURL(data);
+}
 
+export function ProdutosAdm() {
   const [produtos, setProdutos] = useState<Produto[] | null>(null);
   const [editando, setEditando] = useState<Rascunho | null>(null);
   const [ocupado, setOcupado] = useState(false);
@@ -63,12 +65,26 @@ export function ProdutosAdm() {
 
   const carregar = useCallback(async () => {
     try {
-      setProdutos(await listar({ data: { todos: true } }));
+      const { data, error } = await supabase
+        .from("produtos")
+        .select("id, nome, descricao, preco, imagem_url, pede_tamanho, tamanhos, link_pagamento, ativo, ordem")
+        .order("ordem")
+        .order("nome");
+      if (error) throw error;
+      const lista = await Promise.all(
+        (data ?? []).map(async (l) => ({
+          ...l,
+          preco: Number(l.preco ?? 0),
+          tamanhos: l.tamanhos ?? [],
+          imagem: await carregarFoto(l.imagem_url),
+        })),
+      );
+      setProdutos(lista as Produto[]);
     } catch {
       toast.error("Não foi possível carregar os produtos.");
       setProdutos([]);
     }
-  }, [listar]);
+  }, []);
 
   useEffect(() => {
     void carregar();
@@ -88,19 +104,20 @@ export function ProdutosAdm() {
     }
     setOcupado(true);
     try {
-      await salvar({
-        data: {
-          id: editando.id,
-          nome: editando.nome.trim(),
-          descricao: editando.descricao,
-          preco,
-          pede_tamanho: editando.pede_tamanho,
-          tamanhos: editando.pede_tamanho ? editando.tamanhos : [],
-          link_pagamento: editando.link_pagamento,
-          ativo: editando.ativo,
-          ordem: Number(editando.ordem) || 0,
-        },
-      });
+      const valores = {
+        nome: editando.nome.trim(),
+        descricao: editando.descricao.trim() || null,
+        preco,
+        pede_tamanho: editando.pede_tamanho,
+        tamanhos: editando.pede_tamanho ? editando.tamanhos : [],
+        link_pagamento: editando.link_pagamento.trim() || null,
+        ativo: editando.ativo,
+        ordem: Number(editando.ordem) || 0,
+      };
+      const { error } = editando.id
+        ? await supabase.from("produtos").update(valores).eq("id", editando.id)
+        : await supabase.from("produtos").insert(valores);
+      if (error) throw error;
       toast.success("Produto salvo. A loja já está atualizada.");
       setEditando(null);
       await carregar();
@@ -115,8 +132,14 @@ export function ProdutosAdm() {
     if (!window.confirm(`Excluir o produto ${p.nome}?`)) return;
     const senha = window.prompt("Digite a senha de exclusão:");
     if (senha === null) return;
+    if (senha.trim() !== SENHA_EXCLUSAO) {
+      toast.error("Senha incorreta.");
+      return;
+    }
     try {
-      await excluir({ data: { id: p.id, senha } });
+      if (p.imagem_url) await supabase.storage.from(BUCKET_PRODUTOS).remove([p.imagem_url]);
+      const { error } = await supabase.from("produtos").delete().eq("id", p.id);
+      if (error) throw error;
       toast.success("Produto excluído.");
       await carregar();
     } catch {
@@ -131,20 +154,17 @@ export function ProdutosAdm() {
     }
     setOcupado(true);
     try {
-      const buffer = await arquivo.arrayBuffer();
-      let binario = "";
-      const bytes = new Uint8Array(buffer);
-      for (let i = 0; i < bytes.length; i += 8192) {
-        binario += String.fromCharCode(...bytes.subarray(i, i + 8192));
+      const extensao = (arquivo.name.split(".").pop() || "jpg").toLowerCase();
+      const caminho = `${p.id}/${Date.now()}.${extensao}`;
+      const { error: erroUpload } = await supabase.storage
+        .from(BUCKET_PRODUTOS)
+        .upload(caminho, arquivo, { contentType: arquivo.type || "image/jpeg", upsert: true });
+      if (erroUpload) throw erroUpload;
+      const { error } = await supabase.from("produtos").update({ imagem_url: caminho }).eq("id", p.id);
+      if (error) throw error;
+      if (p.imagem_url && p.imagem_url !== caminho) {
+        await supabase.storage.from(BUCKET_PRODUTOS).remove([p.imagem_url]);
       }
-      await enviarFoto({
-        data: {
-          id: p.id,
-          nomeArquivo: arquivo.name,
-          tipo: arquivo.type || "image/jpeg",
-          conteudoBase64: btoa(binario),
-        },
-      });
       toast.success("Foto atualizada.");
       await carregar();
     } catch {
