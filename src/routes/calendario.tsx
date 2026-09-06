@@ -193,7 +193,7 @@ function CalendarioPage() {
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="inline-block size-3 rounded-sm border-2 border-primary bg-transparent" aria-hidden="true" />
-              emenda de feriado
+              emenda de feriado / fechado
             </span>
           </p>
         </section>
