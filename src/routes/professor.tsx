@@ -144,6 +144,9 @@ function Painel({ professorId }: { professorId: string }) {
     setEhAdm((papeis ?? []).some((p) => p.role === "adm"));
     if (!ehProfessor) return;
 
+    // Liga contratos assinados que ficaram sem aluno cadastrado.
+    await supabase.rpc("vincular_alunos_dos_contratos");
+
     const [{ data: d }, { data: a }, { data: p }, { data: m }] = await Promise.all([
       supabase
         .from("documentos")
