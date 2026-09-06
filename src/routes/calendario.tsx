@@ -122,18 +122,22 @@ function CalendarioPage() {
               const data = `${ano}-${String(mes + 1).padStart(2, "0")}-${String(dia).padStart(2, "0")}`;
               const marca = porData.get(data);
               const ehHoje = data === hojeIso;
+              const diaSemana = new Date(Date.UTC(ano, mes, dia)).getUTCDay();
+              const diaDeAula = !marca && diaSemana >= 1 && diaSemana <= 5;
               return (
                 <div
                   key={data}
-                  aria-label={marca ? `${dia} — ${marca.nome}` : String(dia)}
+                  aria-label={marca ? `${dia} — ${marca.nome}` : diaDeAula ? `${dia} — dia de aula` : String(dia)}
                   className={[
                     "flex aspect-square flex-col items-center justify-center rounded-md text-sm",
                     marca?.tipo === "emenda"
                       ? "border border-primary/70 text-primary"
                       : marca
                         ? "bg-primary font-bold text-primary-foreground"
-                        : "text-foreground/80",
-                    ehHoje && !marca ? "border border-foreground/60" : "",
+                        : diaDeAula
+                          ? "border border-secondary/60 bg-secondary/15 font-semibold text-secondary"
+                          : "text-foreground/80",
+                    ehHoje && !marca ? "ring-1 ring-foreground/60" : "",
                   ].join(" ")}
                 >
                   {dia}
@@ -179,8 +183,8 @@ function CalendarioPage() {
             </ul>
           )}
           <p className="mt-4 font-mono text-[9px] uppercase leading-relaxed tracking-widest text-muted-foreground">
-            Dia laranja cheio = feriado • contorno laranja = emenda de feriado (feriado na terça ou na
-            sexta, o dia anterior também é recesso)
+            Dia azul = dia de aula/treino (segunda a sexta) • laranja cheio = feriado • contorno laranja =
+            emenda de feriado (recesso)
           </p>
         </section>
 
