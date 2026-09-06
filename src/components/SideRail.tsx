@@ -63,21 +63,26 @@ export function SideRail() {
       setRecolhida(false);
       return;
     }
-    const alvo = document.getElementById("cards-inicio");
-    if (!alvo) {
-      setRecolhida(false);
-      return;
+
+    function verificar() {
+      const alvo = document.getElementById("cards-inicio");
+      if (!alvo) {
+        setRecolhida(false);
+        return;
+      }
+      const r = alvo.getBoundingClientRect();
+      const margem = window.innerHeight * 0.1;
+      const visivel = r.top < window.innerHeight - margem && r.bottom > margem;
+      setRecolhida(visivel);
     }
-    observerRef.current?.disconnect();
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        const visivel = entries.some((e) => e.isIntersecting);
-        setRecolhida(visivel);
-      },
-      { threshold: 0.05, rootMargin: "-10% 0px -10% 0px" },
-    );
-    observerRef.current.observe(alvo);
-    return () => observerRef.current?.disconnect();
+
+    verificar();
+    window.addEventListener("scroll", verificar, { passive: true });
+    window.addEventListener("resize", verificar, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", verificar);
+      window.removeEventListener("resize", verificar);
+    };
   }, [aberta]);
 
   const links = [
