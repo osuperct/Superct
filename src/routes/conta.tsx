@@ -116,16 +116,28 @@ function Autenticacao() {
     setAviso(null);
     try {
       if (modo === "entrar") {
-        const r = await entrar({ data: { identificador: email.trim(), senha } });
-        if (!r.ok) {
-          setAviso(r.erro);
-          return;
+        const identificador = email.trim();
+        if (identificador.includes("@")) {
+          const { error } = await supabase.auth.signInWithPassword({
+            email: identificador.toLowerCase(),
+            password: senha,
+          });
+          if (error) {
+            setAviso("E-mail ou senha incorretos.");
+            return;
+          }
+        } else {
+          const r = await entrar({ data: { identificador, senha } });
+          if (!r.ok) {
+            setAviso(r.erro);
+            return;
+          }
+          const { error } = await supabase.auth.setSession({
+            access_token: r.access_token,
+            refresh_token: r.refresh_token,
+          });
+          if (error) throw error;
         }
-        const { error } = await supabase.auth.setSession({
-          access_token: r.access_token,
-          refresh_token: r.refresh_token,
-        });
-        if (error) throw error;
         toast.success("Bem-vindo de volta!");
       } else {
         if (!aceite) {

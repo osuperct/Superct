@@ -85,16 +85,15 @@ function LojaPage() {
         .order("nome");
       if (error) throw error;
 
-      setProdutos(
-        (data ?? []).map((produto) => ({
+      const produtosComFotos = await Promise.all(
+        (data ?? []).map(async (produto) => ({
           ...produto,
           preco: Number(produto.preco ?? 0),
           tamanhos: produto.tamanhos ?? [],
-          imagem: produto.imagem_url
-            ? supabase.storage.from(BUCKET_PRODUTOS).getPublicUrl(produto.imagem_url).data.publicUrl
-            : null,
+          imagem: await carregarFotoProduto(produto.imagem_url),
         })),
       );
+      setProdutos(produtosComFotos);
     } catch {
       setProdutos([]);
     }
@@ -126,6 +125,13 @@ function LojaPage() {
       )}
     </Casca>
   );
+}
+
+async function carregarFotoProduto(caminho: string | null): Promise<string | null> {
+  if (!caminho) return null;
+  const { data, error } = await supabase.storage.from(BUCKET_PRODUTOS).download(caminho);
+  if (error || !data) return null;
+  return URL.createObjectURL(data);
 }
 
 const INFANTIS = new Set(["4", "6", "8", "10", "12", "14", "16"]);
