@@ -1,8 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Clock } from "lucide-react";
 
 import { DIAS_SEMANA, MESES, diaExtenso, marcacoesDoAno } from "@/lib/feriados";
+import { listarTurmas, type Turma } from "@/lib/turmas";
+import { assetUrl } from "@/lib/assetUrl";
+import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
+import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
+
+const turmasPadrao = [
+  { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
+  { turma: "2", horario: "15:45 às 17:45", idade: "07 a 14 anos", dias: "Segunda a sexta" },
+  { turma: "3", horario: "17:45 às 18:45", idade: "04 a 07 anos", dias: "Segunda a quinta" },
+  { turma: "4", horario: "18:45 às 19:45", idade: "08 a 14 anos", dias: "Segunda a quinta" },
+];
 
 export const Route = createFileRoute("/calendario")({
   head: () => ({
