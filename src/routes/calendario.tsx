@@ -39,6 +39,13 @@ function CalendarioPage() {
   const anoVigente = hoje.getFullYear();
   const [ano, setAno] = useState(anoVigente);
   const [mes, setMes] = useState(hoje.getMonth());
+  const [turmasApp, setTurmasApp] = useState<Turma[]>([]);
+
+  useEffect(() => {
+    void listarTurmas().then(setTurmasApp);
+  }, []);
+
+  const turmasLista = turmasApp.length > 0 ? turmasApp : turmasPadrao;
 
   const marcacoes = useMemo(() => marcacoesDoAno(ano), [ano]);
   const porData = useMemo(() => new Map(marcacoes.map((m) => [m.data, m])), [marcacoes]);
