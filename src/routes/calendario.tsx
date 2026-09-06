@@ -123,7 +123,7 @@ function CalendarioPage() {
               const marca = porData.get(data);
               const ehHoje = data === hojeIso;
               const diaSemana = new Date(Date.UTC(ano, mes, dia)).getUTCDay();
-              const diaDeAula = !marca && diaSemana >= 1 && diaSemana <= 5;
+                const diaDeAula = !marca && diaSemana >= 1 && diaSemana <= 5;
               return (
                 <div
                   key={data}
@@ -131,11 +131,11 @@ function CalendarioPage() {
                   className={[
                     "flex aspect-square flex-col items-center justify-center rounded-md text-sm",
                     marca?.tipo === "emenda"
-                      ? "border border-primary/70 text-primary"
+                      ? "border-2 border-primary text-primary"
                       : marca
                         ? "bg-primary font-bold text-primary-foreground"
                         : diaDeAula
-                          ? "border border-secondary/60 bg-secondary/15 font-semibold text-secondary"
+                          ? "border-2 border-secondary font-semibold text-secondary"
                           : "text-foreground/80",
                     ehHoje && !marca ? "ring-1 ring-foreground/60" : "",
                   ].join(" ")}
@@ -182,9 +182,19 @@ function CalendarioPage() {
               ))}
             </ul>
           )}
-          <p className="mt-4 font-mono text-[9px] uppercase leading-relaxed tracking-widest text-muted-foreground">
-            Dia azul = dia de aula/treino (segunda a sexta) • laranja cheio = feriado • contorno laranja =
-            emenda de feriado (recesso)
+          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[9px] uppercase leading-relaxed tracking-widest text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block size-3 rounded-sm border-2 border-secondary bg-transparent" aria-hidden="true" />
+              aula / treino
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block size-3 rounded-sm bg-primary" aria-hidden="true" />
+              feriado / fechado
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="inline-block size-3 rounded-sm border-2 border-primary bg-transparent" aria-hidden="true" />
+              emenda de feriado
+            </span>
           </p>
         </section>
 
