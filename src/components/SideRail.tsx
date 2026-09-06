@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   Home,
@@ -31,7 +31,7 @@ export function SideRail() {
   const [recolhida, setRecolhida] = useState(false);
   const [professor, setProfessor] = useState(false);
   const [adm, setAdm] = useState(false);
-  const observerRef = useRef<IntersectionObserver | null>(null);
+  
 
   useEffect(() => {
     let ativo = true;
