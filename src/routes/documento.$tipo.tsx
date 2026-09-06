@@ -134,7 +134,10 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         supabase.from("fichas").select("tipo, dados").eq("user_id", uid).order("created_at", { ascending: false }).limit(10),
       ]);
       if (!ativo) return;
-      const temFicha = (fichas ?? []).some((f) => f.tipo === "ficha" && f.dados?.assinado_online === true);
+      const temFicha = (fichas ?? []).some((f) => {
+        const dados = f.dados as Record<string, unknown> | null;
+        return f.tipo === "ficha" && dados?.assinado_online === true;
+      });
       setFichaPendente(!temFicha);
       const aluno = alunos?.[0];
       const daFicha = (fichas?.[0]?.dados ?? {}) as Record<string, string>;
