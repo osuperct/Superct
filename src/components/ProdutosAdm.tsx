@@ -1,17 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { ChevronDown, ChevronUp, ImagePlus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import {
-  enviarFotoProduto,
-  excluirProduto,
-  listarProdutos,
-  salvarProduto,
-  type Produto,
-} from "@/lib/loja.functions";
+import { BUCKET_PRODUTOS, type Produto } from "@/lib/loja.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 const TAMANHOS_PADRAO = ["4", "6", "8", "10", "12", "14", "16", "P", "M", "G", "GG"];
+const SENHA_EXCLUSAO = "2802";
 
 type Rascunho = {
   id?: string;
