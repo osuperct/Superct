@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { CreditCard, ShoppingBag, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import { listarProdutos, type Produto } from "@/lib/loja.functions";
+import { supabase } from "@/integrations/supabase/client";
+import { BUCKET_PRODUTOS, type Produto } from "@/lib/loja.functions";
 import mascotesLoja from "@/assets/loja-mascotes.png";
 
 const LINK_INFINITEPAY = "https://checkout.infinitepay.io/super_ct/gF9RQ9e7qg";
@@ -73,16 +73,32 @@ function Casca({ children }: { children: React.ReactNode }) {
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 function LojaPage() {
-  const listar = useServerFn(listarProdutos);
   const [produtos, setProdutos] = useState<Produto[] | null>(null);
 
   const carregar = useCallback(async () => {
     try {
-      setProdutos(await listar({ data: {} }));
+      const { data, error } = await supabase
+        .from("produtos")
+        .select("id, nome, descricao, preco, imagem_url, pede_tamanho, tamanhos, link_pagamento, ativo, ordem")
+        .eq("ativo", true)
+        .order("ordem")
+        .order("nome");
+      if (error) throw error;
+
+      setProdutos(
+        (data ?? []).map((produto) => ({
+          ...produto,
+          preco: Number(produto.preco ?? 0),
+          tamanhos: produto.tamanhos ?? [],
+          imagem: produto.imagem_url
+            ? supabase.storage.from(BUCKET_PRODUTOS).getPublicUrl(produto.imagem_url).data.publicUrl
+            : null,
+        })),
+      );
     } catch {
       setProdutos([]);
     }
-  }, [listar]);
+  }, []);
 
   useEffect(() => {
     void carregar();
