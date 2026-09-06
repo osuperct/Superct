@@ -28,6 +28,7 @@ const itens = [
 
 export function SideRail() {
   const [aberta, setAberta] = useState(true);
+  const [recolhida, setRecolhida] = useState(false);
   const [professor, setProfessor] = useState(false);
   const [adm, setAdm] = useState(false);
 
@@ -56,6 +57,33 @@ export function SideRail() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!aberta) {
+      setRecolhida(false);
+      return;
+    }
+
+    function verificar() {
+      const alvo = document.getElementById("cards-inicio");
+      if (!alvo) {
+        setRecolhida(false);
+        return;
+      }
+      const r = alvo.getBoundingClientRect();
+      const margem = window.innerHeight * 0.1;
+      const visivel = r.top < window.innerHeight - margem && r.bottom > margem;
+      setRecolhida(visivel);
+    }
+
+    verificar();
+    window.addEventListener("scroll", verificar, { passive: true });
+    window.addEventListener("resize", verificar, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", verificar);
+      window.removeEventListener("resize", verificar);
+    };
+  }, [aberta]);
+
   const links = [
     ...itens,
     ...(professor ? [{ to: "/professor", label: "Professor", icon: GraduationCap } as const] : []),
@@ -77,7 +105,11 @@ export function SideRail() {
 
   return (
     <aside className="fixed left-0 top-1/2 z-[60] -translate-y-1/2">
-      <nav className="flex flex-col gap-1 rounded-r-lg border border-l-0 border-border bg-background/70 py-2 pl-1 pr-1.5 backdrop-blur-md">
+      <nav
+        className={`flex flex-col gap-1 rounded-r-lg border border-l-0 border-border bg-background/70 py-2 pl-1 pr-1.5 backdrop-blur-md transition-transform duration-300 ease-out ${
+          recolhida ? "-translate-x-[calc(100%-10px)]" : "translate-x-0"
+        }`}
+      >
         {links.map((item) => (
           <Link
             key={item.to}
