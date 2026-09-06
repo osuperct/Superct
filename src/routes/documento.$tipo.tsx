@@ -140,7 +140,19 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       });
       setFichaPendente(!temFicha);
       const aluno = alunos?.[0];
-      const daFicha = (fichas?.[0]?.dados ?? {}) as Record<string, string>;
+      /** Mescla os dados de todos os documentos do responsável (mais recente primeiro),
+       *  dando preferência ao outro tipo — quem assinou o contrato reaproveita na ficha PAR-Q e vice-versa. */
+      const ordenadas = [...(fichas ?? [])].sort((a, b) => {
+        if (a.tipo === b.tipo) return 0;
+        return a.tipo === tipo ? 1 : -1;
+      });
+      const daFicha: Record<string, string> = {};
+      for (const f of ordenadas) {
+        const dados = (f.dados ?? {}) as Record<string, unknown>;
+        for (const [k, v] of Object.entries(dados)) {
+          if (typeof v === "string" && v && daFicha[k] === undefined) daFicha[k] = v;
+        }
+      }
       const sugestoes: Record<string, string> = {
         contratante: perfil?.nome_responsavel || daFicha["responsavel_nome"] || "",
         responsavel_nome: perfil?.nome_responsavel || daFicha["responsavel_nome"] || "",
