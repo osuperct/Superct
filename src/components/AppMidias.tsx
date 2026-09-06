@@ -9,7 +9,6 @@ import video3 from "@/assets/video3.mp4.asset.json";
 import { criarTurma, excluirTurma, listarTurmas, salvarTurma, type Turma } from "@/lib/turmas";
 import { CHAVES_TEXTO, listarTextos, salvarTexto, type Textos } from "@/lib/textos";
 import {
-import { assetUrl } from "@/lib/assetUrl";
   type Midia,
   GRUPOS_CARDS,
   GRUPO_LOGO,
