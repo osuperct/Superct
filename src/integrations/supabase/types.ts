@@ -585,6 +585,7 @@ export type Database = {
           professor: boolean
         }[]
       }
+      vincular_alunos_dos_contratos: { Args: never; Returns: number }
     }
     Enums: {
       app_role: "professor" | "responsavel" | "adm"

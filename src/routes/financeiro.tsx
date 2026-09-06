@@ -66,6 +66,9 @@ function FinanceiroPage() {
     setAutorizado(ehProfessor);
     if (!ehProfessor) return;
 
+    // Liga contratos assinados que ficaram sem aluno cadastrado.
+    await supabase.rpc("vincular_alunos_dos_contratos");
+
     const [{ data: a }, { data: m }, { data: f }, { data: docs }] = await Promise.all([
       supabase.from("alunos").select("id, nome, matricula, user_id").order("nome"),
       supabase

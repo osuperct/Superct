@@ -254,7 +254,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           alunoId = achado.id;
         } else {
           const idadeTexto = (valores["aluno_idade"] ?? "").replace(/\D+/g, "");
-          const { data: criado } = await supabase
+          const { data: criado, error: erroAluno } = await supabase
             .from("alunos")
             .insert({
               user_id: uid,
@@ -263,6 +263,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             })
             .select("id")
             .maybeSingle();
+          if (erroAluno) console.error("Falha ao cadastrar o aluno:", erroAluno);
           alunoId = criado?.id ?? null;
         }
       }
