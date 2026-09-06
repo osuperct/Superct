@@ -4,13 +4,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { ChevronDown, ChevronUp, CircleDollarSign, ShieldCheck, Trash2, UserCheck, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import {
-  cadastrarProfessor,
-  definirAcesso,
-  excluirProfessor,
-  listarAcessos,
-  type ContaAcesso,
-} from "@/lib/adm.functions";
+import { cadastrarProfessor } from "@/lib/adm.functions";
+import { definirAcessoConta, excluirConta, listarAcessosContas, type ContaAcesso } from "@/lib/adm";
 import { AppMidias } from "@/components/AppMidias";
 import { ProdutosAdm } from "@/components/ProdutosAdm";
 import { supabase } from "@/integrations/supabase/client";
@@ -182,10 +177,7 @@ function AdmPage() {
 /* ----------------------------- LIBERAÇÃO DE ACESSOS ----------------------------- */
 
 function Acessos() {
-  const listar = useServerFn(listarAcessos);
-  const definir = useServerFn(definirAcesso);
   const cadastrar = useServerFn(cadastrarProfessor);
-  const excluir = useServerFn(excluirProfessor);
   const [contas, setContas] = useState<ContaAcesso[] | null>(null);
 
   const [busca, setBusca] = useState("");
@@ -226,7 +218,9 @@ function Acessos() {
       setNovo(false);
       await carregar();
     } catch {
-      toast.error("Não foi possível cadastrar o professor.");
+      toast.error(
+        "Não foi possível cadastrar o professor por aqui. Peça para ele criar a conta na área do responsável e depois libere o acesso na lista abaixo.",
+      );
     } finally {
       setCriando(false);
     }
@@ -235,12 +229,12 @@ function Acessos() {
 
   const carregar = useCallback(async () => {
     try {
-      setContas(await listar());
+      setContas(await listarAcessosContas());
     } catch {
       toast.error("Não foi possível carregar as contas.");
       setContas([]);
     }
-  }, [listar]);
+  }, []);
 
   useEffect(() => {
     void carregar();
@@ -254,7 +248,7 @@ function Acessos() {
       pin = senha;
     }
     setOcupado(`${conta.id}-${papel}`);
-    const r = await definir({ data: { userId: conta.id, papel, liberar, senha: pin } });
+    const r = await definirAcessoConta(conta.id, papel, liberar, pin);
     setOcupado(null);
     if (!r.ok) {
       toast.error(r.erro);
@@ -272,7 +266,7 @@ function Acessos() {
     setOcupado(`${conta.id}-excluir`);
 
     try {
-      const r = await excluir({ data: { userId: conta.id, senha } });
+      const r = await excluirConta(conta.id, senha);
       if (!r.ok) {
         toast.error(r.erro);
         return;
@@ -427,8 +421,6 @@ function Acessos() {
 /* ----------------------------- CADASTROS ----------------------------- */
 
 function Cadastros() {
-  const listar = useServerFn(listarAcessos);
-  const excluir = useServerFn(excluirProfessor);
   const [contas, setContas] = useState<ContaAcesso[] | null>(null);
   const [busca, setBusca] = useState("");
   const [ocupado, setOcupado] = useState<string | null>(null);
@@ -436,11 +428,11 @@ function Cadastros() {
 
   const carregar = useCallback(async () => {
     try {
-      setContas(await listar());
+      setContas(await listarAcessosContas());
     } catch {
       setContas([]);
     }
-  }, [listar]);
+  }, []);
 
   useEffect(() => {
     void carregar();
@@ -453,7 +445,7 @@ function Cadastros() {
     if (senha === null) return;
     setOcupado(conta.id);
     try {
-      const r = await excluir({ data: { userId: conta.id, senha } });
+      const r = await excluirConta(conta.id, senha);
       if (!r.ok) {
         toast.error(r.erro);
         return;

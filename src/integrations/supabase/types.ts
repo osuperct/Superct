@@ -562,7 +562,29 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      adm_definir_acesso: {
+        Args: {
+          _liberar: boolean
+          _papel: Database["public"]["Enums"]["app_role"]
+          _senha?: string
+          _user_id: string
+        }
+        Returns: Json
+      }
+      adm_excluir_conta: {
+        Args: { _senha: string; _user_id: string }
+        Returns: Json
+      }
+      adm_listar_acessos: {
+        Args: never
+        Returns: {
+          adm: boolean
+          email: string
+          id: string
+          nome: string
+          professor: boolean
+        }[]
+      }
     }
     Enums: {
       app_role: "professor" | "responsavel" | "adm"
