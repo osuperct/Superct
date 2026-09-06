@@ -9,7 +9,7 @@ import { GRUPO_QG, GRUPO_VIDEOS, listarMidias, type Midia } from "@/lib/midias";
 import { listarTextos, type Textos } from "@/lib/textos";
 import { listarTurmas, type Turma } from "@/lib/turmas";
 
-import logoAsset from "@/assets/super-ct-logo.asset.json";
+import logoAsset from "@/assets/super-ct-logo-sem-fundo.png.asset.json";
 
 const logo = assetUrl(logoAsset);
 import arena from "@/assets/IMG_20260901_175621.jpg.asset.json";
