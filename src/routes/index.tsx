@@ -375,7 +375,7 @@ function Index() {
 
         <VideoShowcase videos={videosApp} />
 
-        <section className="px-4 py-12">
+        <section id="cards-inicio" className="px-4 py-12">
           <div className="mb-8 flex items-center gap-2">
             <div className="h-[2px] w-8 bg-primary" />
             <h2 className="font-display text-2xl uppercase tracking-tight">MODALIDADES</h2>
