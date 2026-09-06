@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import assinaturaVictor from "@/assets/assinatura-victor.png.asset.json";
 import seloSuperCt from "@/assets/selo-superct.png.asset.json";
+import { assetUrl } from "@/lib/assetUrl";
 
 export type LinhaDoc = { rotulo: string; valor: string };
 
@@ -32,7 +33,7 @@ export async function gerarDocumentoPdf(opcoes: {
   assinaturaEmpresa?: boolean;
 }): Promise<Blob> {
   const [assinaturaProf, selo] = opcoes.assinaturaEmpresa
-    ? await Promise.all([carregarDataUrl(assinaturaVictor.url), carregarDataUrl(seloSuperCt.url)])
+    ? await Promise.all([carregarDataUrl(assetUrl(assinaturaVictor)), carregarDataUrl(assetUrl(seloSuperCt))])
     : [null, null];
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const margem = 48;

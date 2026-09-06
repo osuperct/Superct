@@ -19,8 +19,9 @@ import {
   excluirMidia,
   listarMidiasAdm,
 } from "@/lib/midias";
+import { assetUrl } from "@/lib/assetUrl";
 
-const VIDEOS_ORIGINAIS: string[] = [video2.url, video1.url, video3.url];
+const VIDEOS_ORIGINAIS: string[] = [assetUrl(video2), assetUrl(video1), assetUrl(video3)];
 
 export function AppMidias() {
   const [lista, setLista] = useState<Midia[]>([]);

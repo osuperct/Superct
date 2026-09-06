@@ -15,6 +15,7 @@ import { AppMidias } from "@/components/AppMidias";
 import { ProdutosAdm } from "@/components/ProdutosAdm";
 import { supabase } from "@/integrations/supabase/client";
 import logoAdm from "@/assets/super-ct-logo-adm.jpg.asset.json";
+import { assetUrl } from "@/lib/assetUrl";
 
 export const Route = createFileRoute("/adm")({
   head: () => ({
@@ -56,7 +57,7 @@ function Casca({ children }: { children: React.ReactNode }) {
             </span>
           </span>
           <img
-            src={logoAdm.url}
+            src={assetUrl(logoAdm)}
             alt="Super CT"
             className="h-10 w-auto rounded-md object-contain"
           />
