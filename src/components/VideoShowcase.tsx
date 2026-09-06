@@ -45,7 +45,7 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
           ref={ref}
           key={item.url}
           src={item.url}
-          className="absolute inset-0 h-full w-full object-cover scale-x-[1.35]"
+          className="absolute top-0 left-1/2 h-full w-[160%] -translate-x-1/2 object-cover"
           autoPlay
           loop={lista.length === 1 && !item.fim}
           muted={!item.com_som}
