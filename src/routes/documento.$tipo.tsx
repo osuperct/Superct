@@ -110,6 +110,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
   const [assinatura, setAssinatura] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [pdfPronto, setPdfPronto] = useState<{ url: string; nome: string } | null>(null);
+  const [fichaPendente, setFichaPendente] = useState(false);
 
   useEffect(() => {
     const bruto = localStorage.getItem(rascunhoKey);
@@ -130,9 +131,14 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       const [{ data: perfil }, { data: alunos }, { data: fichas }] = await Promise.all([
         supabase.from("perfis").select("nome_responsavel, telefone, cpf, endereco").eq("id", uid).maybeSingle(),
         supabase.from("alunos").select("nome, idade, nascimento").eq("user_id", uid).order("created_at").limit(1),
-        supabase.from("fichas").select("dados").eq("user_id", uid).order("created_at", { ascending: false }).limit(1),
+        supabase.from("fichas").select("tipo, dados").eq("user_id", uid).order("created_at", { ascending: false }).limit(10),
       ]);
       if (!ativo) return;
+      const temFicha = (fichas ?? []).some((f) => {
+        const dados = f.dados as Record<string, unknown> | null;
+        return f.tipo === "ficha" && dados?.["assinado_online"] === true;
+      });
+      setFichaPendente(!temFicha);
       const aluno = alunos?.[0];
       const daFicha = (fichas?.[0]?.dados ?? {}) as Record<string, string>;
       const sugestoes: Record<string, string> = {
@@ -538,13 +544,28 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             <Send className="size-4" /> ENVIAR CÓPIA POR E-MAIL
           </button>
           {tipo === "contrato" ? (
-            <Link
-              to="/documento/$tipo"
-              params={{ tipo: "ficha" }}
-              className="flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-xs tracking-tight text-primary-foreground"
-            >
-              <FileText className="size-4" /> AGORA PREENCHA A FICHA / PAR-Q
-            </Link>
+            fichaPendente ? (
+              <div className="space-y-1.5">
+                <p className="text-center text-[11px] font-medium text-primary">
+                  Falta só um passo: a ficha de saúde (PAR-Q) do aluno.
+                </p>
+                <Link
+                  to="/documento/$tipo"
+                  params={{ tipo: "ficha" }}
+                  className="flex animate-pulse items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-xs tracking-tight text-primary-foreground shadow-[0_0_20px_rgba(255,255,255,0.15)] ring-2 ring-primary/60"
+                >
+                  <FileText className="size-4" /> AGORA PREENCHA A FICHA / PAR-Q
+                </Link>
+              </div>
+            ) : (
+              <Link
+                to="/documento/$tipo"
+                params={{ tipo: "ficha" }}
+                className="flex items-center justify-center gap-2 rounded-md border border-border px-4 py-2 font-display text-xs tracking-tight text-muted-foreground"
+              >
+                <FileText className="size-4" /> ABRIR A FICHA / PAR-Q
+              </Link>
+            )
           ) : (
             <Link
               to="/documento/$tipo"
