@@ -147,6 +147,21 @@ function CalendarioPage() {
           </div>
         </section>
 
+        <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[9px] uppercase leading-relaxed tracking-widest text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block size-3 rounded-sm border-2 border-secondary bg-transparent" aria-hidden="true" />
+            aula / treino
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block size-3 rounded-sm bg-primary" aria-hidden="true" />
+            feriado / fechado
+          </span>
+          <span className="inline-flex items-center gap-1.5">
+            <span className="inline-block size-3 rounded-sm border-2 border-primary bg-transparent" aria-hidden="true" />
+            emenda de feriado / fechado
+          </span>
+        </p>
+
         <section className="mt-5">
           <h2 className="font-display text-lg tracking-tight">
             RECESSO E FERIADOS — {MESES[mes]?.toUpperCase()}
@@ -182,20 +197,6 @@ function CalendarioPage() {
               ))}
             </ul>
           )}
-          <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[9px] uppercase leading-relaxed tracking-widest text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block size-3 rounded-sm border-2 border-secondary bg-transparent" aria-hidden="true" />
-              aula / treino
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block size-3 rounded-sm bg-primary" aria-hidden="true" />
-              feriado / fechado
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="inline-block size-3 rounded-sm border-2 border-primary bg-transparent" aria-hidden="true" />
-              emenda de feriado / fechado
-            </span>
-          </p>
         </section>
 
         <section className="mt-8">
