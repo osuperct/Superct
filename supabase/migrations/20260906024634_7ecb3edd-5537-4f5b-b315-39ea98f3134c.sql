@@ -1,0 +1,4 @@
+CREATE POLICY "produtos_fotos_adm_select" ON storage.objects FOR SELECT TO authenticated USING (bucket_id = 'produtos' AND private.has_role(auth.uid(), 'adm'::app_role));
+CREATE POLICY "produtos_fotos_adm_insert" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'produtos' AND private.has_role(auth.uid(), 'adm'::app_role));
+CREATE POLICY "produtos_fotos_adm_update" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'produtos' AND private.has_role(auth.uid(), 'adm'::app_role)) WITH CHECK (bucket_id = 'produtos' AND private.has_role(auth.uid(), 'adm'::app_role));
+CREATE POLICY "produtos_fotos_adm_delete" ON storage.objects FOR DELETE TO authenticated USING (bucket_id = 'produtos' AND private.has_role(auth.uid(), 'adm'::app_role));
