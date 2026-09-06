@@ -429,7 +429,7 @@ function Index() {
           </div>
         </section>
 
-        <section className="px-4 py-12">
+        <section id="horarios" className="px-4 py-12">
           <div className="mb-2 flex items-center gap-2">
             <div className="h-[2px] w-8 bg-secondary" />
             <h2 className="font-display text-2xl uppercase tracking-tight">HORÁRIOS POR IDADE</h2>
@@ -475,7 +475,7 @@ function Index() {
           </div>
         </section>
 
-        <section className="bg-surface/50 py-12">
+        <section id="nosso-qg" className="bg-surface/50 py-12">
           <div className="mb-6 px-4">
             <h2 className="font-display text-2xl uppercase tracking-tight">NOSSO QG</h2>
             <p className="font-mono text-[10px] text-primary">ESTRUTURA PROFISSIONAL</p>
