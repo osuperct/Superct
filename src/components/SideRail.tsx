@@ -64,14 +64,14 @@ export function SideRail() {
     }
 
     function verificar() {
-      const alvo = document.getElementById("cards-inicio");
-      if (!alvo) {
-        setRecolhida(false);
-        return;
-      }
-      const r = alvo.getBoundingClientRect();
+      const ids = ["cards-inicio", "horarios", "nosso-qg"];
       const margem = window.innerHeight * 0.1;
-      const visivel = r.top < window.innerHeight - margem && r.bottom > margem;
+      const visivel = ids.some((id) => {
+        const alvo = document.getElementById(id);
+        if (!alvo) return false;
+        const r = alvo.getBoundingClientRect();
+        return r.top < window.innerHeight - margem && r.bottom > margem;
+      });
       setRecolhida(visivel);
     }
 
