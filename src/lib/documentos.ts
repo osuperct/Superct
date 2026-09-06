@@ -42,10 +42,9 @@ export const CAMPOS_FICHA: CampoDoc[] = [
   {
     chave: "objetivo",
     rotulo: "Objetivo principal",
-    opcoes: ["Condicionamento físico", "Desenvolvimento motor", "Recreação", "Socialização"],
+    opcoes: ["Condicionamento físico", "Desenvolvimento motor", "Recreação", "Socialização", "Todos"],
   },
   { chave: "plano", rotulo: "Convênio / plano de saúde" },
-  { chave: "turma", rotulo: "Turma e horário desejados", opcoes: ["Turma Manhã", "Turma Tarde", "Turma Noite"] },
 ];
 
 export const CAMPOS_CONTRATO: CampoDoc[] = [
