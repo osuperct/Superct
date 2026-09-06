@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react";
 import video1 from "@/assets/video1.mp4.asset.json";
 import video2 from "@/assets/video2.mp4.asset.json";
 import video3 from "@/assets/video3.mp4.asset.json";
+import { assetUrl } from "@/lib/assetUrl";
 
 export type VideoApp = { url: string; com_som: boolean; inicio: number; fim: number | null };
 
-const PADRAO: VideoApp[] = [video2.url, video1.url, video3.url].map((url) => ({
+const PADRAO: VideoApp[] = [assetUrl(video2), assetUrl(video1), assetUrl(video3)].map((url) => ({
   url,
   com_som: false,
   inicio: 0,

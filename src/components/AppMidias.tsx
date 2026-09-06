@@ -9,6 +9,7 @@ import video3 from "@/assets/video3.mp4.asset.json";
 import { criarTurma, excluirTurma, listarTurmas, salvarTurma, type Turma } from "@/lib/turmas";
 import { CHAVES_TEXTO, listarTextos, salvarTexto, type Textos } from "@/lib/textos";
 import {
+import { assetUrl } from "@/lib/assetUrl";
   type Midia,
   GRUPOS_CARDS,
   GRUPO_LOGO,
@@ -20,7 +21,7 @@ import {
   listarMidiasAdm,
 } from "@/lib/midias";
 
-const VIDEOS_ORIGINAIS: string[] = [video2.url, video1.url, video3.url];
+const VIDEOS_ORIGINAIS: string[] = [assetUrl(video2), assetUrl(video1), assetUrl(video3)];
 
 export function AppMidias() {
   const [lista, setLista] = useState<Midia[]>([]);

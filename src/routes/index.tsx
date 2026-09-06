@@ -11,7 +11,7 @@ import { listarTurmas, type Turma } from "@/lib/turmas";
 
 import logoAsset from "@/assets/super-ct-logo.asset.json";
 
-const logo = logoAsset.url;
+const logo = assetUrl(logoAsset);
 import arena from "@/assets/IMG_20260901_175621.jpg.asset.json";
 import escalada from "@/assets/IMG_20260901_175604.jpg.asset.json";
 import argolas from "@/assets/IMG_20260901_175528.jpg.asset.json";
@@ -54,6 +54,7 @@ import coloniaFoto2 from "@/assets/colonia-foto2.png.asset.json";
 import coloniaFoto3 from "@/assets/colonia-foto3.jpg.asset.json";
 import coloniaCover from "@/assets/colonia-cover.jpg.asset.json";
 import professorTioVictor from "@/assets/professor-tio-victor.png.asset.json";
+import { assetUrl } from "@/lib/assetUrl";
 
 const turmas = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -106,27 +107,27 @@ const modalidades: Modalidade[] = [
     clicavel: true,
     fotos: [
       {
-        src: funcionalInfantilImg.url,
+        src: assetUrl(funcionalInfantilImg),
         alt: "Criança no Super CT fazendo exercício funcional sobre caixa de madeira",
       },
       {
-        src: funcionalFoto1.url,
+        src: assetUrl(funcionalFoto1),
         alt: "Menino em prancha com apoio no step durante treino funcional no Super CT",
       },
       {
-        src: funcionalFoto3.url,
+        src: assetUrl(funcionalFoto3),
         alt: "Menino saltando a caixa de madeira em treino funcional no Super CT",
       },
       {
-        src: funcionalFoto4.url,
+        src: assetUrl(funcionalFoto4),
         alt: "Criança escalando corda naval em treino funcional no Super CT",
       },
       {
-        src: funcionalFoto5.url,
+        src: assetUrl(funcionalFoto5),
         alt: "Aluno apoiado no step em exercício funcional no Super CT",
       },
       {
-        src: funcionalFoto6.url,
+        src: assetUrl(funcionalFoto6),
         alt: "Menino sentado no tatame do Super CT com bola de peso e arco",
       },
     ],
@@ -134,17 +135,17 @@ const modalidades: Modalidade[] = [
   {
     nome: "GINÁSTICA",
     texto: "Base motora, equilíbrio e flexibilidade.",
-    imagem: ginasticaCover.url,
+    imagem: assetUrl(ginasticaCover),
     alt: "Jump com a logo Super CT gravada em cinza e elásticos de perna sobre tatame preto",
     destaque: true,
     clicavel: true,
     fotos: [
       {
-        src: funcionalFoto2.url,
+        src: assetUrl(funcionalFoto2),
         alt: "Menina pulando no mini trampolim em frente à parede de escalada do Super CT",
       },
       {
-        src: ginasticaFoto2.url,
+        src: assetUrl(ginasticaFoto2),
         alt: "Aluna do Super CT saltando no jump em frente à parede de escalada",
       },
     ],
@@ -152,27 +153,27 @@ const modalidades: Modalidade[] = [
   {
     nome: "ESPORTES",
     texto: "Iniciação esportiva com jogo e trabalho em equipe.",
-    imagem: esportesCover.url,
+    imagem: assetUrl(esportesCover),
     alt: "Crianças em ação no basquete do Super CT com logo e cesta",
     destaque: true,
     position: "top",
     clicavel: true,
     fotos: [
-      { src: esportesFoto3.url, alt: "Turma do Super CT em treino de basquete na parede de cimento queimado" },
-      { src: esportesFoto1.url, alt: "Duas alunas do Super CT passando a bola em aula de esportes" },
-      { src: esportesFoto2.url, alt: "Crianças do Super CT em atividade com bola durante aula de esportes" },
+      { src: assetUrl(esportesFoto3), alt: "Turma do Super CT em treino de basquete na parede de cimento queimado" },
+      { src: assetUrl(esportesFoto1), alt: "Duas alunas do Super CT passando a bola em aula de esportes" },
+      { src: assetUrl(esportesFoto2), alt: "Crianças do Super CT em atividade com bola durante aula de esportes" },
     ],
   },
   {
     nome: "PAREDE DE ESCALADA",
     texto: "Desafio vertical com total segurança.",
-    imagem: escaladaCover.url,
+    imagem: assetUrl(escaladaCover),
     alt: "Parede de escalada do Super CT com agarras coloridas",
     destaque: true,
     clicavel: true,
     fotos: [
       {
-        src: escaladaFoto1.url,
+        src: assetUrl(escaladaFoto1),
         alt: "Menino escalando a parede de escalada do Super CT com o polegar para cima",
       },
     ],
@@ -180,59 +181,59 @@ const modalidades: Modalidade[] = [
   {
     nome: "SUPER CAMPÃO — AULAS ESPECIAIS",
     texto: "Vôlei de areia, futebol e jogos na arena externa.",
-    imagem: campaoCover.url,
+    imagem: assetUrl(campaoCover),
     alt: "Camiseta do uniforme Super CT com estampa de lava e escudo dourado sobre a grama do campo, ao lado de uma bola de vôlei",
     destaque: true,
     clicavel: true,
     fotos: [
-      { src: campaoFoto8.url, alt: "Turma Super Campão reunida com o Professor Tio Victor no fim da aula" },
-      { src: campaoFoto1.url, alt: "Criança do Super CT sacando a bola na quadra de areia" },
-      { src: campaoFoto2.url, alt: "Aluno do Super CT com a bola de vôlei na quadra de areia" },
-      { src: campaoFoto3.url, alt: "Alunas do Super CT jogando vôlei de areia" },
-      { src: campaoFoto4.url, alt: "Turma do Super CT posicionada na quadra de areia antes do jogo" },
-      { src: campaoFoto5.url, alt: "Professor Tio Victor com a bola no campo do Super CT" },
-      { src: campaoFoto6.url, alt: "Alunas do Super CT abraçadas com o uniforme vermelho no campo" },
-      { src: campaoFoto7.url, alt: "Professor Tio Victor conversando com os alunos sentados na areia" },
-      { src: campaoFoto9.url, alt: "Turma do Super CT em roda na areia durante a aula especial" },
+      { src: assetUrl(campaoFoto8), alt: "Turma Super Campão reunida com o Professor Tio Victor no fim da aula" },
+      { src: assetUrl(campaoFoto1), alt: "Criança do Super CT sacando a bola na quadra de areia" },
+      { src: assetUrl(campaoFoto2), alt: "Aluno do Super CT com a bola de vôlei na quadra de areia" },
+      { src: assetUrl(campaoFoto3), alt: "Alunas do Super CT jogando vôlei de areia" },
+      { src: assetUrl(campaoFoto4), alt: "Turma do Super CT posicionada na quadra de areia antes do jogo" },
+      { src: assetUrl(campaoFoto5), alt: "Professor Tio Victor com a bola no campo do Super CT" },
+      { src: assetUrl(campaoFoto6), alt: "Alunas do Super CT abraçadas com o uniforme vermelho no campo" },
+      { src: assetUrl(campaoFoto7), alt: "Professor Tio Victor conversando com os alunos sentados na areia" },
+      { src: assetUrl(campaoFoto9), alt: "Turma do Super CT em roda na areia durante a aula especial" },
     ],
   },
   {
     nome: "TREPA-TREPA & ARGOLAS",
     texto: "Domine a gravidade e o movimento.",
-    imagem: trepaTrepaCover.url,
+    imagem: assetUrl(trepaTrepaCover),
     alt: "Aluno do Super CT na estrutura de trepa-trepa com parede de escalada ao fundo",
     destaque: true,
     clicavel: true,
     fotos: [
-      { src: trepaTrepaCover.url, alt: "Aluno do Super CT na estrutura de trepa-trepa com parede de escalada ao fundo" },
-      { src: argolasFoto1.url, alt: "Criança de cabeça para baixo nas argolas do Super CT" },
-      { src: argolasFoto2.url, alt: "Aluna suspensa nas argolas laranja em treino no Super CT" },
-      { src: argolasFoto3.url, alt: "Aluno de cabeça para baixo nas argolas laranja no Super CT" },
+      { src: assetUrl(trepaTrepaCover), alt: "Aluno do Super CT na estrutura de trepa-trepa com parede de escalada ao fundo" },
+      { src: assetUrl(argolasFoto1), alt: "Criança de cabeça para baixo nas argolas do Super CT" },
+      { src: assetUrl(argolasFoto2), alt: "Aluna suspensa nas argolas laranja em treino no Super CT" },
+      { src: assetUrl(argolasFoto3), alt: "Aluno de cabeça para baixo nas argolas laranja no Super CT" },
     ],
   },
   {
     nome: "COLÔNIA DE FÉRIAS E ACAMPAMENTO INDOOR",
     texto: "Diversão máxima nas pausas escolares.",
-    imagem: coloniaCover.url,
+    imagem: assetUrl(coloniaCover),
     alt: "Cartaz Colônia de Férias Edição Ninjas 2026 do Super CT com mascotes ninja e datas 20/07 a 31/07",
     destaque: true,
     clicavel: true,
     position: "top",
     fotos: [
       {
-        src: coloniaCover.url,
+        src: assetUrl(coloniaCover),
         alt: "Cartaz Colônia de Férias Edição Ninjas 2026 do Super CT com mascotes ninja e datas 20/07 a 31/07",
       },
       {
-        src: coloniaFoto2.url,
+        src: assetUrl(coloniaFoto2),
         alt: "Turma da Colônia de Férias Edição Ninjas do Super CT reunida com o Professor Tio Victor",
       },
       {
-        src: coloniaFoto1.url,
+        src: assetUrl(coloniaFoto1),
         alt: "Crianças da colônia de férias do Super CT em frente ao painel do Wolverine",
       },
       {
-        src: coloniaFoto3.url,
+        src: assetUrl(coloniaFoto3),
         alt: "Cartaz Super Acampa CT do Tio Victor com aventuras, games, esportes e amizades para meninos",
       },
     ],
@@ -240,11 +241,11 @@ const modalidades: Modalidade[] = [
 ];
 
 const galeria = [
-  { src: arena.url, legenda: "Arena Principal", alt: "Área de treino do Super CT com piso emborrachado e iluminação laranja" },
-  { src: escalada.url, legenda: "Muro Ninja", alt: "Parede de escalada infantil com agarras coloridas" },
-  { src: argolas.url, legenda: "Treino Aéreo", alt: "Argolas e estrutura de trepa-trepa do Super CT" },
-  { src: circuitos.url, legenda: "Circuitos", alt: "Crianças em circuito de treino com escada de agilidade" },
-  { src: fachada.url, legenda: "Nossa Fachada", alt: "Fachada do Super CT com logo na vitrine de vidro" },
+  { src: assetUrl(arena), legenda: "Arena Principal", alt: "Área de treino do Super CT com piso emborrachado e iluminação laranja" },
+  { src: assetUrl(escalada), legenda: "Muro Ninja", alt: "Parede de escalada infantil com agarras coloridas" },
+  { src: assetUrl(argolas), legenda: "Treino Aéreo", alt: "Argolas e estrutura de trepa-trepa do Super CT" },
+  { src: assetUrl(circuitos), legenda: "Circuitos", alt: "Crianças em circuito de treino com escada de agilidade" },
+  { src: assetUrl(fachada), legenda: "Nossa Fachada", alt: "Fachada do Super CT com logo na vitrine de vidro" },
 ];
 
 // Mantém as palavras "super" em laranja, mesmo quando o título é editado na Área ADM.
@@ -437,13 +438,13 @@ function Index() {
 
           <div className="mb-6 flex items-end justify-center gap-2">
             <img
-              src={mascoteMenino.url}
+              src={assetUrl(mascoteMenino)}
               alt="Mascote menino do Super CT com o polegar para cima"
               loading="lazy"
               className="h-32 w-auto"
             />
             <img
-              src={mascoteMenina.url}
+              src={assetUrl(mascoteMenina)}
               alt="Mascote menina do Super CT fazendo um coração com as mãos"
               loading="lazy"
               className="h-32 w-auto"
@@ -501,7 +502,7 @@ function Index() {
           <div className="relative rounded-r-xl border-l-4 border-primary bg-surface p-6">
             <div className="mb-4 flex items-start gap-4">
               <img
-                src={professorTioVictor.url}
+                src={assetUrl(professorTioVictor)}
                 alt="Professor Tio Victor"
                 loading="lazy"
                 width={1024}
