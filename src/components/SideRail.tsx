@@ -28,8 +28,10 @@ const itens = [
 
 export function SideRail() {
   const [aberta, setAberta] = useState(true);
+  const [recolhida, setRecolhida] = useState(false);
   const [professor, setProfessor] = useState(false);
   const [adm, setAdm] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     let ativo = true;
@@ -55,6 +57,28 @@ export function SideRail() {
       sub.subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    if (!aberta) {
+      setRecolhida(false);
+      return;
+    }
+    const alvo = document.getElementById("cards-inicio");
+    if (!alvo) {
+      setRecolhida(false);
+      return;
+    }
+    observerRef.current?.disconnect();
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const visivel = entries.some((e) => e.isIntersecting);
+        setRecolhida(visivel);
+      },
+      { threshold: 0.05, rootMargin: "-10% 0px -10% 0px" },
+    );
+    observerRef.current.observe(alvo);
+    return () => observerRef.current?.disconnect();
+  }, [aberta]);
 
   const links = [
     ...itens,
