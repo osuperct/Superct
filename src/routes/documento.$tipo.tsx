@@ -110,6 +110,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
   const [assinatura, setAssinatura] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [pdfPronto, setPdfPronto] = useState<{ url: string; nome: string } | null>(null);
+  const [fichaPendente, setFichaPendente] = useState(false);
 
   useEffect(() => {
     const bruto = localStorage.getItem(rascunhoKey);
