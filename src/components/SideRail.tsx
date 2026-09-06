@@ -31,7 +31,6 @@ export function SideRail() {
   const [recolhida, setRecolhida] = useState(false);
   const [professor, setProfessor] = useState(false);
   const [adm, setAdm] = useState(false);
-  
 
   useEffect(() => {
     let ativo = true;
