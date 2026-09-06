@@ -183,8 +183,8 @@ function CalendarioPage() {
             </ul>
           )}
           <p className="mt-4 font-mono text-[9px] uppercase leading-relaxed tracking-widest text-muted-foreground">
-            Dia laranja cheio = feriado • contorno laranja = emenda de feriado (feriado na terça ou na
-            sexta, o dia anterior também é recesso)
+            Dia azul = dia de aula/treino (segunda a sexta) • laranja cheio = feriado • contorno laranja =
+            emenda de feriado (recesso)
           </p>
         </section>
 
