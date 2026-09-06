@@ -890,7 +890,7 @@ function JogoPage() {
           if (b) apoio = b.y - alt;
           else seguro.current = false;
         } else if (seguro.current === "argola") {
-          const a = argolas.find((a) => Math.abs(a.x - (x.current + HEROI_W / 2)) < 34);
+          const a = argolas.find((a) => Math.abs(a.x - (x.current + HEROI_W / 2)) < (faseRef.current === 3 ? 52 : 34));
           if (a) apoio = a.y - alt;
           else seguro.current = false;
         } else if (seguro.current === "parede") {
@@ -927,7 +927,7 @@ function JogoPage() {
         }
       } else if (noAr.current || y.current > 0) {
         const anterior = y.current;
-        vy.current += GRAVIDADE;
+        vy.current += faseRef.current === 3 ? GRAVIDADE * 0.82 : GRAVIDADE;
         if (vy.current > 0 && subindoDesde.current === null) subindoDesde.current = performance.now();
         if (vy.current <= 0) subindoDesde.current = null;
         if (vy.current > 0 && subindoDesde.current !== null && performance.now() - subindoDesde.current > 1000) {
@@ -945,7 +945,9 @@ function JogoPage() {
           const topo = prox + alt;
           const cx = x.current + HEROI_W / 2;
           const barra = barras.find((b) => cx > b.x && cx < b.x + b.w && Math.abs(topo - b.y) < 16);
-          const argola = argolas.find((a) => Math.abs(a.x - cx) < 26 && Math.abs(topo - a.y) < 20);
+          const argTolX = faseRef.current === 3 ? 46 : 26;
+          const argTolY = faseRef.current === 3 ? 34 : 20;
+          const argola = argolas.find((a) => Math.abs(a.x - cx) < argTolX && Math.abs(topo - a.y) < argTolY);
           const corda = cordas.find((c) => Math.abs(c.x - cx) < 22 && prox + alt > c.base && prox < c.topo);
           const parede = paredes.find(
             (p) => cx > p.x - 4 && cx < p.x + p.w + 4 && prox >= 0 && prox < p.h - alt,
@@ -1257,9 +1259,9 @@ function JogoPage() {
         }
 
 
-        /* inimigos do percurso (mais lentos na fase 1) */
+        /* inimigos do percurso (mais lentos na fase 1; fase 3 sem vilões) */
         spawn.current -= 1;
-        if (spawn.current <= 0) {
+        if (spawn.current <= 0 && faseRef.current !== 3) {
           spawn.current =
             Math.max(44, 264 - faseRef.current * 22) + Math.floor(Math.random() * 50);
           const vilao = Math.floor(Math.random() * VILOES.length);
