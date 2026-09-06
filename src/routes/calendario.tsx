@@ -183,6 +183,54 @@ function CalendarioPage() {
             sexta, o dia anterior também é recesso)
           </p>
         </section>
+
+        <section className="mt-8">
+          <div className="mb-2 flex items-center gap-2">
+            <Clock className="size-4 text-primary" />
+            <h2 className="font-display text-xl tracking-tight">TURMAS E HORÁRIOS</h2>
+          </div>
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-widest text-primary">
+            Aulas de segunda a sexta
+          </p>
+
+          <div className="mb-4 flex items-end justify-center gap-2">
+            <img
+              src={assetUrl(mascoteMenino)}
+              alt="Mascote menino do Super CT com o polegar para cima"
+              loading="lazy"
+              className="h-28 w-auto"
+            />
+            <img
+              src={assetUrl(mascoteMenina)}
+              alt="Mascote menina do Super CT fazendo um coração com as mãos"
+              loading="lazy"
+              className="h-28 w-auto"
+            />
+          </div>
+
+          <div className="overflow-hidden rounded-lg border border-border bg-surface">
+            <table className="w-full text-sm">
+              <thead className="bg-primary/10 text-left font-display uppercase tracking-wide text-primary">
+                <tr>
+                  <th className="px-3 py-3">Turma</th>
+                  <th className="px-3 py-3">Horário</th>
+                  <th className="px-3 py-3">Idade</th>
+                  <th className="px-3 py-3">Dias</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {turmasLista.map((t) => (
+                  <tr key={t.turma}>
+                    <td className="px-3 py-3 font-display text-secondary">{t.turma}</td>
+                    <td className="px-3 py-3 font-mono text-xs">{t.horario}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{t.idade}</td>
+                    <td className="px-3 py-3 text-muted-foreground">{t.dias}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </main>
     </div>
   );
