@@ -34,18 +34,18 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
   }, [atual, item.com_som, item.inicio]);
 
   return (
-    <section className="px-4 pt-4">
+    <section className="pl-16 pr-4 pt-4 sm:px-4">
       <div className="mb-4 flex items-center gap-2">
         <div className="h-[2px] w-8 bg-primary" />
-        <h2 className="font-display text-2xl uppercase tracking-tight">SUPER CT EM AÇÃO</h2>
+        <h2 className="truncate font-display text-2xl uppercase tracking-tight">SUPER CT EM AÇÃO</h2>
       </div>
 
-      <div className="relative mx-auto aspect-[3/4] w-full max-w-sm overflow-hidden rounded-lg border border-border bg-surface">
+      <div className="relative mx-auto aspect-[3/4] max-h-[70vh] w-full max-w-[280px] overflow-hidden rounded-lg border border-border bg-surface sm:max-w-sm">
         <video
           ref={ref}
           key={item.url}
           src={item.url}
-          className="h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
           autoPlay
           loop={lista.length === 1 && !item.fim}
           muted={!item.com_som}
