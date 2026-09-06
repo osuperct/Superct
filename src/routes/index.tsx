@@ -346,7 +346,7 @@ function Index() {
           </div>
 
           <div className="animate-reveal [animation-delay:100ms]">
-            <div className="mx-auto -mb-6 w-full max-w-[200px]">
+            <div className="mx-auto mb-4 w-full max-w-[200px]">
               <img
                 src={logoApp}
                 alt="Logo Super CT"
