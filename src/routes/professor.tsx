@@ -602,6 +602,7 @@ function EnvioRecadoPush() {
           <Send className="size-4" /> {enviando ? "ENVIANDO…" : "ENVIAR NOTIFICAÇÃO"}
         </button>
       </form>
+      <ResponsaveisSemNotificacao />
     </section>
   );
 }
