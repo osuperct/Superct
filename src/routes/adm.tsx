@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { BadgeCheck, ChevronDown, ChevronUp, CircleDollarSign, ShieldCheck, Trash2, UserCheck, UserPlus } from "lucide-react";
+import { BadgeCheck, ChevronDown, ChevronUp, CircleDollarSign, FileText, ShieldCheck, Trash2, UserCheck, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 
 import { cadastrarProfessor } from "@/lib/adm.functions";
@@ -158,6 +158,22 @@ function AdmPage() {
           className="mt-3 inline-block rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground"
         >
           ABRIR MATRÍCULAS E MENSALIDADES
+        </Link>
+      </section>
+
+      <section className="rounded-lg border border-border bg-card/40 p-4">
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <FileText className="size-4 text-primary" /> RELATÓRIO
+        </h2>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Exporte em PDF, separado ou em conjunto: alunos ativos, mensalidades pagas, em aberto e em atraso,
+          lista de chamada, matrículas recentes e o financeiro total por forma de pagamento.
+        </p>
+        <Link
+          to="/relatorios"
+          className="mt-3 inline-block rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground"
+        >
+          ABRIR RELATÓRIOS
         </Link>
       </section>
 
