@@ -710,11 +710,12 @@ function JogoPage() {
   const reiniciar = useCallback(() => {
     pontosRef.current = 0;
     setPontos(0);
-    vidasRef.current = VIDAS_CHEFAO;
-    setVidas(VIDAS_CHEFAO);
     estoqueRef.current = 0;
     setEstoqueCoracoes(0);
     iniciarCorrida(1);
+    /* garante 3 vidas ao recomeçar do zero, mesmo saindo do modo chefão */
+    vidasRef.current = VIDAS_CHEFAO;
+    setVidas(VIDAS_CHEFAO);
   }, [iniciarCorrida]);
 
   const iniciarChefao = useCallback(() => {
