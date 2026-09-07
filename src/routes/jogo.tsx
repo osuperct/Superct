@@ -608,6 +608,10 @@ function JogoPage() {
   const presoAte = useRef(0);
   const spawnQueda = useRef(60);
   const impactos = useRef(0);
+  /* cada batata/donut que encosta deixa o personagem mais "gordo" e mais lento */
+  const gordura = useRef(0);
+  const [gorduraUi, setGorduraUi] = useState(0);
+  const GORDURA_MAX = 5;
 
 
 
