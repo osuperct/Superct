@@ -752,11 +752,20 @@ function JogoPage() {
       setPiscando(true);
       window.setTimeout(() => setPiscando(false), 1600);
       if (vidasRef.current <= 0) {
-        fimRef.current = true;
-        sfx(somGameOver);
-        setFim(true);
-        setDerrotado(vilao);
-        return;
+        if (estoqueRef.current > 0) {
+          /* usa um coração coletado e volta com a barra cheia */
+          estoqueRef.current -= 1;
+          setEstoqueCoracoes(estoqueRef.current);
+          vidasRef.current = VIDAS_CHEFAO;
+          setVidas(VIDAS_CHEFAO);
+          sfx(somMoeda);
+        } else {
+          fimRef.current = true;
+          sfx(somGameOver);
+          setFim(true);
+          setDerrotado(vilao);
+          return;
+        }
       }
       impactos.current = 0;
       presoAte.current = 0;
