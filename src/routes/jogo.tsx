@@ -1253,11 +1253,14 @@ function JogoPage() {
           const restantes: Tiro[] = [];
           let acertou = false;
           let engordou = false;
+          let levouRaio = false;
           for (const t of tirosRef.current) {
             let ny = t.y + t.vy;
             let nvy = t.vy;
             const nx = t.x + t.vx;
-            if (t.tipo === "batata") {
+            if (t.tipo === "raio") {
+              if (ny > ALTURA_CENA) continue;
+            } else if (t.tipo === "batata") {
               nvy = t.vy - 0.12;
               if (ny <= 0) continue;
             } else {
@@ -1275,8 +1278,11 @@ function JogoPage() {
               ny + d.h > y.current + 3 &&
               ny < y.current + hAlt;
             if (bate && performance.now() > invulAte.current) {
-              acertou = true;
-              if (t.tipo === "batata" || t.tipo === "donut") engordou = true;
+              if (t.tipo === "raio") levouRaio = true;
+              else {
+                acertou = true;
+                if (t.tipo === "batata" || t.tipo === "donut") engordou = true;
+              }
               continue;
             }
             restantes.push({ ...t, x: nx, y: ny, vy: nvy });
@@ -1286,6 +1292,10 @@ function JogoPage() {
           if (engordou && gordura.current < GORDURA_MAX) {
             gordura.current += 1;
             setGorduraUi(gordura.current);
+          }
+          if (levouRaio) {
+            perderVida(null);
+            return;
           }
           if (acertou) {
             impactos.current += 1;
