@@ -170,6 +170,7 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
                   <ul className="space-y-2 border-t border-border px-3 pb-3 pt-2">
                     {grupo.avisos.map((a) => {
                       const novo = !lidos.has(a.id);
+                      const aberto = novo || expandidos.has(a.id);
                       return (
                         <li
                           key={a.id}
@@ -181,28 +182,40 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
                               <span className="mt-0.5 size-2 shrink-0 rounded-full bg-primary" aria-label="Não lido" />
                             )}
                           </div>
-                          <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
-                          {a.imagem && (
-                            <a href={a.imagem} target="_blank" rel="noreferrer">
-                              <img
-                                src={a.imagem}
-                                alt={`Foto do aviso ${a.titulo}`}
-                                loading="lazy"
-                                className="mt-2 max-h-64 w-full rounded-md border border-border object-contain"
-                              />
-                            </a>
+                          {aberto && (
+                            <>
+                              <p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{a.mensagem}</p>
+                              {a.imagem && (
+                                <a href={a.imagem} target="_blank" rel="noreferrer">
+                                  <img
+                                    src={a.imagem}
+                                    alt={`Foto do aviso ${a.titulo}`}
+                                    loading="lazy"
+                                    className="mt-2 max-h-64 w-full rounded-md border border-border object-contain"
+                                  />
+                                </a>
+                              )}
+                            </>
                           )}
                           <div className="mt-2 flex items-center justify-between gap-2">
                             <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                               {dataCurta(a.created_at)}
                             </span>
-                            {novo && (
+                            {novo ? (
                               <button
                                 type="button"
                                 onClick={() => void marcar(a.id)}
                                 className="flex items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
                               >
                                 <Check className="size-3" /> MARCAR COMO LIDO
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => toggleItem(a.id)}
+                                className="rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                              >
+                                {aberto ? "OCULTAR" : "MOSTRAR"}
                               </button>
                             )}
                           </div>
