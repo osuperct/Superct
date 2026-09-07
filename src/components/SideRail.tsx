@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { useSidebarControl } from "./SidebarContext";
 
 const itens = [
   { to: "/", label: "Início", icon: Home },
@@ -27,10 +28,12 @@ const itens = [
 ] as const;
 
 export function SideRail() {
+  const { forcarRecolhida } = useSidebarControl();
   const [aberta, setAberta] = useState(true);
   const [recolhida, setRecolhida] = useState(false);
   const [professor, setProfessor] = useState(false);
   const [adm, setAdm] = useState(false);
+  const estaRecolhida = !aberta || forcarRecolhida;
 
   useEffect(() => {
     let ativo = true;
@@ -90,13 +93,17 @@ export function SideRail() {
     ...(adm ? [{ to: "/adm", label: "ADM", icon: ShieldCheck } as const] : []),
   ];
 
-  if (!aberta) {
+  if (estaRecolhida) {
     return (
       <button
         type="button"
         aria-label="Abrir menu lateral"
-        onClick={() => setAberta(true)}
-        className="fixed left-0 top-1/2 z-[60] -translate-y-1/2 rounded-r-lg border border-l-0 border-border bg-background/80 py-6 pl-0.5 pr-1 text-primary backdrop-blur-md active:scale-95"
+        onClick={() => {
+          if (!forcarRecolhida) setAberta(true);
+        }}
+        className={`fixed left-0 top-1/2 z-[40] -translate-y-1/2 rounded-r-lg border border-l-0 border-border bg-background/80 py-6 pl-0.5 pr-1 text-primary backdrop-blur-md active:scale-95 ${
+          forcarRecolhida ? "pointer-events-none opacity-0" : ""
+        }`}
       >
         <ChevronRight className="size-4" />
       </button>
@@ -104,7 +111,7 @@ export function SideRail() {
   }
 
   return (
-    <aside className="fixed left-0 top-1/2 z-[60] -translate-y-1/2">
+    <aside className="fixed left-0 top-1/2 z-[40] -translate-y-1/2">
       <nav
         className={`flex flex-col gap-1 rounded-r-lg border border-l-0 border-border bg-background/70 py-2 pl-1 pr-1.5 backdrop-blur-md transition-transform duration-300 ease-out ${
           recolhida ? "-translate-x-[calc(100%_-_10px)]" : "translate-x-0"

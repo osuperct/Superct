@@ -7,6 +7,7 @@ import { MESES } from "@/lib/feriados";
 import { diasDeAula, hojeDia, isoDia, type Presenca } from "@/lib/presenca";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useSidebarControl } from "./SidebarContext";
 
 type AlunoChamada = { id: string; nome: string; user_id: string; matricula: string | null };
 
@@ -24,6 +25,7 @@ export function ListaChamada({
   const [salvando, setSalvando] = useState<string | null>(null);
   const [busca, setBusca] = useState("");
   const [aberto, setAberto] = useState(false);
+  const { setForcarRecolhida } = useSidebarControl();
 
   const dias = useMemo(() => diasDeAula(ano, mes), [ano, mes]);
   const hoje = hojeDia();
@@ -50,6 +52,13 @@ export function ListaChamada({
   useEffect(() => {
     void carregar();
   }, [carregar]);
+
+  useEffect(() => {
+    setForcarRecolhida(aberto);
+    return () => {
+      setForcarRecolhida(false);
+    };
+  }, [aberto, setForcarRecolhida]);
 
   function mudarMes(passo: number) {
     const d = new Date(ano, mes - 1 + passo, 1);
