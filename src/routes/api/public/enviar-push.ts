@@ -94,7 +94,8 @@ export const Route = createFileRoute("/api/public/enviar-push")({
 
         const { data: alunos, error: erroAlunos } = await supabase
           .from("alunos")
-          .select("user_id");
+          .select("user_id")
+          .not("matricula", "is", null);
         if (erroAlunos) {
           return json({ erro: "Erro ao buscar alunos: " + erroAlunos.message }, 500);
         }
