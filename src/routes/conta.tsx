@@ -304,7 +304,15 @@ function Autenticacao() {
               maxLength={14}
               inputMode="numeric"
             />
+            <Campo
+              label="Endereço completo"
+              value={endereco}
+              onChange={setEndereco}
+              required
+              maxLength={200}
+            />
             <Campo label="Nome do aluno" value={alunoNome} onChange={setAlunoNome} required maxLength={120} />
+
             <Campo label="Idade do aluno" value={alunoIdade} onChange={setAlunoIdade} required type="number" />
           </>
         )}
