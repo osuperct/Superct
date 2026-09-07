@@ -671,6 +671,8 @@ function JogoPage() {
       invulAte.current = performance.now() + 900;
       presoAte.current = 0;
       impactos.current = 0;
+      gordura.current = 0;
+      setGorduraUi(0);
       spawnQueda.current = 60;
       setChocado(false);
       if (reporCoracoes) {
@@ -814,7 +816,8 @@ function JogoPage() {
       const alt = alturaHeroi(duck.current);
 
 
-      /* ---- movimento horizontal ---- */
+      /* ---- movimento horizontal (mais lento a cada batata/donut no corpo) ---- */
+      const lento = Math.max(0.5, 1 - gordura.current * 0.11);
       const passo = (delta: number) => {
         const alvo = x.current + delta;
         let livre = true;
@@ -840,7 +843,7 @@ function JogoPage() {
           /* na parede: desliza para os lados e sai da parede ao passar da borda */
           const cx = x.current + HEROI_W / 2;
           const p = paredes.find((pp) => cx > pp.x - 6 && cx < pp.x + pp.w + 6);
-          const alvo = x.current + dir.current * VELOCIDADE * 0.7;
+          const alvo = x.current + dir.current * VELOCIDADE * 0.7 * lento;
           if (p && alvo + HEROI_W / 2 > p.x - 4 && alvo + HEROI_W / 2 < p.x + p.w + 4) {
             x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
           } else {
@@ -851,7 +854,7 @@ function JogoPage() {
             x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
           }
         } else {
-          passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
+          passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE) * lento);
         }
       }
 
@@ -1171,7 +1174,7 @@ function JogoPage() {
         if (lay.donuts) {
           spawnQueda.current -= 1;
           if (spawnQueda.current <= 0) {
-            spawnQueda.current = 46 + Math.floor(Math.random() * 40);
+            spawnQueda.current = 95 + Math.floor(Math.random() * 70);
             tirosRef.current = [
               ...tirosRef.current,
               {
