@@ -3,11 +3,13 @@ import kaelAnda1 from "@/assets/heroi-kael-anda1-atual.png";
 import kaelAnda2 from "@/assets/heroi-kael-anda2-corrigido.png";
 import kaelEscala from "@/assets/heroi-kael-escala-costas-atual.png";
 import kaelTrepaTrepa from "@/assets/heroi-kael-trepa-trepa.png";
+import kaelMedalha from "@/assets/heroi-kael-medalha.png";
 import miah from "@/assets/heroi-miah.png";
 import miahAnda1 from "@/assets/heroi-miah-anda1.png";
 import miahAnda2 from "@/assets/heroi-miah-anda2-corrigido.png";
 import miahEscala from "@/assets/heroi-miah-escala-costas-atual.png";
 import miahTrepaTrepa from "@/assets/heroi-miah-trepa-trepa.png";
+import miahMedalha from "@/assets/heroi-miah-medalha.png";
 
 export type HeroiId = "kael" | "miah";
 
@@ -21,6 +23,7 @@ export type Heroi = {
   anda: [string, string];
   escala: string;
   trepaTrepa: string;
+  medalha: string;
 };
 
 export const HEROIS: Heroi[] = [
@@ -35,6 +38,7 @@ export const HEROIS: Heroi[] = [
     anda: [kaelAnda1, kaelAnda2],
     escala: kaelEscala,
     trepaTrepa: kaelTrepaTrepa,
+    medalha: kaelMedalha,
   },
   {
     id: "miah",
@@ -47,6 +51,7 @@ export const HEROIS: Heroi[] = [
     anda: [miahAnda1, miahAnda2],
     escala: miahEscala,
     trepaTrepa: miahTrepaTrepa,
+    medalha: miahMedalha,
   },
 ];
 
