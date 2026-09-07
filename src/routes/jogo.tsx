@@ -945,14 +945,24 @@ function JogoPage() {
           subindoDesde.current = null;
         }
 
-        if (vy.current > -4 && performance.now() >= bloquearAgarreAte.current) {
+        const fase3 = faseRef.current === 3;
+        if ((vy.current > -4 || fase3) && performance.now() >= bloquearAgarreAte.current) {
           const topo = prox + alt;
           const cx = x.current + HEROI_W / 2;
           const barra = barras.find((b) => cx > b.x && cx < b.x + b.w && Math.abs(topo - b.y) < 16);
-          const argTolX = faseRef.current === 3 ? 46 : 26;
-          const argTolY = faseRef.current === 3 ? 34 : 20;
+          const argTolX = fase3 ? 46 : 26;
+          const argTolY = fase3 ? 34 : 20;
           const argola = argolas.find((a) => Math.abs(a.x - cx) < argTolX && Math.abs(topo - a.y) < argTolY);
-          const corda = cordas.find((c) => Math.abs(c.x - cx) < 22 && prox + alt > c.base && prox < c.topo);
+          const cordaTolX = fase3 ? 64 : 22;
+          const cordaFolga = fase3 ? 34 : 0;
+          const cordasProximas = cordas.filter(
+            (c) =>
+              Math.abs(c.x - cx) < cordaTolX &&
+              prox + alt > c.base - cordaFolga &&
+              prox < c.topo + cordaFolga,
+          );
+          const corda = cordasProximas.sort((a, b) => Math.abs(a.x - cx) - Math.abs(b.x - cx))[0];
+
           const parede = paredes.find(
             (p) => cx > p.x - 4 && cx < p.x + p.w + 4 && prox >= 0 && prox < p.h - alt,
           );
@@ -1587,7 +1597,7 @@ function JogoPage() {
       vy.current = (duploToque ? IMPULSO : IMPULSO * 0.95);
       if (vy.current > 0) subindoDesde.current = performance.now();
       vxAr.current = lado * VELOCIDADE * 2.1;
-      bloquearAgarreAte.current = agora + 400;
+      bloquearAgarreAte.current = agora + (faseRef.current === 3 ? 180 : 400);
       return;
     }
     if (seguro.current === "parede") {
