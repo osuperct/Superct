@@ -152,7 +152,7 @@ function Autenticacao() {
           setAviso("Confira o CPF do responsável: os números não formam um CPF válido.");
           return;
         }
-        const { livre } = await checarCpf({ data: { cpf } });
+        const livre = await checarCpf(cpf);
         if (!livre) {
           setAviso("Este CPF já tem uma conta no Super CT. Entre com o CPF ou peça uma nova senha.");
           return;
