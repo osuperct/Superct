@@ -64,7 +64,7 @@ export const enviarRecadoPush = createServerFn({ method: "POST" })
               message: {
                 token,
                 notification: { title: data.titulo, body: data.mensagem },
-                data: data.caminho ? { path: data.caminha } : undefined,
+                data: data.caminho ? { path: data.caminho } : undefined,
               },
             }),
           });
