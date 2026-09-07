@@ -2371,6 +2371,20 @@ function JogoPage() {
                       boxShadow: "0 0 8px #d97706",
                     }}
                   />
+                 );
+              if (t.tipo === "raio")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute animate-pulse"
+                    style={{
+                      ...comum,
+                      background: "linear-gradient(180deg,#ecfeff,#22d3ee 45%,#0ea5e9)",
+                      clipPath:
+                        "polygon(52% 0,18% 46%,46% 46%,26% 100%,86% 40%,54% 40%,84% 6%)",
+                      filter: "drop-shadow(0 0 10px #22d3ee)",
+                    }}
+                  />
                 );
               return (
                 <div
