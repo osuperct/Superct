@@ -1194,6 +1194,7 @@ function JogoPage() {
         if (tirosRef.current.length > 0) {
           const restantes: Tiro[] = [];
           let acertou = false;
+          let engordou = false;
           for (const t of tirosRef.current) {
             let ny = t.y + t.vy;
             let nvy = t.vy;
@@ -1217,12 +1218,17 @@ function JogoPage() {
               ny < y.current + hAlt;
             if (bate && performance.now() > invulAte.current) {
               acertou = true;
+              if (t.tipo === "batata" || t.tipo === "donut") engordou = true;
               continue;
             }
             restantes.push({ ...t, x: nx, y: ny, vy: nvy });
           }
           tirosRef.current = restantes;
           setTiros(restantes);
+          if (engordou && gordura.current < GORDURA_MAX) {
+            gordura.current += 1;
+            setGorduraUi(gordura.current);
+          }
           if (acertou) {
             impactos.current += 1;
             sfx(somDano);
