@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, ImagePlus, Megaphone, Send, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
-import { type Aviso, agruparPorMes, dataCurta, enviarAviso, excluirAviso, listarAvisos, mesAtual } from "@/lib/avisos";
+import { type Aviso, agruparPorMes, dataCurta, enviarAviso, excluirAviso, listarAvisos } from "@/lib/avisos";
 
 export function AvisosProfessor({ uid }: { uid: string }) {
   const [lista, setLista] = useState<Aviso[]>([]);
@@ -11,7 +11,7 @@ export function AvisosProfessor({ uid }: { uid: string }) {
   const [enviando, setEnviando] = useState(false);
   const [imagem, setImagem] = useState<File | null>(null);
   const [previa, setPrevia] = useState<string | null>(null);
-  const [abertos, setAbertos] = useState<Set<string>>(new Set([mesAtual()]));
+  const [abertos, setAbertos] = useState<Set<string>>(new Set());
 
   function escolherImagem(file: File | null) {
     if (previa) URL.revokeObjectURL(previa);

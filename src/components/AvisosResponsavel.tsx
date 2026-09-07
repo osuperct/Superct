@@ -13,7 +13,6 @@ import {
   listarAvisos,
   listarLidos,
   marcarLido,
-  mesAtual,
   notificarAparelho,
   pedirPermissao,
 } from "@/lib/avisos";
@@ -22,7 +21,7 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
   const [lista, setLista] = useState<Aviso[]>([]);
   const [lidos, setLidos] = useState<Set<string>>(new Set());
   const [permissao, setPermissao] = useState<EstadoNotificacao>("pendente");
-  const [abertos, setAbertos] = useState<Set<string>>(new Set([mesAtual()]));
+  const [abertos, setAbertos] = useState<Set<string>>(new Set());
   const [expandidos, setExpandidos] = useState<Set<string>>(new Set());
 
   useEffect(() => {
