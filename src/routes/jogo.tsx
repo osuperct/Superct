@@ -2383,16 +2383,18 @@ function JogoPage() {
                   <img
                     src={heroiAtual.medalha}
                     alt={`${heroiAtual.nome} segurando a medalha suprema do Super CT`}
-                    className="mx-auto h-44 w-auto select-none"
+                    className="mx-auto h-44 w-auto origin-bottom select-none animate-erguer-medalha"
                     style={{ filter: `drop-shadow(0 0 20px ${heroiAtual.cor})` }}
                   />
-                  <p
-                    className="mt-3 font-display text-2xl uppercase leading-tight tracking-tight"
-                    style={{ color: heroiAtual.cor, textShadow: `0 0 16px ${heroiAtual.cor}` }}
-                  >
-                    Yeeees! Você ganhou a medalha suprema!
-                  </p>
-                  <p className="mt-2 font-body text-[13px] leading-snug text-foreground">
+                  <div className="overflow-hidden">
+                    <p
+                      className="mt-3 font-display text-2xl uppercase leading-tight tracking-tight animate-titulo-desliza"
+                      style={{ color: heroiAtual.cor, textShadow: `0 0 16px ${heroiAtual.cor}` }}
+                    >
+                      Yeeees! Você ganhou a medalha suprema!
+                    </p>
+                  </div>
+                  <p className="mt-2 font-body text-[13px] leading-snug text-foreground animate-texto-surge">
                     Você conseguiu atravessar os maiores desafios da nossa academia e derrotar todos
                     os terríveis vilões! Parabéns!
                   </p>
