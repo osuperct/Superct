@@ -101,7 +101,7 @@ export function SideRail() {
         onClick={() => {
           if (!forcarRecolhida) setAberta(true);
         }}
-        className={`fixed left-0 top-1/2 z-[60] -translate-y-1/2 rounded-r-lg border border-l-0 border-border bg-background/80 py-6 pl-0.5 pr-1 text-primary backdrop-blur-md active:scale-95 ${
+        className={`fixed left-0 top-28 z-[60] rounded-r-lg border border-l-0 border-border bg-background/80 py-6 pl-0.5 pr-1 text-primary backdrop-blur-md active:scale-95 md:top-1/2 md:-translate-y-1/2 ${
           forcarRecolhida ? "pointer-events-none opacity-0" : ""
         }`}
       >
