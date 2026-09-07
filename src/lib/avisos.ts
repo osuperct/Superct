@@ -96,29 +96,3 @@ export function mesAtual() {
   return `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, "0")}`;
 }
 
-/** Situação das notificações do aparelho. */
-export type EstadoNotificacao = "indisponivel" | "abrir-em-nova-aba" | "permitido" | "negado" | "pendente";
-
-export function estadoNotificacao(): EstadoNotificacao {
-  if (typeof window === "undefined" || !("Notification" in window)) return "indisponivel";
-  if (window.top !== window.self) return "abrir-em-nova-aba";
-  if (Notification.permission === "granted") return "permitido";
-  if (Notification.permission === "denied") return "negado";
-  return "pendente";
-}
-
-export async function pedirPermissao(): Promise<EstadoNotificacao> {
-  const estado = estadoNotificacao();
-  if (estado !== "pendente") return estado;
-  const resposta = await Notification.requestPermission();
-  return resposta === "granted" ? "permitido" : "negado";
-}
-
-export function notificarAparelho(titulo: string, corpo: string) {
-  if (estadoNotificacao() !== "permitido") return;
-  try {
-    new Notification(titulo, { body: corpo, icon: "/favicon.png" });
-  } catch {
-    /* sem notificação disponível */
-  }
-}
