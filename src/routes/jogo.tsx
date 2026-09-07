@@ -472,7 +472,7 @@ type Bola = { id: number; x: number; y: number; vx: number; super: boolean };
 type Haltere = { id: number; x: number; y: number; cor: "verde" | "azul"; caindo: boolean };
 type Chefao = { x: number; y: number; vx: number; vy: number; hp: number; hpMax: number };
 type Modo = "corrida" | "intervalo" | "chefao" | "fase-vencida";
-type TipoTiro = "celular" | "batata" | "furacao" | "corda" | "donut" | "balao";
+type TipoTiro = "celular" | "batata" | "furacao" | "corda" | "donut" | "balao" | "raio";
 type Tiro = {
   id: number;
   x: number;
@@ -495,6 +495,7 @@ const TAM_TIRO: Record<TipoTiro, { w: number; h: number }> = {
   corda: { w: 44, h: 10 },
   donut: { w: 22, h: 22 },
   balao: { w: 40, h: 24 },
+  raio: { w: 14, h: 44 },
 };
 const CORES_DONUT = ["#ec4899", "#f59e0b", "#22d3ee", "#a3e635", "#f43f5e"];
 const VIDAS_CHEFAO = 3;
@@ -757,7 +758,7 @@ function JogoPage() {
     let raf = 0;
 
     /* perder uma vida: volta ao checkpoint do trecho atual (corrida ou arena do chefão) */
-    const perderVida = (vilao: number | null) => {
+    const perderVida = (vilao: number | null, semVoltar = false) => {
       if (fimRef.current || performance.now() <= invulAte.current) return;
       vidasRef.current -= 1;
       setVidas(vidasRef.current);
@@ -765,6 +766,7 @@ function JogoPage() {
       invulAte.current = performance.now() + 1800;
       setPiscando(true);
       window.setTimeout(() => setPiscando(false), 1600);
+      let acabou = false;
       if (vidasRef.current <= 0) {
         if (estoqueRef.current > 0) {
           /* usa um coração coletado e volta com a barra cheia */
@@ -780,6 +782,12 @@ function JogoPage() {
           setDerrotado(vilao);
           return;
         }
+        acabou = true;
+      }
+      /* só volta ao checkpoint quando a vida zera de vez */
+      if (semVoltar && !acabou) {
+        impactos.current = 0;
+        return;
       }
       impactos.current = 0;
       presoAte.current = 0;
@@ -1168,6 +1176,35 @@ function JogoPage() {
           }
         }
 
+        /* ---- computadores lançam 3 raios para cima a cada 2 segundos ---- */
+        if (lay.telas.length > 0) {
+          spawnQueda.current -= 1;
+          if (spawnQueda.current <= 0) {
+            spawnQueda.current = 120;
+            const visiveis = lay.telas.filter((t) => t.x > cam - 40 && t.x < cam + vista + 40);
+            const novos: Tiro[] = [];
+            for (const t of visiveis) {
+              for (let i = 0; i < 3; i += 1) {
+                novos.push({
+                  id: nextTiro.current++,
+                  x: t.x + t.w / 2 - 7 + (i - 1) * 15,
+                  y: 34,
+                  vx: 0,
+                  vy: 2.6 + dif,
+                  tipo: "raio",
+                  volta: false,
+                  origem: t.x,
+                  cor: "#67e8f9",
+                  fase: Math.random() * Math.PI * 2,
+                });
+              }
+            }
+            if (novos.length > 0) tirosRef.current = [...tirosRef.current, ...novos];
+          }
+        }
+
+
+
         /* ---- chuva de batata frita (fase 4) ---- */
         if (lay.chuvaBatata.length > 0) {
           spawnQueda.current -= 1;
@@ -1223,11 +1260,14 @@ function JogoPage() {
           const restantes: Tiro[] = [];
           let acertou = false;
           let engordou = false;
+          let levouRaio = false;
           for (const t of tirosRef.current) {
             let ny = t.y + t.vy;
             let nvy = t.vy;
             const nx = t.x + t.vx;
-            if (t.tipo === "batata") {
+            if (t.tipo === "raio") {
+              if (ny > ALTURA_CENA) continue;
+            } else if (t.tipo === "batata") {
               nvy = t.vy - 0.12;
               if (ny <= 0) continue;
             } else {
@@ -1245,8 +1285,11 @@ function JogoPage() {
               ny + d.h > y.current + 3 &&
               ny < y.current + hAlt;
             if (bate && performance.now() > invulAte.current) {
-              acertou = true;
-              if (t.tipo === "batata" || t.tipo === "donut") engordou = true;
+              if (t.tipo === "raio") levouRaio = true;
+              else {
+                acertou = true;
+                if (t.tipo === "batata" || t.tipo === "donut") engordou = true;
+              }
               continue;
             }
             restantes.push({ ...t, x: nx, y: ny, vy: nvy });
@@ -1256,6 +1299,10 @@ function JogoPage() {
           if (engordou && gordura.current < GORDURA_MAX) {
             gordura.current += 1;
             setGorduraUi(gordura.current);
+          }
+          if (levouRaio) {
+            perderVida(null, true);
+            return;
           }
           if (acertou) {
             impactos.current += 1;
@@ -1340,6 +1387,7 @@ function JogoPage() {
           ]);
         }
 
+        let vilaoQueBateu: number | null = null;
         setInimigos((prev) => {
           const proximos: Inimigo[] = [];
           const hx = x.current;
@@ -1355,17 +1403,21 @@ function JogoPage() {
               setPontos(pontosRef.current + passados.current + Math.floor((maxX.current - 60) / 60));
               continue;
             }
-            const bateX = nx + 34 > hx + 4 && nx + 4 < hx + HEROI_W - 4;
-            const bateY = ny + 34 > hy + 4 && ny + 4 < hy + hAlt;
-            if (bateX && bateY) {
-              perderVida(i.vilao);
+            /* área de contato do vilão (imagem de 36px) */
+            const bateX = nx + 34 > hx + 2 && nx + 2 < hx + HEROI_W - 2;
+            const bateY = ny + 34 > hy + 2 && ny + 2 < hy + hAlt;
+            if (bateX && bateY && performance.now() > invulAte.current) {
+              vilaoQueBateu = i.vilao;
               continue;
             }
             proximos.push({ ...i, x: nx, y: ny });
-
           }
           return proximos;
         });
+        if (vilaoQueBateu !== null) {
+          perderVida(vilaoQueBateu, true);
+          return;
+        }
         return;
       }
 
@@ -1559,7 +1611,8 @@ function JogoPage() {
         y.current < boss.y + tam - 8;
 
       if (levouDano || (bateBoss && performance.now() > invulAte.current)) {
-        perderVida(Math.min(faseRef.current, TOTAL_FASES) - 1);
+        /* no chefão só tira vida; volta ao começo apenas quando zera tudo */
+        perderVida(Math.min(faseRef.current, TOTAL_FASES) - 1, true);
         return;
       }
 
@@ -1761,7 +1814,16 @@ function JogoPage() {
     setSalvando(true);
     try {
       const { default: html2canvas } = await import("html2canvas-pro");
-      const canvas = await html2canvas(alvo, { backgroundColor: "#0b0b0f", scale: 2 });
+      const canvas = await html2canvas(alvo, {
+        backgroundColor: "#0b0b0f",
+        scale: 2,
+        scrollX: 0,
+        scrollY: 0,
+        width: alvo.scrollWidth,
+        height: alvo.scrollHeight,
+        windowWidth: alvo.scrollWidth,
+        windowHeight: alvo.scrollHeight,
+      });
       const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
       if (!blob) return;
       const arquivo = new File([blob], "super-ct-medalha-suprema.png", { type: "image/png" });
@@ -2309,6 +2371,20 @@ function JogoPage() {
                       boxShadow: "0 0 8px #d97706",
                     }}
                   />
+                 );
+              if (t.tipo === "raio")
+                return (
+                  <div
+                    key={`t-${t.id}`}
+                    className="absolute animate-pulse"
+                    style={{
+                      ...comum,
+                      background: "linear-gradient(180deg,#ecfeff,#22d3ee 45%,#0ea5e9)",
+                      clipPath:
+                        "polygon(52% 0,18% 46%,46% 46%,26% 100%,86% 40%,54% 40%,84% 6%)",
+                      filter: "drop-shadow(0 0 10px #22d3ee)",
+                    }}
+                  />
                 );
               return (
                 <div
@@ -2468,31 +2544,32 @@ function JogoPage() {
 
           {fim && venceu && (
             <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 px-3 py-4 backdrop-blur-md">
-              <div className="flex max-h-full w-full max-w-sm flex-col items-center gap-3 overflow-y-auto">
+              <div className="flex w-full max-w-sm flex-col items-center gap-2">
                 <div
                   ref={printRef}
-                  className="w-full rounded-2xl border-2 bg-[#0b0b0f] px-4 py-5 text-center animate-pulse-slow"
+                  className="w-full rounded-2xl border-2 bg-[#0b0b0f] px-4 py-4 text-center animate-pulse-slow"
                   style={{ borderColor: heroiAtual.cor, boxShadow: `0 0 24px ${heroiAtual.cor}66` }}
                 >
-                  <img
-                    src={heroiAtual.medalha}
-                    alt={`${heroiAtual.nome} segurando a medalha suprema do Super CT`}
-                    className="mx-auto h-44 w-auto origin-bottom select-none animate-erguer-medalha"
-                    style={{ filter: `drop-shadow(0 0 20px ${heroiAtual.cor})` }}
-                  />
+                  <div className="mx-auto w-fit origin-bottom animate-erguer-medalha-uma">
+                    <img
+                      src={heroiAtual.medalha}
+                      alt={`${heroiAtual.nome} segurando a medalha suprema do Super CT`}
+                      className="mx-auto h-32 w-auto select-none animate-brilho-medalha"
+                    />
+                  </div>
                   <div className="overflow-hidden">
                     <p
-                      className="mt-3 font-display text-2xl uppercase leading-tight tracking-tight animate-titulo-desliza"
+                      className="mt-2 font-display text-xl uppercase leading-tight tracking-tight animate-titulo-desliza"
                       style={{ color: heroiAtual.cor, textShadow: `0 0 16px ${heroiAtual.cor}` }}
                     >
                       Yeeees! Você ganhou a medalha suprema!
                     </p>
                   </div>
-                  <p className="mt-2 font-body text-[13px] leading-snug text-foreground animate-texto-surge">
+                  <p className="mt-2 font-body text-[12px] leading-snug text-foreground animate-texto-surge">
                     Você conseguiu atravessar os maiores desafios da nossa academia e derrotar todos
                     os terríveis vilões! Parabéns!
                   </p>
-                  <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                     {heroiAtual.nome} • {pontos} pontos • Super CT
                   </p>
                 </div>
