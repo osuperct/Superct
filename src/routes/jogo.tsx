@@ -2477,21 +2477,22 @@ function JogoPage() {
 
           {fim && venceu && (
             <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 px-3 py-4 backdrop-blur-md">
-              <div className="flex max-h-full w-full max-w-sm flex-col items-center gap-3 overflow-y-auto">
+              <div className="flex w-full max-w-sm flex-col items-center gap-2">
                 <div
                   ref={printRef}
-                  className="w-full rounded-2xl border-2 bg-[#0b0b0f] px-4 py-5 text-center animate-pulse-slow"
+                  className="w-full rounded-2xl border-2 bg-[#0b0b0f] px-4 py-4 text-center animate-pulse-slow"
                   style={{ borderColor: heroiAtual.cor, boxShadow: `0 0 24px ${heroiAtual.cor}66` }}
                 >
-                  <img
-                    src={heroiAtual.medalha}
-                    alt={`${heroiAtual.nome} segurando a medalha suprema do Super CT`}
-                    className="mx-auto h-44 w-auto origin-bottom select-none animate-erguer-medalha"
-                    style={{ filter: `drop-shadow(0 0 20px ${heroiAtual.cor})` }}
-                  />
+                  <div className="mx-auto w-fit origin-bottom animate-erguer-medalha-uma">
+                    <img
+                      src={heroiAtual.medalha}
+                      alt={`${heroiAtual.nome} segurando a medalha suprema do Super CT`}
+                      className="mx-auto h-32 w-auto select-none animate-brilho-medalha"
+                    />
+                  </div>
                   <div className="overflow-hidden">
                     <p
-                      className="mt-3 font-display text-2xl uppercase leading-tight tracking-tight animate-titulo-desliza"
+                      className="mt-2 font-display text-xl uppercase leading-tight tracking-tight animate-titulo-desliza"
                       style={{ color: heroiAtual.cor, textShadow: `0 0 16px ${heroiAtual.cor}` }}
                     >
                       Yeeees! Você ganhou a medalha suprema!
