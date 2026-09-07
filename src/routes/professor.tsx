@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
 import { AvisosProfessor } from "@/components/AvisosProfessor";
 import { ListaChamada } from "@/components/ListaChamada";
+import { ResponsaveisSemNotificacao } from "@/components/ResponsaveisSemNotificacao";
 
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
