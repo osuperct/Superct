@@ -393,6 +393,41 @@ export type Database = {
         }
         Relationships: []
       }
+      presencas: {
+        Row: {
+          aluno_id: string
+          created_at: string
+          dia: string
+          id: string
+          professor_id: string | null
+          user_id: string
+        }
+        Insert: {
+          aluno_id: string
+          created_at?: string
+          dia: string
+          id?: string
+          professor_id?: string | null
+          user_id: string
+        }
+        Update: {
+          aluno_id?: string
+          created_at?: string
+          dia?: string
+          id?: string
+          professor_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "presencas_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       produtos: {
         Row: {
           ativo: boolean
