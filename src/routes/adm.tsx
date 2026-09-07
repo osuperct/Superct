@@ -238,7 +238,12 @@ function Aprovacoes() {
           {lista.map((c) => {
             const zap = c.telefone.replace(/\D/g, "");
             return (
-              <li key={c.id} className="rounded-md border border-border bg-background/60 p-3">
+              <li
+                key={c.id}
+                className={`rounded-md border bg-background/60 p-3 ${
+                  c.aprovado ? "border-border" : "animate-pulse-slow border-primary/60"
+                }`}
+              >
                 <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
                 <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{c.email}</p>
                 {c.telefone && <p className="mt-0.5 text-xs text-muted-foreground">WhatsApp: {c.telefone}</p>}
