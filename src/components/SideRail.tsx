@@ -101,7 +101,7 @@ export function SideRail() {
         onClick={() => {
           if (!forcarRecolhida) setAberta(true);
         }}
-        className={`fixed left-0 top-28 z-[60] rounded-r-lg border border-l-0 border-border bg-background/80 py-6 pl-0.5 pr-1 text-primary backdrop-blur-md active:scale-95 md:top-1/2 md:-translate-y-1/2 ${
+        className={`fixed left-0 top-16 z-[60] rounded-r-lg border border-l-0 border-border bg-background/80 py-6 pl-0.5 pr-1 text-primary backdrop-blur-md active:scale-95 md:top-1/2 md:-translate-y-1/2 ${
           forcarRecolhida ? "pointer-events-none opacity-0" : ""
         }`}
       >
@@ -111,7 +111,7 @@ export function SideRail() {
   }
 
   return (
-    <aside className="fixed left-0 top-28 z-[60] md:top-1/2 md:-translate-y-1/2">
+    <aside className="fixed left-0 top-16 z-[60] md:top-1/2 md:-translate-y-1/2">
       <nav
         className={`flex flex-col gap-1 rounded-r-lg border border-l-0 border-border bg-background/70 py-2 pl-1 pr-1.5 backdrop-blur-md transition-transform duration-300 ease-out ${
           recolhida ? "-translate-x-[calc(100%_-_10px)]" : "translate-x-0"
