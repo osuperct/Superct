@@ -1597,7 +1597,7 @@ function JogoPage() {
       vy.current = (duploToque ? IMPULSO : IMPULSO * 0.95);
       if (vy.current > 0) subindoDesde.current = performance.now();
       vxAr.current = lado * VELOCIDADE * 2.1;
-      bloquearAgarreAte.current = agora + 400;
+      bloquearAgarreAte.current = agora + (faseRef.current === 3 ? 180 : 400);
       return;
     }
     if (seguro.current === "parede") {
