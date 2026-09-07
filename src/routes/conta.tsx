@@ -145,6 +145,19 @@ function Autenticacao() {
         }
         toast.success("Bem-vindo de volta!");
       } else {
+        const faltando = [
+          [nome, "Nome do responsável"],
+          [telefone, "Telefone / WhatsApp"],
+          [cpf, "CPF do responsável"],
+          [endereco, "Endereço completo"],
+          [alunoNome, "Nome do aluno"],
+          [email, "E-mail do responsável"],
+          [senha, "Senha"],
+        ].filter(([v]) => !String(v).trim()).map(([, l]) => l);
+        if (faltando.length > 0) {
+          setAviso(`Preencha todos os campos obrigatórios: ${faltando.join(", ")}.`);
+          return;
+        }
         if (!aceite) {
           setAviso("É preciso aceitar o termo de uso de imagem para concluir o cadastro.");
           return;
