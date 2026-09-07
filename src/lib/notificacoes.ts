@@ -64,12 +64,13 @@ export async function salvarToken(userId: string, token: string) {
   if (!userId || !token) return;
   const plataforma = /iPhone|iPad|iPod/.test(navigator.userAgent) ? "ios" : "android/web";
   const { error } = await supabase.from("tokens_push").upsert(
-    { user_id: userId, token, plataforma },
-    { onConflict: "user_id" }
+    { user_id: userId, token, plataforma, updated_at: new Date().toISOString() },
+    { onConflict: "token" }
   );
   if (error) {
     // eslint-disable-next-line no-console
     console.error("Erro ao salvar token push:", error);
+    throw new Error(error.message);
   }
 }
 
