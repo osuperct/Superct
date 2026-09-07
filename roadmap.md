@@ -8,3 +8,5 @@
   - [ ] Pedir permissão de notificação ao entrar no app
   - [ ] Guardar token do aparelho por responsável
   - [ ] Envio de recado geral pelo professor para responsáveis de alunos ativos
+
+- [ ] Remover toda a interface e integração de notificações push/Firebase.
