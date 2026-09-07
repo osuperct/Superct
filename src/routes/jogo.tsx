@@ -519,6 +519,11 @@ function JogoPage() {
   const [heroY, setHeroY] = useState(0);
   const [camera, setCamera] = useState(0);
   const [inimigos, setInimigos] = useState<Inimigo[]>([]);
+  const inimigosRef = useRef<Inimigo[]>([]);
+  const atualizarInimigos = (lista: Inimigo[]) => {
+    inimigosRef.current = lista;
+    setInimigos(lista);
+  };
   const [bolas, setBolas] = useState<Bola[]>([]);
   const [halteres, setHalteres] = useState<Haltere[]>([]);
   const [chefao, setChefao] = useState<Chefao | null>(null);
@@ -695,7 +700,7 @@ function JogoPage() {
       setChefao(null);
       setBolas([]);
       setHalteres([]);
-      setInimigos([]);
+      atualizarInimigos([]);
       setDerrotado(null);
       setVenceu(false);
       setFim(false);
@@ -744,7 +749,7 @@ function JogoPage() {
     tirosRef.current = [];
     setTiros([]);
     setHalteres([]);
-    setInimigos([]);
+    atualizarInimigos([]);
     conesRef.current = [];
     setConesPegos([]);
     zerarHeroi();
@@ -812,7 +817,7 @@ function JogoPage() {
       setTiros([]);
       bolasRef.current = [];
       setBolas([]);
-      if (modoRef.current !== "chefao") setInimigos([]);
+      if (modoRef.current !== "chefao") atualizarInimigos([]);
     };
 
 
@@ -1359,7 +1364,7 @@ function JogoPage() {
           pausaRef.current = true;
           modoRef.current = "intervalo";
           setModo("intervalo");
-          setInimigos([]);
+          atualizarInimigos([]);
           return;
         }
 
@@ -1373,8 +1378,8 @@ function JogoPage() {
           const r = Math.random();
           const padrao: Padrao = r < 0.4 ? "reta" : r < 0.7 ? "queda" : "zigue";
           const base = padrao === "reta" ? 0 : 90 + Math.random() * 60;
-          setInimigos((prev) => [
-            ...prev,
+          atualizarInimigos([
+            ...inimigosRef.current,
             {
               id: nextId.current++,
               x: cam + vista + 30,
@@ -1389,11 +1394,11 @@ function JogoPage() {
         }
 
         let vilaoQueBateu: number | null = null;
-        setInimigos((prev) => {
+        {
           const proximos: Inimigo[] = [];
           const hx = x.current;
           const hy = y.current;
-          for (const i of prev) {
+          for (const i of inimigosRef.current) {
             const nx = i.x - i.vx;
             let ny = i.y;
             if (i.padrao === "queda") ny = Math.max(0, i.y - 0.9 * dif);
@@ -1413,8 +1418,8 @@ function JogoPage() {
             }
             proximos.push({ ...i, x: nx, y: ny });
           }
-          return proximos;
-        });
+          atualizarInimigos(proximos);
+        }
         if (vilaoQueBateu !== null) {
           perderVida(vilaoQueBateu, true);
           return;
