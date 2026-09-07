@@ -1271,8 +1271,13 @@ function JogoPage() {
           if (pego !== undefined) {
             coracoesRef.current = coracoesRef.current.filter((idx) => idx !== pego);
             setCoracoes(coracoesRef.current);
-            estoqueRef.current = Math.min(VIDAS_MAX, estoqueRef.current + 1);
-            setEstoqueCoracoes(estoqueRef.current);
+            if (modoRef.current === "chefao") {
+              estoqueRef.current = Math.min(VIDAS_MAX, estoqueRef.current + 1);
+              setEstoqueCoracoes(estoqueRef.current);
+            } else {
+              vidasRef.current = Math.min(VIDAS_MAX + VIDAS_CHEFAO, vidasRef.current + 1);
+              setVidas(vidasRef.current);
+            }
             pontosRef.current += 10;
             setPontos(pontosRef.current);
             sfx(somMoeda);
