@@ -23,6 +23,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ViloesRouteImport } from './routes/viloes'
 import { Route as DocumentoTipoRouteImport } from './routes/documento.$tipo'
 import { Route as ApiPublicEnviarPushRouteImport } from './routes/api/public/enviar-push'
+import { Route as ApiPublicPushTesteRouteImport } from './routes/api/public/push-teste'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -94,6 +95,11 @@ const ApiPublicEnviarPushRoute = ApiPublicEnviarPushRouteImport.update({
   path: '/api/public/enviar-push',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPushTesteRoute = ApiPublicPushTesteRouteImport.update({
+  id: '/api/public/push-teste',
+  path: '/api/public/push-teste',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
   '/api/public/enviar-push': typeof ApiPublicEnviarPushRoute
+  '/api/public/push-teste': typeof ApiPublicPushTesteRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
   '/api/public/enviar-push': typeof ApiPublicEnviarPushRoute
+  '/api/public/push-teste': typeof ApiPublicPushTesteRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
   '/api/public/enviar-push': typeof ApiPublicEnviarPushRoute
+  '/api/public/push-teste': typeof ApiPublicPushTesteRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/viloes'
     | '/documento/$tipo'
     | '/api/public/enviar-push'
+    | '/api/public/push-teste'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/viloes'
     | '/documento/$tipo'
     | '/api/public/enviar-push'
+    | '/api/public/push-teste'
   id:
     | '__root__'
     | '/'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/viloes'
     | '/documento/$tipo'
     | '/api/public/enviar-push'
+    | '/api/public/push-teste'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -210,6 +222,7 @@ export interface RootRouteChildren {
   ViloesRoute: typeof ViloesRoute
   DocumentoTipoRoute: typeof DocumentoTipoRoute
   ApiPublicEnviarPushRoute: typeof ApiPublicEnviarPushRoute
+  ApiPublicPushTesteRoute: typeof ApiPublicPushTesteRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEnviarPushRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/push-teste': {
+      id: '/api/public/push-teste'
+      path: '/api/public/push-teste'
+      fullPath: '/api/public/push-teste'
+      preLoaderRoute: typeof ApiPublicPushTesteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -330,6 +350,7 @@ const rootRouteChildren: RootRouteChildren = {
   ViloesRoute: ViloesRoute,
   DocumentoTipoRoute: DocumentoTipoRoute,
   ApiPublicEnviarPushRoute: ApiPublicEnviarPushRoute,
+  ApiPublicPushTesteRoute: ApiPublicPushTesteRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

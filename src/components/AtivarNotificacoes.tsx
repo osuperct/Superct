@@ -30,6 +30,31 @@ export function AtivarNotificacoes({ uid }: { uid: string }) {
       if (r.status === "registered" || r.status === "already-granted") {
         setRegistrado(true);
         toast.success("Notificações ativadas neste celular!");
+        const { data } = await supabase.auth.getSession();
+        const jwt = data.session?.access_token;
+        if (jwt) {
+          try {
+            const resp = await fetch("/api/public/push-teste", {
+              method: "POST",
+              headers: { Authorization: `Bearer ${jwt}`, "Content-Type": "application/json" },
+              body: JSON.stringify({ token: r.token }),
+            });
+            const info = (await resp.json()) as { enviados?: number; erro?: string; detalhe?: string };
+            if (!resp.ok || (info.enviados ?? 0) === 0) {
+              toast.error(
+                "Ativado, mas a notificação de teste não chegou: " +
+                  (info.erro ?? info.detalhe ?? "tente novamente."),
+                { duration: 8000 }
+              );
+            } else {
+              toast.success("Enviei uma notificação de teste agora. Confira na tela do celular!");
+            }
+          } catch {
+            toast.error("Ativado, mas não consegui enviar a notificação de teste.");
+          }
+        }
+      } else if (r.status === "open-in-new-tab") {
+
       } else if (r.status === "open-in-new-tab") {
         toast.error("Abra o site osuperct.com direto no navegador do celular para ativar.");
       } else if (r.status === "denied") {
