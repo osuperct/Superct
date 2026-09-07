@@ -2317,26 +2317,44 @@ function JogoPage() {
           )}
 
           <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/70 px-2 py-1">
-            <span className="relative block h-2 w-24 overflow-hidden rounded-full border border-[#f43f5e]/40 bg-[#3f3f46]/70">
-              <span
-                className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-200"
-                style={{
-                  width: `${(Math.max(0, Math.min(vidas, VIDAS_CHEFAO)) / VIDAS_CHEFAO) * 100}%`,
-                  background: "linear-gradient(90deg,#f43f5e,#fb7185)",
-                  boxShadow: "0 0 8px #f43f5e",
-                }}
-              />
-            </span>
-
-            {estoqueCoracoes > 0 && (
+            {emChefao ? (
+              <>
+                <span className="relative block h-2 w-24 overflow-hidden rounded-full border border-[#f43f5e]/40 bg-[#3f3f46]/70">
+                  <span
+                    className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-200"
+                    style={{
+                      width: `${(Math.max(0, Math.min(vidas, VIDAS_CHEFAO)) / VIDAS_CHEFAO) * 100}%`,
+                      background: "linear-gradient(90deg,#f43f5e,#fb7185)",
+                      boxShadow: "0 0 8px #f43f5e",
+                    }}
+                  />
+                </span>
+                {estoqueCoracoes > 0 && (
+                  <span className="flex items-center gap-1">
+                    <Heart
+                      className="size-3 shrink-0"
+                      style={{ color: "#f43f5e", fill: "#f43f5e", filter: "drop-shadow(0 0 6px #f43f5e)" }}
+                    />
+                    <span className="font-mono text-[9px] tracking-widest text-[#fb7185]">{estoqueCoracoes}</span>
+                  </span>
+                )}
+              </>
+            ) : (
               <span className="flex items-center gap-1">
-                <Heart
-                  className="size-3 shrink-0"
-                  style={{ color: "#f43f5e", fill: "#f43f5e", filter: "drop-shadow(0 0 6px #f43f5e)" }}
-                />
-                <span className="font-mono text-[9px] tracking-widest text-[#fb7185]">{estoqueCoracoes}</span>
+                {Array.from({ length: Math.max(0, Math.min(vidas, 6)) }).map((_, i) => (
+                  <Heart
+                    key={`vida-${i}`}
+                    className="size-3 shrink-0"
+                    style={{ color: "#f43f5e", fill: "#f43f5e", filter: "drop-shadow(0 0 6px #f43f5e)" }}
+                  />
+                ))}
+                {vidas > 6 && (
+                  <span className="font-mono text-[9px] tracking-widest text-[#fb7185]">+{vidas - 6}</span>
+                )}
               </span>
             )}
+
+
 
 
             {piscando && (
