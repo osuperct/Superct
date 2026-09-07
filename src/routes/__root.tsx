@@ -7,13 +7,14 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SideRail } from "../components/SideRail";
 import { BotaoSair } from "../components/BotaoSair";
 import { Toaster } from "@/components/ui/sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -148,6 +149,32 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const registrado = useRef(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || registrado.current) return;
+
+    let ignorar = false;
+    const tentar = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (!data.user || ignorar) return;
+      registrado.current = true;
+      const { enablePush } = await import("../lib/notificacoes");
+      await enablePush();
+    };
+
+    tentar();
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") {
+        void tentar();
+      }
+    });
+
+    return () => {
+      ignorar = true;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

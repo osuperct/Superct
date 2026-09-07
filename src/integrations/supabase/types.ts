@@ -524,6 +524,33 @@ export type Database = {
         }
         Relationships: []
       }
+      tokens_push: {
+        Row: {
+          created_at: string
+          id: string
+          plataforma: string | null
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plataforma?: string | null
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plataforma?: string | null
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       turmas_app: {
         Row: {
           created_at: string
@@ -634,6 +661,13 @@ export type Database = {
         }[]
       }
       cpf_disponivel: { Args: { _cpf: string }; Returns: boolean }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       vincular_alunos_dos_contratos: { Args: never; Returns: number }
     }
     Enums: {
