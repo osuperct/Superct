@@ -608,6 +608,10 @@ function JogoPage() {
   const presoAte = useRef(0);
   const spawnQueda = useRef(60);
   const impactos = useRef(0);
+  /* cada batata/donut que encosta deixa o personagem mais "gordo" e mais lento */
+  const gordura = useRef(0);
+  const [gorduraUi, setGorduraUi] = useState(0);
+  const GORDURA_MAX = 5;
 
 
 
@@ -667,6 +671,8 @@ function JogoPage() {
       invulAte.current = performance.now() + 900;
       presoAte.current = 0;
       impactos.current = 0;
+      gordura.current = 0;
+      setGorduraUi(0);
       spawnQueda.current = 60;
       setChocado(false);
       if (reporCoracoes) {
@@ -810,7 +816,8 @@ function JogoPage() {
       const alt = alturaHeroi(duck.current);
 
 
-      /* ---- movimento horizontal ---- */
+      /* ---- movimento horizontal (mais lento a cada batata/donut no corpo) ---- */
+      const lento = Math.max(0.5, 1 - gordura.current * 0.11);
       const passo = (delta: number) => {
         const alvo = x.current + delta;
         let livre = true;
@@ -836,7 +843,7 @@ function JogoPage() {
           /* na parede: desliza para os lados e sai da parede ao passar da borda */
           const cx = x.current + HEROI_W / 2;
           const p = paredes.find((pp) => cx > pp.x - 6 && cx < pp.x + pp.w + 6);
-          const alvo = x.current + dir.current * VELOCIDADE * 0.7;
+          const alvo = x.current + dir.current * VELOCIDADE * 0.7 * lento;
           if (p && alvo + HEROI_W / 2 > p.x - 4 && alvo + HEROI_W / 2 < p.x + p.w + 4) {
             x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
           } else {
@@ -847,7 +854,7 @@ function JogoPage() {
             x.current = Math.min(mundo - HEROI_W, Math.max(0, alvo));
           }
         } else {
-          passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE));
+          passo(dir.current * (seguro.current ? VELOCIDADE * 0.7 : VELOCIDADE) * lento);
         }
       }
 
@@ -1167,7 +1174,7 @@ function JogoPage() {
         if (lay.donuts) {
           spawnQueda.current -= 1;
           if (spawnQueda.current <= 0) {
-            spawnQueda.current = 46 + Math.floor(Math.random() * 40);
+            spawnQueda.current = 95 + Math.floor(Math.random() * 70);
             tirosRef.current = [
               ...tirosRef.current,
               {
@@ -1190,6 +1197,7 @@ function JogoPage() {
         if (tirosRef.current.length > 0) {
           const restantes: Tiro[] = [];
           let acertou = false;
+          let engordou = false;
           for (const t of tirosRef.current) {
             let ny = t.y + t.vy;
             let nvy = t.vy;
@@ -1213,12 +1221,17 @@ function JogoPage() {
               ny < y.current + hAlt;
             if (bate && performance.now() > invulAte.current) {
               acertou = true;
+              if (t.tipo === "batata" || t.tipo === "donut") engordou = true;
               continue;
             }
             restantes.push({ ...t, x: nx, y: ny, vy: nvy });
           }
           tirosRef.current = restantes;
           setTiros(restantes);
+          if (engordou && gordura.current < GORDURA_MAX) {
+            gordura.current += 1;
+            setGorduraUi(gordura.current);
+          }
           if (acertou) {
             impactos.current += 1;
             sfx(somDano);
@@ -2083,6 +2096,9 @@ function JogoPage() {
                   ? heroiAtual.anda[passoFrame]
                   : heroiAtual.anda[0];
               const inclinacao = pulando && !escalando ? olhando * 14 : 0;
+              /* cada batata/donut que encostou deixa o personagem um pouco maior */
+              const gordoX = 1 + gorduraUi * 0.1;
+              const gordoY = 1 + gorduraUi * 0.045;
               return (
                 <div
                   className="absolute transition-[height] duration-100"
@@ -2091,7 +2107,9 @@ function JogoPage() {
                     width: HEROI_W,
                     height: alt,
                     bottom: 40 + heroY,
-                    transform: escalando ? "none" : `scaleX(${olhando}) rotate(${inclinacao}deg)`,
+                    transform: escalando
+                      ? `scale(${gordoX}, ${gordoY})`
+                      : `scaleX(${olhando * gordoX}) scaleY(${gordoY}) rotate(${inclinacao}deg)`,
                     transformOrigin: "bottom center",
                   }}
                 >
