@@ -4,7 +4,7 @@ import type { Session } from "@supabase/supabase-js";
 import { Eye, EyeOff, GraduationCap, Paperclip, Send, ShieldCheck, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
+import { entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
 import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 
 import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
