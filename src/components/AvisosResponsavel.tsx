@@ -23,6 +23,12 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
   const [lidos, setLidos] = useState<Set<string>>(new Set());
   const [permissao, setPermissao] = useState<EstadoNotificacao>("pendente");
   const [abertos, setAbertos] = useState<Set<string>>(new Set([mesAtual()]));
+  const [expandidos, setExpandidos] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Avisos não lidos ficam expandidos; lidos começam minimizados.
+    setExpandidos(new Set(lista.filter((a) => !lidos.has(a.id)).map((a) => a.id)));
+  }, [lista, lidos]);
 
   const carregar = useCallback(async () => {
     const [avisos, jaLidos] = await Promise.all([listarAvisos(), listarLidos(uid)]);
