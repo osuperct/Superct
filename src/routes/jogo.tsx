@@ -1301,7 +1301,7 @@ function JogoPage() {
             setGorduraUi(gordura.current);
           }
           if (levouRaio) {
-            perderVida(null);
+            perderVida(null, true);
             return;
           }
           if (acertou) {
