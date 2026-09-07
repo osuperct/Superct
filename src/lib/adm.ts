@@ -4,8 +4,11 @@ export type ContaAcesso = {
   id: string;
   email: string;
   nome: string;
+  telefone: string;
   professor: boolean;
   adm: boolean;
+  aprovado: boolean;
+  criadoEm: string;
 };
 
 type Resultado = { ok: true } | { ok: false; erro: string };
@@ -18,9 +21,27 @@ export async function listarAcessosContas(): Promise<ContaAcesso[]> {
     id: c.id,
     email: c.email ?? "",
     nome: c.nome ?? "",
+    telefone: c.telefone ?? "",
     professor: Boolean(c.professor),
     adm: Boolean(c.adm),
+    aprovado: Boolean(c.aprovado),
+    criadoEm: c.criado_em ?? "",
   }));
+}
+
+/** Aprova (libera o acesso) ou bloqueia o cadastro de um responsável. */
+export async function definirAprovacaoConta(
+  userId: string,
+  aprovado: boolean,
+  senha = "",
+): Promise<Resultado> {
+  const { data, error } = await supabase.rpc("adm_definir_aprovacao", {
+    _user_id: userId,
+    _aprovado: aprovado,
+    _senha: senha,
+  });
+  if (error) return { ok: false, erro: "Não foi possível alterar a aprovação." };
+  return data as unknown as Resultado;
 }
 
 /** Libera ou remove o acesso de professor / ADM de uma conta. */

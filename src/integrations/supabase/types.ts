@@ -352,6 +352,8 @@ export type Database = {
         Row: {
           aceite_imagem: boolean
           aceite_imagem_em: string | null
+          aprovado: boolean
+          aprovado_em: string | null
           cpf: string | null
           created_at: string
           endereco: string | null
@@ -364,6 +366,8 @@ export type Database = {
         Insert: {
           aceite_imagem?: boolean
           aceite_imagem_em?: string | null
+          aprovado?: boolean
+          aprovado_em?: string | null
           cpf?: string | null
           created_at?: string
           endereco?: string | null
@@ -376,6 +380,8 @@ export type Database = {
         Update: {
           aceite_imagem?: boolean
           aceite_imagem_em?: string | null
+          aprovado?: boolean
+          aprovado_em?: string | null
           cpf?: string | null
           created_at?: string
           endereco?: string | null
@@ -571,6 +577,10 @@ export type Database = {
         }
         Returns: Json
       }
+      adm_definir_aprovacao: {
+        Args: { _aprovado: boolean; _senha?: string; _user_id: string }
+        Returns: Json
+      }
       adm_excluir_conta: {
         Args: { _senha: string; _user_id: string }
         Returns: Json
@@ -579,10 +589,13 @@ export type Database = {
         Args: never
         Returns: {
           adm: boolean
+          aprovado: boolean
+          criado_em: string
           email: string
           id: string
           nome: string
           professor: boolean
+          telefone: string
         }[]
       }
       vincular_alunos_dos_contratos: { Args: never; Returns: number }
