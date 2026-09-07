@@ -253,18 +253,31 @@ function Aprovacoes() {
                       CONFIRMAR NO WHATSAPP
                     </a>
                   )}
-                  <button
-                    type="button"
-                    disabled={ocupado === c.id}
-                    onClick={() => void alternar(c, !c.aprovado)}
-                    className={`rounded-md px-3 py-1.5 font-display text-[11px] tracking-tight disabled:opacity-60 ${
-                      c.aprovado
-                        ? "border border-border text-muted-foreground"
-                        : "bg-primary text-primary-foreground"
-                    }`}
-                  >
-                    {c.aprovado ? "APROVADO — BLOQUEAR" : "APROVAR CADASTRO"}
-                  </button>
+                  {c.aprovado ? (
+                    <>
+                      <span className="inline-flex items-center gap-1 rounded-md bg-secondary/20 px-3 py-1.5 font-display text-[11px] tracking-tight text-secondary">
+                        <BadgeCheck className="size-3.5" />
+                        APROVADO
+                      </span>
+                      <button
+                        type="button"
+                        disabled={ocupado === c.id}
+                        onClick={() => void alternar(c, false)}
+                        className="rounded-md border border-border px-3 py-1.5 font-display text-[11px] tracking-tight text-muted-foreground disabled:opacity-60 hover:border-primary hover:text-primary"
+                      >
+                        BLOQUEAR
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      disabled={ocupado === c.id}
+                      onClick={() => void alternar(c, true)}
+                      className="rounded-md bg-primary px-3 py-1.5 font-display text-[11px] tracking-tight text-primary-foreground disabled:opacity-60"
+                    >
+                      APROVAR CADASTRO
+                    </button>
+                  )}
                 </div>
               </li>
             );
