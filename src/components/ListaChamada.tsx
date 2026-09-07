@@ -115,7 +115,7 @@ export function ListaChamada({
         </button>
       </div>
 
-      <Accordion type="single" collapsible defaultValue="lista" className="mt-3">
+      <Accordion type="single" collapsible className="mt-3">
         <AccordionItem value="lista" className="border-0">
           <AccordionTrigger className="py-2 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:no-underline hover:text-foreground">
             <span className="flex items-center gap-2">
