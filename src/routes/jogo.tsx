@@ -495,6 +495,7 @@ const TAM_TIRO: Record<TipoTiro, { w: number; h: number }> = {
   corda: { w: 44, h: 10 },
   donut: { w: 22, h: 22 },
   balao: { w: 40, h: 24 },
+  raio: { w: 14, h: 44 },
 };
 const CORES_DONUT = ["#ec4899", "#f59e0b", "#22d3ee", "#a3e635", "#f43f5e"];
 const VIDAS_CHEFAO = 3;
