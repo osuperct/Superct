@@ -7,6 +7,7 @@ import { MESES } from "@/lib/feriados";
 import { diasDeAula, hojeDia, isoDia, type Presenca } from "@/lib/presenca";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useSidebarControl } from "./SidebarContext";
 
 type AlunoChamada = { id: string; nome: string; user_id: string; matricula: string | null };
 
