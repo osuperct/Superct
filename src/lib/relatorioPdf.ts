@@ -9,7 +9,7 @@ export type SecaoRelatorio = {
 };
 
 const MARGEM = 40;
-const LOGO_TAMANHO = 54;
+const LOGO_ALTURA = 54;
 
 async function carregarLogo() {
   const imagem = new Image();
@@ -22,15 +22,16 @@ async function carregarLogo() {
   const contexto = canvas.getContext("2d");
   if (!contexto) throw new Error("Não foi possível preparar a logo do relatório.");
   contexto.drawImage(imagem, 0, 0);
-  return canvas.toDataURL("image/png");
+  return { dataUrl: canvas.toDataURL("image/png"), proporcao: imagem.naturalWidth / imagem.naturalHeight };
 }
 
-function adicionarLogoEmTodasAsPaginas(doc: jsPDF, logo: string) {
+function adicionarLogoEmTodasAsPaginas(doc: jsPDF, logo: { dataUrl: string; proporcao: number }) {
   const total = doc.getNumberOfPages();
   const larguraPagina = doc.internal.pageSize.getWidth();
+  const larguraLogo = LOGO_ALTURA * logo.proporcao;
   for (let pagina = 1; pagina <= total; pagina += 1) {
     doc.setPage(pagina);
-    doc.addImage(logo, "PNG", larguraPagina - MARGEM - LOGO_TAMANHO, 22, LOGO_TAMANHO, LOGO_TAMANHO);
+    doc.addImage(logo.dataUrl, "PNG", larguraPagina - MARGEM - larguraLogo, 22, larguraLogo, LOGO_ALTURA);
   }
 }
 
