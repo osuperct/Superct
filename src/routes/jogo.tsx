@@ -472,7 +472,7 @@ type Bola = { id: number; x: number; y: number; vx: number; super: boolean };
 type Haltere = { id: number; x: number; y: number; cor: "verde" | "azul"; caindo: boolean };
 type Chefao = { x: number; y: number; vx: number; vy: number; hp: number; hpMax: number };
 type Modo = "corrida" | "intervalo" | "chefao" | "fase-vencida";
-type TipoTiro = "celular" | "batata" | "furacao" | "corda" | "donut" | "balao";
+type TipoTiro = "celular" | "batata" | "furacao" | "corda" | "donut" | "balao" | "raio";
 type Tiro = {
   id: number;
   x: number;
