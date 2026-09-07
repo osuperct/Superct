@@ -891,6 +891,8 @@ function Painel({ session }: { session: Session }) {
 
       <AvisosResponsavel uid={uid} />
 
+      <PresencaResponsavel uid={uid} alunos={alunos} />
+
       <AvaliacaoResponsavel uid={uid} alunos={alunos} />
 
       {(
