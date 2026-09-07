@@ -324,3 +324,21 @@
 @utility animate-erguer-medalha {
   animation: erguerMedalha 2.2s infinite ease-in-out;
 }
+
+@utility animate-erguer-medalha-uma {
+  animation: erguerMedalha 2.2s ease-in-out 1 both;
+}
+
+@keyframes brilhoMedalha {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.5)) brightness(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 26px rgba(250, 204, 21, 1)) brightness(1.18);
+  }
+}
+
+@utility animate-brilho-medalha {
+  animation: brilhoMedalha 1.2s infinite ease-in-out;
+}
