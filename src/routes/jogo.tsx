@@ -2197,6 +2197,28 @@ function JogoPage() {
                 }}
               />
             )}
+            {emChefao && chefao && (
+              <div
+                className="absolute overflow-hidden rounded-full border bg-black/70"
+                style={{
+                  left: chefao.x,
+                  bottom: 40 + chefao.y + tamBoss + 6,
+                  width: tamBoss,
+                  height: 6,
+                  borderColor: `${vilaoFase.cor}80`,
+                }}
+              >
+                <div
+                  className="h-full rounded-full transition-[width] duration-150"
+                  style={{
+                    width: `${(chefao.hp / chefao.hpMax) * 100}%`,
+                    background: `linear-gradient(90deg,${vilaoFase.cor},#fff8)`,
+                    boxShadow: `0 0 10px ${vilaoFase.cor}`,
+                  }}
+                />
+              </div>
+            )}
+
             {/* ataques do chefão */}
             {tiros.map((t) => {
               const d = TAM_TIRO[t.tipo];
@@ -2281,18 +2303,25 @@ function JogoPage() {
             </span>
           )}
 
-          <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/70 px-2 py-1">
-            {Array.from({ length: Math.max(VIDAS_CHEFAO, vidas) }).map((_, i) => (
-              <Heart
-                key={`vida-${i}`}
-                className="size-3"
+          <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/70 px-2 py-1">
+            <Heart
+              className="size-3 shrink-0"
+              style={{ color: "#f43f5e", fill: "#f43f5e", filter: "drop-shadow(0 0 6px #f43f5e)" }}
+            />
+            <span className="relative block h-2 w-24 overflow-hidden rounded-full border border-[#f43f5e]/40 bg-[#3f3f46]/70">
+              <span
+                className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-200"
                 style={{
-                  color: vidas > i ? "#f43f5e" : "#3f3f46",
-                  fill: vidas > i ? "#f43f5e" : "transparent",
-                  filter: vidas > i ? "drop-shadow(0 0 6px #f43f5e)" : undefined,
+                  width: `${(Math.max(0, vidas) / Math.max(VIDAS_MAX, vidas)) * 100}%`,
+                  background: "linear-gradient(90deg,#f43f5e,#fb7185)",
+                  boxShadow: "0 0 8px #f43f5e",
                 }}
               />
-            ))}
+            </span>
+            <span className="font-mono text-[8px] tracking-widest text-[#fb7185]">
+              {Math.max(0, vidas)}/{Math.max(VIDAS_MAX, vidas)}
+            </span>
+
             {piscando && (
               <span className="ml-1 font-mono text-[8px] uppercase tracking-widest text-[#f43f5e]">
                 Perdeu uma vida — voltou ao checkpoint!
