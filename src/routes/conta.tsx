@@ -107,7 +107,11 @@ function Autenticacao() {
   const [credenciais, setCredenciais] = useState<{ email: string; senha: string } | null>(null);
   const entrar = useServerFn(entrarComCpfOuEmail);
   const pedirSenha = useServerFn(pedirNovaSenha);
-  const checarCpf = useServerFn(cpfDisponivel);
+  const checarCpf = async (valor: string) => {
+    const { data, error } = await supabase.rpc("cpf_disponivel", { _cpf: valor });
+    if (error) return true; // não bloqueia o cadastro se a checagem falhar
+    return data !== false;
+  };
   const [recuperando, setRecuperando] = useState(false);
 
   async function enviar(e: React.FormEvent) {
