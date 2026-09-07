@@ -336,6 +336,8 @@ function Painel({ professorId }: { professorId: string }) {
       </section>
 
 
+      <ListaChamada alunos={porNome.filter((a) => estaAtivo(a.id))} professorId={professorId} />
+
       <AvisosProfessor uid={professorId} />
 
       <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
