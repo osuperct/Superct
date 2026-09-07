@@ -24,11 +24,25 @@ export const enviarRecadoPush = createServerFn({ method: "POST" })
     const mesRef = new Date();
     const refStr = `${mesRef.getFullYear()}-${String(mesRef.getMonth() + 1).padStart(2, "0")}-01`;
 
-    const { data: tokens } = await context.supabase.rpc("listar_tokens_responsaveis_ativos", {
-      _referencia: refStr,
-    });
+    const { data: tokens, error } = await context.supabase
+      .from("tokens_push")
+      .select("token, user_id, alunos!inner(mensalidades!inner(ativo, referencia))")
+      .eq("alunos.mensalidades.referencia", refStr)
+      .eq("alunos.mensalidades.ativo", true);
 
-    const lista = (tokens ?? []) as { token: string }[];
+    if (error) {
+      throw new Error("Erro ao buscar tokens: " + error.message);
+    }
+
+    const vistos = new Set<string>();
+    const lista: string[] = [];
+    for (const row of tokens ?? []) {
+      if (!vistos.has(row.token)) {
+        vistos.add(row.token);
+        lista.push(row.token);
+      }
+    }
+
     if (lista.length === 0) {
       return { enviados: 0, falhas: 0, total: 0 };
     }
@@ -37,7 +51,7 @@ export const enviarRecadoPush = createServerFn({ method: "POST" })
     let falhas = 0;
 
     await Promise.all(
-      lista.map(async ({ token }) => {
+      lista.map(async (token) => {
         try {
           const res = await fetch(`${GATEWAY_URL}/v1/projects/_/messages:send`, {
             method: "POST",
@@ -50,7 +64,7 @@ export const enviarRecadoPush = createServerFn({ method: "POST" })
               message: {
                 token,
                 notification: { title: data.titulo, body: data.mensagem },
-                data: data.caminho ? { path: data.caminho } : undefined,
+                data: data.caminho ? { path: data.caminha } : undefined,
               },
             }),
           });
