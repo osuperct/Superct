@@ -4,7 +4,7 @@ import type { Session } from "@supabase/supabase-js";
 import { Eye, EyeOff, GraduationCap, Paperclip, Send, ShieldCheck, Upload, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
-import { cpfDisponivel, entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
+import { entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
 import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 
 import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
@@ -107,7 +107,11 @@ function Autenticacao() {
   const [credenciais, setCredenciais] = useState<{ email: string; senha: string } | null>(null);
   const entrar = useServerFn(entrarComCpfOuEmail);
   const pedirSenha = useServerFn(pedirNovaSenha);
-  const checarCpf = useServerFn(cpfDisponivel);
+  const checarCpf = async (valor: string) => {
+    const { data, error } = await supabase.rpc("cpf_disponivel", { _cpf: valor });
+    if (error) return true; // não bloqueia o cadastro se a checagem falhar
+    return data !== false;
+  };
   const [recuperando, setRecuperando] = useState(false);
 
   async function enviar(e: React.FormEvent) {
@@ -148,7 +152,7 @@ function Autenticacao() {
           setAviso("Confira o CPF do responsável: os números não formam um CPF válido.");
           return;
         }
-        const { livre } = await checarCpf({ data: { cpf } });
+        const livre = await checarCpf(cpf);
         if (!livre) {
           setAviso("Este CPF já tem uma conta no Super CT. Entre com o CPF ou peça uma nova senha.");
           return;

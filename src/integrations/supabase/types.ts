@@ -598,6 +598,7 @@ export type Database = {
           telefone: string
         }[]
       }
+      cpf_disponivel: { Args: { _cpf: string }; Returns: boolean }
       vincular_alunos_dos_contratos: { Args: never; Returns: number }
     }
     Enums: {
