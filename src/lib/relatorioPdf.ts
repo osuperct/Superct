@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import logoRelatorio from "@/assets/logo-super-ct-relatorio.png";
 
 export type SecaoRelatorio = {
   titulo: string;
@@ -8,6 +9,30 @@ export type SecaoRelatorio = {
 };
 
 const MARGEM = 40;
+const LOGO_TAMANHO = 54;
+
+async function carregarLogo() {
+  const imagem = new Image();
+  imagem.src = logoRelatorio;
+  await imagem.decode();
+
+  const canvas = document.createElement("canvas");
+  canvas.width = imagem.naturalWidth;
+  canvas.height = imagem.naturalHeight;
+  const contexto = canvas.getContext("2d");
+  if (!contexto) throw new Error("Não foi possível preparar a logo do relatório.");
+  contexto.drawImage(imagem, 0, 0);
+  return canvas.toDataURL("image/png");
+}
+
+function adicionarLogoEmTodasAsPaginas(doc: jsPDF, logo: string) {
+  const total = doc.getNumberOfPages();
+  const larguraPagina = doc.internal.pageSize.getWidth();
+  for (let pagina = 1; pagina <= total; pagina += 1) {
+    doc.setPage(pagina);
+    doc.addImage(logo, "PNG", larguraPagina - MARGEM - LOGO_TAMANHO, 22, LOGO_TAMANHO, LOGO_TAMANHO);
+  }
+}
 
 function cabecalho(doc: jsPDF, subtitulo: string) {
   let y = MARGEM;
@@ -87,18 +112,20 @@ function desenharSecao(doc: jsPDF, secao: SecaoRelatorio, yInicial: number) {
 }
 
 /** Um PDF com todas as seções escolhidas. */
-export function relatorioConjunto(secoes: SecaoRelatorio[], subtitulo = "Relatório geral") {
+export async function relatorioConjunto(secoes: SecaoRelatorio[], subtitulo = "Relatório geral") {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   let y = cabecalho(doc, subtitulo);
   for (const secao of secoes) y = desenharSecao(doc, secao, y);
+  adicionarLogoEmTodasAsPaginas(doc, await carregarLogo());
   return doc.output("blob");
 }
 
 /** Um PDF só com esta seção. */
-export function relatorioSeparado(secao: SecaoRelatorio) {
+export async function relatorioSeparado(secao: SecaoRelatorio) {
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const y = cabecalho(doc, secao.titulo);
   desenharSecao(doc, secao, y);
+  adicionarLogoEmTodasAsPaginas(doc, await carregarLogo());
   return doc.output("blob");
 }
 

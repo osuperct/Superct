@@ -230,7 +230,7 @@ function RelatoriosPage() {
     setEscolhidas((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
   }
 
-  function exportar(modo: "conjunto" | "separado") {
+  async function exportar(modo: "conjunto" | "separado") {
     if (escolhidas.length === 0) {
       toast.error("Escolha pelo menos um relatório.");
       return;
@@ -239,12 +239,12 @@ function RelatoriosPage() {
     try {
       const secoes = escolhidas.map(montarSecao);
       if (modo === "conjunto") {
-        baixarBlob(relatorioConjunto(secoes), `relatorio-super-ct-${new Date().toISOString().slice(0, 10)}.pdf`);
+        baixarBlob(await relatorioConjunto(secoes), `relatorio-super-ct-${new Date().toISOString().slice(0, 10)}.pdf`);
       } else {
-        secoes.forEach((secao, i) => {
+        await Promise.all(secoes.map(async (secao, i) => {
           const nome = OPCOES[OPCOES.findIndex((o) => o.id === escolhidas[i])]?.id ?? "relatorio";
-          baixarBlob(relatorioSeparado(secao), `relatorio-${nome}-${new Date().toISOString().slice(0, 10)}.pdf`);
-        });
+          baixarBlob(await relatorioSeparado(secao), `relatorio-${nome}-${new Date().toISOString().slice(0, 10)}.pdf`);
+        }));
       }
       toast.success(modo === "conjunto" ? "PDF gerado." : "PDFs gerados.");
     } catch {
