@@ -180,6 +180,7 @@ function Aprovacoes() {
   const [contas, setContas] = useState<ContaAcesso[] | null>(null);
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [verTodas, setVerTodas] = useState(false);
+  const [busca, setBusca] = useState("");
 
   const carregar = useCallback(async () => {
     try {
@@ -233,12 +234,23 @@ function Aprovacoes() {
   }
 
   const pendentes = (contas ?? []).filter((c) => !c.aprovado);
-  const lista = verTodas ? (contas ?? []) : pendentes;
+  const base = verTodas ? (contas ?? []) : pendentes;
+  const t = busca.trim().toLowerCase();
+  const filtradas = !t
+    ? base
+    : base.filter((c) => {
+        const nomeOk = c.nome.toLowerCase().includes(t);
+        const emailOk = c.email.toLowerCase().includes(t);
+        const zap = c.telefone.replace(/\D/g, "");
+        const buscaZap = t.replace(/\D/g, "");
+        const telefoneOk = buscaZap.length > 0 && zap.includes(buscaZap);
+        return nomeOk || emailOk || telefoneOk;
+      });
 
   return (
     <section className="rounded-lg border border-primary/40 bg-card/40 p-4">
       <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <BadgeCheck className="size-4 text-primary" /> APROVAR NOVOS CADASTROS
+        <BadgeCheck className="size-4 text-primary" /> CADASTROS
         {pendentes.length > 0 && (
           <span className="rounded-full bg-primary px-2 py-0.5 font-mono text-[10px] text-primary-foreground">
             {pendentes.length}
@@ -246,78 +258,88 @@ function Aprovacoes() {
         )}
       </h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        O responsável se cadastra no site e só entra na área dele depois que você confirmar o WhatsApp e aprovar
-        aqui.
+        Gerencie os responsáveis cadastrados. Aprove, bloqueie ou exclua cadastros; use o WhatsApp para
+        confirmar.
       </p>
 
       {contas === null ? (
         <p className="mt-3 text-xs text-muted-foreground">Carregando…</p>
       ) : (
-        <ul className="mt-3 space-y-2">
-          {lista.map((c) => {
-            const zap = c.telefone.replace(/\D/g, "");
-            return (
-              <li
-                key={c.id}
-                className={`rounded-md border bg-background/60 p-3 ${
-                  c.aprovado ? "border-border" : "animate-pulse-slow border-primary/60"
-                }`}
-              >
-                <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
-                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{c.email}</p>
-                {c.telefone && <p className="mt-0.5 text-xs text-muted-foreground">WhatsApp: {c.telefone}</p>}
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {zap.length >= 10 && (
-                    <a
-                      href={`https://wa.me/55${zap.slice(-11)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="rounded-md border border-border px-3 py-1.5 font-display text-[11px] tracking-tight text-muted-foreground"
-                    >
-                      CONFIRMAR NO WHATSAPP
-                    </a>
-                  )}
-                  {c.aprovado ? (
-                    <>
-                      <span className="inline-flex items-center gap-1 rounded-md bg-secondary/20 px-3 py-1.5 font-display text-[11px] tracking-tight text-secondary">
-                        <BadgeCheck className="size-3.5" />
-                        APROVADO
-                      </span>
+        <>
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar por nome, telefone ou e-mail"
+            className="mt-3 w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+          />
+          <ul className="mt-3 space-y-2">
+            {filtradas.map((c) => {
+              const zap = c.telefone.replace(/\D/g, "");
+              return (
+                <li
+                  key={c.id}
+                  className={`rounded-md border bg-background/60 p-3 ${
+                    c.aprovado ? "border-border" : "animate-pulse-slow border-primary/60"
+                  }`}
+                >
+                  <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{c.email}</p>
+                  {c.telefone && <p className="mt-0.5 text-xs text-muted-foreground">WhatsApp: {c.telefone}</p>}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {zap.length >= 10 && (
+                      <a
+                        href={`https://wa.me/55${zap.slice(-11)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-md border border-border px-3 py-1.5 font-display text-[11px] tracking-tight text-muted-foreground"
+                      >
+                        CONFIRMAR NO WHATSAPP
+                      </a>
+                    )}
+                    {c.aprovado ? (
+                      <>
+                        <span className="inline-flex items-center gap-1 rounded-md bg-secondary/20 px-3 py-1.5 font-display text-[11px] tracking-tight text-secondary">
+                          <BadgeCheck className="size-3.5" />
+                          APROVADO
+                        </span>
+                        <button
+                          type="button"
+                          disabled={ocupado === c.id}
+                          onClick={() => void alternar(c, false)}
+                          className="rounded-md border border-border px-3 py-1.5 font-display text-[11px] tracking-tight text-muted-foreground disabled:opacity-60 hover:border-primary hover:text-primary"
+                        >
+                          BLOQUEAR
+                        </button>
+                      </>
+                    ) : (
                       <button
                         type="button"
                         disabled={ocupado === c.id}
-                        onClick={() => void alternar(c, false)}
-                        className="rounded-md border border-border px-3 py-1.5 font-display text-[11px] tracking-tight text-muted-foreground disabled:opacity-60 hover:border-primary hover:text-primary"
+                        onClick={() => void alternar(c, true)}
+                        className="rounded-md bg-primary px-3 py-1.5 font-display text-[11px] tracking-tight text-primary-foreground disabled:opacity-60"
                       >
-                        BLOQUEAR
+                        APROVAR CADASTRO
                       </button>
-                    </>
-                  ) : (
+                    )}
                     <button
                       type="button"
                       disabled={ocupado === c.id}
-                      onClick={() => void alternar(c, true)}
-                      className="rounded-md bg-primary px-3 py-1.5 font-display text-[11px] tracking-tight text-primary-foreground disabled:opacity-60"
+                      onClick={() => void apagar(c)}
+                      className="flex items-center gap-1 rounded-md border border-destructive/60 px-3 py-1.5 font-display text-[11px] tracking-tight text-destructive disabled:opacity-60"
                     >
-                      APROVAR CADASTRO
+                      <Trash2 className="size-3.5" /> EXCLUIR CADASTRO
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    disabled={ocupado === c.id}
-                    onClick={() => void apagar(c)}
-                    className="flex items-center gap-1 rounded-md border border-destructive/60 px-3 py-1.5 font-display text-[11px] tracking-tight text-destructive disabled:opacity-60"
-                  >
-                    <Trash2 className="size-3.5" /> EXCLUIR CADASTRO
-                  </button>
-                </div>
+                  </div>
+                </li>
+              );
+            })}
+            {filtradas.length === 0 && (
+              <li className="text-xs text-muted-foreground">
+                {t ? "Nenhum cadastro encontrado para essa busca." : "Nenhum cadastro aguardando aprovação."}
               </li>
-            );
-          })}
-          {lista.length === 0 && (
-            <li className="text-xs text-muted-foreground">Nenhum cadastro aguardando aprovação.</li>
-          )}
-        </ul>
+            )}
+          </ul>
+        </>
       )}
 
       <button
