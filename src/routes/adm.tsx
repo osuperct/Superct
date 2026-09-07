@@ -278,9 +278,10 @@ function Aprovacoes() {
       <button
         type="button"
         onClick={() => setVerTodas((v) => !v)}
-        className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground underline decoration-primary/60"
+        aria-label={verTodas ? "Mostrar só pendentes" : "Mostrar todos os cadastros"}
+        className="mt-3 inline-flex items-center justify-center rounded-md border border-border bg-background/60 p-2 text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
       >
-        {verTodas ? "ver só os pendentes" : "ver todos os cadastros"}
+        {verTodas ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
       </button>
     </section>
   );
