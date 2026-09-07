@@ -353,6 +353,8 @@ function Painel({ professorId }: { professorId: string }) {
 
       <AvisosProfessor uid={professorId} />
 
+      <EnvioRecadoPush />
+
       <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
