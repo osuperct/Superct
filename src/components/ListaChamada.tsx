@@ -138,7 +138,7 @@ export function ListaChamada({
             {alunosOrdenados.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">Nenhum aluno ativo neste mês.</p>
             ) : (
-              <div className="mt-3 overflow-x-auto">
+              <div className="mt-3 max-h-[200px] overflow-y-auto overflow-x-auto rounded-md border border-border">
                 <table className="w-max border-separate border-spacing-0 text-left">
                   <thead>
                     <tr>
