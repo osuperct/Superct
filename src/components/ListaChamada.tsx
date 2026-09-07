@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, ClipboardCheck, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ClipboardCheck, Search } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
