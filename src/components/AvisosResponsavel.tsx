@@ -86,6 +86,15 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
     });
   }
 
+  function toggleItem(id: string) {
+    setExpandidos((atual) => {
+      const proximo = new Set(atual);
+      if (proximo.has(id)) proximo.delete(id);
+      else proximo.add(id);
+      return proximo;
+    });
+  }
+
   const porMes = agruparPorMes(lista);
 
   return (
