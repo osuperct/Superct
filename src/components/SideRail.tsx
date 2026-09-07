@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
+import { useSidebarControl } from "./SidebarContext";
 
 const itens = [
   { to: "/", label: "Início", icon: Home },
