@@ -412,7 +412,10 @@ function Campo({
   const ehSenha = type === "password";
   return (
     <label className="block">
-      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</span>
+      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+        {label}
+        {required && <span className="ml-0.5 text-primary">*</span>}
+      </span>
       <span className="relative mt-1 block">
         <input
           type={ehSenha && visivel ? "text" : type}
