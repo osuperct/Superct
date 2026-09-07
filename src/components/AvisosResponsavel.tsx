@@ -143,7 +143,7 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
       {lista.length === 0 ? (
         <p className="mt-3 text-sm text-muted-foreground">Nenhum aviso por enquanto.</p>
       ) : (
-        <div className="mt-3 max-h-[420px] space-y-2 overflow-y-auto rounded-md border border-border bg-background/20 p-2">
+        <div className="mt-3 max-h-[280px] space-y-2 overflow-y-auto rounded-md border border-border bg-background/20 p-2">
           {porMes.map((grupo) => {
             const aberto = abertos.has(grupo.chave);
             const naoLidosMes = grupo.avisos.filter((a) => !lidos.has(a.id)).length;
