@@ -28,10 +28,12 @@ const itens = [
 ] as const;
 
 export function SideRail() {
+  const { forcarRecolhida } = useSidebarControl();
   const [aberta, setAberta] = useState(true);
   const [recolhida, setRecolhida] = useState(false);
   const [professor, setProfessor] = useState(false);
   const [adm, setAdm] = useState(false);
+  const estaRecolhida = !aberta || forcarRecolhida;
 
   useEffect(() => {
     let ativo = true;
