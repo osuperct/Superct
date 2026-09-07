@@ -172,7 +172,7 @@ function Autenticacao() {
         sessionStorage.setItem("superct_acesso", JSON.stringify({ email: email.trim(), senha }));
         setCredenciais({ email: email.trim(), senha });
         if (!data.session) {
-          setAviso("Cadastro criado! Confira seu e-mail e clique no link de confirmação para entrar.");
+          setAviso("Cadastro criado! Confirme seu e-mail pelo link que enviamos. Depois o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso.");
         } else {
           toast.success("Cadastro concluído!");
         }
@@ -552,6 +552,22 @@ function Painel({ session }: { session: Session }) {
 
   const [ehProfessor, setEhProfessor] = useState(false);
   const [ehAdm, setEhAdm] = useState(false);
+  const [aprovado, setAprovado] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let ativo = true;
+    void supabase
+      .from("perfis")
+      .select("aprovado")
+      .eq("id", uid)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (ativo) setAprovado(data ? Boolean(data.aprovado) : false);
+      });
+    return () => {
+      ativo = false;
+    };
+  }, [uid]);
 
   useEffect(() => {
     void recarregar();
@@ -620,6 +636,39 @@ function Painel({ session }: { session: Session }) {
     else toast.error("Não foi possível abrir o arquivo.");
   }
 
+
+  if (aprovado === false && !ehProfessor && !ehAdm) {
+    return (
+      <div className="mt-6 space-y-4">
+        <div className="rounded-lg border border-primary/50 bg-primary/5 p-4">
+          <h2 className="font-display text-lg tracking-tight text-primary">CADASTRO EM ANÁLISE</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Recebemos seu cadastro! O Professor Tio Victor vai confirmar seus dados pelo WhatsApp e liberar o
+            acesso à sua área. Isso costuma ser rápido — depois é só entrar novamente com o mesmo e-mail e senha.
+          </p>
+          <a
+            href="https://wa.me/5535988223596?text=Ol%C3%A1%2C%20fiz%20meu%20cadastro%20no%20site%20do%20Super%20CT%20e%20gostaria%20de%20liberar%20o%20acesso."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+          >
+            FALAR NO WHATSAPP (35) 98822-3596
+          </a>
+        </div>
+        <div className="rounded-md border border-border bg-card/50 p-3">
+          <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
+          <p className="text-sm">{session.user.email}</p>
+        </div>
+        <button
+          type="button"
+          onClick={() => void supabase.auth.signOut()}
+          className="w-full rounded-md border border-border px-4 py-2 font-display text-xs tracking-tight text-muted-foreground"
+        >
+          SAIR
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="mt-6">
