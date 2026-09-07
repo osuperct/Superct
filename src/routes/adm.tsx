@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronDown, ChevronUp, CircleDollarSign, ShieldCheck, Trash2, UserCheck, UserPlus, Users } from "lucide-react";
+import { BadgeCheck, ChevronDown, ChevronUp, CircleDollarSign, ShieldCheck, Trash2, UserCheck, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { cadastrarProfessor } from "@/lib/adm.functions";
-import { definirAcessoConta, excluirConta, listarAcessosContas, type ContaAcesso } from "@/lib/adm";
+import { definirAcessoConta, definirAprovacaoConta, excluirConta, listarAcessosContas, type ContaAcesso } from "@/lib/adm";
 import { AppMidias } from "@/components/AppMidias";
 import { ProdutosAdm } from "@/components/ProdutosAdm";
 import { supabase } from "@/integrations/supabase/client";
@@ -161,6 +161,8 @@ function AdmPage() {
         </Link>
       </section>
 
+      <Aprovacoes />
+
       <Acessos />
 
       <AppMidias />
@@ -171,6 +173,116 @@ function AdmPage() {
 
 
     </Casca>
+  );
+}
+
+/* ----------------------------- APROVAÇÃO DE CADASTROS ----------------------------- */
+
+function Aprovacoes() {
+  const [contas, setContas] = useState<ContaAcesso[] | null>(null);
+  const [ocupado, setOcupado] = useState<string | null>(null);
+  const [verTodas, setVerTodas] = useState(false);
+
+  const carregar = useCallback(async () => {
+    try {
+      setContas(await listarAcessosContas());
+    } catch {
+      setContas([]);
+    }
+  }, []);
+
+  useEffect(() => {
+    void carregar();
+  }, [carregar]);
+
+  async function alternar(conta: ContaAcesso, aprovar: boolean) {
+    let pin = "";
+    if (!aprovar) {
+      const senha = window.prompt("Digite a senha para bloquear este cadastro:");
+      if (senha === null) return;
+      pin = senha;
+    }
+    setOcupado(conta.id);
+    const r = await definirAprovacaoConta(conta.id, aprovar, pin);
+    setOcupado(null);
+    if (!r.ok) {
+      toast.error(r.erro);
+      return;
+    }
+    toast.success(aprovar ? "Cadastro aprovado!" : "Cadastro bloqueado.");
+    await carregar();
+  }
+
+  const pendentes = (contas ?? []).filter((c) => !c.aprovado);
+  const lista = verTodas ? (contas ?? []) : pendentes;
+
+  return (
+    <section className="rounded-lg border border-primary/40 bg-card/40 p-4">
+      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+        <BadgeCheck className="size-4 text-primary" /> APROVAR NOVOS CADASTROS
+        {pendentes.length > 0 && (
+          <span className="rounded-full bg-primary px-2 py-0.5 font-mono text-[10px] text-primary-foreground">
+            {pendentes.length}
+          </span>
+        )}
+      </h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        O responsável se cadastra no site e só entra na área dele depois que você confirmar o WhatsApp e aprovar
+        aqui.
+      </p>
+
+      {contas === null ? (
+        <p className="mt-3 text-xs text-muted-foreground">Carregando…</p>
+      ) : (
+        <ul className="mt-3 space-y-2">
+          {lista.map((c) => {
+            const zap = c.telefone.replace(/\D/g, "");
+            return (
+              <li key={c.id} className="rounded-md border border-border bg-background/60 p-3">
+                <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
+                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{c.email}</p>
+                {c.telefone && <p className="mt-0.5 text-xs text-muted-foreground">WhatsApp: {c.telefone}</p>}
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {zap.length >= 10 && (
+                    <a
+                      href={`https://wa.me/55${zap.slice(-11)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rounded-md border border-border px-3 py-1.5 font-display text-[11px] tracking-tight text-muted-foreground"
+                    >
+                      CONFIRMAR NO WHATSAPP
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    disabled={ocupado === c.id}
+                    onClick={() => void alternar(c, !c.aprovado)}
+                    className={`rounded-md px-3 py-1.5 font-display text-[11px] tracking-tight disabled:opacity-60 ${
+                      c.aprovado
+                        ? "border border-border text-muted-foreground"
+                        : "bg-primary text-primary-foreground"
+                    }`}
+                  >
+                    {c.aprovado ? "APROVADO — BLOQUEAR" : "APROVAR CADASTRO"}
+                  </button>
+                </div>
+              </li>
+            );
+          })}
+          {lista.length === 0 && (
+            <li className="text-xs text-muted-foreground">Nenhum cadastro aguardando aprovação.</li>
+          )}
+        </ul>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setVerTodas((v) => !v)}
+        className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground underline decoration-primary/60"
+      >
+        {verTodas ? "ver só os pendentes" : "ver todos os cadastros"}
+      </button>
+    </section>
   );
 }
 
