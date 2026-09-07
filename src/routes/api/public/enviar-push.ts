@@ -38,8 +38,9 @@ export const Route = createFileRoute("/api/public/enviar-push")({
     handlers: {
       OPTIONS: () => new Response(null, { status: 204, headers: cors }),
       POST: async ({ request }) => {
-        const SUPABASE_URL = process.env["SUPABASE_URL"];
-        const SUPABASE_PUBLISHABLE_KEY = process.env["SUPABASE_PUBLISHABLE_KEY"];
+        const SUPABASE_URL = process.env["SUPABASE_URL"] ?? process.env["VITE_SUPABASE_URL"];
+        const SUPABASE_PUBLISHABLE_KEY =
+          process.env["SUPABASE_PUBLISHABLE_KEY"] ?? process.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
         const LOVABLE_API_KEY = process.env["LOVABLE_API_KEY"];
         const FIREBASE_MESSAGING_API_KEY = process.env["FIREBASE_MESSAGING_API_KEY"];
 

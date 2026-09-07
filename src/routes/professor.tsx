@@ -504,10 +504,12 @@ function EnvioRecadoPush() {
         toast.error("Faça login novamente para enviar o recado.");
         return;
       }
+      // O envio de notificação só funciona no servidor do app da Lovable.
+      // Em outros domínios (ex: osuperct.com hospedado fora), usamos o endereço fixo do app.
       const base =
         typeof window !== "undefined" && window.location.hostname.endsWith(".lovable.app")
           ? ""
-          : "https://superct.lovable.app";
+          : "https://project--f98de061-dc8c-43b5-9c7f-56210aba7b2d.lovable.app";
       const res = await fetch(`${base}/api/public/enviar-push`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
