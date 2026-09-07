@@ -348,7 +348,7 @@ function Autenticacao() {
               className="mt-0.5 size-4 shrink-0 accent-[hsl(var(--primary))]"
             />
             <span>
-              <strong className="text-primary">Termo de uso de imagem.</strong> {TERMO_IMAGEM}
+              <strong className="text-primary">Termo de uso de imagem *</strong> {TERMO_IMAGEM}
             </span>
           </label>
         )}
