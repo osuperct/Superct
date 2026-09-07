@@ -519,6 +519,11 @@ function JogoPage() {
   const [heroY, setHeroY] = useState(0);
   const [camera, setCamera] = useState(0);
   const [inimigos, setInimigos] = useState<Inimigo[]>([]);
+  const inimigosRef = useRef<Inimigo[]>([]);
+  const atualizarInimigos = (lista: Inimigo[]) => {
+    inimigosRef.current = lista;
+    setInimigos(lista);
+  };
   const [bolas, setBolas] = useState<Bola[]>([]);
   const [halteres, setHalteres] = useState<Haltere[]>([]);
   const [chefao, setChefao] = useState<Chefao | null>(null);
