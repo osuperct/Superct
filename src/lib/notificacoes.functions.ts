@@ -24,11 +24,25 @@ export const enviarRecadoPush = createServerFn({ method: "POST" })
     const mesRef = new Date();
     const refStr = `${mesRef.getFullYear()}-${String(mesRef.getMonth() + 1).padStart(2, "0")}-01`;
 
+    const { data: mensalidadesAtivas, error: errMens } = await context.supabase
+      .from("mensalidades")
+      .select("user_id")
+      .eq("referencia", refStr)
+      .eq("ativo", true);
+
+    if (errMens) {
+      throw new Error("Erro ao buscar mensalidades: " + errMens.message);
+    }
+
+    const userIds = Array.from(new Set((mensalidadesAtivas ?? []).map((m) => m.user_id)));
+    if (userIds.length === 0) {
+      return { enviados: 0, falhas: 0, total: 0 };
+    }
+
     const { data: tokens, error } = await context.supabase
       .from("tokens_push")
-      .select("token, user_id, alunos!inner(mensalidades!inner(ativo, referencia))")
-      .eq("alunos.mensalidades.referencia", refStr)
-      .eq("alunos.mensalidades.ativo", true);
+      .select("token")
+      .in("user_id", userIds);
 
     if (error) {
       throw new Error("Erro ao buscar tokens: " + error.message);
