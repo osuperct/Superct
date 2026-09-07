@@ -486,3 +486,89 @@ function Painel({ professorId }: { professorId: string }) {
     </div>
   );
 }
+
+function EnvioRecadoPush() {
+  const [titulo, setTitulo] = useState("");
+  const [mensagem, setMensagem] = useState("");
+  const [caminho, setCaminho] = useState("");
+  const [enviando, setEnviando] = useState(false);
+  const enviar = useServerFn(enviarRecadoPush);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!titulo.trim() || !mensagem.trim()) {
+      toast.error("Preencha o título e a mensagem.");
+      return;
+    }
+    setEnviando(true);
+    try {
+      const r = await enviar({ data: { titulo: titulo.trim(), mensagem: mensagem.trim(), caminho: caminho.trim() || undefined } });
+      toast.success(`Recado enviado para ${r.enviados} aparelho(s).`);
+      if (r.falhas > 0) {
+        toast.error(`${r.falhas} envio(s) falharam.`);
+      }
+      setTitulo("");
+      setMensagem("");
+      setCaminho("");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao enviar recado.");
+    } finally {
+      setEnviando(false);
+    }
+  }
+
+  return (
+    <section className="rounded-lg border border-primary/40 bg-card/40 p-4">
+      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+        <Bell className="size-4 text-primary" /> ENVIAR RECADO POR NOTIFICAÇÃO
+      </h2>
+      <p className="mt-1 text-xs text-muted-foreground">
+        Envie um recado que chega como notificação no celular dos responsáveis de alunos ativos.
+      </p>
+      <form onSubmit={(e) => void handleSubmit(e)} className="mt-3 space-y-3">
+        <label className="block space-y-1">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Título</span>
+          <input
+            value={titulo}
+            onChange={(e) => setTitulo(e.target.value)}
+            placeholder="Ex: Aula cancelada"
+            maxLength={60}
+            required
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Mensagem</span>
+          <textarea
+            value={mensagem}
+            onChange={(e) => setMensagem(e.target.value)}
+            placeholder="Escreva o recado…"
+            rows={3}
+            maxLength={160}
+            required
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Link do app (opcional)
+          </span>
+          <input
+            value={caminho}
+            onChange={(e) => setCaminho(e.target.value)}
+            placeholder="Ex: /calendario"
+            maxLength={100}
+            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+          />
+        </label>
+        <button
+          type="submit"
+          disabled={enviando}
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground disabled:opacity-60"
+        >
+          <Send className="size-4" /> {enviando ? "ENVIANDO…" : "ENVIAR NOTIFICAÇÃO"}
+        </button>
+      </form>
+    </section>
+  );
+}
