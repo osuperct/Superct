@@ -2197,6 +2197,28 @@ function JogoPage() {
                 }}
               />
             )}
+            {emChefao && chefao && (
+              <div
+                className="absolute overflow-hidden rounded-full border bg-black/70"
+                style={{
+                  left: chefao.x,
+                  bottom: 40 + chefao.y + tamBoss + 6,
+                  width: tamBoss,
+                  height: 6,
+                  borderColor: `${vilaoFase.cor}80`,
+                }}
+              >
+                <div
+                  className="h-full rounded-full transition-[width] duration-150"
+                  style={{
+                    width: `${(chefao.hp / chefao.hpMax) * 100}%`,
+                    background: `linear-gradient(90deg,${vilaoFase.cor},#fff8)`,
+                    boxShadow: `0 0 10px ${vilaoFase.cor}`,
+                  }}
+                />
+              </div>
+            )}
+
             {/* ataques do chefão */}
             {tiros.map((t) => {
               const d = TAM_TIRO[t.tipo];
