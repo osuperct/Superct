@@ -1606,7 +1606,8 @@ function JogoPage() {
         y.current < boss.y + tam - 8;
 
       if (levouDano || (bateBoss && performance.now() > invulAte.current)) {
-        perderVida(Math.min(faseRef.current, TOTAL_FASES) - 1);
+        /* no chefão só tira vida; volta ao começo apenas quando zera tudo */
+        perderVida(Math.min(faseRef.current, TOTAL_FASES) - 1, true);
         return;
       }
 
