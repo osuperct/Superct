@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 export function AtivarNotificacoes({ uid }: { uid: string }) {
   const [registrado, setRegistrado] = useState<boolean | null>(null);
   const [ocupado, setOcupado] = useState(false);
+  const [avisoFechado, setAvisoFechado] = useState(false);
 
   useEffect(() => {
     let vivo = true;
