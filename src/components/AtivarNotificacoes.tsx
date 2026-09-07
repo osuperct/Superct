@@ -55,7 +55,6 @@ export function AtivarNotificacoes({ uid }: { uid: string }) {
         }
       } else if (r.status === "open-in-new-tab") {
 
-      } else if (r.status === "open-in-new-tab") {
         toast.error("Abra o site osuperct.com direto no navegador do celular para ativar.");
       } else if (r.status === "denied") {
         toast.error("Você precisa permitir as notificações nas configurações do navegador.");
