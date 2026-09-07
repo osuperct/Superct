@@ -10,3 +10,5 @@
   - [ ] Envio de recado geral pelo professor para responsáveis de alunos ativos
 
 - [ ] Remover toda a interface e integração de notificações push/Firebase.
+
+- [ ] Abrir lista de chamada completa em tela flutuante separada com barra de rolagem.
