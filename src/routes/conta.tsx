@@ -99,6 +99,7 @@ function Autenticacao() {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [cpf, setCpf] = useState("");
+  const [endereco, setEndereco] = useState("");
   const [alunoNome, setAlunoNome] = useState("");
   const [alunoIdade, setAlunoIdade] = useState("");
   const [aceite, setAceite] = useState(false);
