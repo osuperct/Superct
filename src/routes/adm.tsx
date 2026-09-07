@@ -211,6 +211,27 @@ function Aprovacoes() {
     await carregar();
   }
 
+  async function apagar(conta: ContaAcesso) {
+    const nome = conta.nome || conta.email;
+    if (!window.confirm(`Excluir o cadastro de ${nome}? A pessoa precisará se cadastrar novamente.`)) return;
+    const senha = window.prompt("Digite a senha para confirmar a exclusão:");
+    if (senha === null) return;
+    setOcupado(conta.id);
+    try {
+      const r = await excluirConta(conta.id, senha);
+      if (!r.ok) {
+        toast.error(r.erro);
+        return;
+      }
+      toast.success("Cadastro excluído.");
+      await carregar();
+    } catch {
+      toast.error("Não foi possível excluir o cadastro.");
+    } finally {
+      setOcupado(null);
+    }
+  }
+
   const pendentes = (contas ?? []).filter((c) => !c.aprovado);
   const lista = verTodas ? (contas ?? []) : pendentes;
 
