@@ -11,10 +11,20 @@ export function ResponsaveisSemNotificacao() {
 
   const carregar = async () => {
     setCarregando(true);
-    const [{ data: perfis }, { data: tokens }] = await Promise.all([
-      supabase.from("perfis").select("id, nome_responsavel, telefone"),
+    const [{ data: alunos }, { data: tokens }] = await Promise.all([
+      supabase.from("alunos").select("user_id").not("matricula", "is", null),
       supabase.from("tokens_push").select("user_id"),
     ]);
+    const comAlunoAtivo = Array.from(new Set((alunos ?? []).map((a) => a.user_id)));
+    if (comAlunoAtivo.length === 0) {
+      setLista([]);
+      setCarregando(false);
+      return;
+    }
+    const { data: perfis } = await supabase
+      .from("perfis")
+      .select("id, nome_responsavel, telefone")
+      .in("id", comAlunoAtivo);
     const comToken = new Set((tokens ?? []).map((t) => t.user_id));
     setLista(
       (perfis ?? [])
