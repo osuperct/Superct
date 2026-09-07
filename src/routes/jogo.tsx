@@ -700,7 +700,7 @@ function JogoPage() {
       setChefao(null);
       setBolas([]);
       setHalteres([]);
-      setInimigos([]);
+      atualizarInimigos([]);
       setDerrotado(null);
       setVenceu(false);
       setFim(false);
@@ -749,7 +749,7 @@ function JogoPage() {
     tirosRef.current = [];
     setTiros([]);
     setHalteres([]);
-    setInimigos([]);
+    atualizarInimigos([]);
     conesRef.current = [];
     setConesPegos([]);
     zerarHeroi();
@@ -817,7 +817,7 @@ function JogoPage() {
       setTiros([]);
       bolasRef.current = [];
       setBolas([]);
-      if (modoRef.current !== "chefao") setInimigos([]);
+      if (modoRef.current !== "chefao") atualizarInimigos([]);
     };
 
 
@@ -1364,7 +1364,7 @@ function JogoPage() {
           pausaRef.current = true;
           modoRef.current = "intervalo";
           setModo("intervalo");
-          setInimigos([]);
+          atualizarInimigos([]);
           return;
         }
 
