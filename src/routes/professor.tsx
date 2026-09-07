@@ -196,9 +196,18 @@ function Painel({ professorId }: { professorId: string }) {
       toast.error("Não foi possível atualizar a liberação.");
       return;
     }
-    toast.success(liberado ? "Documento liberado para o responsável." : "Liberação cancelada.");
+    if (liberado) {
+      // Garante que o aluno do contrato conferido já exista e entre na lista de chamada.
+      await supabase.rpc("vincular_alunos_dos_contratos");
+    }
+    toast.success(
+      liberado
+        ? "Documento liberado. Aluno incluído na lista de chamada."
+        : "Liberação cancelada.",
+    );
     void carregar();
   }
+
 
   async function anexar(arquivo: File) {
     const alu = alunos.find((a) => a.id === alunoSel);
