@@ -379,18 +379,34 @@ function Campo({
   maxLength?: number;
   inputMode?: "numeric" | "text" | "tel" | "email";
 }) {
+  const [visivel, setVisivel] = useState(false);
+  const ehSenha = type === "password";
   return (
     <label className="block">
       <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">{label}</span>
-      <input
-        type={type}
-        inputMode={inputMode}
-        value={value}
-        required={required}
-        maxLength={maxLength}
-        onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-      />
+      <span className="relative mt-1 block">
+        <input
+          type={ehSenha && visivel ? "text" : type}
+          inputMode={inputMode}
+          value={value}
+          required={required}
+          maxLength={maxLength}
+          onChange={(e) => onChange(e.target.value)}
+          className={`w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary ${
+            ehSenha ? "pr-11" : ""
+          }`}
+        />
+        {ehSenha && (
+          <button
+            type="button"
+            onClick={() => setVisivel((v) => !v)}
+            aria-label={visivel ? "Esconder senha" : "Mostrar senha"}
+            className="absolute right-1 top-1/2 -translate-y-1/2 rounded-md p-2 text-muted-foreground hover:text-primary"
+          >
+            {visivel ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+          </button>
+        )}
+      </span>
     </label>
   );
 }
