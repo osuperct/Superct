@@ -2498,11 +2498,11 @@ function JogoPage() {
                       Yeeees! Você ganhou a medalha suprema!
                     </p>
                   </div>
-                  <p className="mt-2 font-body text-[13px] leading-snug text-foreground animate-texto-surge">
+                  <p className="mt-2 font-body text-[12px] leading-snug text-foreground animate-texto-surge">
                     Você conseguiu atravessar os maiores desafios da nossa academia e derrotar todos
                     os terríveis vilões! Parabéns!
                   </p>
-                  <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                     {heroiAtual.nome} • {pontos} pontos • Super CT
                   </p>
                 </div>
