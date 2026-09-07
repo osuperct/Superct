@@ -99,6 +99,7 @@ function Autenticacao() {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
   const [cpf, setCpf] = useState("");
+  const [endereco, setEndereco] = useState("");
   const [alunoNome, setAlunoNome] = useState("");
   const [alunoIdade, setAlunoIdade] = useState("");
   const [aceite, setAceite] = useState(false);
@@ -144,6 +145,19 @@ function Autenticacao() {
         }
         toast.success("Bem-vindo de volta!");
       } else {
+        const faltando = [
+          [nome, "Nome do responsável"],
+          [telefone, "Telefone / WhatsApp"],
+          [cpf, "CPF do responsável"],
+          [endereco, "Endereço completo"],
+          [alunoNome, "Nome do aluno"],
+          [email, "E-mail do responsável"],
+          [senha, "Senha"],
+        ].filter(([v]) => !String(v).trim()).map(([, l]) => l);
+        if (faltando.length > 0) {
+          setAviso(`Preencha todos os campos obrigatórios: ${faltando.join(", ")}.`);
+          return;
+        }
         if (!aceite) {
           setAviso("É preciso aceitar o termo de uso de imagem para concluir o cadastro.");
           return;
@@ -166,6 +180,7 @@ function Autenticacao() {
               nome_responsavel: nome.trim(),
               telefone: telefone.trim(),
               cpf: apenasDigitos(cpf),
+              endereco: endereco.trim(),
               aluno_nome: alunoNome.trim(),
               aluno_idade: alunoIdade,
               aceite_imagem: aceite,
@@ -302,7 +317,15 @@ function Autenticacao() {
               maxLength={14}
               inputMode="numeric"
             />
+            <Campo
+              label="Endereço completo"
+              value={endereco}
+              onChange={setEndereco}
+              required
+              maxLength={200}
+            />
             <Campo label="Nome do aluno" value={alunoNome} onChange={setAlunoNome} required maxLength={120} />
+
             <Campo label="Idade do aluno" value={alunoIdade} onChange={setAlunoIdade} required type="number" />
           </>
         )}
