@@ -9,6 +9,7 @@ import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 
 import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
 import { AvisosResponsavel } from "@/components/AvisosResponsavel";
+import { AtivarNotificacoes } from "@/components/AtivarNotificacoes";
 import { PresencaResponsavel } from "@/components/PresencaResponsavel";
 import { supabase } from "@/integrations/supabase/client";
 
