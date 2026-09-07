@@ -704,6 +704,8 @@ function JogoPage() {
     setPontos(0);
     vidasRef.current = VIDAS_CHEFAO;
     setVidas(VIDAS_CHEFAO);
+    estoqueRef.current = 0;
+    setEstoqueCoracoes(0);
     iniciarCorrida(1);
   }, [iniciarCorrida]);
 
