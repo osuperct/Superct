@@ -522,15 +522,23 @@ function EnvioRecadoPush() {
       const r = (await res.json().catch(() => ({}))) as {
         enviados?: number;
         falhas?: number;
+        responsaveis?: number;
         erro?: string;
       };
       if (!res.ok) {
         throw new Error(r.erro ?? `Erro ao enviar recado (${res.status}).`);
       }
-      toast.success(`Recado enviado para ${r.enviados ?? 0} aparelho(s).`);
+      if ((r.enviados ?? 0) === 0 && (r.falhas ?? 0) === 0) {
+        toast.error(
+          "Nenhum celular está registrado ainda. O responsável precisa abrir o app em osuperct.com no celular e aceitar as notificações."
+        );
+      } else {
+        toast.success(`Recado enviado para ${r.enviados ?? 0} aparelho(s).`);
+      }
       if ((r.falhas ?? 0) > 0) {
         toast.error(`${r.falhas} envio(s) falharam.`);
       }
+
 
       setTitulo("");
       setMensagem("");
