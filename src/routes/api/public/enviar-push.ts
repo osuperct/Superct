@@ -114,7 +114,7 @@ export const Route = createFileRoute("/api/public/enviar-push")({
 
         const lista = Array.from(new Set((tokens ?? []).map((t) => t.token))).filter(Boolean);
         if (lista.length === 0) {
-          return json({ enviados: 0, falhas: 0, total: 0 });
+          return json({ enviados: 0, falhas: 0, total: 0, responsaveis: userIds.length });
         }
 
         let enviados = 0;
