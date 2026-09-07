@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight, ClipboardCheck, Search } from "lucide-react";
+import { ChevronLeft, ChevronRight, ClipboardCheck, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { MESES } from "@/lib/feriados";
 import { diasDeAula, hojeDia, isoDia, type Presenca } from "@/lib/presenca";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 type AlunoChamada = { id: string; nome: string; user_id: string; matricula: string | null };
 
@@ -23,6 +23,7 @@ export function ListaChamada({
   const [marcadas, setMarcadas] = useState<Set<string>>(new Set());
   const [salvando, setSalvando] = useState<string | null>(null);
   const [busca, setBusca] = useState("");
+  const [aberto, setAberto] = useState(false);
 
   const dias = useMemo(() => diasDeAula(ano, mes), [ano, mes]);
   const hoje = hojeDia();
@@ -115,30 +116,67 @@ export function ListaChamada({
         </button>
       </div>
 
-      <Accordion type="single" collapsible className="mt-3">
-        <AccordionItem value="lista" className="border-0">
-          <AccordionTrigger className="py-2 text-xs font-mono uppercase tracking-widest text-muted-foreground hover:no-underline hover:text-foreground">
-            <span className="flex items-center gap-2">
-              <ClipboardCheck className="size-3" />
-              ABRIR LISTA COMPLETA ({alunosOrdenados.length})
-            </span>
-          </AccordionTrigger>
-          <AccordionContent>
-            <div className="relative mt-2">
-              <Search className="absolute left-2.5 top-1/2 size-3 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Buscar aluno por nome..."
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-                className="pl-7 text-xs"
-              />
-            </div>
+      <Dialog open={aberto} onOpenChange={setAberto}>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-md border border-border bg-background px-3 py-2 font-mono text-xs uppercase tracking-widest text-muted-foreground hover:border-primary hover:text-primary"
+          >
+            <ClipboardCheck className="size-3" />
+            ABRIR LISTA COMPLETA ({alunosOrdenados.length})
+          </button>
+        </DialogTrigger>
 
+        <DialogContent className="flex h-[92vh] max-h-[900px] w-[96vw] max-w-4xl flex-col overflow-hidden border-border bg-card p-0 sm:h-[85vh]">
+          <DialogHeader className="shrink-0 border-b border-border px-4 pb-3 pt-4 text-left">
+            <DialogTitle className="flex items-center gap-2 font-display text-lg tracking-tight">
+              <ClipboardCheck className="size-4 text-primary" /> LISTA DE CHAMADA — {MESES[mes - 1]} {ano}
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="flex shrink-0 items-center justify-between gap-2 border-b border-border px-4 py-3">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => mudarMes(-1)}
+                aria-label="Mês anterior"
+                className="rounded-md border border-border p-1.5 text-muted-foreground"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+              <p className="min-w-[120px] text-center font-display text-sm tracking-tight text-primary">
+                {MESES[mes - 1]} {ano}
+              </p>
+              <button
+                type="button"
+                onClick={() => mudarMes(1)}
+                aria-label="Próximo mês"
+                className="rounded-md border border-border p-1.5 text-muted-foreground"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+            </div>
+            <p className="hidden font-mono text-[10px] uppercase tracking-widest text-muted-foreground sm:block">
+              {alunosOrdenados.length} aluno{alunosOrdenados.length > 1 ? "s" : ""}
+            </p>
+          </div>
+
+          <div className="relative shrink-0 px-4 pt-3">
+            <Search className="absolute left-6 top-1/2 size-3 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Buscar aluno por nome..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="pl-7 text-xs"
+            />
+          </div>
+
+          <div className="flex-1 overflow-hidden px-4 pb-4 pt-3">
             {alunosOrdenados.length === 0 ? (
               <p className="mt-4 text-sm text-muted-foreground">Nenhum aluno ativo neste mês.</p>
             ) : (
-              <div className="mt-3 max-h-[200px] overflow-y-auto overflow-x-auto rounded-md border border-border">
+              <div className="h-full overflow-auto rounded-md border border-border bg-background/40">
                 <table className="w-max border-separate border-spacing-0 text-left">
                   <thead>
                     <tr>
@@ -168,7 +206,7 @@ export function ListaChamada({
                       const uteis = dias.filter((d) => !d.feriado).length;
                       return (
                         <tr key={a.id}>
-                          <th className="sticky left-0 z-10 max-w-[120px] truncate bg-card px-2 py-1 text-left text-xs font-medium">
+                          <th className="sticky left-0 z-10 max-w-[140px] truncate bg-card px-2 py-1 text-left text-xs font-medium">
                             {a.nome}
                           </th>
                           {dias.map((d) => {
@@ -202,13 +240,13 @@ export function ListaChamada({
                 </table>
               </div>
             )}
+          </div>
 
-            <p className="mt-3 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-              Azul = presença • vazio = falta • laranja = feriado
-            </p>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+          <p className="shrink-0 border-t border-border px-4 py-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+            Azul = presença • vazio = falta • laranja = feriado
+          </p>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }
