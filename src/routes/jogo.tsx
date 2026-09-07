@@ -524,6 +524,7 @@ function JogoPage() {
   const [tiros, setTiros] = useState<Tiro[]>([]);
   const [vidas, setVidas] = useState(VIDAS_CHEFAO);
   const [coracoes, setCoracoes] = useState<number[]>(CORACOES.map((_, i) => i));
+  const [estoqueCoracoes, setEstoqueCoracoes] = useState(0);
   const [conesPegos, setConesPegos] = useState<number[]>([]);
   const [piscando, setPiscando] = useState(false);
   const [chocado, setChocado] = useState(false);
@@ -603,6 +604,7 @@ function JogoPage() {
   const spawnTiro = useRef(90);
   const vidasRef = useRef(VIDAS_CHEFAO);
   const coracoesRef = useRef<number[]>(CORACOES.map((_, i) => i));
+  const estoqueRef = useRef(0);
   const conesRef = useRef<number[]>([]);
   const invulAte = useRef(0);
   const presoAte = useRef(0);
@@ -702,6 +704,8 @@ function JogoPage() {
     setPontos(0);
     vidasRef.current = VIDAS_CHEFAO;
     setVidas(VIDAS_CHEFAO);
+    estoqueRef.current = 0;
+    setEstoqueCoracoes(0);
     iniciarCorrida(1);
   }, [iniciarCorrida]);
 
@@ -750,11 +754,20 @@ function JogoPage() {
       setPiscando(true);
       window.setTimeout(() => setPiscando(false), 1600);
       if (vidasRef.current <= 0) {
-        fimRef.current = true;
-        sfx(somGameOver);
-        setFim(true);
-        setDerrotado(vilao);
-        return;
+        if (estoqueRef.current > 0) {
+          /* usa um coração coletado e volta com a barra cheia */
+          estoqueRef.current -= 1;
+          setEstoqueCoracoes(estoqueRef.current);
+          vidasRef.current = VIDAS_CHEFAO;
+          setVidas(VIDAS_CHEFAO);
+          sfx(somMoeda);
+        } else {
+          fimRef.current = true;
+          sfx(somGameOver);
+          setFim(true);
+          setDerrotado(vilao);
+          return;
+        }
       }
       impactos.current = 0;
       presoAte.current = 0;
@@ -1258,8 +1271,8 @@ function JogoPage() {
           if (pego !== undefined) {
             coracoesRef.current = coracoesRef.current.filter((idx) => idx !== pego);
             setCoracoes(coracoesRef.current);
-            vidasRef.current = Math.min(VIDAS_MAX, vidasRef.current + 1);
-            setVidas(vidasRef.current);
+            estoqueRef.current = Math.min(VIDAS_MAX, estoqueRef.current + 1);
+            setEstoqueCoracoes(estoqueRef.current);
             pontosRef.current += 10;
             setPontos(pontosRef.current);
             sfx(somMoeda);
@@ -2304,23 +2317,27 @@ function JogoPage() {
           )}
 
           <span className="absolute left-1/2 top-12 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black/70 px-2 py-1">
-            <Heart
-              className="size-3 shrink-0"
-              style={{ color: "#f43f5e", fill: "#f43f5e", filter: "drop-shadow(0 0 6px #f43f5e)" }}
-            />
             <span className="relative block h-2 w-24 overflow-hidden rounded-full border border-[#f43f5e]/40 bg-[#3f3f46]/70">
               <span
                 className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-200"
                 style={{
-                  width: `${(Math.max(0, vidas) / Math.max(VIDAS_MAX, vidas)) * 100}%`,
+                  width: `${(Math.max(0, Math.min(vidas, VIDAS_CHEFAO)) / VIDAS_CHEFAO) * 100}%`,
                   background: "linear-gradient(90deg,#f43f5e,#fb7185)",
                   boxShadow: "0 0 8px #f43f5e",
                 }}
               />
             </span>
-            <span className="font-mono text-[8px] tracking-widest text-[#fb7185]">
-              {Math.max(0, vidas)}/{Math.max(VIDAS_MAX, vidas)}
-            </span>
+
+            {estoqueCoracoes > 0 && (
+              <span className="flex items-center gap-1">
+                <Heart
+                  className="size-3 shrink-0"
+                  style={{ color: "#f43f5e", fill: "#f43f5e", filter: "drop-shadow(0 0 6px #f43f5e)" }}
+                />
+                <span className="font-mono text-[9px] tracking-widest text-[#fb7185]">{estoqueCoracoes}</span>
+              </span>
+            )}
+
 
             {piscando && (
               <span className="ml-1 font-mono text-[8px] uppercase tracking-widest text-[#f43f5e]">
