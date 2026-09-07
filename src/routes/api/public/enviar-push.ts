@@ -92,21 +92,16 @@ export const Route = createFileRoute("/api/public/enviar-push")({
           return json({ erro: "Título e mensagem são obrigatórios." }, 400);
         }
 
-        const agora = new Date();
-        const referencia = `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, "0")}-01`;
-
-        const { data: mensalidades, error: erroMens } = await supabase
-          .from("mensalidades")
-          .select("user_id")
-          .eq("referencia", referencia)
-          .eq("ativo", true);
-        if (erroMens) {
-          return json({ erro: "Erro ao buscar alunos ativos: " + erroMens.message }, 500);
+        const { data: alunos, error: erroAlunos } = await supabase
+          .from("alunos")
+          .select("user_id");
+        if (erroAlunos) {
+          return json({ erro: "Erro ao buscar alunos: " + erroAlunos.message }, 500);
         }
 
-        const userIds = Array.from(new Set((mensalidades ?? []).map((m) => m.user_id)));
+        const userIds = Array.from(new Set((alunos ?? []).map((a) => a.user_id)));
         if (userIds.length === 0) {
-          return json({ enviados: 0, falhas: 0, total: 0 });
+          return json({ enviados: 0, falhas: 0, total: 0, responsaveis: 0 });
         }
 
         const { data: tokens, error: erroTokens } = await supabase
