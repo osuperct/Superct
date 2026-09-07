@@ -47,6 +47,36 @@ export function AtivarNotificacoes({ uid }: { uid: string }) {
   };
 
   return (
+    <>
+    {registrado === false && !avisoFechado && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-md">
+        <div className="animate-pulse-slow w-full max-w-sm rounded-xl border-2 border-primary bg-card p-5 text-center shadow-2xl">
+          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Avisos do Super CT</p>
+          <h2 className="mt-2 font-display text-xl tracking-tight text-foreground">
+            ATIVE AS NOTIFICAÇÕES!
+          </h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Toque no botão abaixo e permita as notificações para receber os recados do professor
+            neste celular.
+          </p>
+          <button
+            type="button"
+            onClick={ativar}
+            disabled={ocupado}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground disabled:opacity-60"
+          >
+            <Bell className="size-4 shrink-0" /> ATIVAR AGORA
+          </button>
+          <button
+            type="button"
+            onClick={() => setAvisoFechado(true)}
+            className="mt-3 w-full rounded-md border border-border px-4 py-2 font-display text-xs tracking-tight text-muted-foreground"
+          >
+            FAZER DEPOIS
+          </button>
+        </div>
+      </div>
+    )}
     <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
       <h2 className="font-display text-sm tracking-tight text-foreground">NOTIFICAÇÕES</h2>
       <p className="mt-1 text-xs text-muted-foreground">
