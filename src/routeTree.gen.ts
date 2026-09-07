@@ -22,6 +22,7 @@ import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ViloesRouteImport } from './routes/viloes'
 import { Route as DocumentoTipoRouteImport } from './routes/documento.$tipo'
+import { Route as ApiPublicEnviarPushRouteImport } from './routes/api/public/enviar-push'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,6 +89,11 @@ const DocumentoTipoRoute = DocumentoTipoRouteImport.update({
   path: '/documento/$tipo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicEnviarPushRoute = ApiPublicEnviarPushRouteImport.update({
+  id: '/api/public/enviar-push',
+  path: '/api/public/enviar-push',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
+  '/api/public/enviar-push': typeof ApiPublicEnviarPushRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
+  '/api/public/enviar-push': typeof ApiPublicEnviarPushRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
+  '/api/public/enviar-push': typeof ApiPublicEnviarPushRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
+    | '/api/public/enviar-push'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
+    | '/api/public/enviar-push'
   id:
     | '__root__'
     | '/'
@@ -181,6 +192,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
+    | '/api/public/enviar-push'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -197,6 +209,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ViloesRoute: typeof ViloesRoute
   DocumentoTipoRoute: typeof DocumentoTipoRoute
+  ApiPublicEnviarPushRoute: typeof ApiPublicEnviarPushRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocumentoTipoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/enviar-push': {
+      id: '/api/public/enviar-push'
+      path: '/api/public/enviar-push'
+      fullPath: '/api/public/enviar-push'
+      preLoaderRoute: typeof ApiPublicEnviarPushRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -309,6 +329,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ViloesRoute: ViloesRoute,
   DocumentoTipoRoute: DocumentoTipoRoute,
+  ApiPublicEnviarPushRoute: ApiPublicEnviarPushRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

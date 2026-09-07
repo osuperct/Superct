@@ -4,13 +4,10 @@ import type { Session } from "@supabase/supabase-js";
 import { Bell, FileText, GraduationCap, Paperclip, Send, ShieldCheck, Trash2, Upload, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import { useServerFn } from "@tanstack/react-start";
-
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
 import { AvisosProfessor } from "@/components/AvisosProfessor";
 import { ListaChamada } from "@/components/ListaChamada";
-import { enviarRecadoPush } from "@/lib/notificacoes.functions";
 
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
@@ -492,7 +489,6 @@ function EnvioRecadoPush() {
   const [mensagem, setMensagem] = useState("");
   const [caminho, setCaminho] = useState("");
   const [enviando, setEnviando] = useState(false);
-  const enviar = useServerFn(enviarRecadoPush);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -502,17 +498,38 @@ function EnvioRecadoPush() {
     }
     setEnviando(true);
     try {
-      const payload: { titulo: string; mensagem: string; caminho?: string } = {
-        titulo: titulo.trim(),
-        mensagem: mensagem.trim(),
+      const { data: sessao } = await supabase.auth.getSession();
+      const token = sessao.session?.access_token;
+      if (!token) {
+        toast.error("Faça login novamente para enviar o recado.");
+        return;
+      }
+      const base =
+        typeof window !== "undefined" && window.location.hostname.endsWith(".lovable.app")
+          ? ""
+          : "https://superct.lovable.app";
+      const res = await fetch(`${base}/api/public/enviar-push`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          titulo: titulo.trim(),
+          mensagem: mensagem.trim(),
+          caminho: caminho.trim() || undefined,
+        }),
+      });
+      const r = (await res.json().catch(() => ({}))) as {
+        enviados?: number;
+        falhas?: number;
+        erro?: string;
       };
-      const caminhoTrim = caminho.trim();
-      if (caminhoTrim) payload.caminho = caminhoTrim;
-      const r = await enviar({ data: payload });
-      toast.success(`Recado enviado para ${r.enviados} aparelho(s).`);
-      if (r.falhas > 0) {
+      if (!res.ok) {
+        throw new Error(r.erro ?? `Erro ao enviar recado (${res.status}).`);
+      }
+      toast.success(`Recado enviado para ${r.enviados ?? 0} aparelho(s).`);
+      if ((r.falhas ?? 0) > 0) {
         toast.error(`${r.falhas} envio(s) falharam.`);
       }
+
       setTitulo("");
       setMensagem("");
       setCaminho("");
