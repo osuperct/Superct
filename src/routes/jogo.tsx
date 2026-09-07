@@ -2358,16 +2358,11 @@ function JogoPage() {
               </>
             ) : (
               <span className="flex items-center gap-1">
-                {Array.from({ length: Math.max(0, Math.min(vidas, 6)) }).map((_, i) => (
-                  <Heart
-                    key={`vida-${i}`}
-                    className="size-3 shrink-0"
-                    style={{ color: "#f43f5e", fill: "#f43f5e", filter: "drop-shadow(0 0 6px #f43f5e)" }}
-                  />
-                ))}
-                {vidas > 6 && (
-                  <span className="font-mono text-[9px] tracking-widest text-[#fb7185]">+{vidas - 6}</span>
-                )}
+                <Heart
+                  className="size-4 shrink-0"
+                  style={{ color: "#f43f5e", fill: "#f43f5e", filter: "drop-shadow(0 0 6px #f43f5e)" }}
+                />
+                <span className="font-mono text-[10px] tracking-widest text-[#fb7185]">{vidas}</span>
               </span>
             )}
 
