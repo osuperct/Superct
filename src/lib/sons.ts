@@ -263,3 +263,45 @@ export function musicaAtiva() {
   return ligado;
 }
 
+
+/* --------- fanfarra de vitória final (medalha suprema) --------- */
+let vitoriaTimer: number | null = null;
+
+const FANFARRA: Trilha = {
+  melodia: [523, 659, 784, 1047, 988, 784, 880, 1047, 1175, 1047, 880, 784, 659, 784, 1047, 1319],
+  baixo: [131, 165, 196, 262, 247, 196, 220, 262],
+  intervalo: 210,
+  tipoMel: "square",
+  tipoBaixo: "triangle",
+  volMel: 0.14,
+  volBaixo: 0.18,
+};
+
+/** Música de vitória em loop para a tela da medalha suprema. */
+export function musicaVitoria() {
+  pararMusica();
+  pararMusicaVitoria();
+  const c = audio();
+  if (!c) return;
+  let passo = 0;
+  somVitoria();
+  vitoriaTimer = window.setInterval(() => {
+    tom(FANFARRA.melodia[passo % FANFARRA.melodia.length]!, 0.16, FANFARRA.tipoMel, FANFARRA.volMel);
+    if (passo % 2 === 0) {
+      tom(
+        FANFARRA.baixo[(passo / 2) % FANFARRA.baixo.length]!,
+        0.24,
+        FANFARRA.tipoBaixo,
+        FANFARRA.volBaixo,
+      );
+    }
+    passo += 1;
+  }, FANFARRA.intervalo);
+}
+
+export function pararMusicaVitoria() {
+  if (vitoriaTimer !== null) {
+    window.clearInterval(vitoriaTimer);
+    vitoriaTimer = null;
+  }
+}
