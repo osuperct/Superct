@@ -4,13 +4,10 @@ import type { Session } from "@supabase/supabase-js";
 import { Bell, FileText, GraduationCap, Paperclip, Send, ShieldCheck, Trash2, Upload, Users } from "lucide-react";
 import { toast } from "sonner";
 
-import { useServerFn } from "@tanstack/react-start";
-
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
 import { AvisosProfessor } from "@/components/AvisosProfessor";
 import { ListaChamada } from "@/components/ListaChamada";
-import { enviarRecadoPush } from "@/lib/notificacoes.functions";
 
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
