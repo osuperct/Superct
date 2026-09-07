@@ -1387,6 +1387,7 @@ function JogoPage() {
           ]);
         }
 
+        let vilaoQueBateu: number | null = null;
         setInimigos((prev) => {
           const proximos: Inimigo[] = [];
           const hx = x.current;
@@ -1402,17 +1403,21 @@ function JogoPage() {
               setPontos(pontosRef.current + passados.current + Math.floor((maxX.current - 60) / 60));
               continue;
             }
-            const bateX = nx + 34 > hx + 4 && nx + 4 < hx + HEROI_W - 4;
-            const bateY = ny + 34 > hy + 4 && ny + 4 < hy + hAlt;
-            if (bateX && bateY) {
-              perderVida(i.vilao);
+            /* área de contato do vilão (imagem de 36px) */
+            const bateX = nx + 34 > hx + 2 && nx + 2 < hx + HEROI_W - 2;
+            const bateY = ny + 34 > hy + 2 && ny + 2 < hy + hAlt;
+            if (bateX && bateY && performance.now() > invulAte.current) {
+              vilaoQueBateu = i.vilao;
               continue;
             }
             proximos.push({ ...i, x: nx, y: ny });
-
           }
           return proximos;
         });
+        if (vilaoQueBateu !== null) {
+          perderVida(vilaoQueBateu, true);
+          return;
+        }
         return;
       }
 
