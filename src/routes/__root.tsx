@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SideRail } from "../components/SideRail";
 import { BotaoSair } from "../components/BotaoSair";
+import { SidebarProvider } from "../components/SidebarContext";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
