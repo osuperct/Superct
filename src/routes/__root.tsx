@@ -154,7 +154,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
         <SideRail />
-        <BotaoSair className="fixed right-4 top-4 z-[70]" />
+        <BotaoSair className="fixed right-4 top-4 z-[45]" />
         <Toaster />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
