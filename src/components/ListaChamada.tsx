@@ -25,6 +25,7 @@ export function ListaChamada({
   const [salvando, setSalvando] = useState<string | null>(null);
   const [busca, setBusca] = useState("");
   const [aberto, setAberto] = useState(false);
+  const { setForcarRecolhida } = useSidebarControl();
 
   const dias = useMemo(() => diasDeAula(ano, mes), [ano, mes]);
   const hoje = hojeDia();
