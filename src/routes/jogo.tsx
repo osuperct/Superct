@@ -15,6 +15,8 @@ import {
   somPoder,
   somPulo,
   somVitoria,
+  musicaVitoria,
+  pararMusicaVitoria,
 } from "@/lib/sons";
 
 
@@ -548,6 +550,8 @@ function JogoPage() {
   const [abaixado, setAbaixado] = useState(false);
   const [fim, setFim] = useState(false);
   const [venceu, setVenceu] = useState(false);
+  const [salvando, setSalvando] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
   const [derrotado, setDerrotado] = useState<number | null>(null);
   const [somLigado, setSomLigado] = useState(true);
   const somRef = useRef(true);
@@ -1683,7 +1687,53 @@ function JogoPage() {
   const progresso = emChefao ? 100 : Math.min(100, (heroX / (MUNDO - HEROI_W)) * 100);
   const heroiAtual = heroiPorId(heroiSel ?? "kael");
 
-  useEffect(() => () => pararMusica(), []);
+  useEffect(() => () => {
+    pararMusica();
+    pararMusicaVitoria();
+  }, []);
+
+  /* música de vitória na tela da medalha suprema */
+  useEffect(() => {
+    if (venceu && fim && somRef.current) {
+      acordarAudio();
+      musicaVitoria();
+    } else {
+      pararMusicaVitoria();
+    }
+  }, [venceu, fim]);
+
+  const salvarPrint = async () => {
+    const alvo = printRef.current;
+    if (!alvo || salvando) return;
+    setSalvando(true);
+    try {
+      const { default: html2canvas } = await import("html2canvas-pro");
+      const canvas = await html2canvas(alvo, { backgroundColor: "#0b0b0f", scale: 2 });
+      const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
+      if (!blob) return;
+      const arquivo = new File([blob], "super-ct-medalha-suprema.png", { type: "image/png" });
+      const nav = navigator as Navigator & {
+        canShare?: (d: { files?: File[] }) => boolean;
+        share?: (d: { files?: File[]; title?: string; text?: string }) => Promise<void>;
+      };
+      if (nav.canShare?.({ files: [arquivo] }) && nav.share) {
+        await nav.share({
+          files: [arquivo],
+          title: "Medalha Suprema Super CT",
+          text: "Ganhei a medalha suprema do Super CT!",
+        });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "super-ct-medalha-suprema.png";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } finally {
+      setSalvando(false);
+    }
+  };
 
   useEffect(() => {
     if (fim) pararMusica();
@@ -2312,7 +2362,51 @@ function JogoPage() {
             </div>
           )}
 
-          {fim && (
+          {fim && venceu && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 px-3 py-4 backdrop-blur-md">
+              <div className="flex max-h-full w-full max-w-sm flex-col items-center gap-3 overflow-y-auto">
+                <div
+                  ref={printRef}
+                  className="w-full rounded-2xl border-2 border-primary bg-[#0b0b0f] px-4 py-5 text-center animate-pulse-slow"
+                >
+                  <img
+                    src={heroiAtual.medalha}
+                    alt={`${heroiAtual.nome} segurando a medalha suprema do Super CT`}
+                    className="mx-auto h-44 w-auto select-none"
+                    style={{ filter: `drop-shadow(0 0 20px ${heroiAtual.cor})` }}
+                  />
+                  <p className="mt-3 font-display text-2xl uppercase leading-tight tracking-tight text-primary">
+                    Yeeees! Você ganhou a medalha suprema!
+                  </p>
+                  <p className="mt-2 font-body text-[13px] leading-snug text-foreground">
+                    Você conseguiu atravessar os maiores desafios da nossa academia e derrotar todos
+                    os terríveis vilões! Parabéns!
+                  </p>
+                  <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    {heroiAtual.nome} • {pontos} pontos • Super CT
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={salvarPrint}
+                    className="rounded-full border border-primary bg-primary/15 px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-primary"
+                  >
+                    {salvando ? "Gerando imagem..." : "Salvar / compartilhar print"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={reiniciar}
+                    className="rounded-full border border-border px-4 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                  >
+                    Jogar de novo
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {fim && !venceu && (
             <div className="absolute inset-0 z-40 flex flex-col items-center justify-center gap-2 overflow-hidden bg-black/85 px-6 text-center">
               {!venceu && (
                 <img
