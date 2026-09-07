@@ -357,18 +357,6 @@ function Autenticacao() {
           </button>
         )}
 
-        {modo === "entrar" && (
-          <a
-            href={`https://wa.me/5535988223596?text=${encodeURIComponent(
-              `Olá Professor Tio Victor! Esqueci minha senha da Área do Responsável.${email.trim() ? ` Meu cadastro: ${email.trim()}` : ""} Pode me ajudar a recuperar?`,
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block w-full rounded-md border border-secondary/60 bg-secondary/10 px-3 py-2 text-center font-display text-xs tracking-tight text-secondary"
-          >
-            PEDIR NOVA SENHA NO WHATSAPP
-          </a>
-        )}
 
       </form>
     </div>
