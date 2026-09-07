@@ -13,7 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { SideRail } from "../components/SideRail";
 import { BotaoSair } from "../components/BotaoSair";
-import { SidebarProvider } from "../components/SidebarContext";
+import { SidebarProvider, useSidebarControl } from "../components/SidebarContext";
 import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
@@ -147,6 +147,12 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function SairFlutuante() {
+  const { forcarRecolhida } = useSidebarControl();
+  if (forcarRecolhida) return null;
+  return <BotaoSair className="fixed right-4 top-4 z-[70]" />;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -154,7 +160,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <SidebarProvider>
         <SideRail />
-        <BotaoSair className="fixed right-4 top-4 z-[45]" />
+        <SairFlutuante />
         <Toaster />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
