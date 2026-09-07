@@ -167,6 +167,7 @@ function Autenticacao() {
               nome_responsavel: nome.trim(),
               telefone: telefone.trim(),
               cpf: apenasDigitos(cpf),
+              endereco: endereco.trim(),
               aluno_nome: alunoNome.trim(),
               aluno_idade: alunoIdade,
               aceite_imagem: aceite,
