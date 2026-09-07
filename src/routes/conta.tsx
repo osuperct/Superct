@@ -676,9 +676,46 @@ function Painel({ session }: { session: Session }) {
     );
   }
 
+  const temContrato = entregues.some((e) => e.tipo === "contrato");
+  const temFicha = entregues.some((e) => e.tipo === "ficha");
+  const mostrarAvisoInicial =
+    aprovado === true && !ehProfessor && !ehAdm && (!temContrato || !temFicha) && !avisoFechado;
+
   return (
     <div className="mt-6">
+      {mostrarAvisoInicial && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4 backdrop-blur-md">
+          <div className="animate-pulse-slow w-full max-w-sm rounded-xl border-2 border-primary bg-card p-5 text-center shadow-2xl">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Acesso liberado</p>
+            <h2 className="mt-2 font-display text-xl tracking-tight text-foreground">
+              FALTAM SEUS DOCUMENTOS!
+            </h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {!temContrato
+                ? "Preencha o contrato do aluno e, em seguida, a ficha de saúde (PAR-Q)."
+                : "Falta só um passo: preencher a ficha de saúde (PAR-Q) do aluno."}
+            </p>
+            <Link
+              to="/documento/$tipo"
+              params={{ tipo: !temContrato ? "contrato" : "ficha" }}
+              onClick={() => setAvisoFechado(true)}
+              className="mt-4 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+            >
+              {!temContrato ? "PREENCHER O CONTRATO AGORA" : "PREENCHER A FICHA / PAR-Q"}{" "}
+              <Send className="size-4 shrink-0" />
+            </Link>
+            <button
+              type="button"
+              onClick={() => setAvisoFechado(true)}
+              className="mt-3 w-full rounded-md border border-border px-4 py-2 font-display text-xs tracking-tight text-muted-foreground"
+            >
+              FAZER DEPOIS
+            </button>
+          </div>
+        </div>
+      )}
       <LembreteAcesso />
+
       <div className="rounded-md border border-border bg-card/50 p-3">
         <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
         <p className="text-sm">{session.user.email}</p>
