@@ -712,6 +712,11 @@ function JogoPage() {
   const iniciarChefao = useCallback(() => {
     modoRef.current = "chefao";
     setModo("chefao");
+    /* vidas extras juntadas na corrida viram novas chances; a barra começa cheia */
+    estoqueRef.current = Math.max(0, vidasRef.current - 1);
+    setEstoqueCoracoes(estoqueRef.current);
+    vidasRef.current = VIDAS_CHEFAO;
+    setVidas(VIDAS_CHEFAO);
     pausaRef.current = false;
     fimRef.current = false;
     tick.current = 0;
