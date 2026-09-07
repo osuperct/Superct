@@ -604,6 +604,7 @@ function JogoPage() {
   const spawnTiro = useRef(90);
   const vidasRef = useRef(VIDAS_CHEFAO);
   const coracoesRef = useRef<number[]>(CORACOES.map((_, i) => i));
+  const estoqueRef = useRef(0);
   const conesRef = useRef<number[]>([]);
   const invulAte = useRef(0);
   const presoAte = useRef(0);
