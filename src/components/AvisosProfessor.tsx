@@ -129,7 +129,7 @@ export function AvisosProfessor({ uid }: { uid: string }) {
       </button>
 
       {lista.length > 0 && (
-        <div className="mt-3 space-y-2">
+        <div className="mt-3 max-h-[360px] space-y-2 overflow-y-auto rounded-md border border-border bg-background/20 p-2">
           {porMes.map((grupo) => {
             const aberto = abertos.has(grupo.chave);
             return (
