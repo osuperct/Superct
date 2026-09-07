@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { Bell, FileText, GraduationCap, Paperclip, Send, ShieldCheck, Trash2, Upload, Users } from "lucide-react";
+import { FileText, GraduationCap, Paperclip, ShieldCheck, Trash2, Upload, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
 import { AvisosProfessor } from "@/components/AvisosProfessor";
 import { ListaChamada } from "@/components/ListaChamada";
-import { ResponsaveisSemNotificacao } from "@/components/ResponsaveisSemNotificacao";
 
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
@@ -351,7 +350,6 @@ function Painel({ professorId }: { professorId: string }) {
 
       <AvisosProfessor uid={professorId} />
 
-      <EnvioRecadoPush />
 
       <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
 
@@ -485,125 +483,3 @@ function Painel({ professorId }: { professorId: string }) {
   );
 }
 
-function EnvioRecadoPush() {
-  const [titulo, setTitulo] = useState("");
-  const [mensagem, setMensagem] = useState("");
-  const [caminho, setCaminho] = useState("");
-  const [enviando, setEnviando] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!titulo.trim() || !mensagem.trim()) {
-      toast.error("Preencha o título e a mensagem.");
-      return;
-    }
-    setEnviando(true);
-    try {
-      const { data: sessao } = await supabase.auth.getSession();
-      const token = sessao.session?.access_token;
-      if (!token) {
-        toast.error("Faça login novamente para enviar o recado.");
-        return;
-      }
-      // O envio de notificação só funciona no servidor do app da Lovable.
-      // Em outros domínios (ex: osuperct.com hospedado fora), usamos o endereço fixo do app.
-      const base =
-        typeof window !== "undefined" && window.location.hostname.endsWith(".lovable.app")
-          ? ""
-          : "https://project--f98de061-dc8c-43b5-9c7f-56210aba7b2d.lovable.app";
-      const res = await fetch(`${base}/api/public/enviar-push`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({
-          titulo: titulo.trim(),
-          mensagem: mensagem.trim(),
-          caminho: caminho.trim() || undefined,
-        }),
-      });
-      const r = (await res.json().catch(() => ({}))) as {
-        enviados?: number;
-        falhas?: number;
-        responsaveis?: number;
-        erro?: string;
-      };
-      if (!res.ok) {
-        throw new Error(r.erro ?? `Erro ao enviar recado (${res.status}).`);
-      }
-      if ((r.enviados ?? 0) === 0 && (r.falhas ?? 0) === 0) {
-        toast.error(
-          "Nenhum celular está registrado ainda. O responsável precisa abrir o app em osuperct.com no celular e aceitar as notificações."
-        );
-      } else {
-        toast.success(`Recado enviado para ${r.enviados ?? 0} aparelho(s).`);
-      }
-      if ((r.falhas ?? 0) > 0) {
-        toast.error(`${r.falhas} envio(s) falharam.`);
-      }
-
-
-      setTitulo("");
-      setMensagem("");
-      setCaminho("");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Erro ao enviar recado.");
-    } finally {
-      setEnviando(false);
-    }
-  }
-
-  return (
-    <section className="rounded-lg border border-primary/40 bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <Bell className="size-4 text-primary" /> ENVIAR RECADO POR NOTIFICAÇÃO
-      </h2>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Envie um recado que chega como notificação no celular dos responsáveis de alunos ativos.
-      </p>
-      <form onSubmit={(e) => void handleSubmit(e)} className="mt-3 space-y-3">
-        <label className="block space-y-1">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Título</span>
-          <input
-            value={titulo}
-            onChange={(e) => setTitulo(e.target.value)}
-            placeholder="Ex: Aula cancelada"
-            maxLength={60}
-            required
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-          />
-        </label>
-        <label className="block space-y-1">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Mensagem</span>
-          <textarea
-            value={mensagem}
-            onChange={(e) => setMensagem(e.target.value)}
-            placeholder="Escreva o recado…"
-            rows={3}
-            maxLength={160}
-            required
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-          />
-        </label>
-        <label className="block space-y-1">
-          <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Link do app (opcional)
-          </span>
-          <input
-            value={caminho}
-            onChange={(e) => setCaminho(e.target.value)}
-            placeholder="Ex: /calendario"
-            maxLength={100}
-            className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
-          />
-        </label>
-        <button
-          type="submit"
-          disabled={enviando}
-          className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground disabled:opacity-60"
-        >
-          <Send className="size-4" /> {enviando ? "ENVIANDO…" : "ENVIAR NOTIFICAÇÃO"}
-        </button>
-      </form>
-      <ResponsaveisSemNotificacao />
-    </section>
-  );
-}

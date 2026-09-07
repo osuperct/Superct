@@ -73,7 +73,7 @@ export function AvisosProfessor({ uid }: { uid: string }) {
         <Megaphone className="size-4 text-primary" /> QUADRO DE AVISOS
       </h2>
       <p className="mt-1 text-xs text-muted-foreground">
-        A mensagem aparece na área de todos os responsáveis e chega como notificação no celular.
+        A mensagem aparece na área de todos os responsáveis.
       </p>
 
       <input
