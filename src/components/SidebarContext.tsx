@@ -5,7 +5,10 @@ type SidebarContextValue = {
   setForcarRecolhida: (value: boolean) => void;
 };
 
-const SidebarContext = createContext<SidebarContextValue | undefined>(undefined);
+const SidebarContext = createContext<SidebarContextValue>({
+  forcarRecolhida: false,
+  setForcarRecolhida: () => {},
+});
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
   const [forcarRecolhida, setForcarRecolhida] = useState(false);
@@ -17,7 +20,5 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
 }
 
 export function useSidebarControl() {
-  const ctx = useContext(SidebarContext);
-  if (!ctx) throw new Error("useSidebarControl deve ser usado dentro de SidebarProvider");
-  return ctx;
+  return useContext(SidebarContext);
 }
