@@ -1169,6 +1169,35 @@ function JogoPage() {
           }
         }
 
+        /* ---- computadores lançam 3 raios para cima a cada 2 segundos ---- */
+        if (lay.telas.length > 0) {
+          spawnQueda.current -= 1;
+          if (spawnQueda.current <= 0) {
+            spawnQueda.current = 120;
+            const visiveis = lay.telas.filter((t) => t.x > cam - 40 && t.x < cam + vista + 40);
+            const novos: Tiro[] = [];
+            for (const t of visiveis) {
+              for (let i = 0; i < 3; i += 1) {
+                novos.push({
+                  id: nextTiro.current++,
+                  x: t.x + t.w / 2 - 7 + (i - 1) * 15,
+                  y: 34,
+                  vx: 0,
+                  vy: 2.6 + dif,
+                  tipo: "raio",
+                  volta: false,
+                  origem: t.x,
+                  cor: "#67e8f9",
+                  fase: Math.random() * Math.PI * 2,
+                });
+              }
+            }
+            if (novos.length > 0) tirosRef.current = [...tirosRef.current, ...novos];
+          }
+        }
+
+
+
         /* ---- chuva de batata frita (fase 4) ---- */
         if (lay.chuvaBatata.length > 0) {
           spawnQueda.current -= 1;
