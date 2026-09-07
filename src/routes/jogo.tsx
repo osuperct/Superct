@@ -1260,8 +1260,8 @@ function JogoPage() {
           if (pego !== undefined) {
             coracoesRef.current = coracoesRef.current.filter((idx) => idx !== pego);
             setCoracoes(coracoesRef.current);
-            vidasRef.current = Math.min(VIDAS_MAX, vidasRef.current + 1);
-            setVidas(vidasRef.current);
+            estoqueRef.current = Math.min(VIDAS_MAX, estoqueRef.current + 1);
+            setEstoqueCoracoes(estoqueRef.current);
             pontosRef.current += 10;
             setPontos(pontosRef.current);
             sfx(somMoeda);
