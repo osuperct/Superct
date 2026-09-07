@@ -890,6 +890,8 @@ function Painel({ session }: { session: Session }) {
         </Link>
       </section>
 
+      <AtivarNotificacoes uid={uid} />
+
       <AvisosResponsavel uid={uid} />
 
       <PresencaResponsavel uid={uid} alunos={alunos} />
