@@ -53,6 +53,13 @@ export function ListaChamada({
     void carregar();
   }, [carregar]);
 
+  useEffect(() => {
+    setForcarRecolhida(aberto);
+    return () => {
+      setForcarRecolhida(false);
+    };
+  }, [aberto, setForcarRecolhida]);
+
   function mudarMes(passo: number) {
     const d = new Date(ano, mes - 1 + passo, 1);
     setAno(d.getFullYear());
