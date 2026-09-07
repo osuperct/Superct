@@ -1761,7 +1761,16 @@ function JogoPage() {
     setSalvando(true);
     try {
       const { default: html2canvas } = await import("html2canvas-pro");
-      const canvas = await html2canvas(alvo, { backgroundColor: "#0b0b0f", scale: 2 });
+      const canvas = await html2canvas(alvo, {
+        backgroundColor: "#0b0b0f",
+        scale: 2,
+        scrollX: 0,
+        scrollY: 0,
+        width: alvo.scrollWidth,
+        height: alvo.scrollHeight,
+        windowWidth: alvo.scrollWidth,
+        windowHeight: alvo.scrollHeight,
+      });
       const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/png"));
       if (!blob) return;
       const arquivo = new File([blob], "super-ct-medalha-suprema.png", { type: "image/png" });
