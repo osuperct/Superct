@@ -502,7 +502,13 @@ function EnvioRecadoPush() {
     }
     setEnviando(true);
     try {
-      const r = await enviar({ data: { titulo: titulo.trim(), mensagem: mensagem.trim(), caminho: caminho.trim() || undefined } });
+      const payload: { titulo: string; mensagem: string; caminho?: string } = {
+        titulo: titulo.trim(),
+        mensagem: mensagem.trim(),
+      };
+      const caminhoTrim = caminho.trim();
+      if (caminhoTrim) payload.caminho = caminhoTrim;
+      const r = await enviar({ data: payload });
       toast.success(`Recado enviado para ${r.enviados} aparelho(s).`);
       if (r.falhas > 0) {
         toast.error(`${r.falhas} envio(s) falharam.`);
