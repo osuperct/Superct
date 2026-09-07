@@ -251,6 +251,9 @@ function Aprovacoes() {
     <section className="rounded-lg border border-primary/40 bg-card/40 p-4">
       <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
         <BadgeCheck className="size-4 text-primary" /> CADASTROS
+        {contas !== null && (
+          <span className="text-sm text-muted-foreground">({contas.length})</span>
+        )}
         {pendentes.length > 0 && (
           <span className="rounded-full bg-primary px-2 py-0.5 font-mono text-[10px] text-primary-foreground">
             {pendentes.length}
