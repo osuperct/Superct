@@ -2096,6 +2096,9 @@ function JogoPage() {
                   ? heroiAtual.anda[passoFrame]
                   : heroiAtual.anda[0];
               const inclinacao = pulando && !escalando ? olhando * 14 : 0;
+              /* cada batata/donut que encostou deixa o personagem um pouco maior */
+              const gordoX = 1 + gorduraUi * 0.1;
+              const gordoY = 1 + gorduraUi * 0.045;
               return (
                 <div
                   className="absolute transition-[height] duration-100"
@@ -2104,7 +2107,9 @@ function JogoPage() {
                     width: HEROI_W,
                     height: alt,
                     bottom: 40 + heroY,
-                    transform: escalando ? "none" : `scaleX(${olhando}) rotate(${inclinacao}deg)`,
+                    transform: escalando
+                      ? `scale(${gordoX}, ${gordoY})`
+                      : `scaleX(${olhando * gordoX}) scaleY(${gordoY}) rotate(${inclinacao}deg)`,
                     transformOrigin: "bottom center",
                   }}
                 >
