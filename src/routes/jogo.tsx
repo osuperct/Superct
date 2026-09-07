@@ -758,7 +758,7 @@ function JogoPage() {
     let raf = 0;
 
     /* perder uma vida: volta ao checkpoint do trecho atual (corrida ou arena do chefão) */
-    const perderVida = (vilao: number | null) => {
+    const perderVida = (vilao: number | null, semVoltar = false) => {
       if (fimRef.current || performance.now() <= invulAte.current) return;
       vidasRef.current -= 1;
       setVidas(vidasRef.current);
@@ -766,6 +766,7 @@ function JogoPage() {
       invulAte.current = performance.now() + 1800;
       setPiscando(true);
       window.setTimeout(() => setPiscando(false), 1600);
+      let acabou = false;
       if (vidasRef.current <= 0) {
         if (estoqueRef.current > 0) {
           /* usa um coração coletado e volta com a barra cheia */
@@ -781,6 +782,12 @@ function JogoPage() {
           setDerrotado(vilao);
           return;
         }
+        acabou = true;
+      }
+      /* só volta ao checkpoint quando a vida zera de vez */
+      if (semVoltar && !acabou) {
+        impactos.current = 0;
+        return;
       }
       impactos.current = 0;
       presoAte.current = 0;
