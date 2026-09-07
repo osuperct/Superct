@@ -2367,7 +2367,8 @@ function JogoPage() {
               <div className="flex max-h-full w-full max-w-sm flex-col items-center gap-3 overflow-y-auto">
                 <div
                   ref={printRef}
-                  className="w-full rounded-2xl border-2 border-primary bg-[#0b0b0f] px-4 py-5 text-center animate-pulse-slow"
+                  className="w-full rounded-2xl border-2 bg-[#0b0b0f] px-4 py-5 text-center animate-pulse-slow"
+                  style={{ borderColor: heroiAtual.cor, boxShadow: `0 0 24px ${heroiAtual.cor}66` }}
                 >
                   <img
                     src={heroiAtual.medalha}
@@ -2375,7 +2376,10 @@ function JogoPage() {
                     className="mx-auto h-44 w-auto select-none"
                     style={{ filter: `drop-shadow(0 0 20px ${heroiAtual.cor})` }}
                   />
-                  <p className="mt-3 font-display text-2xl uppercase leading-tight tracking-tight text-primary">
+                  <p
+                    className="mt-3 font-display text-2xl uppercase leading-tight tracking-tight"
+                    style={{ color: heroiAtual.cor, textShadow: `0 0 16px ${heroiAtual.cor}` }}
+                  >
                     Yeeees! Você ganhou a medalha suprema!
                   </p>
                   <p className="mt-2 font-body text-[13px] leading-snug text-foreground">
