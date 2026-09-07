@@ -346,9 +346,12 @@ function Aprovacoes() {
         type="button"
         onClick={() => setVerTodas((v) => !v)}
         aria-label={verTodas ? "Mostrar só pendentes" : "Mostrar todos os cadastros"}
-        className="mt-3 inline-flex items-center justify-center rounded-md border border-border bg-background/60 p-2 text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+        className="mt-3 inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background/60 px-3 py-2 text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
       >
         {verTodas ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+        <span className="font-display text-[11px] tracking-tight">
+          {verTodas ? "MOSTRAR SÓ PENDENTES" : "MOSTRAR LISTA COMPLETA"}
+        </span>
       </button>
     </section>
   );
