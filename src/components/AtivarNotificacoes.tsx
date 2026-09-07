@@ -94,5 +94,6 @@ export function AtivarNotificacoes({ uid }: { uid: string }) {
         {registrado ? "REGISTRAR NOVAMENTE" : "ATIVAR NOTIFICAÇÕES"}
       </button>
     </section>
+    </>
   );
 }
