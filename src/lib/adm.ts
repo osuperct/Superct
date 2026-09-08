@@ -68,6 +68,6 @@ export async function definirAcessoConta(
 /** Exclui definitivamente uma conta cadastrada (pede a senha de confirmação). */
 export async function excluirConta(userId: string, senha: string): Promise<Resultado> {
   const { data, error } = await supabase.rpc("adm_excluir_conta", { _user_id: userId, _senha: senha });
-  if (error) return { ok: false, erro: "Não foi possível excluir o cadastro." };
+  if (error) return { ok: false, erro: `Não foi possível excluir o cadastro: ${error.message}` };
   return data as unknown as Resultado;
 }
