@@ -133,6 +133,7 @@ function Painel({ professorId }: { professorId: string }) {
   const [enviando, setEnviando] = useState(false);
   const [verDocs, setVerDocs] = useState(false);
   const [docsAberto, setDocsAberto] = useState("");
+  const [alunosMinimizado, setAlunosMinimizado] = useState(false);
 
   const inputArquivo = useRef<HTMLInputElement>(null);
 
@@ -300,95 +301,109 @@ function Painel({ professorId }: { professorId: string }) {
       </section>
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={() => setAlunosMinimizado((v) => !v)}
+          className="flex w-full items-center justify-between gap-2"
+        >
           <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
             <Users className="size-4 text-primary" /> ALUNOS MATRICULADOS ({alunos.length})
           </h2>
-          <select
-            value={filtroAlunos}
-            onChange={(e) => setFiltroAlunos(e.target.value as typeof filtroAlunos)}
-            className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
-          >
-            <option value="recentes">Mais recentes (15 dias)</option>
-            <option value="todos">Todos (A–Z)</option>
-            <option value="ativos">Ativos</option>
-            <option value="inativos">Inativos</option>
-          </select>
-        </div>
+          <ChevronDown
+            className={`size-5 shrink-0 text-primary transition-transform ${alunosMinimizado ? "" : "rotate-180"}`}
+          />
+        </button>
 
-        <ul className="mt-3 space-y-2">
-          {alunosFiltrados.map((a) => {
-            const perfil = perfis.find((p) => p.id === a.user_id);
-            const ativo = estaAtivo(a.id);
-            return (
-              <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium">
-                    {a.nome}
-                    {a.idade ? ` — ${a.idade} anos` : ""}
-                  </p>
-                  <span className="shrink-0 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
-                    {a.matricula ?? "sem matrícula"}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Responsável: {perfil?.nome_responsavel || "—"}
-                  {perfil?.telefone ? ` • ${perfil.telefone}` : ""}
-                  {perfil?.cpf ? ` • CPF ${formatarCpf(perfil.cpf)}` : ""}
-                </p>
-                <div className="mt-1 flex items-center justify-between gap-2">
-                  <p
-                    className={`font-mono text-[9px] uppercase tracking-widest ${
-                      ativo ? "text-primary" : "text-destructive"
-                    }`}
-                  >
-                    Matrícula {ativo ? "ativa" : "inativa"}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setDocsAberto((s) => (s === a.id ? "" : a.id))}
-                    className="flex shrink-0 items-center gap-1 rounded border border-primary/60 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary active:scale-95"
-                  >
-                    DOC ({docsDoAluno(a).length})
-                    <ChevronDown
-                      className={`size-3 transition-transform ${docsAberto === a.id ? "rotate-180" : ""}`}
-                    />
-                  </button>
-                </div>
-                {docsAberto === a.id ? (
-                  <ul className="mt-2 space-y-1 border-t border-border pt-2">
-                    {docsDoAluno(a).map((d) => (
-                      <li key={d.id}>
-                        <button
-                          type="button"
-                          onClick={() => void abrir(d)}
-                          className="flex w-full items-center gap-2 rounded-md border border-border bg-background/60 px-2 py-1.5 text-left text-xs active:scale-[0.99]"
-                        >
-                          <FileText className="size-3.5 shrink-0 text-primary" />
-                          <span className="min-w-0 flex-1 truncate">
-                            {d.tipo} • {d.nome_arquivo}
-                          </span>
-                          <span className="shrink-0 font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
-                            {new Date(d.created_at).toLocaleDateString("pt-BR")}
-                          </span>
-                        </button>
-                      </li>
-                    ))}
-                    {docsDoAluno(a).length === 0 && (
-                      <li className="text-xs text-muted-foreground">
-                        Nenhum documento conferido e liberado para este aluno.
-                      </li>
-                    )}
-                  </ul>
-                ) : null}
-              </li>
-            );
-          })}
+        {!alunosMinimizado && (
+          <>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+              <select
+                value={filtroAlunos}
+                onChange={(e) => setFiltroAlunos(e.target.value as typeof filtroAlunos)}
+                className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+              >
+                <option value="recentes">Mais recentes (15 dias)</option>
+                <option value="todos">Todos (A–Z)</option>
+                <option value="ativos">Ativos</option>
+                <option value="inativos">Inativos</option>
+              </select>
+            </div>
 
-          {alunosFiltrados.length === 0 && (
-            <li className="text-sm text-muted-foreground">Nenhum aluno nesta seleção.</li>
-          )}
-        </ul>
+            <ul className="mt-3 space-y-2">
+              {alunosFiltrados.map((a) => {
+                const perfil = perfis.find((p) => p.id === a.user_id);
+                const ativo = estaAtivo(a.id);
+                return (
+                  <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-sm font-medium">
+                        {a.nome}
+                        {a.idade ? ` — ${a.idade} anos` : ""}
+                      </p>
+                      <span className="shrink-0 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
+                        {a.matricula ?? "sem matrícula"}
+                      </span>
+                    </div>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Responsável: {perfil?.nome_responsavel || "—"}
+                      {perfil?.telefone ? ` • ${perfil.telefone}` : ""}
+                      {perfil?.cpf ? ` • CPF ${formatarCpf(perfil.cpf)}` : ""}
+                    </p>
+                    <div className="mt-1 flex items-center justify-between gap-2">
+                      <p
+                        className={`font-mono text-[9px] uppercase tracking-widest ${
+                          ativo ? "text-primary" : "text-destructive"
+                        }`}
+                      >
+                        Matrícula {ativo ? "ativa" : "inativa"}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setDocsAberto((s) => (s === a.id ? "" : a.id))}
+                        className="flex shrink-0 items-center gap-1 rounded border border-primary/60 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary active:scale-95"
+                      >
+                        DOC ({docsDoAluno(a).length})
+                        <ChevronDown
+                          className={`size-3 transition-transform ${docsAberto === a.id ? "rotate-180" : ""}`}
+                        />
+                      </button>
+                    </div>
+                    {docsAberto === a.id ? (
+                      <ul className="mt-2 space-y-1 border-t border-border pt-2">
+                        {docsDoAluno(a).map((d) => (
+                          <li key={d.id}>
+                            <button
+                              type="button"
+                              onClick={() => void abrir(d)}
+                              className="flex w-full items-center gap-2 rounded-md border border-border bg-background/60 px-2 py-1.5 text-left text-xs active:scale-[0.99]"
+                            >
+                              <FileText className="size-3.5 shrink-0 text-primary" />
+                              <span className="min-w-0 flex-1 truncate">
+                                {d.tipo} • {d.nome_arquivo}
+                              </span>
+                              <span className="shrink-0 font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
+                                {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                              </span>
+                            </button>
+                          </li>
+                        ))}
+                        {docsDoAluno(a).length === 0 && (
+                          <li className="text-xs text-muted-foreground">
+                            Nenhum documento conferido e liberado para este aluno.
+                          </li>
+                        )}
+                      </ul>
+                    ) : null}
+                  </li>
+                );
+              })}
+
+              {alunosFiltrados.length === 0 && (
+                <li className="text-sm text-muted-foreground">Nenhum aluno nesta seleção.</li>
+              )}
+            </ul>
+          </>
+        )}
       </section>
 
 
