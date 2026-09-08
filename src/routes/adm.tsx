@@ -210,7 +210,7 @@ function Aprovacoes() {
     void carregar();
   }, [carregar]);
 
-  async function alternar(conta: ContaAcesso, aprovar: boolean) {
+  async function alternar(conta: ContaAcesso, aprovar: boolean, fisico?: boolean) {
     let pin = "";
     if (!aprovar) {
       const senha = window.prompt("Digite a senha para bloquear este cadastro:");
@@ -218,13 +218,19 @@ function Aprovacoes() {
       pin = senha;
     }
     setOcupado(conta.id);
-    const r = await definirAprovacaoConta(conta.id, aprovar, pin);
+    const r = await definirAprovacaoConta(conta.id, aprovar, pin, fisico);
     setOcupado(null);
     if (!r.ok) {
       toast.error(r.erro);
       return;
     }
-    toast.success(aprovar ? "Cadastro aprovado!" : "Cadastro bloqueado.");
+    toast.success(
+      !aprovar
+        ? "Cadastro bloqueado."
+        : fisico
+          ? "Acesso liberado com contrato e PAR-Q em papel."
+          : "Cadastro aprovado!",
+    );
     await carregar();
   }
 
