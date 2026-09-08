@@ -25,7 +25,7 @@ export function AtivarNotificacoes() {
   }, []);
 
   useEffect(() => {
-    if (!uid || !WEBPUSHR_KEY || !suportaPush()) return;
+    if (!uid || !suportaPush()) return;
     void (async () => {
       // Se já autorizou neste celular, só atualiza o registro em silêncio.
       const sincronizou = await sincronizarAparelho(uid);
