@@ -453,18 +453,25 @@ function Campo({
 
 /* ---------------------------------- PAINEL ---------------------------------- */
 
-function LembreteAcesso() {
+function LembreteAcesso({ emailLogado }: { emailLogado: string | null | undefined }) {
   const [dados, setDados] = useState<{ email: string; senha: string } | null>(null);
 
   useEffect(() => {
     const bruto = sessionStorage.getItem("superct_acesso");
     if (!bruto) return;
     try {
-      setDados(JSON.parse(bruto) as { email: string; senha: string });
+      const lido = JSON.parse(bruto) as { email: string; senha: string };
+      // Mostra o lembrete apenas para o dono da conta criada — evita exibir
+      // dados de um responsável no login do professor/adm no mesmo aparelho.
+      if (emailLogado && lido.email.trim().toLowerCase() !== emailLogado.trim().toLowerCase()) {
+        sessionStorage.removeItem("superct_acesso");
+        return;
+      }
+      setDados(lido);
     } catch {
       sessionStorage.removeItem("superct_acesso");
     }
-  }, []);
+  }, [emailLogado]);
 
   if (!dados) return null;
 
@@ -765,7 +772,7 @@ function Painel({ session }: { session: Session }) {
           </div>
         </div>
       )}
-      <LembreteAcesso />
+      <LembreteAcesso emailLogado={session.user.email} />
 
       <div className="rounded-md border border-border bg-card/50 p-3">
         <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
