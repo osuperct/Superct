@@ -152,11 +152,14 @@ function Autenticacao() {
           [cpf, "CPF do responsável"],
           [endereco, "Endereço completo"],
           [alunoNome, "Nome do aluno"],
-          [email, "E-mail do responsável"],
           [senha, "Senha"],
         ].filter(([v]) => !String(v).trim()).map(([, l]) => l);
         if (faltando.length > 0) {
           setAviso(`Preencha todos os campos obrigatórios: ${faltando.join(", ")}.`);
+          return;
+        }
+        if (email.trim() && !email.trim().includes("@")) {
+          setAviso("Confira o e-mail informado: ele não parece válido.");
           return;
         }
         if (!aceite) {
@@ -172,8 +175,13 @@ function Autenticacao() {
           setAviso("Este CPF já tem uma conta no Super CT. Entre com o CPF ou peça uma nova senha.");
           return;
         }
+        // E-mail opcional: sem e-mail, usamos um endereço interno baseado no CPF.
+        // A entrada continua sendo feita pelo CPF + senha.
+        const emailConta = email.trim()
+          ? email.trim().toLowerCase()
+          : `cpf${apenasDigitos(cpf)}@superct.app`;
         const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
+          email: emailConta,
           password: senha,
           options: {
             emailRedirectTo: `${window.location.origin}/conta`,
@@ -189,10 +197,14 @@ function Autenticacao() {
           },
         });
         if (error) throw error;
-        sessionStorage.setItem("superct_acesso", JSON.stringify({ email: email.trim(), senha }));
-        setCredenciais({ email: email.trim(), senha });
+        sessionStorage.setItem("superct_acesso", JSON.stringify({ email: emailConta, senha }));
+        setCredenciais({ email: emailConta, senha });
         if (!data.session) {
-          setAviso("Cadastro criado! Confirme seu e-mail pelo link que enviamos. Depois o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso.");
+          setAviso(
+            email.trim()
+              ? "Cadastro criado! Confirme seu e-mail pelo link que enviamos. Depois o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso."
+              : "Cadastro criado! Agora o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso. Para entrar, use seu CPF e a senha que criou.",
+          );
         } else {
           toast.success("Cadastro concluído!");
         }
@@ -331,10 +343,10 @@ function Autenticacao() {
           </>
         )}
         <Campo
-          label={modo === "entrar" ? "CPF ou e-mail" : "E-mail do responsável"}
+          label={modo === "entrar" ? "CPF ou e-mail" : "E-mail (opcional — para recuperar a senha)"}
           value={email}
           onChange={setEmail}
-          required
+          required={modo === "entrar"}
           type={modo === "entrar" ? "text" : "email"}
           maxLength={255}
         />
