@@ -13,8 +13,8 @@ self.addEventListener("push", (event) => {
   event.waitUntil(
     self.registration.showNotification(titulo, {
       body: dados.body || "",
-      icon: dados.icon || "/icons/icon-192.png",
-      badge: dados.icon || "/icons/icon-192.png",
+      icon: dados.icon || "/icon-192.png",
+      badge: dados.icon || "/icon-192.png",
       data: { url: dados.url || "https://osuperct.com" },
       vibrate: [120, 60, 120],
     }),
