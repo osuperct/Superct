@@ -133,6 +133,7 @@ function Painel({ professorId }: { professorId: string }) {
   const [enviando, setEnviando] = useState(false);
   const [verDocs, setVerDocs] = useState(false);
   const [docsAberto, setDocsAberto] = useState("");
+  const [alunosMinimizado, setAlunosMinimizado] = useState(false);
 
   const inputArquivo = useRef<HTMLInputElement>(null);
 
