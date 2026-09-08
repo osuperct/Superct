@@ -342,3 +342,28 @@
 @utility animate-brilho-medalha {
   animation: brilhoMedalha 1.2s infinite ease-in-out;
 }
+
+/* piscada de dano do herói ao encostar num vilão */
+@keyframes heroHurt {
+  0%,
+  100% {
+    opacity: 1;
+    filter: none;
+  }
+  25% {
+    opacity: 0.25;
+    filter: brightness(2.2) saturate(2) drop-shadow(0 0 10px #f43f5e);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.4) drop-shadow(0 0 8px #f43f5e);
+  }
+  75% {
+    opacity: 0.3;
+    filter: brightness(2.2) saturate(2) drop-shadow(0 0 12px #f43f5e);
+  }
+}
+
+@utility animate-hero-hurt {
+  animation: heroHurt 0.24s infinite steps(1, end);
+}
