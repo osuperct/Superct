@@ -27,6 +27,7 @@ export async function listarAcessosContas(): Promise<ContaAcesso[]> {
     adm: Boolean(c.adm),
     aprovado: Boolean(c.aprovado),
     criadoEm: c.criado_em ?? "",
+    documentosFisicos: Boolean(c.documentos_fisicos),
   }));
 }
 
@@ -35,11 +36,13 @@ export async function definirAprovacaoConta(
   userId: string,
   aprovado: boolean,
   senha = "",
+  documentosFisicos?: boolean,
 ): Promise<Resultado> {
   const { data, error } = await supabase.rpc("adm_definir_aprovacao", {
     _user_id: userId,
     _aprovado: aprovado,
     _senha: senha,
+    ...(documentosFisicos === undefined ? {} : { _fisico: documentosFisicos }),
   });
   if (error) return { ok: false, erro: "Não foi possível alterar a aprovação." };
   return data as unknown as Resultado;
