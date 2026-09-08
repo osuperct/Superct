@@ -61,7 +61,7 @@ export async function definirAcessoConta(
     _liberar: liberar,
     _senha: senha,
   });
-  if (error) return { ok: false, erro: "Não foi possível alterar o acesso." };
+  if (error) return { ok: false, erro: `Não foi possível alterar o acesso: ${error.message}` };
   return data as unknown as Resultado;
 }
 
