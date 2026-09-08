@@ -210,7 +210,7 @@ function Aprovacoes() {
     void carregar();
   }, [carregar]);
 
-  async function alternar(conta: ContaAcesso, aprovar: boolean) {
+  async function alternar(conta: ContaAcesso, aprovar: boolean, fisico?: boolean) {
     let pin = "";
     if (!aprovar) {
       const senha = window.prompt("Digite a senha para bloquear este cadastro:");
@@ -218,13 +218,19 @@ function Aprovacoes() {
       pin = senha;
     }
     setOcupado(conta.id);
-    const r = await definirAprovacaoConta(conta.id, aprovar, pin);
+    const r = await definirAprovacaoConta(conta.id, aprovar, pin, fisico);
     setOcupado(null);
     if (!r.ok) {
       toast.error(r.erro);
       return;
     }
-    toast.success(aprovar ? "Cadastro aprovado!" : "Cadastro bloqueado.");
+    toast.success(
+      !aprovar
+        ? "Cadastro bloqueado."
+        : fisico
+          ? "Acesso liberado com contrato e PAR-Q em papel."
+          : "Cadastro aprovado!",
+    );
     await carregar();
   }
 
@@ -321,6 +327,30 @@ function Aprovacoes() {
                           <BadgeCheck className="size-3.5" />
                           APROVADO
                         </span>
+                        {c.documentosFisicos ? (
+                          <>
+                            <span className="inline-flex items-center gap-1 rounded-md bg-secondary/10 px-3 py-1.5 font-display text-[11px] tracking-tight text-secondary">
+                              <FileText className="size-3.5" /> CONTRATO FÍSICO
+                            </span>
+                            <button
+                              type="button"
+                              disabled={ocupado === c.id}
+                              onClick={() => void alternar(c, true, false)}
+                              className="rounded-md border border-border px-3 py-1.5 font-display text-[11px] tracking-tight text-muted-foreground disabled:opacity-60 hover:border-primary hover:text-primary"
+                            >
+                              COBRAR DOCUMENTOS NO APP
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            disabled={ocupado === c.id}
+                            onClick={() => void alternar(c, true, true)}
+                            className="flex items-center gap-1 rounded-md border border-secondary/60 px-3 py-1.5 font-display text-[11px] tracking-tight text-secondary disabled:opacity-60"
+                          >
+                            <FileText className="size-3.5" /> CONTRATO FÍSICO
+                          </button>
+                        )}
                         <button
                           type="button"
                           disabled={ocupado === c.id}
@@ -331,14 +361,24 @@ function Aprovacoes() {
                         </button>
                       </>
                     ) : (
-                      <button
-                        type="button"
-                        disabled={ocupado === c.id}
-                        onClick={() => void alternar(c, true)}
-                        className="rounded-md bg-primary px-3 py-1.5 font-display text-[11px] tracking-tight text-primary-foreground disabled:opacity-60"
-                      >
-                        APROVAR CADASTRO
-                      </button>
+                      <>
+                        <button
+                          type="button"
+                          disabled={ocupado === c.id}
+                          onClick={() => void alternar(c, true)}
+                          className="rounded-md bg-primary px-3 py-1.5 font-display text-[11px] tracking-tight text-primary-foreground disabled:opacity-60"
+                        >
+                          APROVAR CADASTRO
+                        </button>
+                        <button
+                          type="button"
+                          disabled={ocupado === c.id}
+                          onClick={() => void alternar(c, true, true)}
+                          className="flex items-center gap-1 rounded-md border border-secondary/60 px-3 py-1.5 font-display text-[11px] tracking-tight text-secondary disabled:opacity-60"
+                        >
+                          <FileText className="size-3.5" /> APROVAR — CONTRATO FÍSICO
+                        </button>
+                      </>
                     )}
                     <button
                       type="button"
