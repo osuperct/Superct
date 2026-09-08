@@ -83,11 +83,13 @@ export function permissaoAtual(): NotificationPermission | "indisponivel" {
 
 /** Guarda o aparelho na conta do responsável. */
 export async function salvarAparelho(userId: string, sid: string) {
-  await supabase.from("push_aparelhos").upsert(
+  const { error } = await supabase.from("push_aparelhos").upsert(
     { user_id: userId, sid, updated_at: new Date().toISOString() },
     { onConflict: "sid" },
   );
+  return error ? error.message : null;
 }
+
 
 /** Diz se esta conta já tem algum aparelho ativo. */
 export async function temAparelho(userId: string) {
@@ -125,8 +127,10 @@ export async function ativarNotificacoes(userId: string): Promise<{ ok: boolean;
   for (let i = 0; i < 6; i++) {
     const sid = await lerSid();
     if (sid) {
-      await salvarAparelho(userId, sid);
+      const erro = await salvarAparelho(userId, sid);
+      if (erro) return { ok: false, erro: "Não foi possível guardar o aparelho na sua conta." };
       return { ok: true };
+
     }
     await new Promise((r) => setTimeout(r, 1500));
   }
