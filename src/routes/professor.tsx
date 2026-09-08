@@ -368,7 +368,7 @@ function Painel({ professorId }: { professorId: string }) {
           <select
             value={alunoSel}
             onChange={(e) => setAlunoSel(e.target.value)}
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+            className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-background px-3 py-2 text-sm sm:w-auto"
           >
             <option value="">Escolha o aluno…</option>
             {alunos.map((a) => (
@@ -380,7 +380,7 @@ function Painel({ professorId }: { professorId: string }) {
           <select
             value={tipoSel}
             onChange={(e) => setTipoSel(e.target.value)}
-            className="rounded-md border border-border bg-background px-3 py-2 text-sm"
+            className="min-w-0 max-w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
           >
             <option value="contrato">Contrato assinado</option>
             <option value="ficha">Ficha / PAR-Q</option>
