@@ -9,6 +9,7 @@ import {
   acordarAudio,
   iniciarMusica,
   pararMusica,
+  somAtrito,
   somDano,
   somGameOver,
   somMoeda,
@@ -2217,7 +2218,7 @@ function JogoPage() {
                     alt={`${heroiAtual.nome}, herói do Super CT`}
                     className={`absolute inset-0 size-full object-contain object-bottom${
                       escalando ? " animate-hero-climb-body" : caminhando ? " animate-hero-walk" : ""
-                    }`}
+                    }${piscando ? " animate-hero-hurt" : ""}`}
                     style={{ filter: sombra }}
                   />
                 </div>
