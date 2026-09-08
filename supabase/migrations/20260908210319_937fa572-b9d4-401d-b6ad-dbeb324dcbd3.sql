@@ -1,0 +1,1 @@
+DROP FUNCTION IF EXISTS public.adm_definir_aprovacao(_user_id uuid, _aprovado boolean, _senha text);

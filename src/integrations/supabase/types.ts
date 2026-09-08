@@ -696,20 +696,15 @@ export type Database = {
         }
         Returns: Json
       }
-      adm_definir_aprovacao:
-        | {
-            Args: { _aprovado: boolean; _senha?: string; _user_id: string }
-            Returns: Json
-          }
-        | {
-            Args: {
-              _aprovado: boolean
-              _fisico?: boolean
-              _senha?: string
-              _user_id: string
-            }
-            Returns: Json
-          }
+      adm_definir_aprovacao: {
+        Args: {
+          _aprovado: boolean
+          _fisico?: boolean
+          _senha?: string
+          _user_id: string
+        }
+        Returns: Json
+      }
       adm_excluir_conta: {
         Args: { _senha: string; _user_id: string }
         Returns: Json
