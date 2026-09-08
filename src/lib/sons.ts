@@ -305,3 +305,32 @@ export function pararMusicaVitoria() {
     vitoriaTimer = null;
   }
 }
+
+/* --------- atrito (raspão ao encostar num vilão) --------- */
+export function somAtrito() {
+  const c = audio();
+  if (!c || !master) return;
+  const t0 = c.currentTime;
+  const dur = 0.32;
+  const buf = c.createBuffer(1, Math.floor(c.sampleRate * dur), c.sampleRate);
+  const dados = buf.getChannelData(0);
+  for (let i = 0; i < dados.length; i += 1) {
+    const p = i / dados.length;
+    dados[i] = (Math.random() * 2 - 1) * (1 - p) * (0.6 + 0.4 * Math.sin(p * 60));
+  }
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  const filtro = c.createBiquadFilter();
+  filtro.type = "bandpass";
+  filtro.frequency.setValueAtTime(2200, t0);
+  filtro.frequency.exponentialRampToValueAtTime(500, t0 + dur);
+  filtro.Q.value = 1.2;
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.5, t0);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(filtro);
+  filtro.connect(g);
+  g.connect(master);
+  src.start(t0);
+  src.stop(t0 + dur);
+}

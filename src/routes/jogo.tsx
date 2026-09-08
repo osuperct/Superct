@@ -9,6 +9,7 @@ import {
   acordarAudio,
   iniciarMusica,
   pararMusica,
+  somAtrito,
   somDano,
   somGameOver,
   somMoeda,
@@ -1414,13 +1415,14 @@ function JogoPage() {
             const bateY = ny + 34 > hy + 2 && ny + 2 < hy + hAlt;
             if (bateX && bateY && performance.now() > invulAte.current) {
               vilaoQueBateu = i.vilao;
-              continue;
             }
+            /* o vilão continua no jogo mesmo depois de encostar no herói */
             proximos.push({ ...i, x: nx, y: ny });
           }
           atualizarInimigos(proximos);
         }
         if (vilaoQueBateu !== null) {
+          if (performance.now() > invulAte.current) sfx(somAtrito);
           perderVida(vilaoQueBateu, true);
           return;
         }
@@ -2216,7 +2218,7 @@ function JogoPage() {
                     alt={`${heroiAtual.nome}, herói do Super CT`}
                     className={`absolute inset-0 size-full object-contain object-bottom${
                       escalando ? " animate-hero-climb-body" : caminhando ? " animate-hero-walk" : ""
-                    }`}
+                    }${piscando ? " animate-hero-hurt" : ""}`}
                     style={{ filter: sombra }}
                   />
                 </div>
