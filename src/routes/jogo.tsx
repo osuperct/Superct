@@ -585,6 +585,7 @@ function JogoPage() {
   const subindoDesde = useRef<number | null>(null);
   const ultimoToqueBaixo = useRef<number | null>(null);
   const ultimoToqueCima = useRef<number | null>(null);
+  const ultimoPuloChao = useRef<number | null>(null);
   const podeSuperPular = useRef(true);
   const bloquearAgarreAte = useRef(0);
   const vxAr = useRef(0);
@@ -1726,13 +1727,17 @@ function JogoPage() {
       return;
     }
 
-    /* toque duplo rápido converte o pulo baixo em pulo alto (sem quicar) */
-    if (duploToque) {
+    /* toque duplo rápido converte o pulo baixo em pulo alto, mas só logo
+       após sair do chão — depois disso, precisa pousar para pular de novo */
+    const recemSaiuDoChao =
+      ultimoPuloChao.current !== null && agora - ultimoPuloChao.current <= 320;
+    if (duploToque && (!noAr.current || recemSaiuDoChao)) {
       noAr.current = true;
       vy.current = IMPULSO;
       if (vy.current > 0) subindoDesde.current = performance.now();
       /* salto alto mais inclinado para frente */
       vxAr.current = olhandoRef.current * VELOCIDADE * 1.55;
+      ultimoPuloChao.current = null;
       return;
     }
 
@@ -1740,6 +1745,7 @@ function JogoPage() {
     noAr.current = true;
     vy.current = IMPULSO_BAIXO;
     if (vy.current > 0) subindoDesde.current = performance.now();
+    ultimoPuloChao.current = agora;
     /* salto normal com leve inclinação para frente */
     vxAr.current = olhandoRef.current * VELOCIDADE * 1.25;
   };
