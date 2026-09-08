@@ -9,6 +9,7 @@ export type ContaAcesso = {
   adm: boolean;
   aprovado: boolean;
   criadoEm: string;
+  documentosFisicos: boolean;
 };
 
 type Resultado = { ok: true } | { ok: false; erro: string };
