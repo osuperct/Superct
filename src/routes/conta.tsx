@@ -713,7 +713,12 @@ function Painel({ session }: { session: Session }) {
   const temContrato = entregues.some((e) => e.tipo === "contrato");
   const temFicha = entregues.some((e) => e.tipo === "ficha");
   const mostrarAvisoInicial =
-    aprovado === true && !ehProfessor && !ehAdm && (!temContrato || !temFicha) && !avisoFechado;
+    docsCarregados &&
+    aprovado === true &&
+    !ehProfessor &&
+    !ehAdm &&
+    (!temContrato || !temFicha) &&
+    !avisoFechado;
 
   return (
     <div className="mt-6">
