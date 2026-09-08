@@ -253,7 +253,11 @@ function Painel({ professorId }: { professorId: string }) {
 
 
 
+  const docsDoAluno = (alu: Alu): Doc[] =>
+    docs.filter((d) => d.liberado && (d.aluno_id ? d.aluno_id === alu.id : d.user_id === alu.user_id));
+
   const mesRef = refMes();
+
   const estaAtivo = (alunoId: string) =>
     mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
   const limite = Date.now() - 15 * 24 * 60 * 60 * 1000;
