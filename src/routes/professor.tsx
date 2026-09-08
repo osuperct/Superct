@@ -330,16 +330,55 @@ function Painel({ professorId }: { professorId: string }) {
                   {perfil?.telefone ? ` • ${perfil.telefone}` : ""}
                   {perfil?.cpf ? ` • CPF ${formatarCpf(perfil.cpf)}` : ""}
                 </p>
-                <p
-                  className={`mt-1 font-mono text-[9px] uppercase tracking-widest ${
-                    ativo ? "text-primary" : "text-destructive"
-                  }`}
-                >
-                  Matrícula {ativo ? "ativa" : "inativa"}
-                </p>
+                <div className="mt-1 flex items-center justify-between gap-2">
+                  <p
+                    className={`font-mono text-[9px] uppercase tracking-widest ${
+                      ativo ? "text-primary" : "text-destructive"
+                    }`}
+                  >
+                    Matrícula {ativo ? "ativa" : "inativa"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setDocsAberto((s) => (s === a.id ? "" : a.id))}
+                    className="flex shrink-0 items-center gap-1 rounded border border-primary/60 px-2 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary active:scale-95"
+                  >
+                    DOC ({docsDoAluno(a).length})
+                    <ChevronDown
+                      className={`size-3 transition-transform ${docsAberto === a.id ? "rotate-180" : ""}`}
+                    />
+                  </button>
+                </div>
+                {docsAberto === a.id ? (
+                  <ul className="mt-2 space-y-1 border-t border-border pt-2">
+                    {docsDoAluno(a).map((d) => (
+                      <li key={d.id}>
+                        <button
+                          type="button"
+                          onClick={() => void abrir(d)}
+                          className="flex w-full items-center gap-2 rounded-md border border-border bg-background/60 px-2 py-1.5 text-left text-xs active:scale-[0.99]"
+                        >
+                          <FileText className="size-3.5 shrink-0 text-primary" />
+                          <span className="min-w-0 flex-1 truncate">
+                            {d.tipo} • {d.nome_arquivo}
+                          </span>
+                          <span className="shrink-0 font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
+                            {new Date(d.created_at).toLocaleDateString("pt-BR")}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                    {docsDoAluno(a).length === 0 && (
+                      <li className="text-xs text-muted-foreground">
+                        Nenhum documento conferido e liberado para este aluno.
+                      </li>
+                    )}
+                  </ul>
+                ) : null}
               </li>
             );
           })}
+
           {alunosFiltrados.length === 0 && (
             <li className="text-sm text-muted-foreground">Nenhum aluno nesta seleção.</li>
           )}
