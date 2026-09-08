@@ -52,14 +52,18 @@ export function lerSid(): Promise<string | null> {
   return new Promise((resolve) => {
     if (!window.webpushr) return resolve(null);
     let respondeu = false;
-    window.webpushr("fetch_id", {}, (valor: unknown) => {
+    const receber = (valor: unknown) => {
+      if (respondeu) return;
       respondeu = true;
       const sid = typeof valor === "string" ? valor : (valor as { sid?: string } | null)?.sid;
-      resolve(sid && sid.length > 0 ? sid : null);
-    });
+      resolve(sid && String(sid).length > 0 ? String(sid) : null);
+    };
+    // O WebPushr espera a função de resposta como 2º argumento.
+    window.webpushr("fetch_id", receber);
     setTimeout(() => {
       if (!respondeu) resolve(null);
     }, 6000);
+
   });
 }
 
