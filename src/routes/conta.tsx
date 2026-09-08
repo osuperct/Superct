@@ -198,9 +198,7 @@ function Autenticacao() {
         setCredenciais({ email: emailConta, senha });
         if (!data.session) {
           setAviso(
-            email.trim()
-              ? "Cadastro criado! Confirme seu e-mail pelo link que enviamos. Depois o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso."
-              : "Cadastro criado! Agora o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso. Para entrar, use seu CPF e a senha que criou.",
+            "Cadastro criado! Confirme seu e-mail pelo link que enviamos. Depois o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso.",
           );
         } else {
           toast.success("Cadastro concluído!");
