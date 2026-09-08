@@ -453,7 +453,7 @@ function Campo({
 
 /* ---------------------------------- PAINEL ---------------------------------- */
 
-function LembreteAcesso({ emailLogado }: { emailLogado?: string | null }) {
+function LembreteAcesso({ emailLogado }: { emailLogado: string | null | undefined }) {
   const [dados, setDados] = useState<{ email: string; senha: string } | null>(null);
 
   useEffect(() => {
