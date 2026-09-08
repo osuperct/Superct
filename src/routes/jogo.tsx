@@ -1508,7 +1508,8 @@ function JogoPage() {
 
 
       /* bolas de tênis */
-      let acertos = 0;
+      let acertosNormais = 0;
+      let acertosSuper = 0;
       const bolasAtuais: Bola[] = [];
       for (const b of bolasRef.current) {
         const nx = b.x + b.vx;
@@ -1517,7 +1518,8 @@ function JogoPage() {
         const bateu =
           nx + raio > boss.x && nx < boss.x + tam && b.y + raio > boss.y && b.y < boss.y + tam;
         if (bateu) {
-          acertos += b.super ? 5 : 1;
+          if (b.super) acertosSuper += 1;
+          else acertosNormais += 1;
           continue;
         }
         bolasAtuais.push({ ...b, x: nx });
@@ -1525,11 +1527,13 @@ function JogoPage() {
       bolasRef.current = bolasAtuais;
       setBolas(bolasAtuais);
 
-      if (acertos > 0) {
-        boss.hp = Math.max(0, boss.hp - acertos);
-        pontosRef.current += acertos * 5;
+      if (acertosNormais > 0 || acertosSuper > 0) {
+        /* super poder no chefão: 5x mais dano e 30 pontos por acerto */
+        boss.hp = Math.max(0, boss.hp - (acertosNormais + acertosSuper * 5));
+        pontosRef.current += acertosNormais * 5 + acertosSuper * 30;
         setPontos(pontosRef.current);
       }
+
 
       setChefao({ ...boss });
 
