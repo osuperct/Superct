@@ -73,12 +73,14 @@ export const enviarPush = createServerFn({ method: "POST" })
         title: data.titulo,
         message: data.mensagem,
         target_url: data.link && data.link.length > 0 ? data.link : "https://osuperct.com",
-        sid: sids,
+        sid: sids.map((s) => (/^\d+$/.test(String(s)) ? Number(s) : s)),
       }),
     });
 
-    const corpo = (await resposta.json().catch(() => null)) as { description?: string } | null;
-    if (!resposta.ok) {
+    const corpo = (await resposta.json().catch(() => null)) as
+      | { description?: string; status?: string }
+      | null;
+    if (!resposta.ok || corpo?.status === "failure") {
       console.error("webpushr", resposta.status, corpo);
       return { ok: false as const, erro: corpo?.description ?? "O serviço de notificação recusou o envio." };
     }
