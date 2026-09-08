@@ -38,9 +38,9 @@ function carregarSdk() {
     s.src = "https://cdn.webpushr.com/app.min.js";
     s.async = true;
     s.onload = () => {
-      // O site já usa HTTPS. Não usar `integration: "popup"`, pois esse modo
-      // abre a página intermediária do WebPushr e pode deixar o celular preso nela.
-      window.webpushr?.("setup", { key: WEBPUSHR_KEY });
+      // Usamos o modo "normal": o SDK registra o service worker e devolve o
+      // identificador sem abrir a página intermediária do "popup".
+      window.webpushr?.("setup", { key: WEBPUSHR_KEY, integration: "normal" });
       resolve();
     };
     s.onerror = () => reject(new Error("Não foi possível carregar o WebPushr"));
