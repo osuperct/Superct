@@ -585,6 +585,7 @@ function JogoPage() {
   const subindoDesde = useRef<number | null>(null);
   const ultimoToqueBaixo = useRef<number | null>(null);
   const ultimoToqueCima = useRef<number | null>(null);
+  const ultimoPuloChao = useRef<number | null>(null);
   const podeSuperPular = useRef(true);
   const bloquearAgarreAte = useRef(0);
   const vxAr = useRef(0);
