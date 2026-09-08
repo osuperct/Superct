@@ -338,10 +338,10 @@ function Autenticacao() {
           </>
         )}
         <Campo
-          label={modo === "entrar" ? "CPF ou e-mail" : "E-mail (opcional — para recuperar a senha)"}
+          label={modo === "entrar" ? "CPF ou e-mail" : "E-mail"}
           value={email}
           onChange={setEmail}
-          required={modo === "entrar"}
+          required
           type={modo === "entrar" ? "text" : "email"}
           maxLength={255}
         />
