@@ -566,9 +566,10 @@ function Painel({ session }: { session: Session }) {
   const [alunoDocsAberto, setAlunoDocsAberto] = useState<string | null>(null);
 
   const [entregues, setEntregues] = useState<{ tipo: string; aluno_id: string | null }[]>([]);
+  const [docsCarregados, setDocsCarregados] = useState(false);
 
   const recarregar = useCallback(async () => {
-    const [{ data: a }, { data: d }, { data: todos }] = await Promise.all([
+    const [{ data: a }, { data: d }, { data: todos }, { data: fichas }] = await Promise.all([
       supabase.from("alunos").select("id, nome, idade, matricula").eq("user_id", uid).order("created_at"),
       supabase
         .from("documentos")
@@ -577,10 +578,15 @@ function Painel({ session }: { session: Session }) {
         .eq("oculto_responsavel", false)
         .order("created_at", { ascending: false }),
       supabase.from("documentos").select("tipo, aluno_id").eq("user_id", uid),
+      supabase.from("fichas").select("tipo, aluno_id").eq("user_id", uid),
     ]);
     setAlunos((a ?? []) as Aluno[]);
     setDocumentos((d ?? []) as Documento[]);
-    setEntregues((todos ?? []) as { tipo: string; aluno_id: string | null }[]);
+    setEntregues([
+      ...((todos ?? []) as { tipo: string; aluno_id: string | null }[]),
+      ...((fichas ?? []) as { tipo: string; aluno_id: string | null }[]),
+    ]);
+    setDocsCarregados(true);
   }, [uid]);
 
 
@@ -707,7 +713,12 @@ function Painel({ session }: { session: Session }) {
   const temContrato = entregues.some((e) => e.tipo === "contrato");
   const temFicha = entregues.some((e) => e.tipo === "ficha");
   const mostrarAvisoInicial =
-    aprovado === true && !ehProfessor && !ehAdm && (!temContrato || !temFicha) && !avisoFechado;
+    docsCarregados &&
+    aprovado === true &&
+    !ehProfessor &&
+    !ehAdm &&
+    (!temContrato || !temFicha) &&
+    !avisoFechado;
 
   return (
     <div className="mt-6">
