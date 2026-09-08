@@ -148,6 +148,7 @@ function Autenticacao() {
       } else {
         const faltando = [
           [nome, "Nome do responsável"],
+          [email, "E-mail"],
           [telefone, "Telefone / WhatsApp"],
           [cpf, "CPF do responsável"],
           [endereco, "Endereço completo"],
@@ -158,7 +159,7 @@ function Autenticacao() {
           setAviso(`Preencha todos os campos obrigatórios: ${faltando.join(", ")}.`);
           return;
         }
-        if (email.trim() && !email.trim().includes("@")) {
+        if (!email.trim().includes("@")) {
           setAviso("Confira o e-mail informado: ele não parece válido.");
           return;
         }
@@ -175,11 +176,7 @@ function Autenticacao() {
           setAviso("Este CPF já tem uma conta no Super CT. Entre com o CPF ou peça uma nova senha.");
           return;
         }
-        // E-mail opcional: sem e-mail, usamos um endereço interno baseado no CPF.
-        // A entrada continua sendo feita pelo CPF + senha.
-        const emailConta = email.trim()
-          ? email.trim().toLowerCase()
-          : `cpf${apenasDigitos(cpf)}@superct.app`;
+        const emailConta = email.trim().toLowerCase();
         const { data, error } = await supabase.auth.signUp({
           email: emailConta,
           password: senha,
@@ -201,9 +198,7 @@ function Autenticacao() {
         setCredenciais({ email: emailConta, senha });
         if (!data.session) {
           setAviso(
-            email.trim()
-              ? "Cadastro criado! Confirme seu e-mail pelo link que enviamos. Depois o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso."
-              : "Cadastro criado! Agora o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso. Para entrar, use seu CPF e a senha que criou.",
+            "Cadastro criado! Confirme seu e-mail pelo link que enviamos. Depois o Professor Tio Victor confirma seus dados pelo WhatsApp e libera o acesso.",
           );
         } else {
           toast.success("Cadastro concluído!");
@@ -343,10 +338,10 @@ function Autenticacao() {
           </>
         )}
         <Campo
-          label={modo === "entrar" ? "CPF ou e-mail" : "E-mail (opcional — para recuperar a senha)"}
+          label={modo === "entrar" ? "CPF ou e-mail" : "E-mail"}
           value={email}
           onChange={setEmail}
-          required={modo === "entrar"}
+          required
           type={modo === "entrar" ? "text" : "email"}
           maxLength={255}
         />
