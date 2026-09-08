@@ -51,8 +51,8 @@ export function AtivarNotificacoes() {
 
   return (
     <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-2xl border-2 border-primary bg-card/95 p-5 shadow-[0_0_18px_hsl(var(--primary)/0.7)] backdrop-blur">
-        <h3 className="flex items-center justify-center gap-2 text-center font-display text-lg tracking-tight text-primary">
+      <div className="w-full max-w-sm rounded-2xl border-2 border-secondary bg-card/95 p-5 shadow-[0_0_18px_hsl(var(--secondary)/0.7)] backdrop-blur">
+        <h3 className="flex items-center justify-center gap-2 text-center font-display text-lg tracking-tight text-secondary">
           <Bell className="size-5" /> ATIVE AS NOTIFICAÇÕES!
         </h3>
         <p className="mt-2 text-center text-sm text-muted-foreground">
@@ -67,7 +67,7 @@ export function AtivarNotificacoes() {
           <button
             onClick={() => void ativar()}
             disabled={ocupado}
-            className="flex-1 rounded-lg bg-primary px-3 py-2.5 font-display text-sm text-primary-foreground disabled:opacity-60"
+            className="flex-1 rounded-lg bg-secondary px-3 py-2.5 font-display text-sm text-secondary-foreground disabled:opacity-60"
           >
             {ocupado ? "ATIVANDO…" : "ATIVAR AGORA"}
           </button>
