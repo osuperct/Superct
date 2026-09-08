@@ -7,7 +7,7 @@ type SupabaseComPapeis = {
   from: (t: "user_roles") => {
     select: (c: string) => {
       eq: (c: string, v: string) => {
-        in: (c: string, v: string[]) => { maybeSingle: () => Promise<{ data: unknown }> };
+        in: (c: string, v: string[]) => Promise<{ data: unknown[] | null }>;
       };
     };
   };
@@ -18,9 +18,8 @@ async function ehEquipe(supabase: SupabaseComPapeis, userId: string) {
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
-    .in("role", ["professor", "adm"])
-    .maybeSingle();
-  return Boolean(data);
+    .in("role", ["professor", "adm"]);
+  return (data ?? []).length > 0;
 }
 
 
