@@ -38,7 +38,9 @@ function carregarSdk() {
     s.src = "https://cdn.webpushr.com/app.min.js";
     s.async = true;
     s.onload = () => {
-      window.webpushr?.("setup", { key: WEBPUSHR_KEY, integration: "popup" });
+      // O site já usa HTTPS. Não usar `integration: "popup"`, pois esse modo
+      // abre a página intermediária do WebPushr e pode deixar o celular preso nela.
+      window.webpushr?.("setup", { key: WEBPUSHR_KEY });
       resolve();
     };
     s.onerror = () => reject(new Error("Não foi possível carregar o WebPushr"));
@@ -108,20 +110,21 @@ export async function ativarNotificacoes(userId: string): Promise<{ ok: boolean;
   if (!suportaPush()) return { ok: false, erro: "Este aparelho ou navegador não aceita notificações." };
   if (!WEBPUSHR_KEY) return { ok: false, erro: "As notificações ainda não estão configuradas." };
 
-  try {
-    await carregarSdk();
-  } catch {
-    return { ok: false, erro: "Não foi possível carregar as notificações agora." };
-  }
-
+  // A permissão precisa ser pedida diretamente no clique. Esperar o download
+  // do SDK antes disso pode perder o gesto do usuário em navegadores móveis.
   if (Notification.permission === "denied") {
     return { ok: false, erro: "As notificações estão bloqueadas nas configurações do navegador." };
   }
 
   if (Notification.permission !== "granted") {
-    window.webpushr?.("prompt");
     const permissao = await Notification.requestPermission();
     if (permissao !== "granted") return { ok: false, erro: "Permissão não concedida." };
+  }
+
+  try {
+    await carregarSdk();
+  } catch {
+    return { ok: false, erro: "Não foi possível carregar as notificações agora." };
   }
 
   for (let i = 0; i < 6; i++) {
