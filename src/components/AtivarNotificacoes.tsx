@@ -3,13 +3,7 @@ import { Bell } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import {
-  WEBPUSHR_KEY,
-  ativarNotificacoes,
-  sincronizarAparelho,
-  suportaPush,
-  temAparelho,
-} from "@/lib/webpushr";
+import { ativarNotificacoes, sincronizarAparelho, suportaPush, temAparelho } from "@/lib/push";
 
 
 /** Aviso flutuante que pede ao responsável para ativar as notificações no celular. */
@@ -31,7 +25,7 @@ export function AtivarNotificacoes() {
   }, []);
 
   useEffect(() => {
-    if (!uid || !WEBPUSHR_KEY || !suportaPush()) return;
+    if (!uid || !suportaPush()) return;
     void (async () => {
       // Se já autorizou neste celular, só atualiza o registro em silêncio.
       const sincronizou = await sincronizarAparelho(uid);
