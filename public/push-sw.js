@@ -14,7 +14,7 @@ self.addEventListener("push", (event) => {
     self.registration.showNotification(titulo, {
       body: dados.body || "",
       icon: dados.icon || "/icon-192.png",
-      badge: dados.icon || "/icon-192.png",
+      badge: "/push-badge.png",
       data: { url: dados.url || "https://osuperct.com" },
       vibrate: [120, 60, 120],
     }),
