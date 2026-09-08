@@ -1421,6 +1421,7 @@ function JogoPage() {
           atualizarInimigos(proximos);
         }
         if (vilaoQueBateu !== null) {
+          if (performance.now() > invulAte.current) sfx(somAtrito);
           perderVida(vilaoQueBateu, true);
           return;
         }
