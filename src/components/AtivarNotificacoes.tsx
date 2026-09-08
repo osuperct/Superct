@@ -3,7 +3,14 @@ import { Bell } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { WEBPUSHR_KEY, ativarNotificacoes, suportaPush, temAparelho } from "@/lib/webpushr";
+import {
+  WEBPUSHR_KEY,
+  ativarNotificacoes,
+  sincronizarAparelho,
+  suportaPush,
+  temAparelho,
+} from "@/lib/webpushr";
+
 
 /** Aviso flutuante que pede ao responsável para ativar as notificações no celular. */
 export function AtivarNotificacoes() {
