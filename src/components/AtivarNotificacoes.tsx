@@ -50,34 +50,36 @@ export function AtivarNotificacoes() {
   }
 
   return (
-    <div className="fixed inset-x-3 bottom-4 z-[65] mx-auto max-w-md rounded-xl border-2 border-primary bg-card/95 p-4 shadow-lg backdrop-blur">
-      <h3 className="flex items-center gap-2 font-display text-base tracking-tight">
-        <Bell className="size-4 text-primary" /> ATIVE AS NOTIFICAÇÕES!
-      </h3>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Receba os recados do Professor Tio Victor direto no seu celular.
-      </p>
-      {erro ? (
-        <p className="mt-2 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
-          {erro}
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-2xl border-2 border-primary bg-card/95 p-5 shadow-[0_0_18px_hsl(var(--primary)/0.7)] backdrop-blur">
+        <h3 className="flex items-center justify-center gap-2 text-center font-display text-lg tracking-tight text-primary">
+          <Bell className="size-5" /> ATIVE AS NOTIFICAÇÕES!
+        </h3>
+        <p className="mt-2 text-center text-sm text-muted-foreground">
+          Receba os recados do Professor Tio Victor direto no seu celular.
         </p>
-      ) : null}
-      <div className="mt-3 flex gap-2">
-        <button
-          onClick={() => void ativar()}
-          disabled={ocupado}
-          className="flex-1 rounded-md bg-primary px-3 py-2 font-display text-sm text-primary-foreground disabled:opacity-60"
-        >
-          {ocupado ? "ATIVANDO…" : "ATIVAR AGORA"}
-        </button>
-        <button
-          onClick={() => {
-            setMostrar(false);
-          }}
-          className="rounded-md border border-border px-3 py-2 text-sm"
-        >
-          Depois
-        </button>
+        {erro ? (
+          <p className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-center text-xs text-destructive">
+            {erro}
+          </p>
+        ) : null}
+        <div className="mt-4 flex gap-2">
+          <button
+            onClick={() => void ativar()}
+            disabled={ocupado}
+            className="flex-1 rounded-lg bg-primary px-3 py-2.5 font-display text-sm text-primary-foreground disabled:opacity-60"
+          >
+            {ocupado ? "ATIVANDO…" : "ATIVAR AGORA"}
+          </button>
+          <button
+            onClick={() => {
+              setMostrar(false);
+            }}
+            className="rounded-lg border border-border px-4 py-2.5 text-sm"
+          >
+            Depois
+          </button>
+        </div>
       </div>
     </div>
   );
