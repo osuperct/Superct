@@ -15,6 +15,7 @@ import { SideRail } from "../components/SideRail";
 import { BotaoSair } from "../components/BotaoSair";
 import { SidebarProvider, useSidebarControl } from "../components/SidebarContext";
 import { Toaster } from "@/components/ui/sonner";
+import { AtivarNotificacoes } from "@/components/AtivarNotificacoes";
 
 function NotFoundComponent() {
   return (
@@ -162,6 +163,7 @@ function RootComponent() {
         <SideRail />
         <SairFlutuante />
         <Toaster />
+        <AtivarNotificacoes />
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <Outlet />
       </SidebarProvider>
