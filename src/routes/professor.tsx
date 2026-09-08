@@ -132,6 +132,8 @@ function Painel({ professorId }: { professorId: string }) {
   const [tipoSel, setTipoSel] = useState("contrato");
   const [enviando, setEnviando] = useState(false);
   const [verDocs, setVerDocs] = useState(false);
+  const [docsAberto, setDocsAberto] = useState("");
+
   const inputArquivo = useRef<HTMLInputElement>(null);
 
   const carregar = useCallback(async () => {
