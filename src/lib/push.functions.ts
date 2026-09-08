@@ -62,29 +62,49 @@ export const enviarPush = createServerFn({ method: "POST" })
       return { ok: false as const, erro: "Nenhum celular ativou as notificações ainda." };
     }
 
-    const resposta = await fetch("https://api.webpushr.com/v1/notification/send/sid", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        webpushrKey: chave,
-        webpushrAuthToken: token,
-      },
-      body: JSON.stringify({
-        title: data.titulo,
-        message: data.mensagem,
-        target_url: data.link && data.link.length > 0 ? data.link : "https://osuperct.com",
-        sid: sids.map((s) => (/^\d+$/.test(String(s)) ? Number(s) : s)),
-      }),
+    const cabecalho = {
+      "Content-Type": "application/json",
+      webpushrKey: chave,
+      webpushrAuthToken: token,
+    };
+    const corpoBase = {
+      title: data.titulo,
+      message: data.mensagem,
+      target_url: data.link && data.link.length > 0 ? data.link : "https://osuperct.com",
+    };
+
+    async function enviar(url: string, extra: Record<string, unknown>) {
+      const r = await fetch(url, {
+        method: "POST",
+        headers: cabecalho,
+        body: JSON.stringify({ ...corpoBase, ...extra }),
+      });
+      const c = (await r.json().catch(() => null)) as
+        | { description?: string; status?: string }
+        | null;
+      return { ok: r.ok && c?.status !== "failure", corpo: c, http: r.status };
+    }
+
+    let envio = await enviar("https://api.webpushr.com/v1/notification/send/sid", {
+      sid: sids.map((s) => (/^\d+$/.test(String(s)) ? Number(s) : s)),
     });
 
-    const corpo = (await resposta.json().catch(() => null)) as
-      | { description?: string; status?: string }
-      | null;
-    if (!resposta.ok || corpo?.status === "failure") {
-      console.error("webpushr", resposta.status, corpo);
-      return { ok: false as const, erro: corpo?.description ?? "O serviço de notificação recusou o envio." };
+    // Registros antigos podem ter identificador inválido: nesse caso enviamos
+    // para todos os celulares inscritos no site.
+    if (!envio.ok) {
+      console.error("webpushr sid", envio.http, envio.corpo);
+      envio = await enviar("https://api.webpushr.com/v1/notification/send/all", {});
+    }
+
+    if (!envio.ok) {
+      console.error("webpushr all", envio.http, envio.corpo);
+      return {
+        ok: false as const,
+        erro: envio.corpo?.description ?? "O serviço de notificação recusou o envio.",
+      };
     }
     return { ok: true as const, enviados: sids.length };
+
   });
 
 /** Lista os responsáveis de alunos ativos que ainda não ativaram as notificações. */

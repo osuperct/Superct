@@ -103,6 +103,30 @@ export async function temAparelho(userId: string) {
 }
 
 /**
+ * Quando a pessoa já autorizou neste aparelho, atualiza o identificador guardado
+ * sem pedir nada. Isso conserta cadastros antigos que ficaram inválidos.
+ */
+export async function sincronizarAparelho(userId: string) {
+  if (!suportaPush() || !WEBPUSHR_KEY) return false;
+  if (Notification.permission !== "granted") return false;
+  try {
+    await carregarSdk();
+  } catch {
+    return false;
+  }
+  for (let i = 0; i < 4; i++) {
+    const sid = await lerSid();
+    if (sid) {
+      await salvarAparelho(userId, sid);
+      return true;
+    }
+    await new Promise((r) => setTimeout(r, 1500));
+  }
+  return false;
+}
+
+
+/**
  * Pede a permissão, pega o identificador e salva na conta.
  * Devolve o motivo quando não der certo.
  */
