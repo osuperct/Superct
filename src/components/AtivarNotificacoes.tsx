@@ -10,6 +10,7 @@ export function AtivarNotificacoes() {
   const [uid, setUid] = useState<string | null>(null);
   const [mostrar, setMostrar] = useState(false);
   const [ocupado, setOcupado] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => setUid(data.session?.user.id ?? null));
@@ -24,10 +25,8 @@ export function AtivarNotificacoes() {
 
   useEffect(() => {
     if (!uid || !WEBPUSHR_KEY || !suportaPush()) return;
-    if (Notification.permission === "denied") return;
-    if (sessionStorage.getItem("aviso-push-fechado") === "1") return;
     void temAparelho(uid).then((tem) => {
-      if (!tem) setMostrar(true);
+      setMostrar(!tem);
     });
   }, [uid]);
 
@@ -35,14 +34,18 @@ export function AtivarNotificacoes() {
   if (!mostrar || !uid) return null;
 
   async function ativar() {
+    if (!uid) return;
+    setErro(null);
     setOcupado(true);
-    const r = await ativarNotificacoes(uid!);
+    const r = await ativarNotificacoes(uid);
     setOcupado(false);
     if (r.ok) {
       toast.success("Notificações ativadas neste aparelho!");
       setMostrar(false);
     } else {
-      toast.error(r.erro ?? "Não foi possível ativar agora.");
+      const mensagem = r.erro ?? "Não foi possível ativar agora.";
+      setErro(mensagem);
+      toast.error(mensagem);
     }
   }
 
@@ -54,6 +57,11 @@ export function AtivarNotificacoes() {
       <p className="mt-1 text-xs text-muted-foreground">
         Receba os recados do Professor Tio Victor direto no seu celular.
       </p>
+      {erro ? (
+        <p className="mt-2 rounded-md border border-destructive/40 bg-destructive/10 p-2 text-xs text-destructive">
+          {erro}
+        </p>
+      ) : null}
       <div className="mt-3 flex gap-2">
         <button
           onClick={() => void ativar()}
@@ -64,7 +72,6 @@ export function AtivarNotificacoes() {
         </button>
         <button
           onClick={() => {
-            sessionStorage.setItem("aviso-push-fechado", "1");
             setMostrar(false);
           }}
           className="rounded-md border border-border px-3 py-2 text-sm"
