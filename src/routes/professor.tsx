@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { AvaliacaoProfessor } from "@/components/AvaliacaoProfessor";
 import { AvisosProfessor } from "@/components/AvisosProfessor";
+import { EnvioPush } from "@/components/EnvioPush";
 import { ListaChamada } from "@/components/ListaChamada";
 
 import { formatarCpf } from "@/lib/cpf";
@@ -349,6 +350,8 @@ function Painel({ professorId }: { professorId: string }) {
       <ListaChamada alunos={porNome.filter((a) => estaAtivo(a.id))} professorId={professorId} />
 
       <AvisosProfessor uid={professorId} />
+
+      <EnvioPush />
 
 
       <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
