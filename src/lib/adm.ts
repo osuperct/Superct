@@ -42,7 +42,7 @@ export async function definirAprovacaoConta(
     _user_id: userId,
     _aprovado: aprovado,
     _senha: senha,
-    _fisico: documentosFisicos ?? null,
+    ...(documentosFisicos === undefined ? {} : { _fisico: documentosFisicos }),
   });
   if (error) return { ok: false, erro: `Não foi possível alterar a aprovação: ${error.message}` };
   return data as unknown as Resultado;
