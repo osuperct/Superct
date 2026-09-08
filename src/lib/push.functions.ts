@@ -35,7 +35,9 @@ export const enviarPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => entrada.parse(data))
   .handler(async ({ data, context }) => {
-    await garantirEquipe(context.supabase as never, context.userId);
+    if (!(await ehEquipe(context.supabase as never, context.userId))) {
+      return { ok: false as const, erro: "Acesso restrito à equipe." };
+    }
 
     const chave = process.env["WEBPUSHR_KEY"] ?? "";
     const token = process.env["WEBPUSHR_AUTH_TOKEN"] ?? "";
