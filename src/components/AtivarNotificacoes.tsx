@@ -13,7 +13,12 @@ export function AtivarNotificacoes() {
 
   useEffect(() => {
     void supabase.auth.getSession().then(({ data }) => setUid(data.session?.user.id ?? null));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setUid(s?.user.id ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((evento, s) => {
+      // Só troca a conta em mudanças reais de sessão: eventos de renovação
+      // vinham sem sessão e faziam o aviso desaparecer sozinho.
+      if (evento === "SIGNED_OUT") return setUid(null);
+      if (s?.user.id) setUid(s.user.id);
+    });
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -21,8 +26,11 @@ export function AtivarNotificacoes() {
     if (!uid || !WEBPUSHR_KEY || !suportaPush()) return;
     if (Notification.permission === "denied") return;
     if (sessionStorage.getItem("aviso-push-fechado") === "1") return;
-    void temAparelho(uid).then((tem) => setMostrar(!tem));
+    void temAparelho(uid).then((tem) => {
+      if (!tem) setMostrar(true);
+    });
   }, [uid]);
+
 
   if (!mostrar || !uid) return null;
 
