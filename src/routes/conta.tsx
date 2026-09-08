@@ -719,6 +719,7 @@ function Painel({ session }: { session: Session }) {
   const mostrarAvisoInicial =
     docsCarregados &&
     aprovado === true &&
+    !docsFisicos &&
     !ehProfessor &&
     !ehAdm &&
     (!temContrato || !temFicha) &&
