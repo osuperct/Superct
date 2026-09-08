@@ -91,7 +91,7 @@ export const enviarPush = createServerFn({ method: "POST" })
 export const listarSemPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await garantirEquipe(context.supabase as never, context.userId);
+    if (!(await ehEquipe(context.supabase as never, context.userId))) return [];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: alunos } = await supabaseAdmin
