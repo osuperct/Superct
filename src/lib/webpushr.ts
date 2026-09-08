@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
  * Chave pública do WebPushr (pode ficar no código, é publicável).
  * Pegue em WebPushr → Settings → Integration → "Public Key".
  */
-export const WEBPUSHR_KEY = (import.meta.env["VITE_WEBPUSHR_KEY"] as string | undefined) ?? "";
+export const WEBPUSHR_KEY =
+  "BBEWdJgDzYLNtfZK3412qtwR2BV3jHF31vT6CH65q5R7Jukp9AXn4oqluADegxFn-AoQcCV7wMHWlcAaYzoOZ74";
 
 type Webpushr = ((acao: string, opcoes?: unknown, cb?: (v: unknown) => void) => void) & {
   q?: unknown[];
@@ -37,7 +38,7 @@ function carregarSdk() {
     s.src = "https://cdn.webpushr.com/app.min.js";
     s.async = true;
     s.onload = () => {
-      window.webpushr?.("setup", { key: WEBPUSHR_KEY });
+      window.webpushr?.("setup", { key: WEBPUSHR_KEY, integration: "popup" });
       resolve();
     };
     s.onerror = () => reject(new Error("Não foi possível carregar o WebPushr"));
