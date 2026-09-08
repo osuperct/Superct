@@ -23,9 +23,6 @@ async function ehEquipe(supabase: SupabaseComPapeis, userId: string) {
   return Boolean(data);
 }
 
-async function garantirEquipe(supabase: SupabaseComPapeis, userId: string) {
-  if (!(await ehEquipe(supabase, userId))) throw new Error("Acesso restrito à equipe.");
-}
 
 const entrada = z.object({
   titulo: z.string().trim().min(2).max(80),
