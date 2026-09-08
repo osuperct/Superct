@@ -13,14 +13,18 @@ type SupabaseComPapeis = {
   };
 };
 
-async function garantirEquipe(supabase: SupabaseComPapeis, userId: string) {
+async function ehEquipe(supabase: SupabaseComPapeis, userId: string) {
   const { data } = await supabase
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
     .in("role", ["professor", "adm"])
     .maybeSingle();
-  if (!data) throw new Error("Acesso restrito à equipe.");
+  return Boolean(data);
+}
+
+async function garantirEquipe(supabase: SupabaseComPapeis, userId: string) {
+  if (!(await ehEquipe(supabase, userId))) throw new Error("Acesso restrito à equipe.");
 }
 
 const entrada = z.object({
@@ -87,7 +91,7 @@ export const enviarPush = createServerFn({ method: "POST" })
 export const listarSemPush = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    await garantirEquipe(context.supabase as never, context.userId);
+    if (!(await ehEquipe(context.supabase as never, context.userId))) return [];
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { data: alunos } = await supabaseAdmin
