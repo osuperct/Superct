@@ -5,3 +5,5 @@
 - [x] Validar loja e login no site publicado
 - [x] Remover toda a interface e integração de notificações push/Firebase.
 - [x] Abrir lista de chamada completa em tela flutuante separada com barra de rolagem.
+
+- [x] Notificacoes push via WebPushr (aviso de ativacao para responsaveis + envio na area do professor)
