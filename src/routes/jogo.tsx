@@ -1414,8 +1414,8 @@ function JogoPage() {
             const bateY = ny + 34 > hy + 2 && ny + 2 < hy + hAlt;
             if (bateX && bateY && performance.now() > invulAte.current) {
               vilaoQueBateu = i.vilao;
-              continue;
             }
+            /* o vilão continua no jogo mesmo depois de encostar no herói */
             proximos.push({ ...i, x: nx, y: ny });
           }
           atualizarInimigos(proximos);
