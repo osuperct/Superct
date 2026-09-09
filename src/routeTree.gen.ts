@@ -22,6 +22,7 @@ import { Route as RelatoriosRouteImport } from './routes/relatorios'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ViloesRouteImport } from './routes/viloes'
 import { Route as DocumentoTipoRouteImport } from './routes/documento.$tipo'
+import { Route as ApiPublicAvaliacaoMensalRouteImport } from './routes/api/public/avaliacao-mensal'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -88,6 +89,12 @@ const DocumentoTipoRoute = DocumentoTipoRouteImport.update({
   path: '/documento/$tipo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAvaliacaoMensalRoute =
+  ApiPublicAvaliacaoMensalRouteImport.update({
+    id: '/api/public/avaliacao-mensal',
+    path: '/api/public/avaliacao-mensal',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
+  '/api/public/avaliacao-mensal': typeof ApiPublicAvaliacaoMensalRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -118,6 +126,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
+  '/api/public/avaliacao-mensal': typeof ApiPublicAvaliacaoMensalRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -134,6 +143,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
+  '/api/public/avaliacao-mensal': typeof ApiPublicAvaliacaoMensalRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -151,6 +161,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
+    | '/api/public/avaliacao-mensal'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
+    | '/api/public/avaliacao-mensal'
   id:
     | '__root__'
     | '/'
@@ -181,6 +193,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/viloes'
     | '/documento/$tipo'
+    | '/api/public/avaliacao-mensal'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -197,6 +210,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   ViloesRoute: typeof ViloesRoute
   DocumentoTipoRoute: typeof DocumentoTipoRoute
+  ApiPublicAvaliacaoMensalRoute: typeof ApiPublicAvaliacaoMensalRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +306,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocumentoTipoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/avaliacao-mensal': {
+      id: '/api/public/avaliacao-mensal'
+      path: '/api/public/avaliacao-mensal'
+      fullPath: '/api/public/avaliacao-mensal'
+      preLoaderRoute: typeof ApiPublicAvaliacaoMensalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -309,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   ViloesRoute: ViloesRoute,
   DocumentoTipoRoute: DocumentoTipoRoute,
+  ApiPublicAvaliacaoMensalRoute: ApiPublicAvaliacaoMensalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
