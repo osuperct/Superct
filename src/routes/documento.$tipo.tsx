@@ -577,7 +577,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           className="mt-0.5 size-4 shrink-0"
         />
         <span>
-          Declaro que as informações são verdadeiras e autorizo o uso de imagem do(a) aluno(a) conforme o termo:{" "}
+          Autorizo o uso de imagem do(a) aluno(a) conforme o termo:{" "}
           {TERMO_IMAGEM} <span className="text-primary">*obrigatório</span>
         </span>
       </label>
