@@ -287,12 +287,24 @@ function Painel({ professorId }: { professorId: string }) {
       return;
     }
     setCriandoAluno(true);
+    // Plano escolhido: opção da tabela ou valor digitado ("Outro valor — R$ 170,00").
+    const planoTexto =
+      novoAluno.plano === "outro"
+        ? novoAluno.valor === ""
+          ? ""
+          : `Outro valor — R$ ${Number(novoAluno.valor).toFixed(2).replace(".", ",")}`
+        : novoAluno.plano;
+    const valorPlano = planoTexto ? lerPlano(planoTexto).valor : null;
     const r = await criarAlunoProfessor({
       userId: novoAluno.userId,
       nome: novoAluno.nome.trim(),
       ...(novoAluno.nascimento ? { nascimento: novoAluno.nascimento } : {}),
       documentosFisicos: novoAluno.fisico,
+      plano: planoTexto,
+      forma: novoAluno.forma,
+      vencimento: novoAluno.vencimento,
     });
+
     if (!r.ok) {
       setCriandoAluno(false);
       toast.error(r.erro);
