@@ -574,6 +574,38 @@ function Painel({ professorId }: { professorId: string }) {
               </span>
             </label>
 
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block space-y-1">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Forma de pagamento
+                </span>
+                <select
+                  value={novoAluno.forma}
+                  onChange={(e) => setNovoAluno((f) => ({ ...f, forma: e.target.value }))}
+                  className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+                >
+                  <option value="">Escolha…</option>
+                  <option value="Pix">Pix</option>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Cartão">Cartão</option>
+                  <option value="Cartão Recorrente (link)">Cartão Recorrente (link)</option>
+                </select>
+              </label>
+              <label className="block space-y-1">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Mensalidade (R$)
+                </span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={novoAluno.valor}
+                  onChange={(e) => setNovoAluno((f) => ({ ...f, valor: e.target.value }))}
+                  className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+              </label>
+            </div>
+
             <label className="block space-y-1">
               <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                 Anexar documento (foto ou PDF, opcional)
