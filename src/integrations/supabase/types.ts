@@ -705,6 +705,10 @@ export type Database = {
         }
         Returns: Json
       }
+      adm_editar_contrato: {
+        Args: { _dados: Json; _ficha_id: string }
+        Returns: Json
+      }
       adm_excluir_conta: {
         Args: { _senha: string; _user_id: string }
         Returns: Json
@@ -723,6 +727,18 @@ export type Database = {
           telefone: string
         }[]
       }
+      adm_listar_contratos: {
+        Args: never
+        Returns: {
+          aluno: string
+          aluno_id: string
+          created_at: string
+          dados: Json
+          id: string
+          responsavel: string
+          user_id: string
+        }[]
+      }
       cpf_disponivel: { Args: { _cpf: string }; Returns: boolean }
       has_role: {
         Args: {
@@ -730,6 +746,16 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      prof_criar_aluno: {
+        Args: {
+          _fisico?: boolean
+          _idade?: number
+          _nascimento?: string
+          _nome: string
+          _user_id: string
+        }
+        Returns: Json
       }
       vincular_alunos_dos_contratos: { Args: never; Returns: number }
     }
