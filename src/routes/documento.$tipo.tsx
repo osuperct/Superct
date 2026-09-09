@@ -432,6 +432,18 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         }
 
         if (c.opcoes) {
+          if (c.chave === "valor") {
+            return (
+              <CampoValor
+                key={c.chave}
+                rotulo={c.rotulo}
+                opcoes={c.opcoes}
+                obrigatorio={c.obrigatorio === true}
+                valor={valores[c.chave] ?? ""}
+                onChange={(v) => set(c.chave, v)}
+              />
+            );
+          }
           return (
             <label key={c.chave} className="block">
               <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
