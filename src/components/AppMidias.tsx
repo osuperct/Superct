@@ -213,21 +213,25 @@ export function AppMidias() {
             ))}
           </ul>
         )}
+        {grupoAtual && (
         <EnvioImagem
           rotulo="ANEXAR NOVA FOTO INTERNA"
           aspecto={4 / 3}
           onEnviar={async (blob, nome, descricao) => {
             await enviarMidia({
               tipo: "foto",
-              grupo,
+              grupo: grupoAtual,
               arquivo: blob,
               nomeArquivo: nome,
               descricao,
               ordem: fotos.length,
             });
             await carregar();
+            setGrupo(grupoAtual);
+            setNomeNovo("");
           }}
         />
+        )}
       </div>
 
       {/* -------- NOSSO QG -------- */}
