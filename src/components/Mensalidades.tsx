@@ -173,6 +173,38 @@ export function Mensalidades({
 
   const planoDoAluno = (alunoId: string) => planos.find((p) => p.alunoId === alunoId);
 
+  /** Valor do mês: usa o valor lançado; se faltar, o valor do plano do contrato. */
+  const valorDoMes = (alunoId: string) =>
+    Number(doMes(alunoId)?.valor ?? planoDoAluno(alunoId)?.valor ?? 0);
+
+  const diaHoje = new Date().getDate();
+
+  /** pago | atraso (venceu e não pagou) | vencer */
+  const situacaoDoAluno = (a: Alu): "pago" | "atraso" | "vencer" => {
+    const m = doMes(a.id);
+    if (m?.pago) return "pago";
+    const temAtrasoAnterior = mensalidades.some(
+      (x) => x.aluno_id === a.id && x.ativo && !x.pago && x.referencia < mesAtual,
+    );
+    if (temAtrasoAnterior) return "atraso";
+    const dia = Number(String(planoDoAluno(a.id)?.vencimento ?? "").replace(/\D+/g, ""));
+    if (dia && diaHoje > dia) return "atraso";
+    return "vencer";
+  };
+
+  const termo = busca.trim().toLowerCase();
+  const listaFiltrada = ordenados.filter((a) => {
+    if (situacao !== "todos") {
+      const s = situacaoDoAluno(a);
+      if (situacao === "pagos" && s !== "pago") return false;
+      if (situacao === "atraso" && s !== "atraso") return false;
+      if (situacao === "vencer" && s !== "vencer") return false;
+    }
+    if (!termo) return true;
+    const resp = (responsaveis[a.user_id] ?? "").toLowerCase();
+    return a.nome.toLowerCase().includes(termo) || resp.includes(termo);
+  });
+
   // Meses disponíveis na projeção: do próximo mês até a última parcela dos planos.
   const mesesProjecao = useMemo(() => {
     let ultimo = refSomando(mesAtual, 12);
