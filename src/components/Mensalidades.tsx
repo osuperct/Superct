@@ -516,28 +516,30 @@ export function Mensalidades({
                   {itens.map((i) => (
                     <li
                       key={i.aluno.id}
-                      className="flex items-center justify-between gap-2 rounded-md border border-border bg-background/40 px-3 py-2 text-xs"
+                      className="flex flex-col gap-2 rounded-md border border-border bg-background/40 px-3 py-2 text-xs sm:flex-row sm:items-center sm:justify-between"
                     >
-                      <span>
+                      <span className="min-w-0 break-words">
                         {i.aluno.nome}
                         <span className="ml-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                           {i.plano!.planoTexto}
                         </span>
                       </span>
-                      <span className="shrink-0 text-right">
+                      <span className="w-full shrink-0 text-right sm:w-auto">
                         {i.plano!.planoTexto === "Contrato físico" ? (
-                          <span className="flex items-center gap-1.5">
-                            <CampoValor
-                              valor={doMes(i.aluno.id)?.valor ?? null}
-                              onChange={(v) => void salvar(i.aluno, { valor: v })}
-                            />
+                          <span className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+                            <div className="w-full sm:w-40">
+                              <CampoValor
+                                valor={doMes(i.aluno.id)?.valor ?? null}
+                                onChange={(v) => void salvar(i.aluno, { valor: v })}
+                              />
+                            </div>
                             <select
                               value={doMes(i.aluno.id)?.forma ?? ""}
                               onChange={(e) =>
                                 void salvar(i.aluno, { forma: e.target.value || null })
                               }
                               disabled={salvando === i.aluno.id}
-                              className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+                              className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-background px-2 py-1.5 text-xs sm:w-44"
                             >
                               <option value="">Forma…</option>
                               {GRUPOS.filter((x) => x.forma !== "Não informado").map((x) => (
