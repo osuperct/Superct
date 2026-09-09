@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { ChevronDown, FileText, GraduationCap, Paperclip, ShieldCheck, Trash2, Upload, Users } from "lucide-react";
+import { ChevronDown, FileText, GraduationCap, Paperclip, ShieldCheck, Trash2, Upload, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import { AvisosProfessor } from "@/components/AvisosProfessor";
 import { EnvioPush } from "@/components/EnvioPush";
 import { ListaChamada } from "@/components/ListaChamada";
 
+import { criarAlunoProfessor } from "@/lib/adm";
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
 
