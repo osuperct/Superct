@@ -39,6 +39,79 @@ export const Route = createFileRoute("/documento/$tipo")({
   component: DocumentoPage,
 });
 
+const OUTRO_VALOR = "__outro__";
+
+/** Campo da mensalidade: planos prontos ou "Outro valor" digitado pelo responsável. */
+function CampoValor({
+  rotulo,
+  opcoes,
+  obrigatorio,
+  valor,
+  onChange,
+}: {
+  rotulo: string;
+  opcoes: string[];
+  obrigatorio: boolean;
+  valor: string;
+  onChange: (v: string) => void;
+}) {
+  const ehPlano = opcoes.includes(valor);
+  const ehOutroSalvo = !ehPlano && valor !== "";
+  const [modoOutro, setModoOutro] = useState(ehOutroSalvo);
+  const digitado = ehOutroSalvo ? valor.replace(/^Outro valor\s*—?\s*/i, "").replace(/^R\$\s*/i, "") : "";
+
+  function escolher(v: string) {
+    if (v === OUTRO_VALOR) {
+      setModoOutro(true);
+      onChange("");
+    } else {
+      setModoOutro(false);
+      onChange(v);
+    }
+  }
+
+  function digitar(texto: string) {
+    const limpo = texto.replace(/[^\d.,]/g, "").slice(0, 10);
+    onChange(limpo ? `Outro valor — R$${limpo}` : "");
+  }
+
+  return (
+    <div className="block">
+      <span className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+        {rotulo}
+        {obrigatorio && <span className="text-primary"> *obrigatório</span>}
+      </span>
+      <select
+        value={modoOutro ? OUTRO_VALOR : ehPlano ? valor : ""}
+        onChange={(e) => escolher(e.target.value)}
+        required={obrigatorio && !modoOutro}
+        className="mt-1 w-full appearance-none rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+      >
+        <option value="">Selecione</option>
+        {opcoes.map((op) => (
+          <option key={op} value={op}>
+            {op}
+          </option>
+        ))}
+        <option value={OUTRO_VALOR}>Outro valor</option>
+      </select>
+      {modoOutro && (
+        <input
+          value={digitado}
+          onChange={(e) => digitar(e.target.value)}
+          required={obrigatorio}
+          inputMode="decimal"
+          placeholder="Digite o valor combinado (ex.: 120,00)"
+          className="mt-2 w-full rounded-md border border-primary/50 bg-background px-3 py-2 text-sm outline-none focus:border-primary"
+        />
+      )}
+      {modoOutro && digitado && (
+        <p className="mt-1 text-[10px] text-primary">Outro valor — R${digitado}</p>
+      )}
+    </div>
+  );
+}
+
 function Aviso({ texto }: { texto: string }) {
   return (
     <div className="min-h-screen bg-background pl-16 text-foreground">
