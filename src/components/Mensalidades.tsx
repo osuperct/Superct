@@ -87,11 +87,13 @@ export function Mensalidades({
   alunos,
   mensalidades,
   planos = [],
+  responsaveis = {},
   recarregar,
 }: {
   alunos: Alu[];
   mensalidades: Mensalidade[];
   planos?: PlanoContrato[];
+  responsaveis?: Record<string, string>;
   recarregar: () => void;
 }) {
   const [salvando, setSalvando] = useState<string | null>(null);
