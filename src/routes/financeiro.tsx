@@ -89,6 +89,14 @@ function FinanceiroPage() {
     setAlunos((a ?? []) as Alu[]);
     setMensalidades((m ?? []) as Mensalidade[]);
 
+    // Alunos de contrato físico entram na lista mesmo sem documento digital conferido.
+    const fisicos = new Set(
+      (perfis ?? []).filter((p) => p.documentos_fisicos).map((p) => p.id as string),
+    );
+    const alunosFisicos = new Set(
+      ((a ?? []) as Alu[]).filter((al) => fisicos.has(al.user_id)).map((al) => al.id),
+    );
+
     // Só entram na lista os alunos cujo contrato já foi conferido e liberado.
     const conferidos = new Set(
       (docs ?? []).filter((d) => d.liberado && d.aluno_id).map((d) => d.aluno_id as string),
@@ -97,15 +105,14 @@ function FinanceiroPage() {
     const lista: PlanoContrato[] = [];
     for (const ficha of f ?? []) {
       const alunoId = ficha.aluno_id;
-      if (!alunoId || vistos.has(alunoId) || !conferidos.has(alunoId)) continue;
+      if (!alunoId || vistos.has(alunoId)) continue;
+      if (!conferidos.has(alunoId) && !alunosFisicos.has(alunoId)) continue;
       vistos.add(alunoId);
       lista.push(planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>));
     }
 
-    // Alunos de contrato físico (sem ficha digital): entram na lista com o valor/forma lançados na mensalidade.
-    const fisicos = new Set(
-      (perfis ?? []).filter((p) => p.documentos_fisicos).map((p) => p.id as string),
-    );
+    // Contrato físico sem ficha registrada: usa o valor/forma lançados na mensalidade.
+
     for (const aluno of (a ?? []) as Alu[]) {
       if (vistos.has(aluno.id) || !fisicos.has(aluno.user_id)) continue;
       const mensal = (m ?? []).find((x: Mensalidade) => x.aluno_id === aluno.id);
