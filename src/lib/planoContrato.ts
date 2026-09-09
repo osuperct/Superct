@@ -1,6 +1,6 @@
 /** Leitura dos dados de pagamento vindos do contrato assinado pelo responsável. */
 
-export type FormaContrato = "Pix / dinheiro" | "Cartão" | "Cartão Recorrente (link)" | "Não informado";
+export type FormaContrato = "Pix" | "Dinheiro" | "Cartão" | "Cartão Recorrente (link)" | "Não informado";
 
 export type PlanoContrato = {
   alunoId: string;

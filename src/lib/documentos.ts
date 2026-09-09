@@ -86,7 +86,7 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
     ],
   },
   { chave: "vencimento", rotulo: "Dia de vencimento", obrigatorio: true, opcoes: ["5", "10", "20", "25"] },
-  { chave: "forma_pagamento", rotulo: "Forma de pagamento", opcoes: ["Pix / dinheiro", "Cartão", "Cartão Recorrente (link)"] },
+  { chave: "forma_pagamento", rotulo: "Forma de pagamento", opcoes: ["Pix", "Dinheiro", "Cartão", "Cartão Recorrente (link)"] },
   { chave: "observacoes", rotulo: "Observações", longo: true },
 ];
 
