@@ -577,57 +577,76 @@ export function Mensalidades({
       </section>
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <TrendingUp className="size-4 text-primary" /> PROJEÇÃO — {mesExtensoRef(mesProjecao).toUpperCase()}
-        </h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+            <TrendingUp className="size-4 text-primary" /> PROJEÇÃO — {mesExtensoRef(mesProjecao).toUpperCase()}
+          </h2>
+          <button
+            type="button"
+            onClick={() => setProjecaoMinimizada((v) => !v)}
+            className="rounded-md border border-border bg-background p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={projecaoMinimizada ? "Expandir projeção" : "Minimizar projeção"}
+          >
+            {projecaoMinimizada ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
+          </button>
+        </div>
         <p className="mt-1 text-xs text-muted-foreground">
           Alunos com matrícula ativa e valor previsto a receber.
         </p>
-        <select
-          value={mesProjecao}
-          onChange={(e) => setMesProjecao(e.target.value)}
-          className="mt-2 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
-        >
-          {mesesProjecao.map((m) => (
-            <option key={m} value={m}>
-              {mesExtensoRef(m)}
-            </option>
-          ))}
-        </select>
-        <ul className="mt-3 space-y-1.5">
-          {projecao.map((p) => (
-            <li
-              key={p.aluno.id}
-              className="rounded-md border border-border bg-background/40 px-3 py-2 text-xs"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span>{p.aluno.nome}</span>
-                <span className="font-mono text-[10px] tracking-widest text-primary">
-                  {formatarValor(p.valor)}
-                </span>
-              </div>
-              {p.plano?.planoTexto && (
-                <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                  {p.plano.planoTexto}
-                  {p.parcela?.numero
-                    ? ` • parcela ${p.parcela.numero}/${p.parcela.total}`
-                    : ""}
-                  {p.parcela?.fim ? ` • termina em ${mesExtensoRef(p.parcela.fim)}` : ""}
-                  {p.plano.vencimento
-                    ? ` • vence ${vencimentoNoMes(p.plano.vencimento, mesProjecao)}`
-                    : ""}
-                  {p.encerrado ? " • PLANO ENCERRADO" : ""}
-                </p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <select
+            value={mesProjecao}
+            onChange={(e) => setMesProjecao(e.target.value)}
+            className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+          >
+            {mesesProjecao.map((m) => (
+              <option key={m} value={m}>
+                {mesExtensoRef(m)}
+              </option>
+            ))}
+          </select>
+          <span className="font-mono text-[10px] uppercase tracking-widest text-primary">
+            Total {formatarValor(totalProjecao)} • {projecao.length} aluno{projecao.length === 1 ? "" : "s"}
+          </span>
+        </div>
+        {!projecaoMinimizada && (
+          <>
+            <ul className="mt-3 space-y-1.5">
+              {projecao.map((p) => (
+                <li
+                  key={p.aluno.id}
+                  className="rounded-md border border-border bg-background/40 px-3 py-2 text-xs"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span>{p.aluno.nome}</span>
+                    <span className="font-mono text-[10px] tracking-widest text-primary">
+                      {formatarValor(p.valor)}
+                    </span>
+                  </div>
+                  {p.plano?.planoTexto && (
+                    <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                      {p.plano.planoTexto}
+                      {p.parcela?.numero
+                        ? ` • parcela ${p.parcela.numero}/${p.parcela.total}`
+                        : ""}
+                      {p.parcela?.fim ? ` • termina em ${mesExtensoRef(p.parcela.fim)}` : ""}
+                      {p.plano.vencimento
+                        ? ` • vence ${vencimentoNoMes(p.plano.vencimento, mesProjecao)}`
+                        : ""}
+                      {p.encerrado ? " • PLANO ENCERRADO" : ""}
+                    </p>
+                  )}
+                </li>
+              ))}
+              {projecao.length === 0 && (
+                <li className="text-sm text-muted-foreground">Nenhuma matrícula ativa no mês.</li>
               )}
-            </li>
-          ))}
-          {projecao.length === 0 && (
-            <li className="text-sm text-muted-foreground">Nenhuma matrícula ativa no mês.</li>
-          )}
-        </ul>
-        <p className="mt-3 border-t border-border pt-2 text-sm font-medium">
-          Total previsto: <span className="text-primary">{formatarValor(totalProjecao)}</span>
-        </p>
+            </ul>
+            <p className="mt-3 border-t border-border pt-2 text-sm font-medium">
+              Total previsto: <span className="text-primary">{formatarValor(totalProjecao)}</span>
+            </p>
+          </>
+        )}
 
         <h3 className="mt-4 font-display text-sm tracking-tight">
           ATRASADOS ({atrasados.length})
