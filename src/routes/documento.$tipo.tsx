@@ -593,7 +593,8 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             />
             <span>
               Li todas as cláusulas e regras acima e estou ciente e de acordo, inclusive com as condições de
-              pagamento e as normas de convivência e segurança do Super CT. <span className="text-primary">*obrigatório</span>
+              pagamento, as normas de convivência e segurança do Super CT e o aviso de cancelamento por escrito com
+              antecedência mínima de 10 (dez) dias. <span className="text-primary">*obrigatório</span>
             </span>
           </label>
           <h2 className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
