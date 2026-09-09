@@ -2061,25 +2061,38 @@ function JogoPage() {
             ))}
 
             {argolas.map((a, i) => (
-              <div key={`a-${i}`}>
+              <div
+                key={`a-${i}`}
+                className="absolute origin-top animate-balanco-corda"
+                style={{
+                  left: a.x - 12,
+                  bottom: 40 + a.y - 12,
+                  width: 24,
+                  height: ALTURA_CENA - 40 - a.y + 2,
+                  animationDelay: `${(i % 4) * 0.4}s`,
+                }}
+              >
                 <div
-                  className="absolute w-[3px] bg-[#52525b]"
-                  style={{ left: a.x - 1, bottom: 40 + a.y, height: ALTURA_CENA - 40 - a.y - 10 }}
+                  className="absolute left-1/2 top-0 w-[3px] -translate-x-1/2 bg-[#52525b]"
+                  style={{ height: ALTURA_CENA - 40 - a.y - 10 }}
                 />
-                <div
-                  className="absolute size-6 rounded-full border-[4px] border-[#f59e0b] shadow-[0_0_10px_2px_rgba(245,158,11,0.5)]"
-                  style={{ left: a.x - 12, bottom: 40 + a.y - 12 }}
-                />
+                <div className="absolute bottom-0 left-0 size-6 rounded-full border-[4px] border-[#f59e0b] shadow-[0_0_10px_2px_rgba(245,158,11,0.5)]" />
               </div>
             ))}
 
             {cordas.map((corda, i) => (
               <div
                 key={`corda-${i}`}
-                className="absolute w-3 rounded-b-full border-x-2 border-amber-200/70 bg-[repeating-linear-gradient(0deg,#92400e_0px,#92400e_5px,#f59e0b_6px,#f59e0b_9px)] shadow-[0_0_8px_rgba(245,158,11,0.35)]"
-                style={{ left: corda.x - 6, bottom: 40 + corda.base, height: corda.topo - corda.base }}
+                className="absolute w-3 origin-top animate-balanco-corda rounded-b-full border-x-2 border-amber-200/70 bg-[repeating-linear-gradient(0deg,#92400e_0px,#92400e_5px,#f59e0b_6px,#f59e0b_9px)] shadow-[0_0_8px_rgba(245,158,11,0.35)]"
+                style={{
+                  left: corda.x - 6,
+                  bottom: 40 + corda.base,
+                  height: corda.topo - corda.base,
+                  animationDelay: `${(i % 5) * 0.35}s`,
+                }}
               />
             ))}
+
 
             {cones.map((cx, i) => (conesPegos.includes(i) ? null : (
               <div key={`c-${i}`} className="absolute" style={{ left: cx, bottom: 38 }}>
