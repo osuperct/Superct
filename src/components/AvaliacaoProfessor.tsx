@@ -118,13 +118,17 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
       .order("referencia", { ascending: false });
     const lista = (data ?? []) as unknown as Avaliacao[];
     setHistorico(lista);
+    const anterior = lista.find((a) => a.referencia < referencia);
+    setAnteriores(anterior ? lerNotas(anterior.notas) : null);
     const atual = lista.find((a) => a.referencia === referencia);
     if (atual) {
       setNotas(lerNotas(atual.notas));
       setObservacoes(atual.observacoes ?? "");
+      setManuais((atual.conquistas ?? []).filter((c) => CONQUISTAS_MANUAIS.includes(c)));
     } else {
       setNotas(VAZIO);
       setObservacoes("");
+      setManuais([]);
     }
   }, [aluno.id, referencia]);
 
