@@ -12,7 +12,16 @@ import { ListaChamada } from "@/components/ListaChamada";
 
 import { criarAlunoProfessor } from "@/lib/adm";
 import { formatarCpf } from "@/lib/cpf";
+import { CAMPOS_CONTRATO } from "@/lib/documentos";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
+import { lerPlano } from "@/lib/planoContrato";
+
+const campoContrato = (chave: string) => CAMPOS_CONTRATO.find((c) => c.chave === chave);
+/** Mesmos planos, formas e vencimentos do contrato digital. */
+const PLANOS_CONTRATO: string[] = campoContrato("valor")?.opcoes ?? [];
+const FORMAS_CONTRATO: string[] = campoContrato("forma_pagamento")?.opcoes ?? [];
+const VENCIMENTOS_CONTRATO: string[] = campoContrato("vencimento")?.opcoes ?? [];
+
 
 export const Route = createFileRoute("/professor")({
   head: () => ({
