@@ -5,7 +5,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 
 import { VideoShowcase, type VideoApp } from "@/components/VideoShowcase";
-import { GRUPO_QG, GRUPO_VIDEOS, listarMidias, type Midia } from "@/lib/midias";
+import { GRUPO_QG, GRUPO_VIDEOS, gruposExtras, listarMidias, type Midia } from "@/lib/midias";
 import { listarTextos, type Textos } from "@/lib/textos";
 import { listarTurmas, type Turma } from "@/lib/turmas";
 
@@ -301,6 +301,23 @@ function Index() {
     if (alt) base.alt = alt;
     return base;
   });
+
+  // Cartões criados na Área ADM entram no fim da lista.
+  for (const nome of gruposExtras(midias)) {
+    const capa = midias.find((x) => x.tipo === "capa" && x.grupo === nome && x.url);
+    const fotos = midias
+      .filter((x) => x.tipo === "foto" && x.grupo === nome && x.url)
+      .map((x) => ({ src: x.url!, alt: x.descricao ?? `Foto do Super CT — ${nome}` }));
+    const novo: Modalidade = {
+      nome,
+      texto: capa?.descricao ?? "",
+      clicavel: fotos.length > 0,
+      fotos,
+    };
+    if (capa?.url) novo.imagem = capa.url;
+    if (capa?.descricao) novo.alt = capa.descricao;
+    cards.push(novo);
+  }
 
   useEffect(() => {
     let ativo = true;
