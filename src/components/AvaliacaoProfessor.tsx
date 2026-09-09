@@ -9,9 +9,11 @@ import { relatorioAvaliacao } from "@/lib/avaliacaoPdf";
 import {
   CRITERIOS,
   FAIXAS,
+  CONQUISTAS_MANUAIS,
   type Avaliacao,
   type CriterioChave,
   type Notas,
+  conquistasAutomaticas,
   lerNotas,
   mediaNotas,
   mesExtenso,
