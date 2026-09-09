@@ -51,14 +51,19 @@ export type Database = {
         Row: {
           aluno_id: string
           comportamento: string
+          conquistas: string[]
           coordenacao_motora: string
           created_at: string
           disciplina: string
           execucao_exercicios: string
           forca_resistencia: string
           id: string
+          meta: string | null
+          notas: Json
           observacoes: string | null
           professor_id: string
+          publicada: boolean
+          publicada_em: string | null
           referencia: string
           respeito_empatia: string
           updated_at: string
@@ -68,14 +73,19 @@ export type Database = {
         Insert: {
           aluno_id: string
           comportamento?: string
+          conquistas?: string[]
           coordenacao_motora?: string
           created_at?: string
           disciplina?: string
           execucao_exercicios?: string
           forca_resistencia?: string
           id?: string
+          meta?: string | null
+          notas?: Json
           observacoes?: string | null
           professor_id: string
+          publicada?: boolean
+          publicada_em?: string | null
           referencia: string
           respeito_empatia?: string
           updated_at?: string
@@ -85,14 +95,19 @@ export type Database = {
         Update: {
           aluno_id?: string
           comportamento?: string
+          conquistas?: string[]
           coordenacao_motora?: string
           created_at?: string
           disciplina?: string
           execucao_exercicios?: string
           forca_resistencia?: string
           id?: string
+          meta?: string | null
+          notas?: Json
           observacoes?: string | null
           professor_id?: string
+          publicada?: boolean
+          publicada_em?: string | null
           referencia?: string
           respeito_empatia?: string
           updated_at?: string
@@ -739,7 +754,9 @@ export type Database = {
           user_id: string
         }[]
       }
+      cor_da_nota: { Args: { _nota: number }; Returns: string }
       cpf_disponivel: { Args: { _cpf: string }; Returns: boolean }
+      cron_token_valido: { Args: { _token: string }; Returns: boolean }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -747,6 +764,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      media_das_notas: { Args: { _notas: Json }; Returns: number }
       prof_criar_aluno: {
         Args: {
           _fisico?: boolean
@@ -760,6 +778,11 @@ export type Database = {
         }
         Returns: Json
       }
+      publicar_avaliacoes_do_mes: {
+        Args: { _referencia?: string }
+        Returns: Json
+      }
+      rotulo_criterio: { Args: { _chave: string }; Returns: string }
       valor_do_plano: { Args: { _texto: string }; Returns: number }
       vincular_alunos_dos_contratos: { Args: never; Returns: number }
     }
