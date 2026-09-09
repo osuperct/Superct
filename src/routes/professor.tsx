@@ -334,14 +334,14 @@ function Painel({ professorId }: { professorId: string }) {
     }
 
     // Lança forma de pagamento e valor da mensalidade do mês para o contrato físico.
-    if (r.aluno_id && (novoAluno.forma || novoAluno.valor)) {
+    if (r.aluno_id && (novoAluno.forma || valorPlano !== null)) {
       await supabase.from("mensalidades").upsert(
         {
           aluno_id: r.aluno_id,
           user_id: novoAluno.userId,
           referencia: refMes(),
           ativo: true,
-          valor: novoAluno.valor === "" ? null : Number(novoAluno.valor),
+          valor: valorPlano,
           pago: false,
           forma: novoAluno.forma || null,
         },
@@ -350,7 +350,17 @@ function Painel({ professorId }: { professorId: string }) {
     }
 
     setCriandoAluno(false);
-    setNovoAluno({ userId: "", nome: "", nascimento: "", fisico: true, forma: "", valor: "" });
+    setNovoAluno({
+      userId: "",
+      nome: "",
+      nascimento: "",
+      fisico: true,
+      forma: "",
+      plano: "",
+      vencimento: "",
+      valor: "",
+    });
+
     setNovoArquivo(null);
     setNovoAberto(false);
     toast.success("Aluno cadastrado e incluído na lista de chamada.");
