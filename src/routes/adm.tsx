@@ -274,21 +274,35 @@ function Aprovacoes() {
 
   return (
     <section className="rounded-lg border border-primary/40 bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <BadgeCheck className="size-4 text-primary" /> CADASTROS
-        {contas !== null && (
-          <span className="text-sm text-muted-foreground">({contas.length})</span>
-        )}
-        {pendentes.length > 0 && (
-          <span className="rounded-full bg-primary px-2 py-0.5 font-mono text-[10px] text-primary-foreground">
-            {pendentes.length}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+          <BadgeCheck className="size-4 text-primary" /> CADASTROS
+          {contas !== null && (
+            <span className="text-sm text-muted-foreground">({contas.length})</span>
+          )}
+          {pendentes.length > 0 && (
+            <span className="rounded-full bg-primary px-2 py-0.5 font-mono text-[10px] text-primary-foreground">
+              {pendentes.length}
+            </span>
+          )}
+        </h2>
+        <button
+          type="button"
+          onClick={() => setVerTodas((v) => !v)}
+          aria-label={verTodas ? "Mostrar só pendentes" : "Mostrar todos os cadastros"}
+          className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-background/60 px-3 py-1.5 text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
+        >
+          {verTodas ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+          <span className="font-display text-[11px] tracking-tight">
+            {verTodas ? "SÓ PENDENTES" : "LISTA COMPLETA"}
           </span>
-        )}
-      </h2>
+        </button>
+      </div>
       <p className="mt-1 text-xs text-muted-foreground">
         Gerencie os responsáveis cadastrados. Aprove, bloqueie ou exclua cadastros; use o WhatsApp para
         confirmar.
       </p>
+
 
       {contas === null ? (
         <p className="mt-3 text-xs text-muted-foreground">Carregando…</p>
