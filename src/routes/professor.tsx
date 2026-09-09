@@ -257,7 +257,58 @@ function Painel({ professorId }: { professorId: string }) {
     void carregar();
   }
 
+  async function salvarNovoAluno(e: React.FormEvent) {
+    e.preventDefault();
+    if (!novoAluno.userId) {
+      toast.error("Escolha o responsável do aluno.");
+      return;
+    }
+    if (novoAluno.nome.trim().length < 2) {
+      toast.error("Informe o nome do aluno.");
+      return;
+    }
+    setCriandoAluno(true);
+    const r = await criarAlunoProfessor({
+      userId: novoAluno.userId,
+      nome: novoAluno.nome.trim(),
+      ...(novoAluno.nascimento ? { nascimento: novoAluno.nascimento } : {}),
+      documentosFisicos: novoAluno.fisico,
+    });
+    if (!r.ok) {
+      setCriandoAluno(false);
+      toast.error(r.erro);
+      return;
+    }
 
+    if (novoArquivo) {
+      const limpo = novoArquivo.name.replace(/[^\w.\-]+/g, "_");
+      const caminho = `${novoAluno.userId}/${Date.now()}-${limpo}`;
+      const { error: erroUp } = await supabase.storage.from(BUCKET).upload(caminho, novoArquivo);
+      if (erroUp) {
+        setCriandoAluno(false);
+        toast.error("Aluno cadastrado, mas o arquivo não foi enviado. Tente anexar novamente.");
+        void carregar();
+        return;
+      }
+      await supabase.from("documentos").insert({
+        user_id: novoAluno.userId,
+        aluno_id: r.aluno_id,
+        tipo: "contrato",
+        nome_arquivo: novoArquivo.name,
+        caminho,
+        enviado_por_professor: true,
+        liberado: true,
+        liberado_em: new Date().toISOString(),
+      });
+    }
+
+    setCriandoAluno(false);
+    setNovoAluno({ userId: "", nome: "", nascimento: "", fisico: true });
+    setNovoArquivo(null);
+    setNovoAberto(false);
+    toast.success("Aluno cadastrado e incluído na lista de chamada.");
+    void carregar();
+  }
 
   const docsDoAluno = (alu: Alu): Doc[] =>
     docs.filter((d) => d.liberado && (d.aluno_id ? d.aluno_id === alu.id : d.user_id === alu.user_id));
