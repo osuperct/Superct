@@ -17,7 +17,20 @@ export type PlanoContrato = {
   inicio: string | null;
 };
 
-const FORMAS_VALIDAS: FormaContrato[] = ["Pix / dinheiro", "Cartão", "Cartão Recorrente (link)"];
+/** Normaliza o texto da forma de pagamento (aceita variações e o antigo "Pix / dinheiro"). */
+export function normalizarForma(texto: string): FormaContrato {
+  const t = texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .trim();
+  if (!t) return "Não informado";
+  if (t.includes("recorrente")) return "Cartão Recorrente (link)";
+  if (t.includes("cart")) return "Cartão";
+  if (t.includes("pix")) return "Pix";
+  if (t.includes("dinheiro")) return "Dinheiro";
+  return "Não informado";
+}
 
 function numeroBr(texto: string) {
   const limpo = texto.replace(/\./g, "").replace(",", ".");
