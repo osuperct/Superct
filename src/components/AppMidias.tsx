@@ -16,10 +16,14 @@ import {
   GRUPO_VIDEOS,
   atualizarMidia,
   enviarMidia,
+  excluirGrupo,
   excluirMidia,
+  gruposExtras,
   listarMidiasAdm,
 } from "@/lib/midias";
 import { assetUrl } from "@/lib/assetUrl";
+
+const NOVO_CARD = "__novo__";
 
 const VIDEOS_ORIGINAIS: string[] = [assetUrl(video2), assetUrl(video1), assetUrl(video3)];
 
@@ -28,6 +32,7 @@ export function AppMidias() {
   const [grupo, setGrupo] = useState<string>(GRUPOS_CARDS[0]);
   const [ocupado, setOcupado] = useState(false);
   const [aberto, setAberto] = useState(false);
+  const [nomeNovo, setNomeNovo] = useState("");
 
   const carregar = useCallback(async () => {
     setLista(await listarMidiasAdm());
