@@ -27,6 +27,17 @@
   --color-border: var(--border);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-evaluation-surface: var(--evaluation-surface);
+  --color-evaluation-header: var(--evaluation-header);
+  --color-evaluation-orange: var(--evaluation-orange);
+  --color-evaluation-blue: var(--evaluation-blue);
+  --color-evaluation-pink: var(--evaluation-pink);
+  --color-evaluation-star: var(--evaluation-star);
+  --font-evaluation: "Bebas Neue", sans-serif;
+  --drop-shadow-evaluation-blue: 0 0 7px color-mix(in oklab, var(--evaluation-blue) 70%, transparent);
+  --drop-shadow-evaluation-pink: 0 0 7px color-mix(in oklab, var(--evaluation-pink) 70%, transparent);
+  --drop-shadow-evaluation-star: 0 0 7px color-mix(in oklab, var(--evaluation-star) 65%, transparent);
+  --shadow-evaluation: 0 16px 40px color-mix(in oklab, var(--background) 60%, transparent), 0 0 22px color-mix(in oklab, var(--evaluation-blue) 10%, transparent);
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -47,6 +58,12 @@
   --accent-red: oklch(0.63 0.26 15);
   --whatsapp: oklch(0.78 0.19 148);
   --border: oklch(1 0 0 / 8%);
+  --evaluation-surface: oklch(0.185 0.006 285);
+  --evaluation-header: oklch(0.245 0.012 285);
+  --evaluation-orange: oklch(0.7 0.19 45);
+  --evaluation-blue: oklch(0.78 0.17 220);
+  --evaluation-pink: oklch(0.72 0.2 350);
+  --evaluation-star: oklch(0.88 0.18 92);
 }
 
 @keyframes neonPulse {
