@@ -359,7 +359,7 @@ export function Mensalidades({
           </p>
         ) : (
           <ul className="space-y-2">
-            {ordenados.map((a) => {
+            {listaFiltrada.map((a) => {
               const m = doMes(a.id);
               const ativo = m?.ativo ?? true;
               const expandido = abertos.has(a.id);
@@ -457,8 +457,12 @@ export function Mensalidades({
                 </li>
               );
             })}
-            {ordenados.length === 0 && (
-              <li className="text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</li>
+            {listaFiltrada.length === 0 && (
+              <li className="text-sm text-muted-foreground">
+                {ordenados.length === 0
+                  ? "Nenhum aluno matriculado ainda."
+                  : "Nenhum aluno encontrado com esses filtros."}
+              </li>
             )}
           </ul>
         )}
@@ -496,7 +500,7 @@ export function Mensalidades({
                       </span>
                       <span className="shrink-0 text-right">
                         <span className="font-mono text-[10px] tracking-widest text-primary">
-                          {formatarValor(i.plano!.valor)}
+                          {formatarValor(i.plano!.valor ?? valorDoMes(i.aluno.id))}
                         </span>
                         <span className="block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                           vence {vencimentoNoMes(i.plano!.vencimento, mesAtual) ?? "—"}
