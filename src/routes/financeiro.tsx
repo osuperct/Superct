@@ -81,7 +81,7 @@ function FinanceiroPage() {
         .eq("tipo", "contrato")
         .order("created_at", { ascending: false }),
       supabase.from("documentos").select("aluno_id, tipo, liberado").eq("tipo", "contrato"),
-      supabase.from("perfis").select("id, nome_responsavel"),
+      supabase.from("perfis").select("id, nome_responsavel, documentos_fisicos"),
     ]);
     setResponsaveis(
       Object.fromEntries((perfis ?? []).map((p) => [p.id, p.nome_responsavel ?? ""])),
