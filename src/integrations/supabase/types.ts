@@ -754,6 +754,8 @@ export type Database = {
           user_id: string
         }[]
       }
+      conquista_comportamento: { Args: { _criterio: string }; Returns: string }
+      conquista_desempenho: { Args: { _criterio: string }; Returns: string }
       cor_da_nota: { Args: { _nota: number }; Returns: string }
       cpf_disponivel: { Args: { _cpf: string }; Returns: boolean }
       cron_token_valido: { Args: { _token: string }; Returns: boolean }

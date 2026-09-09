@@ -9,9 +9,11 @@ import { relatorioAvaliacao } from "@/lib/avaliacaoPdf";
 import {
   CRITERIOS,
   FAIXAS,
+  CONQUISTAS_MANUAIS,
   type Avaliacao,
   type CriterioChave,
   type Notas,
+  conquistasAutomaticas,
   lerNotas,
   mediaNotas,
   mesExtenso,
@@ -102,6 +104,8 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
   const referencia = referenciaMesAtual();
   const [notas, setNotas] = useState<Notas>(VAZIO);
   const [observacoes, setObservacoes] = useState("");
+  const [manuais, setManuais] = useState<string[]>([]);
+  const [anteriores, setAnteriores] = useState<Notas | null>(null);
   const [historico, setHistorico] = useState<Avaliacao[]>([]);
   const [mesSelecionado, setMesSelecionado] = useState<string>("");
   const [salvando, setSalvando] = useState(false);
@@ -114,13 +118,17 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
       .order("referencia", { ascending: false });
     const lista = (data ?? []) as unknown as Avaliacao[];
     setHistorico(lista);
+    const anterior = lista.find((a) => a.referencia < referencia);
+    setAnteriores(anterior ? lerNotas(anterior.notas) : null);
     const atual = lista.find((a) => a.referencia === referencia);
     if (atual) {
       setNotas(lerNotas(atual.notas));
       setObservacoes(atual.observacoes ?? "");
+      setManuais((atual.conquistas ?? []).filter((c) => CONQUISTAS_MANUAIS.includes(c)));
     } else {
       setNotas(VAZIO);
       setObservacoes("");
+      setManuais([]);
     }
   }, [aluno.id, referencia]);
 
@@ -145,6 +153,7 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
         observacoes: observacoes.trim() || null,
         notas: notas as Record<CriterioChave, number>,
         meta: metaDeNotas(notas),
+        conquistas: [...new Set([...conquistasAutomaticas(notas, anteriores), ...manuais])],
         ...(publicar ? { publicada: true, publicada_em: new Date().toISOString() } : {}),
       },
       { onConflict: "aluno_id,referencia" },
@@ -211,6 +220,46 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
         placeholder="Observação do professor (aparece no relatório da família)"
         className="mt-3 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
       />
+
+      <div className="mt-3 rounded-md border border-border bg-background/40 p-3">
+        <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <Trophy className="size-3 text-primary" /> Conquistas de comportamento e participação
+        </p>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          As de desempenho (🏆) e evolução (📈) são calculadas sozinhas pelas estrelas. Toque para conceder selos de
+          atitude:
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {CONQUISTAS_MANUAIS.map((c) => {
+            const ativa = manuais.includes(c);
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setManuais((atual) => (ativa ? atual.filter((x) => x !== c) : [...atual, c]))}
+                className={`rounded-full border px-3 py-1.5 text-xs ${
+                  ativa
+                    ? "border-primary bg-primary/15 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/60"
+                }`}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+        {(() => {
+          const auto = conquistasAutomaticas(notas, anteriores);
+          return auto.length > 0 ? (
+            <p className="mt-2 text-xs">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Automáticas deste mês:
+              </span>{" "}
+              {auto.join(" · ")}
+            </p>
+          ) : null;
+        })()}
+      </div>
 
       <button
         type="button"
