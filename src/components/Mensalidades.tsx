@@ -87,11 +87,13 @@ export function Mensalidades({
   alunos,
   mensalidades,
   planos = [],
+  responsaveis = {},
   recarregar,
 }: {
   alunos: Alu[];
   mensalidades: Mensalidade[];
   planos?: PlanoContrato[];
+  responsaveis?: Record<string, string>;
   recarregar: () => void;
 }) {
   const [salvando, setSalvando] = useState<string | null>(null);
@@ -106,6 +108,8 @@ export function Mensalidades({
   const [abertos, setAbertos] = useState<Set<string>>(new Set(ordenados.map((a) => a.id)));
   const [todosAbertos, setTodosAbertos] = useState(true);
   const [listaVisivel, setListaVisivel] = useState(true);
+  const [busca, setBusca] = useState("");
+  const [situacao, setSituacao] = useState<"todos" | "pagos" | "atraso" | "vencer">("todos");
 
   const toggleAluno = (id: string) => {
     setAbertos((prev) => {
@@ -168,6 +172,38 @@ export function Mensalidades({
     .sort((a, b) => a.referencia.localeCompare(b.referencia));
 
   const planoDoAluno = (alunoId: string) => planos.find((p) => p.alunoId === alunoId);
+
+  /** Valor do mês: usa o valor lançado; se faltar, o valor do plano do contrato. */
+  const valorDoMes = (alunoId: string) =>
+    Number(doMes(alunoId)?.valor ?? planoDoAluno(alunoId)?.valor ?? 0);
+
+  const diaHoje = new Date().getDate();
+
+  /** pago | atraso (venceu e não pagou) | vencer */
+  const situacaoDoAluno = (a: Alu): "pago" | "atraso" | "vencer" => {
+    const m = doMes(a.id);
+    if (m?.pago) return "pago";
+    const temAtrasoAnterior = mensalidades.some(
+      (x) => x.aluno_id === a.id && x.ativo && !x.pago && x.referencia < mesAtual,
+    );
+    if (temAtrasoAnterior) return "atraso";
+    const dia = Number(String(planoDoAluno(a.id)?.vencimento ?? "").replace(/\D+/g, ""));
+    if (dia && diaHoje > dia) return "atraso";
+    return "vencer";
+  };
+
+  const termo = busca.trim().toLowerCase();
+  const listaFiltrada = ordenados.filter((a) => {
+    if (situacao !== "todos") {
+      const s = situacaoDoAluno(a);
+      if (situacao === "pagos" && s !== "pago") return false;
+      if (situacao === "atraso" && s !== "atraso") return false;
+      if (situacao === "vencer" && s !== "vencer") return false;
+    }
+    if (!termo) return true;
+    const resp = (responsaveis[a.user_id] ?? "").toLowerCase();
+    return a.nome.toLowerCase().includes(termo) || resp.includes(termo);
+  });
 
   // Meses disponíveis na projeção: do próximo mês até a última parcela dos planos.
   const mesesProjecao = useMemo(() => {
@@ -276,7 +312,29 @@ export function Mensalidades({
           Recebido {formatarValor(recebido)} • A receber {formatarValor(aReceber)}
         </p>
 
-        <div className="mb-2 flex items-center justify-end">
+        <div className="mt-3 flex flex-wrap gap-2">
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Pesquisar aluno ou responsável…"
+            className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs"
+          />
+          <select
+            value={situacao}
+            onChange={(e) => setSituacao(e.target.value as typeof situacao)}
+            className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-background px-2 py-1.5 text-xs sm:w-auto"
+          >
+            <option value="todos">Todas as situações</option>
+            <option value="pagos">Pagos</option>
+            <option value="atraso">Em atraso</option>
+            <option value="vencer">A vencer</option>
+          </select>
+        </div>
+        <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+          {listaFiltrada.length} de {ordenados.length} alunos
+        </p>
+
+        <div className="mb-2 mt-2 flex items-center justify-end">
           <button
             type="button"
             onClick={toggleTodos}
@@ -301,7 +359,7 @@ export function Mensalidades({
           </p>
         ) : (
           <ul className="space-y-2">
-            {ordenados.map((a) => {
+            {listaFiltrada.map((a) => {
               const m = doMes(a.id);
               const ativo = m?.ativo ?? true;
               const expandido = abertos.has(a.id);
@@ -399,8 +457,12 @@ export function Mensalidades({
                 </li>
               );
             })}
-            {ordenados.length === 0 && (
-              <li className="text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</li>
+            {listaFiltrada.length === 0 && (
+              <li className="text-sm text-muted-foreground">
+                {ordenados.length === 0
+                  ? "Nenhum aluno matriculado ainda."
+                  : "Nenhum aluno encontrado com esses filtros."}
+              </li>
             )}
           </ul>
         )}
@@ -438,7 +500,7 @@ export function Mensalidades({
                       </span>
                       <span className="shrink-0 text-right">
                         <span className="font-mono text-[10px] tracking-widest text-primary">
-                          {formatarValor(i.plano!.valor)}
+                          {formatarValor(i.plano!.valor ?? valorDoMes(i.aluno.id))}
                         </span>
                         <span className="block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
                           vence {vencimentoNoMes(i.plano!.vencimento, mesAtual) ?? "—"}

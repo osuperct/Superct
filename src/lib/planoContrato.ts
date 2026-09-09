@@ -28,9 +28,15 @@ function numeroBr(texto: string) {
 /** "Plano anual 12x de R$140,00" -> { parcelas: 12, valor: 140 } */
 export function lerPlano(planoTexto: string) {
   const parcelasMatch = planoTexto.match(/(\d+)\s*x/i);
-  const valorMatch = planoTexto.match(/R\$\s*([\d.]+,\d{2}|\d+)/i);
+  const parcelas = parcelasMatch ? Number(parcelasMatch[1]) : 1;
+  // Sem "R$" também vale: "120,00", "Outro valor — 120", "12x de 140,00".
+  const semParcelas = planoTexto.replace(/(\d+)\s*x/gi, " ");
+  const valorMatch =
+    planoTexto.match(/R\$\s*([\d.]+,\d{2}|[\d.]+)/i) ??
+    semParcelas.match(/([\d.]+,\d{2})/) ??
+    semParcelas.match(/(\d[\d.]*)/);
   return {
-    parcelas: parcelasMatch ? Number(parcelasMatch[1]) : 1,
+    parcelas,
     valor: valorMatch ? numeroBr(valorMatch[1]!) : null,
   };
 }

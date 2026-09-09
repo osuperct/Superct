@@ -59,6 +59,7 @@ function FinanceiroPage() {
   const [alunos, setAlunos] = useState<Alu[]>([]);
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [planos, setPlanos] = useState<PlanoContrato[]>([]);
+  const [responsaveis, setResponsaveis] = useState<Record<string, string>>({});
 
   const carregar = useCallback(async () => {
     const { data: papeis } = await supabase.from("user_roles").select("role");
@@ -69,7 +70,7 @@ function FinanceiroPage() {
     // Liga contratos assinados que ficaram sem aluno cadastrado.
     await supabase.rpc("vincular_alunos_dos_contratos");
 
-    const [{ data: a }, { data: m }, { data: f }, { data: docs }] = await Promise.all([
+    const [{ data: a }, { data: m }, { data: f }, { data: docs }, { data: perfis }] = await Promise.all([
       supabase.from("alunos").select("id, nome, matricula, user_id").order("nome"),
       supabase
         .from("mensalidades")
@@ -80,7 +81,11 @@ function FinanceiroPage() {
         .eq("tipo", "contrato")
         .order("created_at", { ascending: false }),
       supabase.from("documentos").select("aluno_id, tipo, liberado").eq("tipo", "contrato"),
+      supabase.from("perfis").select("id, nome_responsavel"),
     ]);
+    setResponsaveis(
+      Object.fromEntries((perfis ?? []).map((p) => [p.id, p.nome_responsavel ?? ""])),
+    );
     setAlunos((a ?? []) as Alu[]);
     setMensalidades((m ?? []) as Mensalidade[]);
 
@@ -131,6 +136,7 @@ function FinanceiroPage() {
         alunos={alunos}
         mensalidades={mensalidades}
         planos={planos}
+        responsaveis={responsaveis}
         recarregar={() => void carregar()}
       />
     </Casca>
