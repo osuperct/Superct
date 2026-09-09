@@ -37,7 +37,7 @@ function CampoValor({
   const [manual, setManual] = useState(valor !== null && !preset);
 
   return (
-    <>
+    <div className="flex flex-wrap items-center gap-2">
       <select
         value={manual ? "outro" : preset ? String(Number(valor)) : ""}
         onChange={(e) => {
@@ -48,7 +48,7 @@ function CampoValor({
           setManual(false);
           onChange(e.target.value === "" ? null : Number(e.target.value));
         }}
-        className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+        className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-background px-2 py-1.5 text-xs"
       >
         <option value="">Mensalidade…</option>
         {VALORES.map((v) => (
@@ -69,10 +69,10 @@ function CampoValor({
             const v = e.target.value === "" ? null : Number(e.target.value);
             if (v !== valor) onChange(v);
           }}
-          className="w-28 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+          className="w-full min-w-0 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
         />
       )}
-    </>
+    </div>
   );
 }
 
