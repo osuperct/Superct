@@ -115,7 +115,43 @@ export function AppMidias() {
               {g}
             </option>
           ))}
+          {extras.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
+          <option value={NOVO_CARD}>+ ADICIONAR CARD</option>
         </select>
+
+        {novoCard && (
+          <>
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              Nome do card novo
+            </p>
+            <input
+              value={nomeNovo}
+              onChange={(e) => setNomeNovo(e.target.value)}
+              placeholder="Ex.: AULÃO DE FÉRIAS"
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm uppercase"
+            />
+            {!grupoAtual && (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Escreva o nome para liberar o envio das fotos.
+              </p>
+            )}
+          </>
+        )}
+
+        {cardExtra && (
+          <button
+            type="button"
+            disabled={ocupado}
+            onClick={() => void apagarCard(grupo)}
+            className="mt-2 flex items-center gap-2 rounded-md border border-destructive/60 px-3 py-2 text-xs uppercase tracking-widest text-destructive"
+          >
+            <Trash2 className="size-4" /> Excluir este card
+          </button>
+        )}
 
         <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Foto de capa</p>
         {capa?.url && (
@@ -136,14 +172,19 @@ export function AppMidias() {
             </button>
           </div>
         )}
+        {grupoAtual && (
         <EnvioImagem
           rotulo={capa ? "TROCAR FOTO DE CAPA" : "ANEXAR FOTO DE CAPA"}
           aspecto={4 / 3}
           onEnviar={async (blob, nome, descricao) => {
-            await enviarMidia({ tipo: "capa", grupo, arquivo: blob, nomeArquivo: nome, descricao });
+            await enviarMidia({ tipo: "capa", grupo: grupoAtual, arquivo: blob, nomeArquivo: nome, descricao });
             await carregar();
+            setGrupo(grupoAtual);
+            setNomeNovo("");
           }}
         />
+        )}
+
 
         <p className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           Fotos de dentro do cartão
