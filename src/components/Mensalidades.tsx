@@ -312,7 +312,29 @@ export function Mensalidades({
           Recebido {formatarValor(recebido)} • A receber {formatarValor(aReceber)}
         </p>
 
-        <div className="mb-2 flex items-center justify-end">
+        <div className="mt-3 flex flex-wrap gap-2">
+          <input
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Pesquisar aluno ou responsável…"
+            className="min-w-0 flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-xs"
+          />
+          <select
+            value={situacao}
+            onChange={(e) => setSituacao(e.target.value as typeof situacao)}
+            className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-background px-2 py-1.5 text-xs sm:w-auto"
+          >
+            <option value="todos">Todas as situações</option>
+            <option value="pagos">Pagos</option>
+            <option value="atraso">Em atraso</option>
+            <option value="vencer">A vencer</option>
+          </select>
+        </div>
+        <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+          {listaFiltrada.length} de {ordenados.length} alunos
+        </p>
+
+        <div className="mb-2 mt-2 flex items-center justify-end">
           <button
             type="button"
             onClick={toggleTodos}
