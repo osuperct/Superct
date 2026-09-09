@@ -106,6 +106,8 @@ export function Mensalidades({
   const [abertos, setAbertos] = useState<Set<string>>(new Set(ordenados.map((a) => a.id)));
   const [todosAbertos, setTodosAbertos] = useState(true);
   const [listaVisivel, setListaVisivel] = useState(true);
+  const [busca, setBusca] = useState("");
+  const [situacao, setSituacao] = useState<"todos" | "pagos" | "atraso" | "vencer">("todos");
 
   const toggleAluno = (id: string) => {
     setAbertos((prev) => {
