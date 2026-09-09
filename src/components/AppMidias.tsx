@@ -37,11 +37,30 @@ export function AppMidias() {
     void carregar();
   }, [carregar]);
 
-  const capa = lista.find((m) => m.tipo === "capa" && m.grupo === grupo) ?? null;
-  const fotos = lista.filter((m) => m.tipo === "foto" && m.grupo === grupo);
+  const extras = gruposExtras(lista);
+  const novoCard = grupo === NOVO_CARD;
+  const grupoAtual = novoCard ? nomeNovo.trim().toUpperCase() : grupo;
+  const capa = lista.find((m) => m.tipo === "capa" && m.grupo === grupoAtual) ?? null;
+  const fotos = lista.filter((m) => m.tipo === "foto" && m.grupo === grupoAtual);
   const videos = lista.filter((m) => m.tipo === "video");
   const logo = lista.find((m) => m.tipo === "logo") ?? null;
   const fotosQg = lista.filter((m) => m.tipo === "foto" && m.grupo === GRUPO_QG);
+  const cardExtra = extras.includes(grupo);
+
+  async function apagarCard(nome: string) {
+    if (!confirm(`Excluir o cartão “${nome}” e todas as fotos dele?`)) return;
+    setOcupado(true);
+    try {
+      await excluirGrupo(nome);
+      setGrupo(GRUPOS_CARDS[0]);
+      await carregar();
+      toast.success("Cartão excluído da página.");
+    } catch {
+      toast.error("Não foi possível excluir o cartão.");
+    } finally {
+      setOcupado(false);
+    }
+  }
 
   async function remover(m: Midia) {
     setOcupado(true);
