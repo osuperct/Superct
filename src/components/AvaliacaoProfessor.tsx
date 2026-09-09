@@ -153,6 +153,7 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
         observacoes: observacoes.trim() || null,
         notas: notas as Record<CriterioChave, number>,
         meta: metaDeNotas(notas),
+        conquistas: [...new Set([...conquistasAutomaticas(notas, anteriores), ...manuais])],
         ...(publicar ? { publicada: true, publicada_em: new Date().toISOString() } : {}),
       },
       { onConflict: "aluno_id,referencia" },
