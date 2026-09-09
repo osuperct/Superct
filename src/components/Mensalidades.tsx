@@ -111,6 +111,8 @@ export function Mensalidades({
   const [listaVisivel, setListaVisivel] = useState(true);
   const [busca, setBusca] = useState("");
   const [situacao, setSituacao] = useState<"todos" | "pagos" | "atraso" | "vencer">("todos");
+  const [formasMinimizado, setFormasMinimizado] = useState(false);
+  const [filtroForma, setFiltroForma] = useState<"todas" | FormaContrato>("todas");
 
   const toggleAluno = (id: string) => {
     setAbertos((prev) => {
@@ -472,12 +474,35 @@ export function Mensalidades({
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <CreditCard className="size-4 text-primary" /> FORMAS DE PAGAMENTO
+          <button
+            type="button"
+            onClick={() => setFormasMinimizado((v) => !v)}
+            className="ml-auto rounded-md border border-border bg-background p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={formasMinimizado ? "Expandir formas de pagamento" : "Minimizar formas de pagamento"}
+          >
+            {formasMinimizado ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
+          </button>
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
           Alunos ativos com contrato conferido, valor do plano e vencimento em {mesExtensoRef(mesAtual)}.
         </p>
+        {!formasMinimizado && (
+        <>
+        <select
+          value={filtroForma}
+          onChange={(e) => setFiltroForma(e.target.value as typeof filtroForma)}
+          className="mt-3 w-full min-w-0 max-w-full truncate rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+        >
+          <option value="todas">Todas as formas</option>
+          {GRUPOS.filter((g) => g.forma !== "Não informado").map((g) => (
+            <option key={g.forma} value={g.forma}>
+              {g.rotulo}
+            </option>
+          ))}
+          <option value="Não informado">SEM FORMA INFORMADA</option>
+        </select>
         <div className="mt-3 space-y-3">
-          {GRUPOS.map((g) => {
+          {GRUPOS.filter((g) => filtroForma === "todas" || g.forma === filtroForma).map((g) => {
             const itens = ativosMes
               .map((a) => ({ aluno: a, plano: planos.find((p) => p.alunoId === a.id) }))
               .filter((i) => i.plano && i.plano.forma === g.forma);
