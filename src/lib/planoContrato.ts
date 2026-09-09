@@ -66,8 +66,7 @@ export function inicioIso(texto: string | undefined) {
 export function planoDoContrato(alunoId: string, dados: Record<string, unknown>): PlanoContrato {
   const planoTexto = String(dados["valor"] ?? "").trim();
   const { parcelas, valor } = lerPlano(planoTexto);
-  const formaTexto = String(dados["forma_pagamento"] ?? "").trim();
-  const forma = (FORMAS_VALIDAS.find((f) => f === formaTexto) ?? "Não informado") as FormaContrato;
+  const forma = normalizarForma(formaTexto);
   return {
     alunoId,
     planoTexto,
