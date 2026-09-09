@@ -5,7 +5,7 @@ import { CircleDollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Mensalidades } from "@/components/Mensalidades";
 import type { Mensalidade } from "@/lib/mensalidade";
-import { planoDoContrato, type PlanoContrato } from "@/lib/planoContrato";
+import { normalizarForma, planoDoContrato, type PlanoContrato } from "@/lib/planoContrato";
 
 export const Route = createFileRoute("/financeiro")({
   head: () => ({
@@ -81,7 +81,7 @@ function FinanceiroPage() {
         .eq("tipo", "contrato")
         .order("created_at", { ascending: false }),
       supabase.from("documentos").select("aluno_id, tipo, liberado").eq("tipo", "contrato"),
-      supabase.from("perfis").select("id, nome_responsavel"),
+      supabase.from("perfis").select("id, nome_responsavel, documentos_fisicos"),
     ]);
     setResponsaveis(
       Object.fromEntries((perfis ?? []).map((p) => [p.id, p.nome_responsavel ?? ""])),
@@ -100,6 +100,24 @@ function FinanceiroPage() {
       if (!alunoId || vistos.has(alunoId) || !conferidos.has(alunoId)) continue;
       vistos.add(alunoId);
       lista.push(planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>));
+    }
+
+    // Alunos de contrato físico (sem ficha digital): entram na lista com o valor/forma lançados na mensalidade.
+    const fisicos = new Set(
+      (perfis ?? []).filter((p) => p.documentos_fisicos).map((p) => p.id as string),
+    );
+    for (const aluno of (a ?? []) as Alu[]) {
+      if (vistos.has(aluno.id) || !fisicos.has(aluno.user_id)) continue;
+      const mensal = (m ?? []).find((x: Mensalidade) => x.aluno_id === aluno.id);
+      lista.push({
+        alunoId: aluno.id,
+        planoTexto: "Contrato físico",
+        forma: normalizarForma(String(mensal?.forma ?? "")),
+        valor: mensal?.valor ?? null,
+        parcelas: 1,
+        vencimento: null,
+        inicio: null,
+      });
     }
     setPlanos(lista);
   }, []);
