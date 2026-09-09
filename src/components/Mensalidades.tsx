@@ -113,6 +113,7 @@ export function Mensalidades({
   const [situacao, setSituacao] = useState<"todos" | "pagos" | "atraso" | "vencer">("todos");
   const [formasMinimizado, setFormasMinimizado] = useState(false);
   const [filtroForma, setFiltroForma] = useState<"todas" | FormaContrato>("todas");
+  const [projecaoMinimizada, setProjecaoMinimizada] = useState(false);
 
   const toggleAluno = (id: string) => {
     setAbertos((prev) => {
