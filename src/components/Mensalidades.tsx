@@ -77,7 +77,8 @@ function CampoValor({
 }
 
 const GRUPOS: { forma: FormaContrato; rotulo: string }[] = [
-  { forma: "Pix / dinheiro", rotulo: "PIX / DINHEIRO" },
+  { forma: "Pix", rotulo: "PIX" },
+  { forma: "Dinheiro", rotulo: "DINHEIRO" },
   { forma: "Cartão", rotulo: "CARTÃO" },
   { forma: "Cartão Recorrente (link)", rotulo: "CARTÃO RECORRENTE (LINK)" },
   { forma: "Não informado", rotulo: "SEM FORMA INFORMADA" },
