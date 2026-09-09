@@ -16,10 +16,14 @@ import {
   GRUPO_VIDEOS,
   atualizarMidia,
   enviarMidia,
+  excluirGrupo,
   excluirMidia,
+  gruposExtras,
   listarMidiasAdm,
 } from "@/lib/midias";
 import { assetUrl } from "@/lib/assetUrl";
+
+const NOVO_CARD = "__novo__";
 
 const VIDEOS_ORIGINAIS: string[] = [assetUrl(video2), assetUrl(video1), assetUrl(video3)];
 
@@ -28,6 +32,7 @@ export function AppMidias() {
   const [grupo, setGrupo] = useState<string>(GRUPOS_CARDS[0]);
   const [ocupado, setOcupado] = useState(false);
   const [aberto, setAberto] = useState(false);
+  const [nomeNovo, setNomeNovo] = useState("");
 
   const carregar = useCallback(async () => {
     setLista(await listarMidiasAdm());
@@ -37,11 +42,30 @@ export function AppMidias() {
     void carregar();
   }, [carregar]);
 
-  const capa = lista.find((m) => m.tipo === "capa" && m.grupo === grupo) ?? null;
-  const fotos = lista.filter((m) => m.tipo === "foto" && m.grupo === grupo);
+  const extras = gruposExtras(lista);
+  const novoCard = grupo === NOVO_CARD;
+  const grupoAtual = novoCard ? nomeNovo.trim().toUpperCase() : grupo;
+  const capa = lista.find((m) => m.tipo === "capa" && m.grupo === grupoAtual) ?? null;
+  const fotos = lista.filter((m) => m.tipo === "foto" && m.grupo === grupoAtual);
   const videos = lista.filter((m) => m.tipo === "video");
   const logo = lista.find((m) => m.tipo === "logo") ?? null;
   const fotosQg = lista.filter((m) => m.tipo === "foto" && m.grupo === GRUPO_QG);
+  const cardExtra = extras.includes(grupo);
+
+  async function apagarCard(nome: string) {
+    if (!confirm(`Excluir o cartão “${nome}” e todas as fotos dele?`)) return;
+    setOcupado(true);
+    try {
+      await excluirGrupo(nome);
+      setGrupo(GRUPOS_CARDS[0]);
+      await carregar();
+      toast.success("Cartão excluído da página.");
+    } catch {
+      toast.error("Não foi possível excluir o cartão.");
+    } finally {
+      setOcupado(false);
+    }
+  }
 
   async function remover(m: Midia) {
     setOcupado(true);
@@ -91,7 +115,43 @@ export function AppMidias() {
               {g}
             </option>
           ))}
+          {extras.map((g) => (
+            <option key={g} value={g}>
+              {g}
+            </option>
+          ))}
+          <option value={NOVO_CARD}>+ ADICIONAR CARD</option>
         </select>
+
+        {novoCard && (
+          <>
+            <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              Nome do card novo
+            </p>
+            <input
+              value={nomeNovo}
+              onChange={(e) => setNomeNovo(e.target.value)}
+              placeholder="Ex.: AULÃO DE FÉRIAS"
+              className="mt-1 w-full rounded-md border border-border bg-background px-3 py-2 text-sm uppercase"
+            />
+            {!grupoAtual && (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                Escreva o nome para liberar o envio das fotos.
+              </p>
+            )}
+          </>
+        )}
+
+        {cardExtra && (
+          <button
+            type="button"
+            disabled={ocupado}
+            onClick={() => void apagarCard(grupo)}
+            className="mt-2 flex items-center gap-2 rounded-md border border-destructive/60 px-3 py-2 text-xs uppercase tracking-widest text-destructive"
+          >
+            <Trash2 className="size-4" /> Excluir este card
+          </button>
+        )}
 
         <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Foto de capa</p>
         {capa?.url && (
@@ -112,14 +172,19 @@ export function AppMidias() {
             </button>
           </div>
         )}
+        {grupoAtual && (
         <EnvioImagem
           rotulo={capa ? "TROCAR FOTO DE CAPA" : "ANEXAR FOTO DE CAPA"}
           aspecto={4 / 3}
           onEnviar={async (blob, nome, descricao) => {
-            await enviarMidia({ tipo: "capa", grupo, arquivo: blob, nomeArquivo: nome, descricao });
+            await enviarMidia({ tipo: "capa", grupo: grupoAtual, arquivo: blob, nomeArquivo: nome, descricao });
             await carregar();
+            setGrupo(grupoAtual);
+            setNomeNovo("");
           }}
         />
+        )}
+
 
         <p className="mt-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           Fotos de dentro do cartão
@@ -148,21 +213,25 @@ export function AppMidias() {
             ))}
           </ul>
         )}
+        {grupoAtual && (
         <EnvioImagem
           rotulo="ANEXAR NOVA FOTO INTERNA"
           aspecto={4 / 3}
           onEnviar={async (blob, nome, descricao) => {
             await enviarMidia({
               tipo: "foto",
-              grupo,
+              grupo: grupoAtual,
               arquivo: blob,
               nomeArquivo: nome,
               descricao,
               ordem: fotos.length,
             });
             await carregar();
+            setGrupo(grupoAtual);
+            setNomeNovo("");
           }}
         />
+        )}
       </div>
 
       {/* -------- NOSSO QG -------- */}

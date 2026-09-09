@@ -123,3 +123,24 @@ export async function excluirMidia(id: string, caminho: string) {
   if (error) throw error;
   await supabase.storage.from(BUCKET_MIDIAS).remove([caminho]);
 }
+
+/** Grupos reservados que não são cartões. */
+const GRUPOS_RESERVADOS = [GRUPO_VIDEOS, GRUPO_QG, GRUPO_LOGO];
+
+/** Cartões criados pela Área ADM (não fazem parte da lista original). */
+export function gruposExtras(lista: Midia[]) {
+  const fixos = new Set<string>([...GRUPOS_CARDS, ...GRUPOS_RESERVADOS]);
+  const nomes = new Set<string>();
+  for (const m of lista) {
+    if ((m.tipo === "capa" || m.tipo === "foto") && !fixos.has(m.grupo)) nomes.add(m.grupo);
+  }
+  return [...nomes].sort((a, b) => a.localeCompare(b, "pt-BR"));
+}
+
+/** Apaga um cartão inteiro: capa, fotos internas e arquivos. */
+export async function excluirGrupo(grupo: string) {
+  const { data } = await supabase.from("midias_app").select("id, caminho").eq("grupo", grupo);
+  for (const m of (data ?? []) as { id: string; caminho: string }[]) {
+    await excluirMidia(m.id, m.caminho);
+  }
+}
