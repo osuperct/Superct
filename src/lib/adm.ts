@@ -117,6 +117,10 @@ export async function criarAlunoProfessor(entrada: {
   nascimento?: string;
   idade?: number;
   documentosFisicos?: boolean;
+  /** Texto do plano escolhido (ex.: "Plano mensal R$185,00"). */
+  plano?: string;
+  forma?: string;
+  vencimento?: string;
 }): Promise<{ ok: true; aluno_id: string } | { ok: false; erro: string }> {
   const { data, error } = await supabase.rpc("prof_criar_aluno", {
     _user_id: entrada.userId,
@@ -124,7 +128,11 @@ export async function criarAlunoProfessor(entrada: {
     ...(entrada.nascimento ? { _nascimento: entrada.nascimento } : {}),
     ...(entrada.idade === undefined ? {} : { _idade: entrada.idade }),
     _fisico: entrada.documentosFisicos ?? false,
+    _plano: entrada.plano ?? "",
+    _forma: entrada.forma ?? "",
+    _vencimento: entrada.vencimento ?? "",
   });
   if (error) return { ok: false, erro: `Não foi possível cadastrar o aluno: ${error.message}` };
   return data as unknown as { ok: true; aluno_id: string } | { ok: false; erro: string };
 }
+

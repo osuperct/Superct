@@ -750,13 +750,17 @@ export type Database = {
       prof_criar_aluno: {
         Args: {
           _fisico?: boolean
+          _forma?: string
           _idade?: number
           _nascimento?: string
           _nome: string
+          _plano?: string
           _user_id: string
+          _vencimento?: string
         }
         Returns: Json
       }
+      valor_do_plano: { Args: { _texto: string }; Returns: number }
       vincular_alunos_dos_contratos: { Args: never; Returns: number }
     }
     Enums: {

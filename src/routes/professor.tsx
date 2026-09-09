@@ -12,7 +12,16 @@ import { ListaChamada } from "@/components/ListaChamada";
 
 import { criarAlunoProfessor } from "@/lib/adm";
 import { formatarCpf } from "@/lib/cpf";
+import { CAMPOS_CONTRATO } from "@/lib/documentos";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
+import { lerPlano } from "@/lib/planoContrato";
+
+const campoContrato = (chave: string) => CAMPOS_CONTRATO.find((c) => c.chave === chave);
+/** Mesmos planos, formas e vencimentos do contrato digital. */
+const PLANOS_CONTRATO: string[] = campoContrato("valor")?.opcoes ?? [];
+const FORMAS_CONTRATO: string[] = campoContrato("forma_pagamento")?.opcoes ?? [];
+const VENCIMENTOS_CONTRATO: string[] = campoContrato("vencimento")?.opcoes ?? [];
+
 
 export const Route = createFileRoute("/professor")({
   head: () => ({
@@ -142,8 +151,11 @@ function Painel({ professorId }: { professorId: string }) {
     nascimento: "",
     fisico: true,
     forma: "",
+    plano: "",
+    vencimento: "",
     valor: "",
   });
+
   const [novoArquivo, setNovoArquivo] = useState<File | null>(null);
   const [criandoAluno, setCriandoAluno] = useState(false);
 
@@ -275,12 +287,24 @@ function Painel({ professorId }: { professorId: string }) {
       return;
     }
     setCriandoAluno(true);
+    // Plano escolhido: opção da tabela ou valor digitado ("Outro valor — R$ 170,00").
+    const planoTexto =
+      novoAluno.plano === "outro"
+        ? novoAluno.valor === ""
+          ? ""
+          : `Outro valor — R$ ${Number(novoAluno.valor).toFixed(2).replace(".", ",")}`
+        : novoAluno.plano;
+    const valorPlano = planoTexto ? lerPlano(planoTexto).valor : null;
     const r = await criarAlunoProfessor({
       userId: novoAluno.userId,
       nome: novoAluno.nome.trim(),
       ...(novoAluno.nascimento ? { nascimento: novoAluno.nascimento } : {}),
       documentosFisicos: novoAluno.fisico,
+      plano: planoTexto,
+      forma: novoAluno.forma,
+      vencimento: novoAluno.vencimento,
     });
+
     if (!r.ok) {
       setCriandoAluno(false);
       toast.error(r.erro);
@@ -310,14 +334,14 @@ function Painel({ professorId }: { professorId: string }) {
     }
 
     // Lança forma de pagamento e valor da mensalidade do mês para o contrato físico.
-    if (r.aluno_id && (novoAluno.forma || novoAluno.valor)) {
+    if (r.aluno_id && (novoAluno.forma || valorPlano !== null)) {
       await supabase.from("mensalidades").upsert(
         {
           aluno_id: r.aluno_id,
           user_id: novoAluno.userId,
           referencia: refMes(),
           ativo: true,
-          valor: novoAluno.valor === "" ? null : Number(novoAluno.valor),
+          valor: valorPlano,
           pago: false,
           forma: novoAluno.forma || null,
         },
@@ -326,7 +350,17 @@ function Painel({ professorId }: { professorId: string }) {
     }
 
     setCriandoAluno(false);
-    setNovoAluno({ userId: "", nome: "", nascimento: "", fisico: true, forma: "", valor: "" });
+    setNovoAluno({
+      userId: "",
+      nome: "",
+      nascimento: "",
+      fisico: true,
+      forma: "",
+      plano: "",
+      vencimento: "",
+      valor: "",
+    });
+
     setNovoArquivo(null);
     setNovoAberto(false);
     toast.success("Aluno cadastrado e incluído na lista de chamada.");
@@ -574,7 +608,7 @@ function Painel({ professorId }: { professorId: string }) {
               </span>
             </label>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid gap-2 sm:grid-cols-2">
               <label className="block space-y-1">
                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                   Forma de pagamento
@@ -585,26 +619,65 @@ function Painel({ professorId }: { professorId: string }) {
                   className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
                 >
                   <option value="">Escolha…</option>
-                  <option value="Pix">Pix</option>
-                  <option value="Dinheiro">Dinheiro</option>
-                  <option value="Cartão">Cartão</option>
-                  <option value="Cartão Recorrente (link)">Cartão Recorrente (link)</option>
+                  {FORMAS_CONTRATO.map((f) => (
+                    <option key={f} value={f}>
+                      {f}
+                    </option>
+                  ))}
                 </select>
               </label>
               <label className="block space-y-1">
                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                  Mensalidade (R$)
+                  Plano / mensalidade
                 </span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={novoAluno.valor}
-                  onChange={(e) => setNovoAluno((f) => ({ ...f, valor: e.target.value }))}
-                  className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
-                />
+                <select
+                  value={novoAluno.plano}
+                  onChange={(e) => setNovoAluno((f) => ({ ...f, plano: e.target.value }))}
+                  className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+                >
+                  <option value="">Escolha o plano…</option>
+                  {PLANOS_CONTRATO.map((p) => (
+                    <option key={p} value={p}>
+                      {p}
+                    </option>
+                  ))}
+                  <option value="outro">Outro valor</option>
+                </select>
+              </label>
+              {novoAluno.plano === "outro" ? (
+                <label className="block space-y-1">
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Outro valor (R$)
+                  </span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={novoAluno.valor}
+                    onChange={(e) => setNovoAluno((f) => ({ ...f, valor: e.target.value }))}
+                    className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+                  />
+                </label>
+              ) : null}
+              <label className="block space-y-1">
+                <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Dia de vencimento
+                </span>
+                <select
+                  value={novoAluno.vencimento}
+                  onChange={(e) => setNovoAluno((f) => ({ ...f, vencimento: e.target.value }))}
+                  className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+                >
+                  <option value="">Escolha…</option>
+                  {VENCIMENTOS_CONTRATO.map((d) => (
+                    <option key={d} value={d}>
+                      Dia {d}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
+
 
             <label className="block space-y-1">
               <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
