@@ -121,8 +121,8 @@ export async function criarAlunoProfessor(entrada: {
   const { data, error } = await supabase.rpc("prof_criar_aluno", {
     _user_id: entrada.userId,
     _nome: entrada.nome,
-    _nascimento: entrada.nascimento || null,
-    _idade: entrada.idade ?? null,
+    ...(entrada.nascimento ? { _nascimento: entrada.nascimento } : {}),
+    ...(entrada.idade === undefined ? {} : { _idade: entrada.idade }),
     _fisico: entrada.documentosFisicos ?? false,
   });
   if (error) return { ok: false, erro: `Não foi possível cadastrar o aluno: ${error.message}` };
