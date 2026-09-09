@@ -104,6 +104,8 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
   const referencia = referenciaMesAtual();
   const [notas, setNotas] = useState<Notas>(VAZIO);
   const [observacoes, setObservacoes] = useState("");
+  const [manuais, setManuais] = useState<string[]>([]);
+  const [anteriores, setAnteriores] = useState<Notas | null>(null);
   const [historico, setHistorico] = useState<Avaliacao[]>([]);
   const [mesSelecionado, setMesSelecionado] = useState<string>("");
   const [salvando, setSalvando] = useState(false);
