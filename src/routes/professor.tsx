@@ -309,8 +309,24 @@ function Painel({ professorId }: { professorId: string }) {
       });
     }
 
+    // Lança forma de pagamento e valor da mensalidade do mês para o contrato físico.
+    if (r.aluno_id && (novoAluno.forma || novoAluno.valor)) {
+      await supabase.from("mensalidades").upsert(
+        {
+          aluno_id: r.aluno_id,
+          user_id: novoAluno.userId,
+          referencia: refMes(),
+          ativo: true,
+          valor: novoAluno.valor === "" ? null : Number(novoAluno.valor),
+          pago: false,
+          forma: novoAluno.forma || null,
+        },
+        { onConflict: "aluno_id,referencia" },
+      );
+    }
+
     setCriandoAluno(false);
-    setNovoAluno({ userId: "", nome: "", nascimento: "", fisico: true });
+    setNovoAluno({ userId: "", nome: "", nascimento: "", fisico: true, forma: "", valor: "" });
     setNovoArquivo(null);
     setNovoAberto(false);
     toast.success("Aluno cadastrado e incluído na lista de chamada.");
