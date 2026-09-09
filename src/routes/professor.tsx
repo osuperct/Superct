@@ -151,8 +151,11 @@ function Painel({ professorId }: { professorId: string }) {
     nascimento: "",
     fisico: true,
     forma: "",
+    plano: "",
+    vencimento: "",
     valor: "",
   });
+
   const [novoArquivo, setNovoArquivo] = useState<File | null>(null);
   const [criandoAluno, setCriandoAluno] = useState(false);
 
