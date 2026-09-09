@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdmRouteImport } from './routes/adm'
 import { Route as CalendarioRouteImport } from './routes/calendario'
 import { Route as ContaRouteImport } from './routes/conta'
+import { Route as DemoAvaliacaoRouteImport } from './routes/demo-avaliacao'
 import { Route as FinanceiroRouteImport } from './routes/financeiro'
 import { Route as HeroisRouteImport } from './routes/herois'
 import { Route as JogoRouteImport } from './routes/jogo'
@@ -42,6 +43,11 @@ const CalendarioRoute = CalendarioRouteImport.update({
 const ContaRoute = ContaRouteImport.update({
   id: '/conta',
   path: '/conta',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoAvaliacaoRoute = DemoAvaliacaoRouteImport.update({
+  id: '/demo-avaliacao',
+  path: '/demo-avaliacao',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FinanceiroRoute = FinanceiroRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/adm': typeof AdmRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
+  '/demo-avaliacao': typeof DemoAvaliacaoRoute
   '/financeiro': typeof FinanceiroRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/adm': typeof AdmRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
+  '/demo-avaliacao': typeof DemoAvaliacaoRoute
   '/financeiro': typeof FinanceiroRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/adm': typeof AdmRoute
   '/calendario': typeof CalendarioRoute
   '/conta': typeof ContaRoute
+  '/demo-avaliacao': typeof DemoAvaliacaoRoute
   '/financeiro': typeof FinanceiroRoute
   '/herois': typeof HeroisRoute
   '/jogo': typeof JogoRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/adm'
     | '/calendario'
     | '/conta'
+    | '/demo-avaliacao'
     | '/financeiro'
     | '/herois'
     | '/jogo'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/adm'
     | '/calendario'
     | '/conta'
+    | '/demo-avaliacao'
     | '/financeiro'
     | '/herois'
     | '/jogo'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/adm'
     | '/calendario'
     | '/conta'
+    | '/demo-avaliacao'
     | '/financeiro'
     | '/herois'
     | '/jogo'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   AdmRoute: typeof AdmRoute
   CalendarioRoute: typeof CalendarioRoute
   ContaRoute: typeof ContaRoute
+  DemoAvaliacaoRoute: typeof DemoAvaliacaoRoute
   FinanceiroRoute: typeof FinanceiroRoute
   HeroisRoute: typeof HeroisRoute
   JogoRoute: typeof JogoRoute
@@ -241,6 +254,13 @@ declare module '@tanstack/react-router' {
       path: '/conta'
       fullPath: '/conta'
       preLoaderRoute: typeof ContaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo-avaliacao': {
+      id: '/demo-avaliacao'
+      path: '/demo-avaliacao'
+      fullPath: '/demo-avaliacao'
+      preLoaderRoute: typeof DemoAvaliacaoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/financeiro': {
@@ -321,6 +341,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdmRoute: AdmRoute,
   CalendarioRoute: CalendarioRoute,
   ContaRoute: ContaRoute,
+  DemoAvaliacaoRoute: DemoAvaliacaoRoute,
   FinanceiroRoute: FinanceiroRoute,
   HeroisRoute: HeroisRoute,
   JogoRoute: JogoRoute,
