@@ -101,6 +101,24 @@ function FinanceiroPage() {
       vistos.add(alunoId);
       lista.push(planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>));
     }
+
+    // Alunos de contrato físico (sem ficha digital): entram na lista com o valor/forma lançados na mensalidade.
+    const fisicos = new Set(
+      (perfis ?? []).filter((p) => p.documentos_fisicos).map((p) => p.id as string),
+    );
+    for (const aluno of (a ?? []) as Alu[]) {
+      if (vistos.has(aluno.id) || !fisicos.has(aluno.user_id)) continue;
+      const m = (m ?? []).find((x: Mensalidade) => x.aluno_id === aluno.id);
+      lista.push({
+        alunoId: aluno.id,
+        planoTexto: "Contrato físico",
+        forma: normalizarForma(String(m?.forma ?? "")),
+        valor: m?.valor ?? null,
+        parcelas: 1,
+        vencimento: null,
+        inicio: null,
+      });
+    }
     setPlanos(lista);
   }, []);
 
