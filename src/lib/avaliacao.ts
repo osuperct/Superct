@@ -98,6 +98,54 @@ export function mesCurto(referencia: string) {
   return data.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "") + "/" + String(ano).slice(2);
 }
 
+// ===== Conquistas =====
+
+/** 🏆 Desempenho: nota 9+ no aspecto físico. */
+const CONQUISTA_DESEMPENHO: Partial<Record<CriterioChave, string>> = {
+  forca_resistencia: "🏆 Super Força",
+  velocidade_agilidade: "🏆 Super Velocidade",
+  coordenacao_motora: "🏆 Super Coordenação",
+  execucao_exercicios: "🏆 Execução Perfeita",
+};
+
+/** 🎯 Comportamento/participação automático: nota 9+ no aspecto de atitude. */
+const CONQUISTA_COMPORTAMENTO: Partial<Record<CriterioChave, string>> = {
+  comportamento: "🎯 Comportamento Exemplar",
+  disciplina: "🎯 Foco Total",
+  respeito_empatia: "🎯 Parceiro de Equipe",
+};
+
+/** 🎯 Selos manuais que o professor pode conceder por atitudes positivas. */
+export const CONQUISTAS_MANUAIS = [
+  "🎯 Foco Total",
+  "🎯 Parceiro de Equipe",
+  "🎯 Super Dedicação",
+  "🎯 Respeito Exemplar",
+  "🎯 Espírito de Equipe",
+];
+
+function subiuFaixa(antes: number, depois: number) {
+  return depois - antes >= 2 || (antes <= 3 && depois >= 4) || (antes <= 6 && depois >= 7);
+}
+
+/** Conquistas automáticas do mês: desempenho (9+), comportamento (9+) e evolução vs. mês anterior. */
+export function conquistasAutomaticas(notas: Notas, anterior: Notas | null): string[] {
+  const conquistas: string[] = [];
+  const media = mediaNotas(notas);
+  if (media >= 9) conquistas.push("🏆 Super Desempenho");
+  for (const c of CRITERIOS) {
+    const n = notas[c.chave];
+    if (typeof n !== "number") continue;
+    if (n >= 9 && CONQUISTA_DESEMPENHO[c.chave]) conquistas.push(CONQUISTA_DESEMPENHO[c.chave]!);
+    if (n >= 9 && CONQUISTA_COMPORTAMENTO[c.chave]) conquistas.push(CONQUISTA_COMPORTAMENTO[c.chave]!);
+    const ant = anterior?.[c.chave];
+    if (typeof ant === "number" && subiuFaixa(ant, n)) conquistas.push(`📈 Evolução em ${c.rotulo}`);
+  }
+  const mediaAnt = anterior ? mediaNotas(anterior) : 0;
+  if (anterior && media - mediaAnt >= 1) conquistas.push("📈 Grande Evolução");
+  return [...new Set(conquistas)];
+}
+
 export type Avaliacao = {
   id: string;
   aluno_id: string;
