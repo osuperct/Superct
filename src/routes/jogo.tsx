@@ -58,7 +58,7 @@ const HEROI_H = 44;
 const HEROI_H_ABAIXADO = 24;
 const TOTAL_FASES = VILOES.length;
 
-type Solido = { x: number; w: number; h: number; tipo: "caixa" | "step" };
+type Solido = { x: number; w: number; h: number; tipo: "caixa" | "step"; madeira?: boolean };
 type Barra = { x: number; w: number; y: number };
 type Argola = { x: number; y: number };
 type Corda = { x: number; base: number; topo: number };
@@ -260,6 +260,7 @@ const FASE3: Layout = {
   solidos: [
     { x: 570, w: 70, h: 80, tipo: "caixa" },
     { x: 1240, w: 70, h: 86, tipo: "caixa" },
+    { x: 1378, w: 64, h: 58, tipo: "caixa", madeira: true },
     { x: 1810, w: 76, h: 84, tipo: "caixa" },
     { x: 2450, w: 70, h: 82, tipo: "caixa" },
     { x: 3020, w: 72, h: 88, tipo: "caixa" },
@@ -2091,19 +2092,32 @@ function JogoPage() {
               s.tipo === "caixa" ? (
                 <div
                   key={`s-${i}`}
-                  className="absolute rounded-sm border border-primary/50 bg-[#1c1917] shadow-[0_0_12px_rgba(255,120,0,0.25)]"
+                  className={`absolute rounded-sm border shadow-[0_0_12px_rgba(255,120,0,0.25)] ${
+                    s.madeira
+                      ? "border-amber-950 bg-[repeating-linear-gradient(0deg,#92400e_0px,#92400e_12px,#78350f_13px,#78350f_15px)]"
+                      : "border-primary/50 bg-[#1c1917]"
+                  }`}
                   style={{ left: s.x, width: s.w, height: s.h, bottom: 40 }}
                 >
-                  <div className="absolute inset-x-0 top-0 h-1 bg-primary/70" />
-                  <div className="absolute inset-2 rounded-sm border border-white/10" />
-                  <div className="absolute inset-1 flex items-center justify-center">
-                    <img
-                      src={logoVazada}
-                      alt=""
-                      aria-hidden="true"
-                      className="h-full w-full object-contain opacity-80"
-                    />
-                  </div>
+                  {s.madeira ? (
+                    <>
+                      <div className="absolute inset-1 border-2 border-amber-950/80" />
+                      <div className="absolute left-1/2 top-0 h-full w-2 -translate-x-1/2 rotate-[38deg] bg-amber-950/70" />
+                    </>
+                  ) : (
+                    <>
+                      <div className="absolute inset-x-0 top-0 h-1 bg-primary/70" />
+                      <div className="absolute inset-2 rounded-sm border border-white/10" />
+                      <div className="absolute inset-1 flex items-center justify-center">
+                        <img
+                          src={logoVazada}
+                          alt=""
+                          aria-hidden="true"
+                          className="h-full w-full object-contain opacity-80"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div
