@@ -367,3 +367,18 @@
 @utility animate-hero-hurt {
   animation: heroHurt 0.24s infinite steps(1, end);
 }
+
+@keyframes balancoCorda {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+@utility animate-balanco-corda {
+  animation: balancoCorda 2.4s ease-in-out infinite;
+}
+
