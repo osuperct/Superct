@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { cadastrarProfessor } from "@/lib/adm.functions";
 import { definirAcessoConta, definirAprovacaoConta, excluirConta, listarAcessosContas, type ContaAcesso } from "@/lib/adm";
 import { AppMidias } from "@/components/AppMidias";
+import { ContratosAdm } from "@/components/ContratosAdm";
 import { ProdutosAdm } from "@/components/ProdutosAdm";
 import { supabase } from "@/integrations/supabase/client";
 import logoAdm from "@/assets/super-ct-logo-adm.jpg.asset.json";
@@ -178,6 +179,8 @@ function AdmPage() {
       </section>
 
       <Aprovacoes />
+
+      <ContratosAdm />
 
       <Acessos />
 
