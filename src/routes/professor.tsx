@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { ChevronDown, FileText, GraduationCap, Paperclip, ShieldCheck, Trash2, Upload, Users } from "lucide-react";
+import { ChevronDown, FileText, GraduationCap, Paperclip, ShieldCheck, Trash2, Upload, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,7 @@ import { AvisosProfessor } from "@/components/AvisosProfessor";
 import { EnvioPush } from "@/components/EnvioPush";
 import { ListaChamada } from "@/components/ListaChamada";
 
+import { criarAlunoProfessor } from "@/lib/adm";
 import { formatarCpf } from "@/lib/cpf";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
 
@@ -134,6 +135,10 @@ function Painel({ professorId }: { professorId: string }) {
   const [verDocs, setVerDocs] = useState(false);
   const [docsAberto, setDocsAberto] = useState("");
   const [alunosMinimizado, setAlunosMinimizado] = useState(false);
+  const [novoAberto, setNovoAberto] = useState(false);
+  const [novoAluno, setNovoAluno] = useState({ userId: "", nome: "", nascimento: "", fisico: true });
+  const [novoArquivo, setNovoArquivo] = useState<File | null>(null);
+  const [criandoAluno, setCriandoAluno] = useState(false);
 
   const inputArquivo = useRef<HTMLInputElement>(null);
 
@@ -252,7 +257,58 @@ function Painel({ professorId }: { professorId: string }) {
     void carregar();
   }
 
+  async function salvarNovoAluno(e: React.FormEvent) {
+    e.preventDefault();
+    if (!novoAluno.userId) {
+      toast.error("Escolha o responsável do aluno.");
+      return;
+    }
+    if (novoAluno.nome.trim().length < 2) {
+      toast.error("Informe o nome do aluno.");
+      return;
+    }
+    setCriandoAluno(true);
+    const r = await criarAlunoProfessor({
+      userId: novoAluno.userId,
+      nome: novoAluno.nome.trim(),
+      ...(novoAluno.nascimento ? { nascimento: novoAluno.nascimento } : {}),
+      documentosFisicos: novoAluno.fisico,
+    });
+    if (!r.ok) {
+      setCriandoAluno(false);
+      toast.error(r.erro);
+      return;
+    }
 
+    if (novoArquivo) {
+      const limpo = novoArquivo.name.replace(/[^\w.\-]+/g, "_");
+      const caminho = `${novoAluno.userId}/${Date.now()}-${limpo}`;
+      const { error: erroUp } = await supabase.storage.from(BUCKET).upload(caminho, novoArquivo);
+      if (erroUp) {
+        setCriandoAluno(false);
+        toast.error("Aluno cadastrado, mas o arquivo não foi enviado. Tente anexar novamente.");
+        void carregar();
+        return;
+      }
+      await supabase.from("documentos").insert({
+        user_id: novoAluno.userId,
+        aluno_id: r.aluno_id,
+        tipo: "contrato",
+        nome_arquivo: novoArquivo.name,
+        caminho,
+        enviado_por_professor: true,
+        liberado: true,
+        liberado_em: new Date().toISOString(),
+      });
+    }
+
+    setCriandoAluno(false);
+    setNovoAluno({ userId: "", nome: "", nascimento: "", fisico: true });
+    setNovoArquivo(null);
+    setNovoAberto(false);
+    toast.success("Aluno cadastrado e incluído na lista de chamada.");
+    void carregar();
+  }
 
   const docsDoAluno = (alu: Alu): Doc[] =>
     docs.filter((d) => d.liberado && (d.aluno_id ? d.aluno_id === alu.id : d.user_id === alu.user_id));
@@ -424,6 +480,99 @@ function Painel({ professorId }: { professorId: string }) {
           Envie um contrato já preenchido (foto ou PDF) para o cadastro do responsável. O responsável poderá
           ver e baixar, mas não excluir.
         </p>
+
+        <button
+          type="button"
+          onClick={() => setNovoAberto((v) => !v)}
+          className="mt-3 flex items-center gap-2 rounded-md border border-primary px-3 py-2 font-display text-[11px] tracking-tight text-primary active:scale-95"
+        >
+          <UserPlus className="size-4" /> {novoAberto ? "FECHAR NOVO ALUNO" : "ADICIONAR NOVO ALUNO"}
+        </button>
+
+        {novoAberto ? (
+          <form
+            onSubmit={(e) => void salvarNovoAluno(e)}
+            className="mt-3 space-y-2 rounded-md border border-border bg-background/60 p-3"
+          >
+            <label className="block space-y-1">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Responsável
+              </span>
+              <select
+                value={novoAluno.userId}
+                onChange={(e) => setNovoAluno((f) => ({ ...f, userId: e.target.value }))}
+                className="w-full min-w-0 max-w-full truncate rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+              >
+                <option value="">Escolha o responsável…</option>
+                {[...perfis]
+                  .sort((a, b) => (a.nome_responsavel || "").localeCompare(b.nome_responsavel || "", "pt-BR"))
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nome_responsavel || "(sem nome)"}
+                      {p.telefone ? ` — ${p.telefone}` : ""}
+                    </option>
+                  ))}
+              </select>
+            </label>
+
+            <label className="block space-y-1">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Nome do aluno
+              </span>
+              <input
+                type="text"
+                value={novoAluno.nome}
+                onChange={(e) => setNovoAluno((f) => ({ ...f, nome: e.target.value }))}
+                className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+
+            <label className="block space-y-1">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Data de nascimento (opcional)
+              </span>
+              <input
+                type="date"
+                value={novoAluno.nascimento}
+                onChange={(e) => setNovoAluno((f) => ({ ...f, nascimento: e.target.value }))}
+                className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+              />
+            </label>
+
+            <label className="flex items-start gap-2 text-xs text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={novoAluno.fisico}
+                onChange={(e) => setNovoAluno((f) => ({ ...f, fisico: e.target.checked }))}
+                className="mt-0.5 size-4 accent-primary"
+              />
+              <span>
+                Contrato físico (papel) — libera o acesso do responsável e não pede contrato e PAR-Q no app.
+              </span>
+            </label>
+
+            <label className="block space-y-1">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Anexar documento (foto ou PDF, opcional)
+              </span>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={(e) => setNovoArquivo(e.target.files?.[0] ?? null)}
+                className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-xs"
+              />
+            </label>
+
+            <button
+              type="submit"
+              disabled={criandoAluno}
+              className="w-full rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground disabled:opacity-60"
+            >
+              {criandoAluno ? "SALVANDO…" : "CADASTRAR ALUNO"}
+            </button>
+          </form>
+        ) : null}
+
         <div className="mt-3 flex flex-wrap gap-2">
           <select
             value={alunoSel}
