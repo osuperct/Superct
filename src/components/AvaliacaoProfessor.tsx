@@ -221,6 +221,46 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
         className="mt-3 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
       />
 
+      <div className="mt-3 rounded-md border border-border bg-background/40 p-3">
+        <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          <Trophy className="size-3 text-primary" /> Conquistas de comportamento e participação
+        </p>
+        <p className="mt-1 text-[11px] text-muted-foreground">
+          As de desempenho (🏆) e evolução (📈) são calculadas sozinhas pelas estrelas. Toque para conceder selos de
+          atitude:
+        </p>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {CONQUISTAS_MANUAIS.map((c) => {
+            const ativa = manuais.includes(c);
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setManuais((atual) => (ativa ? atual.filter((x) => x !== c) : [...atual, c]))}
+                className={`rounded-full border px-3 py-1.5 text-xs ${
+                  ativa
+                    ? "border-primary bg-primary/15 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/60"
+                }`}
+              >
+                {c}
+              </button>
+            );
+          })}
+        </div>
+        {(() => {
+          const auto = conquistasAutomaticas(notas, anteriores);
+          return auto.length > 0 ? (
+            <p className="mt-2 text-xs">
+              <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                Automáticas deste mês:
+              </span>{" "}
+              {auto.join(" · ")}
+            </p>
+          ) : null;
+        })()}
+      </div>
+
       <button
         type="button"
         onClick={() => void salvar(false)}
