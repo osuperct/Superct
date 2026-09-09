@@ -108,10 +108,19 @@ function FinanceiroPage() {
       if (!alunoId || vistos.has(alunoId)) continue;
       if (!conferidos.has(alunoId) && !alunosFisicos.has(alunoId)) continue;
       vistos.add(alunoId);
-      lista.push(planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>));
+      const plano = planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>);
+      if (alunosFisicos.has(alunoId)) {
+        // Contrato em papel: completa o que faltar no contrato com o lançado na mensalidade.
+        const mensal = (m ?? []).find((x: Mensalidade) => x.aluno_id === alunoId);
+        if (plano.valor === null) plano.valor = mensal?.valor ?? null;
+        if (plano.forma === "Não informado") plano.forma = normalizarForma(String(mensal?.forma ?? ""));
+        if (!plano.planoTexto) plano.planoTexto = "Contrato físico";
+      }
+      lista.push(plano);
     }
 
     // Contrato físico sem ficha registrada: usa o valor/forma lançados na mensalidade.
+
 
     for (const aluno of (a ?? []) as Alu[]) {
       if (vistos.has(aluno.id) || !fisicos.has(aluno.user_id)) continue;
