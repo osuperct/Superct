@@ -544,6 +544,8 @@ export function Mensalidades({
             </p>
           )}
         </div>
+        </>
+        )}
       </section>
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
