@@ -136,7 +136,14 @@ function Painel({ professorId }: { professorId: string }) {
   const [docsAberto, setDocsAberto] = useState("");
   const [alunosMinimizado, setAlunosMinimizado] = useState(false);
   const [novoAberto, setNovoAberto] = useState(false);
-  const [novoAluno, setNovoAluno] = useState({ userId: "", nome: "", nascimento: "", fisico: true });
+  const [novoAluno, setNovoAluno] = useState({
+    userId: "",
+    nome: "",
+    nascimento: "",
+    fisico: true,
+    forma: "",
+    valor: "",
+  });
   const [novoArquivo, setNovoArquivo] = useState<File | null>(null);
   const [criandoAluno, setCriandoAluno] = useState(false);
 
