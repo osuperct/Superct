@@ -24,11 +24,12 @@ import {
 
 type Alu = { id: string; nome: string };
 
-export function AvaliacaoResponsavel({ uid, alunos }: { uid: string; alunos: Alu[] }) {
-  const [lista, setLista] = useState<Avaliacao[]>([]);
-  const [escolhida, setEscolhida] = useState<string>("");
+export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; alunos: Alu[]; demo?: Avaliacao[] }) {
+  const [lista, setLista] = useState<Avaliacao[]>(demo ?? []);
+  const [escolhida, setEscolhida] = useState<string>(demo?.[0]?.id ?? "");
 
   useEffect(() => {
+    if (demo) return;
     let ativo = true;
     void supabase
       .from("avaliacoes")
@@ -45,7 +46,8 @@ export function AvaliacaoResponsavel({ uid, alunos }: { uid: string; alunos: Alu
     return () => {
       ativo = false;
     };
-  }, [uid]);
+  }, [uid, demo]);
+
 
   const atual = lista.find((a) => a.id === escolhida) ?? null;
   const nomeAluno = (id: string) => alunos.find((al) => al.id === id)?.nome ?? "Aluno";
