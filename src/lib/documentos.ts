@@ -132,7 +132,7 @@ export const CLAUSULAS_CONTRATO: { titulo: string; texto: string }[] = [
   {
     titulo: "CLÁUSULA 8ª — CANCELAMENTO E RESCISÃO",
     texto:
-      "O cancelamento deverá ser solicitado formalmente por escrito pelo RESPONSÁVEL LEGAL com antecedência mínima de 30 (trinta) dias. A ausência do aluno não isenta o pagamento das mensalidades sem o cancelamento formal.",
+      "O cancelamento deverá ser solicitado formalmente por escrito pelo RESPONSÁVEL LEGAL com antecedência mínima de 10 (dez) dias. A ausência do aluno não isenta o pagamento das mensalidades sem o cancelamento formal.",
   },
   {
     titulo: "CLÁUSULA 9ª — COLÔNIA DE FÉRIAS E REMANEJAMENTO",
