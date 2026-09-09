@@ -525,12 +525,38 @@ export function Mensalidades({
                         </span>
                       </span>
                       <span className="shrink-0 text-right">
-                        <span className="font-mono text-[10px] tracking-widest text-primary">
-                          {formatarValor(i.plano!.valor ?? valorDoMes(i.aluno.id))}
-                        </span>
-                        <span className="block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
-                          vence {vencimentoNoMes(i.plano!.vencimento, mesAtual) ?? "—"}
-                        </span>
+                        {i.plano!.planoTexto === "Contrato físico" ? (
+                          <span className="flex items-center gap-1.5">
+                            <CampoValor
+                              valor={doMes(i.aluno.id)?.valor ?? null}
+                              onChange={(v) => void salvar(i.aluno, { valor: v })}
+                            />
+                            <select
+                              value={doMes(i.aluno.id)?.forma ?? ""}
+                              onChange={(e) =>
+                                void salvar(i.aluno, { forma: e.target.value || null })
+                              }
+                              disabled={salvando === i.aluno.id}
+                              className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+                            >
+                              <option value="">Forma…</option>
+                              {GRUPOS.filter((x) => x.forma !== "Não informado").map((x) => (
+                                <option key={x.forma} value={x.forma}>
+                                  {x.rotulo}
+                                </option>
+                              ))}
+                            </select>
+                          </span>
+                        ) : (
+                          <>
+                            <span className="font-mono text-[10px] tracking-widest text-primary">
+                              {formatarValor(i.plano!.valor ?? valorDoMes(i.aluno.id))}
+                            </span>
+                            <span className="block font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                              vence {vencimentoNoMes(i.plano!.vencimento, mesAtual) ?? "—"}
+                            </span>
+                          </>
+                        )}
                       </span>
                     </li>
                   ))}
