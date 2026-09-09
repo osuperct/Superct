@@ -18,8 +18,8 @@ function Campo({
 }: {
   chave: string;
   rotulo: string;
-  opcoes?: string[];
-  longo?: boolean;
+  opcoes?: string[] | undefined;
+  longo?: boolean | undefined;
   valor: string;
   onChange: (v: string) => void;
 }) {
