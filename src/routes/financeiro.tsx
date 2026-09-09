@@ -5,7 +5,7 @@ import { CircleDollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Mensalidades } from "@/components/Mensalidades";
 import type { Mensalidade } from "@/lib/mensalidade";
-import { planoDoContrato, type PlanoContrato } from "@/lib/planoContrato";
+import { normalizarForma, planoDoContrato, type PlanoContrato } from "@/lib/planoContrato";
 
 export const Route = createFileRoute("/financeiro")({
   head: () => ({
@@ -108,12 +108,12 @@ function FinanceiroPage() {
     );
     for (const aluno of (a ?? []) as Alu[]) {
       if (vistos.has(aluno.id) || !fisicos.has(aluno.user_id)) continue;
-      const m = (m ?? []).find((x: Mensalidade) => x.aluno_id === aluno.id);
+      const mensal = (m ?? []).find((x: Mensalidade) => x.aluno_id === aluno.id);
       lista.push({
         alunoId: aluno.id,
         planoTexto: "Contrato físico",
-        forma: normalizarForma(String(m?.forma ?? "")),
-        valor: m?.valor ?? null,
+        forma: normalizarForma(String(mensal?.forma ?? "")),
+        valor: mensal?.valor ?? null,
         parcelas: 1,
         vencimento: null,
         inicio: null,
