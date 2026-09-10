@@ -592,6 +592,8 @@ function JogoPage() {
   const ultimoPuloChao = useRef<number | null>(null);
   const podeSuperPular = useRef(true);
   const bloquearAgarreAte = useRef(0);
+  /* aparelho que acabou de ser solto: não pode ser reagarrado até o herói se afastar */
+  const ignorarAparelho = useRef<{ tipo: string; x: number } | null>(null);
   const vxAr = useRef(0);
   const duck = useRef(false);
   const fimRef = useRef(false);
@@ -998,22 +1000,40 @@ function JogoPage() {
         }
 
         const fase3 = faseRef.current === 3;
+        {
+          /* solta o bloqueio do último aparelho quando o herói já está longe dele */
+          const ig = ignorarAparelho.current;
+          if (ig && Math.abs(ig.x - (x.current + HEROI_W / 2)) > 70) ignorarAparelho.current = null;
+        }
         if ((vy.current > -4 || fase3) && performance.now() >= bloquearAgarreAte.current) {
           const topo = prox + alt;
           const cx = x.current + HEROI_W / 2;
+          const ignorado = (tipo: string, px: number) => {
+            const ig = ignorarAparelho.current;
+            return !!ig && ig.tipo === tipo && Math.abs(ig.x - px) < 6;
+          };
           const barra = barras.find((b) => cx > b.x && cx < b.x + b.w && Math.abs(topo - b.y) < 16);
-          const argTolX = fase3 ? 46 : 26;
-          const argTolY = fase3 ? 34 : 20;
-          const argola = argolas.find((a) => Math.abs(a.x - cx) < argTolX && Math.abs(topo - a.y) < argTolY);
-          const cordaTolX = fase3 ? 64 : 22;
-          const cordaFolga = fase3 ? 34 : 0;
+          const argTolX = fase3 ? 56 : 26;
+          const argTolY = fase3 ? 44 : 20;
+          const argola = argolas.find(
+            (a) =>
+              !ignorado("argola", a.x) &&
+              Math.abs(a.x - cx) < argTolX &&
+              Math.abs(topo - a.y) < argTolY,
+          );
+          const cordaTolX = fase3 ? 58 : 22;
+          const cordaFolga = fase3 ? 40 : 0;
           const cordasProximas = cordas.filter(
             (c) =>
+              !ignorado("corda", c.x) &&
               Math.abs(c.x - cx) < cordaTolX &&
+              /* nunca puxa o herói para trás: só agarra cordas à frente ou bem alinhadas */
+              (c.x - cx) * olhandoRef.current > -20 &&
               prox + alt > c.base - cordaFolga &&
               prox < c.topo + cordaFolga,
           );
           const corda = cordasProximas.sort((a, b) => Math.abs(a.x - cx) - Math.abs(b.x - cx))[0];
+
 
           const parede = paredes.find(
             (p) => cx > p.x - 4 && cx < p.x + p.w + 4 && prox >= 0 && prox < p.h - alt,
@@ -1074,6 +1094,7 @@ function JogoPage() {
             vy.current = 0;
             subindoDesde.current = null;
             noAr.current = false;
+            ignorarAparelho.current = null;
           }
           y.current = prox;
         }
@@ -1700,6 +1721,7 @@ function JogoPage() {
     /* pendurado + seta lateral pressionada = solta e pula na diagonal */
     if (seguro.current && dir.current !== 0) {
       const lado = dir.current;
+      const aparelhoAnterior = String(seguro.current);
       seguro.current = false;
       subindo.current = false;
       descendoParede.current = false;
@@ -1710,7 +1732,8 @@ function JogoPage() {
       vy.current = (duploToque ? IMPULSO : IMPULSO * 0.95);
       if (vy.current > 0) subindoDesde.current = performance.now();
       vxAr.current = lado * VELOCIDADE * 2.1;
-      bloquearAgarreAte.current = agora + (faseRef.current === 3 ? 180 : 400);
+      ignorarAparelho.current = { tipo: aparelhoAnterior, x: x.current + HEROI_W / 2 };
+      bloquearAgarreAte.current = agora + (faseRef.current === 3 ? 90 : 400);
       return;
     }
     if (seguro.current === "parede") {
@@ -1765,6 +1788,7 @@ function JogoPage() {
       const agora = performance.now();
       const toqueAnterior = ultimoToqueBaixo.current;
       if (toqueAnterior !== null && agora - toqueAnterior <= 2000) {
+        ignorarAparelho.current = { tipo: String(seguro.current), x: x.current + HEROI_W / 2 };
         seguro.current = false;
         noAr.current = true;
         subindo.current = false;
