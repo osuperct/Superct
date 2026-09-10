@@ -1866,6 +1866,21 @@ function JogoPage() {
     }
   }, [venceu, fim]);
 
+  /* ranking atualizado para mostrar na tela de campeões e no print */
+  useEffect(() => {
+    if (!(venceu && fim)) return;
+    let ativo = true;
+    listarRanking(5)
+      .then((l) => {
+        if (ativo) setRankingTop(l);
+      })
+      .catch(() => undefined);
+    return () => {
+      ativo = false;
+    };
+  }, [venceu, fim]);
+
+
   const salvarPrint = async () => {
     const alvo = printRef.current;
     if (!alvo || salvando) return;
