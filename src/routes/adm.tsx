@@ -342,6 +342,11 @@ function Aprovacoes() {
                   <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{c.email}</p>
                   {c.telefone && <p className="mt-0.5 text-xs text-muted-foreground">WhatsApp: {c.telefone}</p>}
+                  {(alunosPorConta[c.id] ?? []).length > 0 && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Aluno(s): {(alunosPorConta[c.id] ?? []).join(", ")}
+                    </p>
+                  )}
                   <div className="mt-2 flex flex-wrap gap-2">
                     {zap.length >= 10 && (
                       <a
