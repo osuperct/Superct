@@ -564,6 +564,7 @@ function JogoPage() {
   const [venceu, setVenceu] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+  const [rankingTop, setRankingTop] = useState<LinhaRanking[]>([]);
   const [derrotado, setDerrotado] = useState<number | null>(null);
   const [somLigado, setSomLigado] = useState(true);
   const somRef = useRef(true);
