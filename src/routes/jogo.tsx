@@ -1718,6 +1718,7 @@ function JogoPage() {
     /* pendurado + seta lateral pressionada = solta e pula na diagonal */
     if (seguro.current && dir.current !== 0) {
       const lado = dir.current;
+      const aparelhoAnterior = String(seguro.current);
       seguro.current = false;
       subindo.current = false;
       descendoParede.current = false;
