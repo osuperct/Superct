@@ -2642,35 +2642,59 @@ function JogoPage() {
           )}
 
           {fim && venceu && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/80 px-3 py-4 backdrop-blur-md">
-              <div className="flex w-full max-w-sm flex-col items-center gap-2">
+            <div className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-background/95 px-3 py-4 backdrop-blur-md">
+              <div className="flex w-full max-w-sm flex-col items-center gap-3">
                 <div
                   ref={printRef}
-                  className="w-full rounded-2xl border-2 bg-[#0b0b0f] px-4 py-4 text-center animate-pulse-slow"
+                  className="w-full rounded-2xl border-2 bg-[#0b0b0f] px-4 py-4 text-center"
                   style={{ borderColor: heroiAtual.cor, boxShadow: `0 0 24px ${heroiAtual.cor}66` }}
                 >
                   <div className="mx-auto w-fit origin-bottom animate-erguer-medalha-uma">
                     <img
                       src={heroiAtual.medalha}
                       alt={`${heroiAtual.nome} segurando a medalha suprema do Super CT`}
-                      className="mx-auto h-32 w-auto select-none animate-brilho-medalha"
+                      className="mx-auto h-40 w-auto max-w-full select-none animate-brilho-medalha"
                     />
                   </div>
-                  <div className="overflow-hidden">
-                    <p
-                      className="mt-2 font-display text-xl uppercase leading-tight tracking-tight animate-titulo-desliza"
-                      style={{ color: heroiAtual.cor, textShadow: `0 0 16px ${heroiAtual.cor}` }}
-                    >
-                      Yeeees! Você ganhou a medalha suprema!
-                    </p>
-                  </div>
-                  <p className="mt-2 font-body text-[12px] leading-snug text-foreground animate-texto-surge">
+                  <p
+                    className="mt-2 font-display text-xl uppercase leading-tight tracking-tight"
+                    style={{ color: heroiAtual.cor, textShadow: `0 0 16px ${heroiAtual.cor}` }}
+                  >
+                    Yeeees! Você ganhou a medalha suprema!
+                  </p>
+                  <p className="mt-2 font-body text-[12px] leading-snug text-foreground">
                     Você conseguiu atravessar os maiores desafios da nossa academia e derrotar todos
                     os terríveis vilões! Parabéns!
                   </p>
                   <p className="mt-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                     {heroiAtual.nome} • {pontos} pontos • Super CT
                   </p>
+
+                  <div className="mt-3 rounded-xl border border-primary/40 bg-primary/5 px-3 py-2 text-left">
+                    <p className="text-center font-display text-[13px] uppercase tracking-tight text-primary">
+                      Ranking dos jogadores
+                    </p>
+                    <ol className="mt-1.5 space-y-1">
+                      {rankingTop.length === 0 && (
+                        <li className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+                          Ninguém pontuou ainda — seja o primeiro!
+                        </li>
+                      )}
+                      {rankingTop.map((l, i) => (
+                        <li
+                          key={`${l.apelido}-${i}`}
+                          className="flex items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground"
+                        >
+                          <span className="truncate">
+                            {i + 1}º {l.apelido}
+                          </span>
+                          <span className="shrink-0">
+                            {l.pontos} pts • fase {l.fase}
+                          </span>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-2">
                   <button
