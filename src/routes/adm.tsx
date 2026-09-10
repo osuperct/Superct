@@ -272,8 +272,9 @@ function Aprovacoes() {
   }
 
   const pendentes = (contas ?? []).filter((c) => !c.aprovado);
-  const base = verTodas ? (contas ?? []) : pendentes;
   const t = busca.trim().toLowerCase();
+  /* com busca preenchida, procura em todos os cadastros (não só nos pendentes) */
+  const base = verTodas || t ? (contas ?? []) : pendentes;
   const filtradas = !t
     ? base
     : base.filter((c) => {
@@ -282,7 +283,8 @@ function Aprovacoes() {
         const zap = c.telefone.replace(/\D/g, "");
         const buscaZap = t.replace(/\D/g, "");
         const telefoneOk = buscaZap.length > 0 && zap.includes(buscaZap);
-        return nomeOk || emailOk || telefoneOk;
+        const alunoOk = (alunosPorConta[c.id] ?? []).some((n) => n.toLowerCase().includes(t));
+        return nomeOk || emailOk || telefoneOk || alunoOk;
       });
 
   return (
