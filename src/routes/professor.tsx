@@ -484,11 +484,11 @@ function Painel({ professorId }: { professorId: string }) {
                     {docsAberto === a.id ? (
                       <ul className="mt-2 space-y-1 border-t border-border pt-2">
                         {docsDoAluno(a).map((d) => (
-                          <li key={d.id}>
+                          <li key={d.id} className="flex items-center gap-1">
                             <button
                               type="button"
                               onClick={() => void abrir(d)}
-                              className="flex w-full items-center gap-2 rounded-md border border-border bg-background/60 px-2 py-1.5 text-left text-xs active:scale-[0.99]"
+                              className="flex min-w-0 flex-1 items-center gap-2 rounded-md border border-border bg-background/60 px-2 py-1.5 text-left text-xs active:scale-[0.99]"
                             >
                               <FileText className="size-3.5 shrink-0 text-primary" />
                               <span className="min-w-0 flex-1 truncate">
@@ -497,6 +497,15 @@ function Painel({ professorId }: { professorId: string }) {
                               <span className="shrink-0 font-mono text-[8px] uppercase tracking-widest text-muted-foreground">
                                 {new Date(d.created_at).toLocaleDateString("pt-BR")}
                               </span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => void excluir(d)}
+                              aria-label="Excluir documento"
+                              title="Excluir documento"
+                              className="shrink-0 rounded-md border border-destructive/60 p-1.5 text-destructive active:scale-95"
+                            >
+                              <Trash2 className="size-3.5" />
                             </button>
                           </li>
                         ))}
