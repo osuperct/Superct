@@ -761,7 +761,17 @@ function JogoPage() {
     conesRef.current = [];
     setConesPegos([]);
     zerarHeroi();
-    const hpMax = 6 + faseRef.current * 2;
+    const fase = faseRef.current;
+    let hpMax = 6 + fase * 2;
+    if (fase >= 3) {
+      const base = 10;
+      const multiplicador =
+        fase === 3 ? 1.15 :
+        fase === 4 ? 1.35 :
+        fase === 5 ? 1.65 :
+        2.05;
+      hpMax = Math.round(base * multiplicador);
+    }
     const boss: Chefao = { x: ARENA - 200, y: 60, vx: -1.1, vy: 0.9, hp: hpMax, hpMax };
     chefaoRef.current = boss;
     setChefao(boss);
