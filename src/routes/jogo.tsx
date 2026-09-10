@@ -592,6 +592,8 @@ function JogoPage() {
   const ultimoPuloChao = useRef<number | null>(null);
   const podeSuperPular = useRef(true);
   const bloquearAgarreAte = useRef(0);
+  /* aparelho que acabou de ser solto: não pode ser reagarrado até o herói se afastar */
+  const ignorarAparelho = useRef<{ tipo: string; x: number } | null>(null);
   const vxAr = useRef(0);
   const duck = useRef(false);
   const fimRef = useRef(false);
