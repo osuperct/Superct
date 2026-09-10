@@ -201,11 +201,24 @@ function Aprovacoes() {
   const [verTodas, setVerTodas] = useState(false);
   const [busca, setBusca] = useState("");
 
+  const [alunosPorConta, setAlunosPorConta] = useState<Record<string, string[]>>({});
+
   const carregar = useCallback(async () => {
     try {
       setContas(await listarAcessosContas());
     } catch {
       setContas([]);
+    }
+    try {
+      const { data } = await supabase.from("alunos").select("user_id, nome");
+      const mapa: Record<string, string[]> = {};
+      for (const a of data ?? []) {
+        if (!a.user_id) continue;
+        (mapa[a.user_id] ??= []).push(a.nome ?? "");
+      }
+      setAlunosPorConta(mapa);
+    } catch {
+      setAlunosPorConta({});
     }
   }, []);
 
@@ -259,8 +272,9 @@ function Aprovacoes() {
   }
 
   const pendentes = (contas ?? []).filter((c) => !c.aprovado);
-  const base = verTodas ? (contas ?? []) : pendentes;
   const t = busca.trim().toLowerCase();
+  /* com busca preenchida, procura em todos os cadastros (não só nos pendentes) */
+  const base = verTodas || t ? (contas ?? []) : pendentes;
   const filtradas = !t
     ? base
     : base.filter((c) => {
@@ -269,7 +283,8 @@ function Aprovacoes() {
         const zap = c.telefone.replace(/\D/g, "");
         const buscaZap = t.replace(/\D/g, "");
         const telefoneOk = buscaZap.length > 0 && zap.includes(buscaZap);
-        return nomeOk || emailOk || telefoneOk;
+        const alunoOk = (alunosPorConta[c.id] ?? []).some((n) => n.toLowerCase().includes(t));
+        return nomeOk || emailOk || telefoneOk || alunoOk;
       });
 
   return (
@@ -327,6 +342,11 @@ function Aprovacoes() {
                   <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
                   <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{c.email}</p>
                   {c.telefone && <p className="mt-0.5 text-xs text-muted-foreground">WhatsApp: {c.telefone}</p>}
+                  {(alunosPorConta[c.id] ?? []).length > 0 && (
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      Aluno(s): {(alunosPorConta[c.id] ?? []).join(", ")}
+                    </p>
+                  )}
                   <div className="mt-2 flex flex-wrap gap-2">
                     {zap.length >= 10 && (
                       <a
