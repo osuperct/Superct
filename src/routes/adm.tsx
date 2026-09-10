@@ -201,11 +201,24 @@ function Aprovacoes() {
   const [verTodas, setVerTodas] = useState(false);
   const [busca, setBusca] = useState("");
 
+  const [alunosPorConta, setAlunosPorConta] = useState<Record<string, string[]>>({});
+
   const carregar = useCallback(async () => {
     try {
       setContas(await listarAcessosContas());
     } catch {
       setContas([]);
+    }
+    try {
+      const { data } = await supabase.from("alunos").select("user_id, nome");
+      const mapa: Record<string, string[]> = {};
+      for (const a of data ?? []) {
+        if (!a.user_id) continue;
+        (mapa[a.user_id] ??= []).push(a.nome ?? "");
+      }
+      setAlunosPorConta(mapa);
+    } catch {
+      setAlunosPorConta({});
     }
   }, []);
 
