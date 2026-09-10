@@ -1785,6 +1785,7 @@ function JogoPage() {
       const agora = performance.now();
       const toqueAnterior = ultimoToqueBaixo.current;
       if (toqueAnterior !== null && agora - toqueAnterior <= 2000) {
+        ignorarAparelho.current = { tipo: String(seguro.current), x: x.current + HEROI_W / 2 };
         seguro.current = false;
         noAr.current = true;
         subindo.current = false;
