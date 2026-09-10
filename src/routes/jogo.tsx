@@ -1000,22 +1000,38 @@ function JogoPage() {
         }
 
         const fase3 = faseRef.current === 3;
+        {
+          /* solta o bloqueio do último aparelho quando o herói já está longe dele */
+          const ig = ignorarAparelho.current;
+          if (ig && Math.abs(ig.x - (x.current + HEROI_W / 2)) > 70) ignorarAparelho.current = null;
+        }
         if ((vy.current > -4 || fase3) && performance.now() >= bloquearAgarreAte.current) {
           const topo = prox + alt;
           const cx = x.current + HEROI_W / 2;
+          const ignorado = (tipo: string, px: number) => {
+            const ig = ignorarAparelho.current;
+            return !!ig && ig.tipo === tipo && Math.abs(ig.x - px) < 6;
+          };
           const barra = barras.find((b) => cx > b.x && cx < b.x + b.w && Math.abs(topo - b.y) < 16);
-          const argTolX = fase3 ? 46 : 26;
-          const argTolY = fase3 ? 34 : 20;
-          const argola = argolas.find((a) => Math.abs(a.x - cx) < argTolX && Math.abs(topo - a.y) < argTolY);
-          const cordaTolX = fase3 ? 64 : 22;
-          const cordaFolga = fase3 ? 34 : 0;
+          const argTolX = fase3 ? 56 : 26;
+          const argTolY = fase3 ? 44 : 20;
+          const argola = argolas.find(
+            (a) =>
+              !ignorado("argola", a.x) &&
+              Math.abs(a.x - cx) < argTolX &&
+              Math.abs(topo - a.y) < argTolY,
+          );
+          const cordaTolX = fase3 ? 58 : 22;
+          const cordaFolga = fase3 ? 40 : 0;
           const cordasProximas = cordas.filter(
             (c) =>
+              !ignorado("corda", c.x) &&
               Math.abs(c.x - cx) < cordaTolX &&
               prox + alt > c.base - cordaFolga &&
               prox < c.topo + cordaFolga,
           );
           const corda = cordasProximas.sort((a, b) => Math.abs(a.x - cx) - Math.abs(b.x - cx))[0];
+
 
           const parede = paredes.find(
             (p) => cx > p.x - 4 && cx < p.x + p.w + 4 && prox >= 0 && prox < p.h - alt,
