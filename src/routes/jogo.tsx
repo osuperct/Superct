@@ -1027,6 +1027,8 @@ function JogoPage() {
             (c) =>
               !ignorado("corda", c.x) &&
               Math.abs(c.x - cx) < cordaTolX &&
+              /* nunca puxa o herói para trás: só agarra cordas à frente ou bem alinhadas */
+              (c.x - cx) * olhandoRef.current > -20 &&
               prox + alt > c.base - cordaFolga &&
               prox < c.topo + cordaFolga,
           );
