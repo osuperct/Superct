@@ -5,6 +5,7 @@ import { HEROIS, heroiPorId, type HeroiId } from "@/data/herois";
 import logoVazada from "@/assets/super-ct-outline-white.png";
 import { VILOES } from "@/data/viloes";
 import RankingJogo from "@/components/RankingJogo";
+import { listarRanking, type LinhaRanking } from "@/lib/ranking";
 import {
   acordarAudio,
   iniciarMusica,
