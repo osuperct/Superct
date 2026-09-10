@@ -1094,6 +1094,7 @@ function JogoPage() {
             vy.current = 0;
             subindoDesde.current = null;
             noAr.current = false;
+            ignorarAparelho.current = null;
           }
           y.current = prox;
         }
