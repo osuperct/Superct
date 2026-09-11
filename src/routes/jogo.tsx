@@ -2109,8 +2109,25 @@ function JogoPage() {
             {lavaAtual.map((l, i) => (
               <div
                 key={`lava-${i}`}
-                className="absolute bottom-0 h-10 animate-pulse border-t-2 border-amber-300 bg-gradient-to-t from-[#7f1d1d] via-[#ea580c] to-[#fde047]"
+                className="animate-lava absolute bottom-0 h-10 border-t-2 border-amber-300"
                 style={{ left: l.x, width: l.w, boxShadow: "0 0 22px 8px rgba(249,115,22,0.55)" }}
+              />
+            ))}
+
+            {chamas.map((c) => (
+              <div
+                key={`fogo-${c.id}`}
+                className="animate-fogo-lava pointer-events-none absolute origin-bottom rounded-full"
+                style={{
+                  left: c.x,
+                  bottom: 36,
+                  width: c.tam,
+                  height: c.tam * 1.9,
+                  background:
+                    "radial-gradient(60% 60% at 50% 85%, #fef08a 0%, #fb923c 45%, rgba(239,68,68,0.85) 70%, rgba(127,29,29,0) 100%)",
+                  filter: "blur(0.4px) drop-shadow(0 0 10px rgba(249,115,22,0.8))",
+                  clipPath: "polygon(50% 0%, 78% 42%, 100% 100%, 0% 100%, 22% 42%)",
+                }}
               />
             ))}
 
@@ -2126,17 +2143,59 @@ function JogoPage() {
             ))}
 
 
+            {/* trepa-trepa visto de lado: postes, travessas e degraus */}
             {barras.map((b, i) => (
-              <div key={`b-${i}`}>
+              <div key={`b-${i}`} className="absolute" style={{ left: b.x, bottom: 40, width: b.w, height: b.y + 8 }}>
+                {/* barra de cima (onde o herói se pendura) */}
                 <div
-                  className="absolute h-2 rounded-full bg-[#d4d4d8] shadow-[0_0_10px_2px_rgba(255,255,255,0.25)]"
-                  style={{ left: b.x, width: b.w, bottom: 40 + b.y }}
+                  className="absolute h-2 w-full rounded-full bg-[#d4d4d8] shadow-[0_0_10px_2px_rgba(255,255,255,0.25)]"
+                  style={{ bottom: b.y }}
                 />
-                <div className="absolute w-[5px] bg-[#3f3f46]" style={{ left: b.x, bottom: 40, height: b.y }} />
+                {/* travessa do meio */}
                 <div
-                  className="absolute w-[5px] bg-[#3f3f46]"
-                  style={{ left: b.x + b.w - 5, bottom: 40, height: b.y }}
+                  className="absolute h-[4px] w-full rounded-full bg-[#a1a1aa]/80"
+                  style={{ bottom: b.y * 0.55 }}
                 />
+                {/* degraus da escada lateral */}
+                {Array.from({ length: 4 }).map((_, d) => (
+                  <div
+                    key={`deg-${i}-${d}`}
+                    className="absolute h-[3px] w-[26px] rounded-full bg-[#facc15]/70"
+                    style={{ left: 4, bottom: 14 + d * ((b.y - 24) / 3) }}
+                  />
+                ))}
+                {Array.from({ length: 4 }).map((_, d) => (
+                  <div
+                    key={`degd-${i}-${d}`}
+                    className="absolute h-[3px] w-[26px] rounded-full bg-[#facc15]/70"
+                    style={{ right: 4, bottom: 14 + d * ((b.y - 24) / 3) }}
+                  />
+                ))}
+                {/* diagonais de contraventamento */}
+                <div
+                  className="absolute h-[3px] origin-left bg-[#71717a]/70"
+                  style={{
+                    left: 4,
+                    bottom: 6,
+                    width: Math.hypot(b.w - 8, b.y - 6),
+                    transform: `rotate(${-Math.atan2(b.y - 6, b.w - 8) * (180 / Math.PI)}deg)`,
+                  }}
+                />
+                <div
+                  className="absolute h-[3px] origin-right bg-[#71717a]/70"
+                  style={{
+                    right: 4,
+                    bottom: 6,
+                    width: Math.hypot(b.w - 8, b.y - 6),
+                    transform: `rotate(${Math.atan2(b.y - 6, b.w - 8) * (180 / Math.PI)}deg)`,
+                  }}
+                />
+                {/* postes verticais */}
+                <div className="absolute bottom-0 left-0 w-[6px] rounded-t bg-[#52525b]" style={{ height: b.y + 6 }} />
+                <div className="absolute bottom-0 right-0 w-[6px] rounded-t bg-[#52525b]" style={{ height: b.y + 6 }} />
+                {/* pés no chão */}
+                <div className="absolute -bottom-1 left-[-4px] h-[4px] w-[16px] rounded bg-[#3f3f46]" />
+                <div className="absolute -bottom-1 right-[-4px] h-[4px] w-[16px] rounded bg-[#3f3f46]" />
               </div>
             ))}
 
