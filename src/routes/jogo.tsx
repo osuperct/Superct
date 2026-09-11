@@ -673,12 +673,12 @@ function JogoPage() {
   const iniciarCorrida = useCallback(
     (novaFase: number, reporCoracoes = true) => {
       if (modoRef.current === "chefao") {
-        /* saindo do chefão: as chances que sobraram voltam a ser vidas */
-        vidasRef.current = estoqueRef.current + 1;
-        setVidas(vidasRef.current);
         estoqueRef.current = 0;
         setEstoqueCoracoes(0);
       }
+      /* toda fase começa com 3 vidas cheias */
+      vidasRef.current = VIDAS_CHEFAO;
+      setVidas(VIDAS_CHEFAO);
       faseRef.current = novaFase;
       setFase(novaFase);
       modoRef.current = "corrida";
