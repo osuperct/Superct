@@ -1843,6 +1843,35 @@ function JogoPage() {
     : PINOS_POR_FASE[(fase - 1) % PINOS_POR_FASE.length]!;
   const cones: number[] = emChefao ? CONES_ARENA : layAtual.cones;
   const lavaAtual: Lava[] = emChefao ? [] : layAtual.lava;
+  const [chamas, setChamas] = useState<{ id: number; x: number; tam: number }[]>([]);
+  useEffect(() => {
+    if (lavaAtual.length === 0) {
+      setChamas([]);
+      return;
+    }
+    let seq = 0;
+    const soltar = () => {
+      const quantas = 2 + Math.floor(Math.random() * 2); /* 2 ou 3 de uma vez */
+      const novas = Array.from({ length: quantas }, () => {
+        const seg = lavaAtual[Math.floor(Math.random() * lavaAtual.length)]!;
+        seq += 1;
+        return {
+          id: Date.now() + seq,
+          x: seg.x + 10 + Math.random() * Math.max(10, seg.w - 20),
+          tam: 16 + Math.floor(Math.random() * 16),
+        };
+      });
+      setChamas((atuais) => [...atuais.slice(-12), ...novas]);
+      window.setTimeout(() => {
+        const ids = new Set(novas.map((c) => c.id));
+        setChamas((atuais) => atuais.filter((c) => !ids.has(c.id)));
+      }, 1500);
+    };
+    soltar();
+    const t = window.setInterval(soltar, 2000);
+    return () => window.clearInterval(t);
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [fase, emChefao, lavaAtual.length]);
   const telasAtuais: Tela[] = emChefao ? [] : layAtual.telas;
 
   const tema = CENARIOS[(fase - 1) % CENARIOS.length]!;
