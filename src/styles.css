@@ -399,3 +399,52 @@
   animation: balancoCorda 2.4s ease-in-out infinite;
 }
 
+
+/* lava com movimento no chão */
+@keyframes lavaFlui {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 120px 0, -90px 0;
+  }
+}
+
+@utility animate-lava {
+  background-image:
+    repeating-linear-gradient(
+      100deg,
+      rgba(253, 224, 71, 0.85) 0px,
+      rgba(234, 88, 12, 0.9) 26px,
+      rgba(127, 29, 29, 0.95) 52px,
+      rgba(234, 88, 12, 0.9) 78px,
+      rgba(253, 224, 71, 0.85) 104px
+    ),
+    linear-gradient(to top, #7f1d1d, #ea580c 60%, #fde047);
+  background-size: 120px 100%, 100% 100%;
+  animation: lavaFlui 2.2s linear infinite;
+}
+
+/* foguinhos que sobem da lava */
+@keyframes fogoSobe {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scaleY(0.5) scaleX(1.1);
+  }
+  25% {
+    opacity: 1;
+    transform: translateY(-10px) scaleY(1.1) scaleX(0.95);
+  }
+  70% {
+    opacity: 0.9;
+    transform: translateY(-34px) scaleY(1.25) scaleX(0.75);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-58px) scaleY(0.9) scaleX(0.5);
+  }
+}
+
+@utility animate-fogo-lava {
+  animation: fogoSobe 1.4s ease-out forwards;
+}
