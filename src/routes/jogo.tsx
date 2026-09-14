@@ -802,10 +802,12 @@ function JogoPage() {
           setVidas(VIDAS_CHEFAO);
           sfx(somMoeda);
         } else {
+          /* sem vidas nem estoque: reinicia automaticamente na primeira fase */
           fimRef.current = true;
           sfx(somGameOver);
           setFim(true);
           setDerrotado(vilao);
+          window.setTimeout(() => reiniciar(), 1200);
           return;
         }
         acabou = true;
@@ -1692,7 +1694,7 @@ function JogoPage() {
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [reiniciar]);
 
   const atirar = useCallback(() => {
     if (modoRef.current !== "chefao" || fimRef.current || pausaRef.current) return;
