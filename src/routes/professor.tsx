@@ -377,16 +377,28 @@ function Painel({ professorId }: { professorId: string }) {
     mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
   const limite = Date.now() - 15 * 24 * 60 * 60 * 1000;
   const porNome = [...alunos].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  const alunosFiltrados: Alu[] =
-    filtroAlunos === "recentes"
-      ? [...alunos]
-          .filter((a) => new Date(a.created_at).getTime() >= limite)
-          .sort((a, b) => b.created_at.localeCompare(a.created_at))
-      : filtroAlunos === "ativos"
-        ? porNome.filter((a) => estaAtivo(a.id))
-        : filtroAlunos === "inativos"
-          ? porNome.filter((a) => !estaAtivo(a.id))
-          : porNome;
+  const termoBusca = buscaAlunos.trim().toLowerCase();
+  const alunosFiltrados: Alu[] = (() => {
+    let lista: Alu[] =
+      filtroAlunos === "recentes"
+        ? [...alunos]
+            .filter((a) => new Date(a.created_at).getTime() >= limite)
+            .sort((a, b) => b.created_at.localeCompare(a.created_at))
+        : filtroAlunos === "ativos"
+          ? porNome.filter((a) => estaAtivo(a.id))
+          : filtroAlunos === "inativos"
+            ? porNome.filter((a) => !estaAtivo(a.id))
+            : porNome;
+    if (termoBusca) {
+      lista = lista.filter((a) => {
+        const perfil = perfis.find((p) => p.id === a.user_id);
+        const nomeAluno = a.nome.toLowerCase();
+        const nomeResponsavel = (perfil?.nome_responsavel || "").toLowerCase();
+        return nomeAluno.includes(termoBusca) || nomeResponsavel.includes(termoBusca);
+      });
+    }
+    return lista;
+  })();
 
   if (autorizado === null) return <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>;
   if (!autorizado)
