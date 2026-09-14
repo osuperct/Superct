@@ -138,6 +138,7 @@ function Painel({ professorId }: { professorId: string }) {
   const [perfis, setPerfis] = useState<Perfil[]>([]);
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [filtroAlunos, setFiltroAlunos] = useState<"recentes" | "todos" | "ativos" | "inativos">("todos");
+  const [buscaAlunos, setBuscaAlunos] = useState("");
   const [alunoSel, setAlunoSel] = useState("");
   const [tipoSel, setTipoSel] = useState("contrato");
   const [enviando, setEnviando] = useState(false);
