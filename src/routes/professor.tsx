@@ -442,7 +442,7 @@ function Painel({ professorId }: { professorId: string }) {
 
         {!alunosMinimizado && (
           <>
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               <select
                 value={filtroAlunos}
                 onChange={(e) => setFiltroAlunos(e.target.value as typeof filtroAlunos)}
@@ -453,6 +453,13 @@ function Painel({ professorId }: { professorId: string }) {
                 <option value="ativos">Ativos</option>
                 <option value="inativos">Inativos</option>
               </select>
+              <input
+                type="text"
+                value={buscaAlunos}
+                onChange={(e) => setBuscaAlunos(e.target.value)}
+                placeholder="Buscar aluno ou responsável"
+                className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+              />
             </div>
 
             <ul className="mt-3 space-y-2">
