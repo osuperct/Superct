@@ -1694,7 +1694,7 @@ function JogoPage() {
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [reiniciar]);
 
   const atirar = useCallback(() => {
     if (modoRef.current !== "chefao" || fimRef.current || pausaRef.current) return;
