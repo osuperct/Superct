@@ -138,6 +138,7 @@ function Painel({ professorId }: { professorId: string }) {
   const [perfis, setPerfis] = useState<Perfil[]>([]);
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [filtroAlunos, setFiltroAlunos] = useState<"recentes" | "todos" | "ativos" | "inativos">("todos");
+  const [buscaAlunos, setBuscaAlunos] = useState("");
   const [alunoSel, setAlunoSel] = useState("");
   const [tipoSel, setTipoSel] = useState("contrato");
   const [enviando, setEnviando] = useState(false);
@@ -376,16 +377,28 @@ function Painel({ professorId }: { professorId: string }) {
     mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
   const limite = Date.now() - 15 * 24 * 60 * 60 * 1000;
   const porNome = [...alunos].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  const alunosFiltrados: Alu[] =
-    filtroAlunos === "recentes"
-      ? [...alunos]
-          .filter((a) => new Date(a.created_at).getTime() >= limite)
-          .sort((a, b) => b.created_at.localeCompare(a.created_at))
-      : filtroAlunos === "ativos"
-        ? porNome.filter((a) => estaAtivo(a.id))
-        : filtroAlunos === "inativos"
-          ? porNome.filter((a) => !estaAtivo(a.id))
-          : porNome;
+  const termoBusca = buscaAlunos.trim().toLowerCase();
+  const alunosFiltrados: Alu[] = (() => {
+    let lista: Alu[] =
+      filtroAlunos === "recentes"
+        ? [...alunos]
+            .filter((a) => new Date(a.created_at).getTime() >= limite)
+            .sort((a, b) => b.created_at.localeCompare(a.created_at))
+        : filtroAlunos === "ativos"
+          ? porNome.filter((a) => estaAtivo(a.id))
+          : filtroAlunos === "inativos"
+            ? porNome.filter((a) => !estaAtivo(a.id))
+            : porNome;
+    if (termoBusca) {
+      lista = lista.filter((a) => {
+        const perfil = perfis.find((p) => p.id === a.user_id);
+        const nomeAluno = a.nome.toLowerCase();
+        const nomeResponsavel = (perfil?.nome_responsavel || "").toLowerCase();
+        return nomeAluno.includes(termoBusca) || nomeResponsavel.includes(termoBusca);
+      });
+    }
+    return lista;
+  })();
 
   if (autorizado === null) return <p className="mt-8 text-sm text-muted-foreground">Carregando…</p>;
   if (!autorizado)
@@ -429,7 +442,7 @@ function Painel({ professorId }: { professorId: string }) {
 
         {!alunosMinimizado && (
           <>
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+            <div className="mt-3 flex flex-wrap items-center gap-2">
               <select
                 value={filtroAlunos}
                 onChange={(e) => setFiltroAlunos(e.target.value as typeof filtroAlunos)}
@@ -440,6 +453,13 @@ function Painel({ professorId }: { professorId: string }) {
                 <option value="ativos">Ativos</option>
                 <option value="inativos">Inativos</option>
               </select>
+              <input
+                type="text"
+                value={buscaAlunos}
+                onChange={(e) => setBuscaAlunos(e.target.value)}
+                placeholder="Buscar aluno ou responsável"
+                className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
+              />
             </div>
 
             <ul className="mt-3 space-y-2">
