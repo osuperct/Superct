@@ -1,6 +1,5 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
-import assinaturaVictor from "@/assets/assinatura-victor.png.asset.json";
-import logoSuperCt from "@/assets/super-ct-logo-sem-fundo.png.asset.json";
+import seloSuperCt from "@/assets/selo-superct.png.asset.json";
 import { assetUrl } from "@/lib/assetUrl";
 
 export type CorrecaoContrato = {
@@ -72,12 +71,8 @@ export async function acrescentarAdendoContrato(opcoes: {
   const pagina = pdf.addPage([595.28, 841.89]);
   const normal = await pdf.embedFont(StandardFonts.Helvetica);
   const negrito = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const [assinaturaBytes, logoBytes] = await Promise.all([
-    carregarImagem(assetUrl(assinaturaVictor)),
-    carregarImagem(assetUrl(logoSuperCt)),
-  ]);
-  const assinatura = assinaturaBytes ? await pdf.embedPng(assinaturaBytes) : null;
-  const logo = logoBytes ? await pdf.embedPng(logoBytes) : null;
+  const seloBytes = await carregarImagem(assetUrl(seloSuperCt));
+  const selo = seloBytes ? await pdf.embedPng(seloBytes) : null;
   const margem = 48;
   const largura = pagina.getWidth() - margem * 2;
   let y = pagina.getHeight() - margem;
@@ -152,61 +147,31 @@ export async function acrescentarAdendoContrato(opcoes: {
     y -= 12;
   }
 
-  const colunaDireita = margem + largura / 2 + 10;
-  if (assinatura) {
-    const escalaAssinatura = Math.min(170 / assinatura.width, 42 / assinatura.height);
-    pagina.drawImage(assinatura, {
-      x: margem + 12,
-      y: 104,
-      width: assinatura.width * escalaAssinatura,
-      height: assinatura.height * escalaAssinatura,
-    });
-  }
-  if (logo) {
-    const escalaLogo = Math.min(78 / logo.width, 58 / logo.height);
-    const larguraLogo = logo.width * escalaLogo;
-    pagina.drawImage(logo, {
-      x: colunaDireita + (210 - larguraLogo) / 2,
+  if (selo) {
+    const escalaSelo = Math.min(96 / selo.width, 62 / selo.height);
+    const larguraSelo = selo.width * escalaSelo;
+    pagina.drawImage(selo, {
+      x: margem + (largura - larguraSelo) / 2,
       y: 99,
-      width: larguraLogo,
-      height: logo.height * escalaLogo,
+      width: larguraSelo,
+      height: selo.height * escalaSelo,
     });
   }
   pagina.drawLine({
-    start: { x: margem, y: 96 },
-    end: { x: margem + 210, y: 96 },
+    start: { x: margem + largura / 2 - 105, y: 96 },
+    end: { x: margem + largura / 2 + 105, y: 96 },
     thickness: 0.7,
     color: rgb(0.25, 0.25, 0.25),
-  });
-  pagina.drawLine({
-    start: { x: colunaDireita, y: 96 },
-    end: { x: colunaDireita + 210, y: 96 },
-    thickness: 0.7,
-    color: rgb(0.25, 0.25, 0.25),
-  });
-  pagina.drawText("VICTOR HUGO JORGE DE SIQUEIRA", {
-    x: margem,
-    y: 82,
-    size: 8,
-    font: negrito,
-    color: rgb(0.2, 0.2, 0.2),
   });
   pagina.drawText("SUPER CT RECREAÇÃO INFANTIL", {
-    x: colunaDireita,
+    x: margem + largura / 2 - 67,
     y: 82,
     size: 8,
     font: negrito,
     color: rgb(0.2, 0.2, 0.2),
   });
-  pagina.drawText("CREF: 057790-G/MG", {
-    x: margem,
-    y: 70,
-    size: 7.5,
-    font: normal,
-    color: rgb(0.3, 0.3, 0.3),
-  });
   pagina.drawText("CNPJ: 61.251.274/0001-48", {
-    x: colunaDireita,
+    x: margem + largura / 2 - 48,
     y: 70,
     size: 7.5,
     font: normal,
