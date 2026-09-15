@@ -1,0 +1,4 @@
+create policy "documentos_adm_read" on public.documentos for select to authenticated using (private.has_role(auth.uid(), 'adm'::app_role));
+create policy "documentos_adm_insert" on public.documentos for insert to authenticated with check (private.has_role(auth.uid(), 'adm'::app_role));
+create policy "docs_alunos_adm_select" on storage.objects for select to authenticated using (bucket_id = 'documentos-alunos' and private.has_role(auth.uid(), 'adm'::app_role));
+create policy "docs_alunos_adm_insert" on storage.objects for insert to authenticated with check (bucket_id = 'documentos-alunos' and private.has_role(auth.uid(), 'adm'::app_role));
