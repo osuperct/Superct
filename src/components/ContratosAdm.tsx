@@ -39,44 +39,6 @@ async function localizarContratoAssinado(c: ContratoAdm): Promise<DocumentoContr
   return contrato;
 }
 
-/** Preserva o contrato assinado e acrescenta as correções como adendo no final do mesmo PDF. */
-async function arquivarContratoComAdendo(c: ContratoAdm, correcoes: CorrecaoContrato[]) {
-  const contrato = await localizarContratoAssinado(c);
-  const { data: arquivo, error: erroDownload } = await supabase.storage.from(BUCKET).download(contrato.caminho);
-  if (erroDownload || !arquivo) throw erroDownload ?? new Error("Não foi possível abrir o contrato assinado.");
-
-  const tipoArquivo = arquivo.type || (contrato.nome_arquivo.toLowerCase().endsWith(".png") ? "image/png" :
-    /\.jpe?g$/i.test(contrato.nome_arquivo) ? "image/jpeg" : "application/pdf");
-  const alteradoEm = new Date();
-  const blob = await acrescentarAdendoContrato({
-    arquivoOriginal: await arquivo.arrayBuffer(),
-    tipoArquivo,
-    aluno: c.aluno,
-    responsavel: c.responsavel,
-    correcoes,
-    alteradoEm,
-  });
-
-  const nomeArquivo = `contrato-adendo-${alteradoEm.toISOString().slice(0, 10)}.pdf`;
-  const caminho = `${c.userId}/${alteradoEm.getTime()}-${nomeArquivo}`;
-  const { error: erroUpload } = await supabase.storage
-    .from(BUCKET)
-    .upload(caminho, blob, { contentType: "application/pdf" });
-  if (erroUpload) throw erroUpload;
-
-  const { error } = await supabase.from("documentos").insert({
-    user_id: c.userId,
-    tipo: "contrato",
-    ...(c.alunoId ? { aluno_id: c.alunoId } : {}),
-    nome_arquivo: nomeArquivo,
-    caminho,
-    enviado_por_professor: true,
-    liberado: true,
-    oculto_responsavel: false,
-  });
-  if (error) throw error;
-}
-
 /** Campos que a administração pode corrigir (os fixos do contrato ficam de fora). */
 const EDITAVEIS = CAMPOS_CONTRATO.filter((c) => !c.fixo);
 
