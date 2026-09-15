@@ -152,12 +152,18 @@ export function ContratosAdm() {
   async function salvar(c: ContratoAdm) {
     setSalvando(true);
     const r = await editarContrato(c.id, form);
-    setSalvando(false);
     if (!r.ok) {
+      setSalvando(false);
       toast.error(r.erro);
       return;
     }
-    toast.success("Contrato corrigido. O financeiro já usa os novos dados.");
+    try {
+      await arquivarContratoCorrigido(c, { ...c.dados, ...form });
+      toast.success("Contrato corrigido. O financeiro e o contrato anexado do aluno já estão atualizados.");
+    } catch {
+      toast.warning("Contrato corrigido, mas não foi possível atualizar o anexo nos documentos do aluno.");
+    }
+    setSalvando(false);
     setEditando("");
     setContratos(null);
     await carregar();
