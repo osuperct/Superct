@@ -3,34 +3,62 @@ import { ChevronDown, ChevronUp, FileSignature } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { BUCKET, CAMPOS_CONTRATO, DOCS, TERMO_IMAGEM } from "@/lib/documentos";
-import { gerarDocumentoPdf } from "@/lib/documentoPdf";
+import { acrescentarAdendoContrato, type CorrecaoContrato } from "@/lib/contratoAdendo";
+import { BUCKET, CAMPOS_CONTRATO } from "@/lib/documentos";
 import { editarContrato, listarContratos, type ContratoAdm } from "@/lib/adm";
 
-/** Gera de novo o PDF do contrato já corrigido e arquiva nos documentos do aluno. */
-async function arquivarContratoCorrigido(c: ContratoAdm, dados: Record<string, string>) {
-  const doc = DOCS["contrato"];
-  const linhas = doc.campos.map((campo) => {
-    if (campo.fixo !== undefined) return { rotulo: campo.rotulo, valor: campo.fixo };
-    if (campo.multiplos) {
-      const partes = campo.multiplos.map((m) => dados[m.chave]).filter(Boolean);
-      return { rotulo: campo.rotulo, valor: partes.join(" — ") };
-    }
-    return { rotulo: campo.rotulo, valor: dados[campo.chave] ?? "" };
+type DocumentoContrato = {
+  caminho: string;
+  nome_arquivo: string;
+  created_at: string;
+  aluno_id: string | null;
+};
+
+function prioridadeDocumento(documento: DocumentoContrato): number {
+  const nome = documento.nome_arquivo.toLowerCase();
+  if (nome.includes("contrato-adendo")) return 3;
+  if (nome.includes("assinado")) return 2;
+  if (!nome.includes("contrato-corrigido")) return 1;
+  return 0;
+}
+
+async function localizarContratoAssinado(c: ContratoAdm): Promise<DocumentoContrato> {
+  const { data, error } = await supabase
+    .from("documentos")
+    .select("caminho, nome_arquivo, created_at, aluno_id")
+    .eq("user_id", c.userId)
+    .eq("tipo", "contrato")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+
+  const documentos = ((data ?? []) as DocumentoContrato[])
+    .filter((d) => !c.alunoId || !d.aluno_id || d.aluno_id === c.alunoId)
+    .sort((a, b) => prioridadeDocumento(b) - prioridadeDocumento(a));
+  const contrato = documentos.find((d) => prioridadeDocumento(d) > 0);
+  if (!contrato) throw new Error("Contrato assinado não encontrado nos documentos do aluno.");
+  return contrato;
+}
+
+/** Preserva o contrato assinado e acrescenta as correções como adendo no final do mesmo PDF. */
+async function arquivarContratoComAdendo(c: ContratoAdm, correcoes: CorrecaoContrato[]) {
+  const contrato = await localizarContratoAssinado(c);
+  const { data: arquivo, error: erroDownload } = await supabase.storage.from(BUCKET).download(contrato.caminho);
+  if (erroDownload || !arquivo) throw erroDownload ?? new Error("Não foi possível abrir o contrato assinado.");
+
+  const tipoArquivo = arquivo.type || (contrato.nome_arquivo.toLowerCase().endsWith(".png") ? "image/png" :
+    /\.jpe?g$/i.test(contrato.nome_arquivo) ? "image/jpeg" : "application/pdf");
+  const alteradoEm = new Date();
+  const blob = await acrescentarAdendoContrato({
+    arquivoOriginal: await arquivo.arrayBuffer(),
+    tipoArquivo,
+    aluno: c.aluno,
+    responsavel: c.responsavel,
+    correcoes,
+    alteradoEm,
   });
 
-  const blob = await gerarDocumentoPdf({
-    titulo: `${doc.titulo} (corrigido pela administração)`,
-    linhas,
-    termo: TERMO_IMAGEM,
-    assinaturaDataUrl: null,
-    nomeAssinante: dados["contratante"] ?? c.responsavel,
-    assinaturaEmpresa: true,
-    ...(doc.clausulas ? { clausulas: doc.clausulas } : {}),
-  });
-
-  const nomeArquivo = `contrato-corrigido-${new Date().toISOString().slice(0, 10)}.pdf`;
-  const caminho = `${c.userId}/${Date.now()}-${nomeArquivo}`;
+  const nomeArquivo = `contrato-adendo-${alteradoEm.toISOString().slice(0, 10)}.pdf`;
+  const caminho = `${c.userId}/${alteradoEm.getTime()}-${nomeArquivo}`;
   const { error: erroUpload } = await supabase.storage
     .from(BUCKET)
     .upload(caminho, blob, { contentType: "application/pdf" });
@@ -150,7 +178,48 @@ export function ContratosAdm() {
   }
 
   async function salvar(c: ContratoAdm) {
+    const rotulos = new Map<string, string>();
+    for (const campo of EDITAVEIS) {
+      if (campo.multiplos) {
+        for (const item of campo.multiplos) rotulos.set(item.chave, `${campo.rotulo} — ${item.rotulo}`);
+      } else {
+        rotulos.set(campo.chave, campo.rotulo);
+      }
+    }
+    const correcoes = Object.entries(form)
+      .filter(([chave, valor]) => String(c.dados[chave] ?? "").trim() !== valor.trim())
+      .map(([chave, valor]) => ({
+        rotulo: rotulos.get(chave) ?? chave,
+        anterior: String(c.dados[chave] ?? ""),
+        atualizado: valor,
+      }));
+    if (correcoes.length === 0) {
+      toast.info("Nenhum dado foi alterado.");
+      return;
+    }
+
     setSalvando(true);
+    let contratoComAdendo: Blob;
+    try {
+      const contrato = await localizarContratoAssinado(c);
+      const { data: arquivo, error } = await supabase.storage.from(BUCKET).download(contrato.caminho);
+      if (error || !arquivo) throw error ?? new Error("Contrato assinado não encontrado.");
+      const tipoArquivo = arquivo.type || (contrato.nome_arquivo.toLowerCase().endsWith(".png") ? "image/png" :
+        /\.jpe?g$/i.test(contrato.nome_arquivo) ? "image/jpeg" : "application/pdf");
+      contratoComAdendo = await acrescentarAdendoContrato({
+        arquivoOriginal: await arquivo.arrayBuffer(),
+        tipoArquivo,
+        aluno: c.aluno,
+        responsavel: c.responsavel,
+        correcoes,
+        alteradoEm: new Date(),
+      });
+    } catch (erro) {
+      setSalvando(false);
+      toast.error(erro instanceof Error ? erro.message : "Não foi possível abrir o contrato assinado.");
+      return;
+    }
+
     const r = await editarContrato(c.id, form);
     if (!r.ok) {
       setSalvando(false);
@@ -158,10 +227,27 @@ export function ContratosAdm() {
       return;
     }
     try {
-      await arquivarContratoCorrigido(c, { ...c.dados, ...form });
-      toast.success("Contrato corrigido. O financeiro e o contrato anexado do aluno já estão atualizados.");
+      const alteradoEm = new Date();
+      const nomeArquivo = `contrato-adendo-${alteradoEm.toISOString().slice(0, 10)}.pdf`;
+      const caminho = `${c.userId}/${alteradoEm.getTime()}-${nomeArquivo}`;
+      const { error: erroUpload } = await supabase.storage
+        .from(BUCKET)
+        .upload(caminho, contratoComAdendo, { contentType: "application/pdf" });
+      if (erroUpload) throw erroUpload;
+      const { error } = await supabase.from("documentos").insert({
+        user_id: c.userId,
+        tipo: "contrato",
+        ...(c.alunoId ? { aluno_id: c.alunoId } : {}),
+        nome_arquivo: nomeArquivo,
+        caminho,
+        enviado_por_professor: true,
+        liberado: true,
+        oculto_responsavel: false,
+      });
+      if (error) throw error;
+      toast.success("Contrato corrigido com a assinatura preservada e o adendo datado no final do documento.");
     } catch {
-      toast.warning("Contrato corrigido, mas não foi possível atualizar o anexo nos documentos do aluno.");
+      toast.warning("Os dados foram corrigidos, mas não foi possível arquivar o adendo no contrato assinado.");
     }
     setSalvando(false);
     setEditando("");
