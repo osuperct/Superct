@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 import assinaturaVictor from "@/assets/assinatura-victor.png.asset.json";
-import seloSuperCt from "@/assets/selo-superct.png.asset.json";
+import logoSuperCt from "@/assets/super-ct-logo-sem-fundo.png.asset.json";
 import { assetUrl } from "@/lib/assetUrl";
 
 export type CorrecaoContrato = {
@@ -72,12 +72,12 @@ export async function acrescentarAdendoContrato(opcoes: {
   const pagina = pdf.addPage([595.28, 841.89]);
   const normal = await pdf.embedFont(StandardFonts.Helvetica);
   const negrito = await pdf.embedFont(StandardFonts.HelveticaBold);
-  const [assinaturaBytes, seloBytes] = await Promise.all([
+  const [assinaturaBytes, logoBytes] = await Promise.all([
     carregarImagem(assetUrl(assinaturaVictor)),
-    carregarImagem(assetUrl(seloSuperCt)),
+    carregarImagem(assetUrl(logoSuperCt)),
   ]);
   const assinatura = assinaturaBytes ? await pdf.embedPng(assinaturaBytes) : null;
-  const selo = seloBytes ? await pdf.embedPng(seloBytes) : null;
+  const logo = logoBytes ? await pdf.embedPng(logoBytes) : null;
   const margem = 48;
   const largura = pagina.getWidth() - margem * 2;
   let y = pagina.getHeight() - margem;
@@ -162,13 +162,14 @@ export async function acrescentarAdendoContrato(opcoes: {
       height: assinatura.height * escalaAssinatura,
     });
   }
-  if (selo) {
-    const escalaSelo = Math.min(70 / selo.width, 52 / selo.height);
-    pagina.drawImage(selo, {
-      x: colunaDireita + 62,
+  if (logo) {
+    const escalaLogo = Math.min(78 / logo.width, 58 / logo.height);
+    const larguraLogo = logo.width * escalaLogo;
+    pagina.drawImage(logo, {
+      x: colunaDireita + (210 - larguraLogo) / 2,
       y: 99,
-      width: selo.width * escalaSelo,
-      height: selo.height * escalaSelo,
+      width: larguraLogo,
+      height: logo.height * escalaLogo,
     });
   }
   pagina.drawLine({
