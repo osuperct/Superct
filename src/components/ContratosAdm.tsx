@@ -2,8 +2,52 @@ import { useCallback, useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, FileSignature } from "lucide-react";
 import { toast } from "sonner";
 
-import { CAMPOS_CONTRATO } from "@/lib/documentos";
+import { supabase } from "@/integrations/supabase/client";
+import { BUCKET, CAMPOS_CONTRATO, DOCS, TERMO_IMAGEM } from "@/lib/documentos";
+import { gerarDocumentoPdf } from "@/lib/documentoPdf";
 import { editarContrato, listarContratos, type ContratoAdm } from "@/lib/adm";
+
+/** Gera de novo o PDF do contrato já corrigido e arquiva nos documentos do aluno. */
+async function arquivarContratoCorrigido(c: ContratoAdm, dados: Record<string, string>) {
+  const doc = DOCS["contrato"];
+  const linhas = doc.campos.map((campo) => {
+    if (campo.fixo !== undefined) return { rotulo: campo.rotulo, valor: campo.fixo };
+    if (campo.multiplos) {
+      const partes = campo.multiplos.map((m) => dados[m.chave]).filter(Boolean);
+      return { rotulo: campo.rotulo, valor: partes.join(" — ") };
+    }
+    return { rotulo: campo.rotulo, valor: dados[campo.chave] ?? "" };
+  });
+
+  const blob = await gerarDocumentoPdf({
+    titulo: `${doc.titulo} (corrigido pela administração)`,
+    linhas,
+    termo: TERMO_IMAGEM,
+    assinaturaDataUrl: null,
+    nomeAssinante: dados["contratante"] ?? c.responsavel,
+    assinaturaEmpresa: true,
+    ...(doc.clausulas ? { clausulas: doc.clausulas } : {}),
+  });
+
+  const nomeArquivo = `contrato-corrigido-${new Date().toISOString().slice(0, 10)}.pdf`;
+  const caminho = `${c.userId}/${Date.now()}-${nomeArquivo}`;
+  const { error: erroUpload } = await supabase.storage
+    .from(BUCKET)
+    .upload(caminho, blob, { contentType: "application/pdf" });
+  if (erroUpload) throw erroUpload;
+
+  const { error } = await supabase.from("documentos").insert({
+    user_id: c.userId,
+    tipo: "contrato",
+    ...(c.alunoId ? { aluno_id: c.alunoId } : {}),
+    nome_arquivo: nomeArquivo,
+    caminho,
+    enviado_por_professor: true,
+    liberado: true,
+    oculto_responsavel: false,
+  });
+  if (error) throw error;
+}
 
 /** Campos que a administração pode corrigir (os fixos do contrato ficam de fora). */
 const EDITAVEIS = CAMPOS_CONTRATO.filter((c) => !c.fixo);
