@@ -500,7 +500,7 @@ function Index() {
 
           <div className="no-scrollbar flex snap-x gap-4 overflow-x-auto px-4 pb-6">
             {galeriaApp.map((foto) => (
-              <figure key={foto.legenda} className="w-64 flex-none snap-center">
+              <figure key={foto.src} className="w-64 flex-none snap-center">
                 <img
                   src={foto.src}
                   alt={foto.alt}
