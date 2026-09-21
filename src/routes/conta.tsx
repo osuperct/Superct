@@ -608,18 +608,20 @@ function Painel({ session }: { session: Session }) {
   const [ehAdm, setEhAdm] = useState(false);
   const [aprovado, setAprovado] = useState<boolean | null>(null);
   const [docsFisicos, setDocsFisicos] = useState(false);
+  const [bloqueado, setBloqueado] = useState(false);
 
   useEffect(() => {
     let ativo = true;
     void supabase
       .from("perfis")
-      .select("aprovado, documentos_fisicos")
+      .select("aprovado, documentos_fisicos, bloqueado_em")
       .eq("id", uid)
       .maybeSingle()
       .then(({ data }) => {
         if (ativo) {
           setAprovado(data ? Boolean(data.aprovado) : false);
           setDocsFisicos(Boolean(data?.documentos_fisicos));
+          setBloqueado(Boolean(data?.bloqueado_em));
         }
       });
     return () => {
