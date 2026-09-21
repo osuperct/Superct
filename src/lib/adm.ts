@@ -10,6 +10,8 @@ export type ContaAcesso = {
   aprovado: boolean;
   criadoEm: string;
   documentosFisicos: boolean;
+  /** Preenchido quando a ADM bloqueou o cadastro (cadastro inativo). */
+  bloqueadoEm: string;
 };
 
 type Resultado = { ok: true } | { ok: false; erro: string };
