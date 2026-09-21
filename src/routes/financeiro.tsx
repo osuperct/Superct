@@ -35,6 +35,16 @@ export const Route = createFileRoute("/financeiro")({
 
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
+/** Nome normalizado para detectar o mesmo aluno cadastrado por pais diferentes. */
+function chaveNome(nome: string) {
+  return nome
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function Casca({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background pl-16 text-foreground">
