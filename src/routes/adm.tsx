@@ -200,6 +200,7 @@ function Aprovacoes() {
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [verTodas, setVerTodas] = useState(false);
   const [busca, setBusca] = useState("");
+  const [verBloqueados, setVerBloqueados] = useState(false);
 
   const [alunosPorConta, setAlunosPorConta] = useState<Record<string, string[]>>({});
 
@@ -271,21 +272,25 @@ function Aprovacoes() {
     }
   }
 
-  const pendentes = (contas ?? []).filter((c) => !c.aprovado);
+  /* cadastros bloqueados pela ADM ficam na lista de inativos, separados dos que aguardam aprovação */
+  const bloqueados = (contas ?? []).filter((c) => !c.aprovado && Boolean(c.bloqueadoEm));
+  const ativos = (contas ?? []).filter((c) => c.aprovado || !c.bloqueadoEm);
+  const pendentes = ativos.filter((c) => !c.aprovado);
   const t = busca.trim().toLowerCase();
+  const combina = (c: ContaAcesso) => {
+    if (!t) return true;
+    const nomeOk = c.nome.toLowerCase().includes(t);
+    const emailOk = c.email.toLowerCase().includes(t);
+    const zap = c.telefone.replace(/\D/g, "");
+    const buscaZap = t.replace(/\D/g, "");
+    const telefoneOk = buscaZap.length > 0 && zap.includes(buscaZap);
+    const alunoOk = (alunosPorConta[c.id] ?? []).some((n) => n.toLowerCase().includes(t));
+    return nomeOk || emailOk || telefoneOk || alunoOk;
+  };
   /* com busca preenchida, procura em todos os cadastros (não só nos pendentes) */
-  const base = verTodas || t ? (contas ?? []) : pendentes;
-  const filtradas = !t
-    ? base
-    : base.filter((c) => {
-        const nomeOk = c.nome.toLowerCase().includes(t);
-        const emailOk = c.email.toLowerCase().includes(t);
-        const zap = c.telefone.replace(/\D/g, "");
-        const buscaZap = t.replace(/\D/g, "");
-        const telefoneOk = buscaZap.length > 0 && zap.includes(buscaZap);
-        const alunoOk = (alunosPorConta[c.id] ?? []).some((n) => n.toLowerCase().includes(t));
-        return nomeOk || emailOk || telefoneOk || alunoOk;
-      });
+  const base = verTodas || t ? ativos : pendentes;
+  const filtradas = base.filter(combina);
+  const bloqueadasFiltradas = bloqueados.filter(combina);
 
   return (
     <section className="rounded-lg border border-primary/40 bg-card/40 p-4">
@@ -435,6 +440,74 @@ function Aprovacoes() {
               </li>
             )}
           </ul>
+
+          {bloqueados.length > 0 && (
+            <div className="mt-6 rounded-md border border-destructive/40 bg-background/40 p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="flex items-center gap-2 font-display text-sm tracking-tight text-destructive">
+                  CADASTROS BLOQUEADOS (INATIVOS)
+                  <span className="text-xs text-muted-foreground">({bloqueados.length})</span>
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setVerBloqueados((v) => !v)}
+                  aria-label={verBloqueados ? "Esconder inativos" : "Mostrar inativos"}
+                  className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 text-muted-foreground hover:text-foreground"
+                >
+                  {verBloqueados ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+                  <span className="font-display text-[11px] tracking-tight">
+                    {verBloqueados ? "ESCONDER" : "VER LISTA"}
+                  </span>
+                </button>
+              </div>
+              {verBloqueados && (
+                <ul className="mt-3 space-y-2">
+                  {bloqueadasFiltradas.map((c) => (
+                    <li key={c.id} className="rounded-md border border-border bg-background/60 p-3 opacity-90">
+                      <p className="font-display text-sm tracking-tight">{c.nome || "(sem nome)"}</p>
+                      <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                        {c.email}
+                      </p>
+                      {c.telefone && (
+                        <p className="mt-0.5 text-xs text-muted-foreground">WhatsApp: {c.telefone}</p>
+                      )}
+                      {(alunosPorConta[c.id] ?? []).length > 0 && (
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          Aluno(s): {(alunosPorConta[c.id] ?? []).join(", ")}
+                        </p>
+                      )}
+                      {c.bloqueadoEm && (
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          Inativo desde {new Date(c.bloqueadoEm).toLocaleDateString("pt-BR")}
+                        </p>
+                      )}
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          disabled={ocupado === c.id}
+                          onClick={() => void alternar(c, true)}
+                          className="rounded-md bg-primary px-3 py-1.5 font-display text-[11px] tracking-tight text-primary-foreground disabled:opacity-60"
+                        >
+                          ATIVAR NOVAMENTE
+                        </button>
+                        <button
+                          type="button"
+                          disabled={ocupado === c.id}
+                          onClick={() => void apagar(c)}
+                          className="flex items-center gap-1 rounded-md border border-destructive/60 px-3 py-1.5 font-display text-[11px] tracking-tight text-destructive disabled:opacity-60"
+                        >
+                          <Trash2 className="size-3.5" /> EXCLUIR CADASTRO
+                        </button>
+                      </div>
+                    </li>
+                  ))}
+                  {bloqueadasFiltradas.length === 0 && (
+                    <li className="text-xs text-muted-foreground">Nenhum inativo para essa busca.</li>
+                  )}
+                </ul>
+              )}
+            </div>
+          )}
         </>
       )}
     </section>
