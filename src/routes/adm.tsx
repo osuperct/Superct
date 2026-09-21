@@ -200,6 +200,7 @@ function Aprovacoes() {
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [verTodas, setVerTodas] = useState(false);
   const [busca, setBusca] = useState("");
+  const [verBloqueados, setVerBloqueados] = useState(false);
 
   const [alunosPorConta, setAlunosPorConta] = useState<Record<string, string[]>>({});
 
