@@ -18,7 +18,6 @@ import {
   gruposExtras,
   listarMidiasAdm,
 } from "@/lib/midias";
-import { assetUrl } from "@/lib/assetUrl";
 
 const NOVO_CARD = "__novo__";
 
