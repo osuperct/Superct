@@ -35,6 +35,16 @@ export const Route = createFileRoute("/financeiro")({
 
 type Alu = { id: string; nome: string; matricula: string | null; user_id: string };
 
+/** Nome normalizado para detectar o mesmo aluno cadastrado por pais diferentes. */
+function chaveNome(nome: string) {
+  return nome
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function Casca({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background pl-16 text-foreground">
@@ -81,20 +91,39 @@ function FinanceiroPage() {
         .eq("tipo", "contrato")
         .order("created_at", { ascending: false }),
       supabase.from("documentos").select("aluno_id, tipo, liberado").eq("tipo", "contrato"),
-      supabase.from("perfis").select("id, nome_responsavel, documentos_fisicos"),
+      supabase.from("perfis").select("id, nome_responsavel, documentos_fisicos, bloqueado_em"),
     ]);
     setResponsaveis(
       Object.fromEntries((perfis ?? []).map((p) => [p.id, p.nome_responsavel ?? ""])),
     );
-    setAlunos((a ?? []) as Alu[]);
-    setMensalidades((m ?? []) as Mensalidade[]);
+
+    // Remove duplicados: mesmo aluno cadastrado pelo pai e pela mãe vira um só,
+    // dando preferência ao cadastro ativo (não bloqueado).
+    const bloqueados = new Set(
+      (perfis ?? []).filter((p) => p.bloqueado_em).map((p) => p.id as string),
+    );
+    const porNome = new Map<string, Alu>();
+    for (const aluno of (a ?? []) as Alu[]) {
+      const chave = chaveNome(aluno.nome);
+      const atual = porNome.get(chave);
+      if (!atual) {
+        porNome.set(chave, aluno);
+      } else if (bloqueados.has(atual.user_id) && !bloqueados.has(aluno.user_id)) {
+        porNome.set(chave, aluno);
+      }
+    }
+    const alunosUnicos = [...porNome.values()];
+    const mantidos = new Set(alunosUnicos.map((al) => al.id));
+
+    setAlunos(alunosUnicos);
+    setMensalidades(((m ?? []) as Mensalidade[]).filter((x) => mantidos.has(x.aluno_id)));
 
     // Alunos de contrato físico entram na lista mesmo sem documento digital conferido.
     const fisicos = new Set(
       (perfis ?? []).filter((p) => p.documentos_fisicos).map((p) => p.id as string),
     );
     const alunosFisicos = new Set(
-      ((a ?? []) as Alu[]).filter((al) => fisicos.has(al.user_id)).map((al) => al.id),
+      alunosUnicos.filter((al) => fisicos.has(al.user_id)).map((al) => al.id),
     );
 
     // Só entram na lista os alunos cujo contrato já foi conferido e liberado.
@@ -105,7 +134,7 @@ function FinanceiroPage() {
     const lista: PlanoContrato[] = [];
     for (const ficha of f ?? []) {
       const alunoId = ficha.aluno_id;
-      if (!alunoId || vistos.has(alunoId)) continue;
+      if (!alunoId || vistos.has(alunoId) || !mantidos.has(alunoId)) continue;
       if (!conferidos.has(alunoId) && !alunosFisicos.has(alunoId)) continue;
       vistos.add(alunoId);
       const plano = planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>);
@@ -122,7 +151,7 @@ function FinanceiroPage() {
     // Contrato físico sem ficha registrada: usa o valor/forma lançados na mensalidade.
 
 
-    for (const aluno of (a ?? []) as Alu[]) {
+    for (const aluno of alunosUnicos) {
       if (vistos.has(aluno.id) || !fisicos.has(aluno.user_id)) continue;
       const mensal = (m ?? []).find((x: Mensalidade) => x.aluno_id === aluno.id);
       lista.push({
