@@ -382,12 +382,39 @@ function Painel({ professorId }: { professorId: string }) {
   const estaAtivo = (alunoId: string) =>
     mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
   const limite = Date.now() - 15 * 24 * 60 * 60 * 1000;
-  const porNome = [...alunos].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+
+  // Pai e mãe podem cadastrar o mesmo aluno: mantém só um registro por nome.
+  const chaveNome = (nome: string) =>
+    nome
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, " ");
+  const alunosUnicos: Alu[] = (() => {
+    const mapa = new Map<string, Alu>();
+    for (const a of alunos) {
+      const chave = chaveNome(a.nome);
+      const atual = mapa.get(chave);
+      if (!atual) {
+        mapa.set(chave, a);
+        continue;
+      }
+      const bloqueado = (alu: Alu) => Boolean(perfis.find((p) => p.id === alu.user_id)?.bloqueado_em);
+      // Prefere o cadastro ativo; em empate, a matrícula mais antiga.
+      if (bloqueado(atual) && !bloqueado(a)) mapa.set(chave, a);
+      else if (bloqueado(atual) === bloqueado(a) && (a.matricula ?? "") < (atual.matricula ?? ""))
+        mapa.set(chave, a);
+    }
+    return [...mapa.values()];
+  })();
+
+  const porNome = [...alunosUnicos].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
   const termoBusca = buscaAlunos.trim().toLowerCase();
   const alunosFiltrados: Alu[] = (() => {
     let lista: Alu[] =
       filtroAlunos === "recentes"
-        ? [...alunos]
+        ? [...alunosUnicos]
             .filter((a) => new Date(a.created_at).getTime() >= limite)
             .sort((a, b) => b.created_at.localeCompare(a.created_at))
         : filtroAlunos === "ativos"
