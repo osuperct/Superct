@@ -271,21 +271,25 @@ function Aprovacoes() {
     }
   }
 
-  const pendentes = (contas ?? []).filter((c) => !c.aprovado);
+  /* cadastros bloqueados pela ADM ficam na lista de inativos, separados dos que aguardam aprovação */
+  const bloqueados = (contas ?? []).filter((c) => !c.aprovado && Boolean(c.bloqueadoEm));
+  const ativos = (contas ?? []).filter((c) => c.aprovado || !c.bloqueadoEm);
+  const pendentes = ativos.filter((c) => !c.aprovado);
   const t = busca.trim().toLowerCase();
+  const combina = (c: ContaAcesso) => {
+    if (!t) return true;
+    const nomeOk = c.nome.toLowerCase().includes(t);
+    const emailOk = c.email.toLowerCase().includes(t);
+    const zap = c.telefone.replace(/\D/g, "");
+    const buscaZap = t.replace(/\D/g, "");
+    const telefoneOk = buscaZap.length > 0 && zap.includes(buscaZap);
+    const alunoOk = (alunosPorConta[c.id] ?? []).some((n) => n.toLowerCase().includes(t));
+    return nomeOk || emailOk || telefoneOk || alunoOk;
+  };
   /* com busca preenchida, procura em todos os cadastros (não só nos pendentes) */
-  const base = verTodas || t ? (contas ?? []) : pendentes;
-  const filtradas = !t
-    ? base
-    : base.filter((c) => {
-        const nomeOk = c.nome.toLowerCase().includes(t);
-        const emailOk = c.email.toLowerCase().includes(t);
-        const zap = c.telefone.replace(/\D/g, "");
-        const buscaZap = t.replace(/\D/g, "");
-        const telefoneOk = buscaZap.length > 0 && zap.includes(buscaZap);
-        const alunoOk = (alunosPorConta[c.id] ?? []).some((n) => n.toLowerCase().includes(t));
-        return nomeOk || emailOk || telefoneOk || alunoOk;
-      });
+  const base = verTodas || t ? ativos : pendentes;
+  const filtradas = base.filter(combina);
+  const bloqueadasFiltradas = bloqueados.filter(combina);
 
   return (
     <section className="rounded-lg border border-primary/40 bg-card/40 p-4">
