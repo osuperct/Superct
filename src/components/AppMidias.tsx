@@ -331,30 +331,39 @@ export function AppMidias() {
           <Film className="size-4 text-primary" /> SUPER CT EM AÇÃO — VÍDEOS
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Estes são os vídeos que aparecem em “SUPER CT EM AÇÃO”. Ao anexar um vídeo novo, ele entra no lugar dos
-          vídeos originais.
+          Estes são os vídeos que aparecem em “SUPER CT EM AÇÃO”. Use as setas para mudar a ordem, a lixeira para
+          excluir e o botão abaixo para anexar mais vídeos.
         </p>
-
-        {videos.length === 0 && (
-          <ul className="mt-2 space-y-2">
-            {VIDEOS_ORIGINAIS.map((src, i) => (
-              <li key={src} className="rounded-md border border-border bg-background/60 p-2">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-                  Vídeo original {i + 1}
-                </p>
-                <video src={src} controls playsInline preload="metadata" className="mt-1 w-full rounded-md" />
-              </li>
-            ))}
-          </ul>
-        )}
-
 
         {videos.length > 0 && (
           <ul className="mt-2 space-y-3">
-            {videos.map((v) => (
+            {videos.map((v, i) => (
               <li key={v.id} className="rounded-md border border-border bg-background/60 p-2">
-                {v.url && <video src={v.url} controls playsInline className="w-full rounded-md" />}
+                {v.url && <video src={v.url} controls playsInline preload="metadata" className="w-full rounded-md" />}
                 <div className="mt-2 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      disabled={ocupado || i === 0}
+                      onClick={() => void mover(v, -1)}
+                      aria-label="Subir vídeo"
+                      className="rounded-md border border-border p-1 text-muted-foreground disabled:opacity-40"
+                    >
+                      <ChevronUp className="size-3" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={ocupado || i === videos.length - 1}
+                      onClick={() => void mover(v, 1)}
+                      aria-label="Descer vídeo"
+                      className="rounded-md border border-border p-1 text-muted-foreground disabled:opacity-40"
+                    >
+                      <ChevronDown className="size-3" />
+                    </button>
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                      {i + 1}º
+                    </span>
+                  </div>
                   <button
                     type="button"
                     onClick={async () => {
@@ -381,6 +390,7 @@ export function AppMidias() {
             ))}
           </ul>
         )}
+
 
         <EnvioVideo onFim={carregar} />
       </div>
