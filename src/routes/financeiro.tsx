@@ -134,7 +134,7 @@ function FinanceiroPage() {
     const lista: PlanoContrato[] = [];
     for (const ficha of f ?? []) {
       const alunoId = ficha.aluno_id;
-      if (!alunoId || vistos.has(alunoId)) continue;
+      if (!alunoId || vistos.has(alunoId) || !mantidos.has(alunoId)) continue;
       if (!conferidos.has(alunoId) && !alunosFisicos.has(alunoId)) continue;
       vistos.add(alunoId);
       const plano = planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>);
@@ -151,7 +151,7 @@ function FinanceiroPage() {
     // Contrato físico sem ficha registrada: usa o valor/forma lançados na mensalidade.
 
 
-    for (const aluno of (a ?? []) as Alu[]) {
+    for (const aluno of alunosUnicos) {
       if (vistos.has(aluno.id) || !fisicos.has(aluno.user_id)) continue;
       const mensal = (m ?? []).find((x: Mensalidade) => x.aluno_id === aluno.id);
       lista.push({
