@@ -414,7 +414,7 @@ function Painel({ professorId }: { professorId: string }) {
   const alunosFiltrados: Alu[] = (() => {
     let lista: Alu[] =
       filtroAlunos === "recentes"
-        ? [...alunos]
+        ? [...alunosUnicos]
             .filter((a) => new Date(a.created_at).getTime() >= limite)
             .sort((a, b) => b.created_at.localeCompare(a.created_at))
         : filtroAlunos === "ativos"
