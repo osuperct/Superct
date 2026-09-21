@@ -3,9 +3,6 @@ import { ChevronDown, ChevronUp, Clock, Film, Image as ImageIcon, Smartphone, Tr
 import { toast } from "sonner";
 
 import { CortarImagem } from "@/components/CortarImagem";
-import video1 from "@/assets/video1.mp4.asset.json";
-import video2 from "@/assets/video2.mp4.asset.json";
-import video3 from "@/assets/video3.mp4.asset.json";
 import { criarTurma, excluirTurma, listarTurmas, salvarTurma, type Turma } from "@/lib/turmas";
 import { CHAVES_TEXTO, listarTextos, salvarTexto, type Textos } from "@/lib/textos";
 import {
@@ -25,7 +22,6 @@ import { assetUrl } from "@/lib/assetUrl";
 
 const NOVO_CARD = "__novo__";
 
-const VIDEOS_ORIGINAIS: string[] = [assetUrl(video2), assetUrl(video1), assetUrl(video3)];
 
 export function AppMidias() {
   const [lista, setLista] = useState<Midia[]>([]);
@@ -51,6 +47,25 @@ export function AppMidias() {
   const logo = lista.find((m) => m.tipo === "logo") ?? null;
   const fotosQg = lista.filter((m) => m.tipo === "foto" && m.grupo === GRUPO_QG);
   const cardExtra = extras.includes(grupo);
+
+  async function mover(midia: Midia, passo: -1 | 1) {
+    const ordenados = lista
+      .filter((m) => m.tipo === "video")
+      .sort((a, b) => a.ordem - b.ordem);
+    const i = ordenados.findIndex((m) => m.id === midia.id);
+    const vizinho = ordenados[i + passo];
+    if (!vizinho) return;
+    setOcupado(true);
+    try {
+      await atualizarMidia(midia.id, { ordem: vizinho.ordem });
+      await atualizarMidia(vizinho.id, { ordem: midia.ordem });
+      await carregar();
+    } catch {
+      toast.error("Não foi possível mudar a ordem.");
+    } finally {
+      setOcupado(false);
+    }
+  }
 
   async function apagarCard(nome: string) {
     if (!confirm(`Excluir o cartão “${nome}” e todas as fotos dele?`)) return;
