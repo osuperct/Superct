@@ -369,6 +369,7 @@ export type Database = {
           aceite_imagem_em: string | null
           aprovado: boolean
           aprovado_em: string | null
+          bloqueado_em: string | null
           cpf: string | null
           created_at: string
           documentos_fisicos: boolean
@@ -384,6 +385,7 @@ export type Database = {
           aceite_imagem_em?: string | null
           aprovado?: boolean
           aprovado_em?: string | null
+          bloqueado_em?: string | null
           cpf?: string | null
           created_at?: string
           documentos_fisicos?: boolean
@@ -399,6 +401,7 @@ export type Database = {
           aceite_imagem_em?: string | null
           aprovado?: boolean
           aprovado_em?: string | null
+          bloqueado_em?: string | null
           cpf?: string | null
           created_at?: string
           documentos_fisicos?: boolean
@@ -733,6 +736,7 @@ export type Database = {
         Returns: {
           adm: boolean
           aprovado: boolean
+          bloqueado_em: string
           criado_em: string
           documentos_fisicos: boolean
           email: string
