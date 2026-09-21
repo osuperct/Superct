@@ -700,21 +700,39 @@ function Painel({ session }: { session: Session }) {
   if (aprovado === false && !ehProfessor && !ehAdm) {
     return (
       <div className="mt-6 space-y-4">
-        <div className="rounded-lg border border-primary/50 bg-primary/5 p-4">
-          <h2 className="font-display text-lg tracking-tight text-primary">CADASTRO EM ANÁLISE</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Recebemos seu cadastro! O Professor Tio Victor vai confirmar seus dados pelo WhatsApp e liberar o
-            acesso à sua área. Isso costuma ser rápido — depois é só entrar novamente com o mesmo e-mail e senha.
-          </p>
-          <a
-            href="https://wa.me/5535988223596?text=Ol%C3%A1%2C%20fiz%20meu%20cadastro%20no%20site%20do%20Super%20CT%20e%20gostaria%20de%20liberar%20o%20acesso."
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-block rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
-          >
-            FALAR NO WHATSAPP (35) 98822-3596
-          </a>
-        </div>
+        {bloqueado ? (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/5 p-4">
+            <h2 className="font-display text-lg tracking-tight text-destructive">CADASTRO INATIVO</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Seu acesso à área do responsável está desativado no momento. Se você quiser voltar a treinar com a
+              gente, fale com o Professor Tio Victor pelo WhatsApp para reativar seu cadastro.
+            </p>
+            <a
+              href="https://wa.me/5535988223596?text=Ol%C3%A1%2C%20meu%20cadastro%20no%20site%20do%20Super%20CT%20est%C3%A1%20inativo%20e%20gostaria%20de%20reativar%20o%20acesso."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+            >
+              FALAR NO WHATSAPP (35) 98822-3596
+            </a>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-primary/50 bg-primary/5 p-4">
+            <h2 className="font-display text-lg tracking-tight text-primary">CADASTRO EM ANÁLISE</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Recebemos seu cadastro! O Professor Tio Victor vai confirmar seus dados pelo WhatsApp e liberar o
+              acesso à sua área. Isso costuma ser rápido — depois é só entrar novamente com o mesmo e-mail e senha.
+            </p>
+            <a
+              href="https://wa.me/5535988223596?text=Ol%C3%A1%2C%20fiz%20meu%20cadastro%20no%20site%20do%20Super%20CT%20e%20gostaria%20de%20liberar%20o%20acesso."
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+            >
+              FALAR NO WHATSAPP (35) 98822-3596
+            </a>
+          </div>
+        )}
         <div className="rounded-md border border-border bg-card/50 p-3">
           <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
           <p className="text-sm">{session.user.email}</p>
