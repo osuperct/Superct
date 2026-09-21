@@ -66,7 +66,13 @@ type Alu = {
   user_id: string;
   created_at: string;
 };
-type Perfil = { id: string; nome_responsavel: string; telefone: string | null; cpf: string | null };
+type Perfil = {
+  id: string;
+  nome_responsavel: string;
+  telefone: string | null;
+  cpf: string | null;
+  bloqueado_em?: string | null;
+};
 
 function Aviso({ texto }: { texto: string }) {
   return (
@@ -183,7 +189,7 @@ function Painel({ professorId }: { professorId: string }) {
         .select("id, tipo, nome_arquivo, caminho, created_at, user_id, aluno_id, enviado_por_professor, liberado")
         .order("created_at", { ascending: false }),
       supabase.from("alunos").select("id, nome, idade, matricula, user_id, created_at").order("matricula"),
-      supabase.from("perfis").select("id, nome_responsavel, telefone, cpf"),
+      supabase.from("perfis").select("id, nome_responsavel, telefone, cpf, bloqueado_em"),
       supabase
         .from("mensalidades")
         .select("id, aluno_id, user_id, referencia, ativo, valor, pago, pago_em, forma"),
@@ -549,7 +555,12 @@ function Painel({ professorId }: { professorId: string }) {
       </section>
 
 
-      <ListaChamada alunos={porNome.filter((a) => estaAtivo(a.id))} professorId={professorId} />
+      <ListaChamada
+        alunos={porNome.filter(
+          (a) => estaAtivo(a.id) && !perfis.find((p) => p.id === a.user_id)?.bloqueado_em,
+        )}
+        professorId={professorId}
+      />
 
       <AvisosProfessor uid={professorId} />
 
