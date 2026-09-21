@@ -30,6 +30,7 @@ export async function listarAcessosContas(): Promise<ContaAcesso[]> {
     aprovado: Boolean(c.aprovado),
     criadoEm: c.criado_em ?? "",
     documentosFisicos: Boolean(c.documentos_fisicos),
+    bloqueadoEm: c.bloqueado_em ?? "",
   }));
 }
 
