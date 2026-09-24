@@ -31,6 +31,17 @@ export async function gerarDocumentoPdf(opcoes: {
   clausulas?: { titulo: string; texto: string }[];
   /** Inclui a assinatura do Prof. Victor e o selo da empresa (contrato). */
   assinaturaEmpresa?: boolean;
+  registro?: {
+    id: string;
+    nome: string;
+    email: string | null;
+    assinadoEm: string;
+    ip: string;
+    ultimoLogin: string | null;
+    biometria: boolean;
+    userAgent: string;
+    hash: string;
+  };
 }): Promise<Blob> {
   const [assinaturaProf, selo] = opcoes.assinaturaEmpresa
     ? await Promise.all([carregarDataUrl(assetUrl(assinaturaVictor)), carregarDataUrl(assetUrl(seloSuperCt))])
@@ -170,6 +181,40 @@ export async function gerarDocumentoPdf(opcoes: {
     y += 11;
     doc.text("(Educador Físico / Prestador)", margem, y);
     doc.text("(Prestadora / Infraestrutura)", colunaDireita, y);
+  }
+
+  if (opcoes.registro) {
+    const r = opcoes.registro;
+    doc.addPage();
+    y = margem;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    doc.text("REGISTRO DE ASSINATURA ELETRÔNICA", margem, y);
+    y += 16;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    const intro = doc.splitTextToSize(
+      "Assinatura eletrônica avançada realizada por usuário autenticado, nos termos da Lei nº 14.063/2020 (art. 4º, II) e da MP nº 2.200-2/2001 (art. 10, § 2º), admitida pelas partes como válida.",
+      largura,
+    ) as string[];
+    doc.text(intro, margem, y);
+    y += intro.length * 11 + 8;
+    const itens: [string, string][] = [
+      ["Código do registro", r.id],
+      ["Assinante", r.nome || "-"],
+      ["E-mail da conta", r.email || "-"],
+      ["Data e hora (Brasília)", new Date(r.assinadoEm).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })],
+      ["Endereço IP", r.ip],
+      ["Verificação de login", `Sim — sessão autenticada por e-mail/CPF e senha${r.ultimoLogin ? ` (login em ${new Date(r.ultimoLogin).toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" })})` : ""}`],
+      ["Biometria do aparelho", r.biometria ? "Confirmada (digital/rosto/bloqueio de tela do aparelho)" : "Não realizada / indisponível no aparelho"],
+      ["Dispositivo", r.userAgent || "-"],
+      ["Hash SHA-256 do conteúdo", r.hash],
+    ];
+    for (const [k, v] of itens) {
+      const t = doc.splitTextToSize(`${k}: ${v}`, largura) as string[];
+      doc.text(t, margem, y);
+      y += t.length * 11 + 3;
+    }
   }
 
   return doc.output("blob");
