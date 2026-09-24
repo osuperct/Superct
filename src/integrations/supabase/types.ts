@@ -47,6 +47,60 @@ export type Database = {
         }
         Relationships: []
       }
+      assinaturas_eletronicas: {
+        Row: {
+          assinado_em: string
+          biometria: boolean
+          biometria_credencial: string | null
+          caminho: string | null
+          created_at: string
+          email: string | null
+          hash_documento: string
+          id: string
+          ip: string | null
+          login_verificado: boolean
+          nome_assinante: string | null
+          tipo: string
+          ultimo_login: string | null
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          assinado_em?: string
+          biometria?: boolean
+          biometria_credencial?: string | null
+          caminho?: string | null
+          created_at?: string
+          email?: string | null
+          hash_documento: string
+          id?: string
+          ip?: string | null
+          login_verificado?: boolean
+          nome_assinante?: string | null
+          tipo: string
+          ultimo_login?: string | null
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          assinado_em?: string
+          biometria?: boolean
+          biometria_credencial?: string | null
+          caminho?: string | null
+          created_at?: string
+          email?: string | null
+          hash_documento?: string
+          id?: string
+          ip?: string | null
+          login_verificado?: boolean
+          nome_assinante?: string | null
+          tipo?: string
+          ultimo_login?: string | null
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       avaliacoes: {
         Row: {
           aluno_id: string

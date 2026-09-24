@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { Download, FileText, Save, Send } from "lucide-react";
+import { Download, FileText, Fingerprint, Save, Send } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Assinatura } from "@/components/Assinatura";
@@ -10,6 +11,8 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 import { gerarDocumentoPdf } from "@/lib/documentoPdf";
 import { BUCKET, DOCS, EMAIL_SUPER_CT, TERMO_IMAGEM, type TipoDoc } from "@/lib/documentos";
+import { registrarAssinatura } from "@/lib/assinatura.functions";
+import { biometriaDisponivel, confirmarBiometria, sha256Hex } from "@/lib/biometria";
 
 export const Route = createFileRoute("/documento/$tipo")({
   params: {
@@ -181,6 +184,12 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
   const [aceite, setAceite] = useState(false);
   const [aceiteClausulas, setAceiteClausulas] = useState(false);
   const [assinatura, setAssinatura] = useState<string | null>(null);
+  const [credBio, setCredBio] = useState<string | null>(null);
+  const [bioDisp, setBioDisp] = useState(false);
+  const registrar = useServerFn(registrarAssinatura);
+  useEffect(() => {
+    void biometriaDisponivel().then(setBioDisp);
+  }, []);
   const [ocupado, setOcupado] = useState(false);
   const [pdfPronto, setPdfPronto] = useState<{ url: string; nome: string } | null>(null);
   const [fichaPendente, setFichaPendente] = useState(false);
@@ -369,6 +378,13 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       if (erroFicha) throw erroFicha;
 
       const linhas = doc.campos.map((c) => ({ rotulo: c.rotulo, valor: valorCampo(c) }));
+      const nomeArquivo = `${doc.arquivo}-assinado-${new Date().toISOString().slice(0, 10)}.pdf`;
+      const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
+      const hash = await sha256Hex(JSON.stringify({ tipo, linhas, termo: TERMO_IMAGEM, assinatura }));
+      const reg = await registrar({
+        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: !!credBio, biometriaCredencial: credBio },
+      });
+      if (!reg.ok) throw new Error(reg.erro);
       const blob = await gerarDocumentoPdf({
         titulo: doc.titulo,
         linhas,
@@ -377,9 +393,18 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         nomeAssinante,
         assinaturaEmpresa: tipo === "contrato",
         ...(doc.clausulas ? { clausulas: doc.clausulas } : {}),
+        registro: {
+          id: reg.id,
+          nome: nomeAssinante,
+          email: reg.email,
+          assinadoEm: reg.assinadoEm,
+          ip: reg.ip,
+          ultimoLogin: reg.ultimoLogin,
+          biometria: !!credBio,
+          userAgent: reg.userAgent,
+          hash,
+        },
       });
-      const nomeArquivo = `${doc.arquivo}-assinado-${new Date().toISOString().slice(0, 10)}.pdf`;
-      const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
       const { error: erroUpload } = await supabase.storage
         .from(BUCKET)
         .upload(caminho, blob, { contentType: "application/pdf" });
@@ -612,6 +637,39 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       )}
 
       <Assinatura onChange={setAssinatura} />
+
+      <section className="space-y-2 rounded-md border border-border bg-card/40 p-3">
+        <p className="flex items-center gap-2 font-mono text-[9px] uppercase tracking-widest text-muted-foreground">
+          <Fingerprint className="size-4 text-primary" /> Validação da assinatura
+        </p>
+        <p className="text-[11px] text-muted-foreground">
+          Serão registrados data e hora, IP, aparelho e a confirmação do seu login, conforme a Lei nº 14.063/2020 e a
+          MP nº 2.200-2/2001.
+        </p>
+        {credBio ? (
+          <p className="font-display text-xs tracking-tight text-primary">BIOMETRIA CONFIRMADA ✓</p>
+        ) : bioDisp ? (
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                const id = await confirmarBiometria(uid, valores["responsavel_nome"] ?? valores["contratante"] ?? "");
+                if (id) {
+                  setCredBio(id);
+                  toast.success("Biometria confirmada!");
+                }
+              } catch {
+                toast.error("Biometria não confirmada. Tente de novo ou siga sem ela.");
+              }
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-md border border-primary px-4 py-2 font-display text-xs tracking-tight text-primary"
+          >
+            <Fingerprint className="size-4" /> CONFIRMAR COM BIOMETRIA
+          </button>
+        ) : (
+          <p className="text-[11px] text-muted-foreground">Este aparelho não oferece biometria; a assinatura segue validada pelo login.</p>
+        )}
+      </section>
 
       <button
         type="submit"
