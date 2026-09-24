@@ -103,6 +103,7 @@ function Autenticacao() {
   const [endereco, setEndereco] = useState("");
   const [alunoNome, setAlunoNome] = useState("");
   const [alunoIdade, setAlunoIdade] = useState("");
+  const [extras, setExtras] = useState<{ nome: string; idade: string }[]>([]);
   const [aceite, setAceite] = useState(false);
   const [ocupado, setOcupado] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -189,6 +190,9 @@ function Autenticacao() {
               endereco: endereco.trim(),
               aluno_nome: alunoNome.trim(),
               aluno_idade: alunoIdade,
+              alunos_extras: extras
+                .filter((x) => x.nome.trim())
+                .map((x) => ({ nome: x.nome.trim(), idade: x.idade })),
               aceite_imagem: aceite,
             },
           },
@@ -335,6 +339,41 @@ function Autenticacao() {
             <Campo label="Nome do aluno" value={alunoNome} onChange={setAlunoNome} required maxLength={120} />
 
             <Campo label="Idade do aluno" value={alunoIdade} onChange={setAlunoIdade} required type="number" />
+            {extras.map((x, i) => (
+              <div key={i} className="space-y-2 rounded-xl border border-border p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-bold">Criança {i + 2}</span>
+                  <button
+                    type="button"
+                    className="text-xs text-destructive underline"
+                    onClick={() => setExtras((l) => l.filter((_, j) => j !== i))}
+                  >
+                    Remover
+                  </button>
+                </div>
+                <Campo
+                  label="Nome do aluno"
+                  value={x.nome}
+                  onChange={(v) => setExtras((l) => l.map((e, j) => (j === i ? { ...e, nome: v } : e)))}
+                  maxLength={120}
+                />
+                <Campo
+                  label="Idade do aluno"
+                  value={x.idade}
+                  onChange={(v) => setExtras((l) => l.map((e, j) => (j === i ? { ...e, idade: v } : e)))}
+                  type="number"
+                />
+              </div>
+            ))}
+            {extras.length < 5 && (
+              <button
+                type="button"
+                onClick={() => setExtras((l) => [...l, { nome: "", idade: "" }])}
+                className="w-full rounded-xl border border-dashed border-primary px-3 py-2 text-sm font-bold text-primary"
+              >
+                + ADICIONAR OUTRA CRIANÇA
+              </button>
+            )}
           </>
         )}
         <Campo

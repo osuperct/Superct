@@ -66,6 +66,9 @@ export async function acrescentarAdendoContrato(opcoes: {
   responsavel: string;
   correcoes: CorrecaoContrato[];
   alteradoEm: Date;
+  titulo?: string;
+  secao?: string;
+  nota?: string;
 }): Promise<Blob> {
   const pdf = await documentoBase(opcoes.arquivoOriginal, opcoes.tipoArquivo);
   const pagina = pdf.addPage([595.28, 841.89]);
@@ -85,7 +88,7 @@ export async function acrescentarAdendoContrato(opcoes: {
     color: rgb(0.12, 0.12, 0.12),
   });
   y -= 24;
-  pagina.drawText("ADENDO DE CORREÇÃO AO CONTRATO ASSINADO", {
+  pagina.drawText(opcoes.titulo ?? "ADENDO DE CORREÇÃO AO CONTRATO ASSINADO", {
     x: margem,
     y,
     size: 12,
@@ -110,7 +113,8 @@ export async function acrescentarAdendoContrato(opcoes: {
     `Aluno(a): ${opcoes.aluno || "não informado"}`,
     `Responsável: ${opcoes.responsavel || "não informado"}`,
     `Alteração registrada em ${dataHora} (horário de Brasília).`,
-    "Este adendo integra o contrato original assinado. A assinatura e todas as cláusulas não alteradas permanecem válidas.",
+    opcoes.nota ??
+      "Este adendo integra o contrato original assinado. A assinatura e todas as cláusulas não alteradas permanecem válidas.",
   ];
 
   pagina.setFont(normal);
@@ -124,7 +128,7 @@ export async function acrescentarAdendoContrato(opcoes: {
   }
 
   y -= 8;
-  pagina.drawText("DADOS CORRIGIDOS", { x: margem, y, size: 11, font: negrito, color: rgb(0.12, 0.12, 0.12) });
+  pagina.drawText(opcoes.secao ?? "DADOS CORRIGIDOS", { x: margem, y, size: 11, font: negrito, color: rgb(0.12, 0.12, 0.12) });
   y -= 20;
 
   for (const correcao of opcoes.correcoes) {
