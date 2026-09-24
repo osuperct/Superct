@@ -757,6 +757,31 @@ function Painel({ professorId }: { professorId: string }) {
               </span>
             </label>
 
+            {novoAluno.userId && !novoAluno.fisico && (() => {
+              const assinados = docs.filter(
+                (d) =>
+                  d.user_id === novoAluno.userId &&
+                  !d.enviado_por_professor &&
+                  (d.tipo === "contrato" || d.tipo === "ficha"),
+              );
+              const temContrato = assinados.some((d) => d.tipo === "contrato");
+              const temFicha = assinados.some((d) => d.tipo === "ficha");
+              if (!temContrato && !temFicha)
+                return (
+                  <p className="rounded-lg border border-border p-2 text-xs text-muted-foreground">
+                    Este responsável ainda não assinou contrato/PAR-Q no app.
+                  </p>
+                );
+              return (
+                <p className="rounded-lg border border-primary/60 bg-primary/10 p-2 text-xs text-foreground">
+                  ✍️ Assinatura já existente: ao cadastrar, a assinatura do responsável será replicada
+                  {temContrato && temFicha ? " no contrato e na ficha PAR-Q" : temContrato ? " no contrato" : " na ficha PAR-Q"}{" "}
+                  deste novo aluno (com o plano, forma e vencimento escolhidos abaixo).
+                </p>
+              );
+            })()}
+
+
             <div className="grid gap-2 sm:grid-cols-2">
               <label className="block space-y-1">
                 <span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
