@@ -15,6 +15,74 @@ import { formatarCpf } from "@/lib/cpf";
 import { CAMPOS_CONTRATO } from "@/lib/documentos";
 import { type Mensalidade, refMes } from "@/lib/mensalidade";
 import { lerPlano } from "@/lib/planoContrato";
+import { acrescentarAdendoContrato } from "@/lib/contratoAdendo";
+
+/** Copia o contrato e a ficha já assinados on-line pelo responsável para um novo filho,
+ *  com uma página final de inclusão do dependente (a assinatura original é preservada). */
+async function anexarAssinadosAoIrmao(o: {
+  userId: string;
+  alunoId: string;
+  aluno: string;
+  nascimento: string;
+  plano: string;
+  forma: string;
+  vencimento: string;
+}): Promise<number> {
+  const { data: docs } = await supabase
+    .from("documentos")
+    .select("tipo, caminho, nome_arquivo")
+    .eq("user_id", o.userId)
+    .eq("enviado_por_professor", false)
+    .in("tipo", ["contrato", "ficha"])
+    .order("created_at", { ascending: false });
+  const { data: perfil } = await supabase.from("perfis").select("nome_responsavel").eq("id", o.userId).maybeSingle();
+  let total = 0;
+  for (const tipo of ["contrato", "ficha"] as const) {
+    const orig = (docs ?? []).find((d) => d.tipo === tipo && d.nome_arquivo.toLowerCase().endsWith(".pdf"));
+    if (!orig) continue;
+    try {
+      const { data: arq } = await supabase.storage.from(BUCKET).download(orig.caminho);
+      if (!arq) continue;
+      const nasc = o.nascimento ? o.nascimento.split("-").reverse().join("/") : "";
+      const linhas = [
+        { rotulo: "Aluno(a) incluído(a)", anterior: "", atualizado: o.aluno },
+        ...(nasc ? [{ rotulo: "Data de nascimento", anterior: "", atualizado: nasc }] : []),
+        ...(tipo === "contrato" && o.plano ? [{ rotulo: "Plano / mensalidade", anterior: "", atualizado: o.plano }] : []),
+        ...(tipo === "contrato" && o.forma ? [{ rotulo: "Forma de pagamento", anterior: "", atualizado: o.forma }] : []),
+        ...(tipo === "contrato" && o.vencimento ? [{ rotulo: "Dia de vencimento", anterior: "", atualizado: o.vencimento }] : []),
+      ].map((l) => ({ ...l, anterior: "—" }));
+      const blob = await acrescentarAdendoContrato({
+        arquivoOriginal: await arq.arrayBuffer(),
+        tipoArquivo: "application/pdf",
+        aluno: o.aluno,
+        responsavel: perfil?.nome_responsavel ?? "",
+        correcoes: linhas,
+        alteradoEm: new Date(),
+        titulo: tipo === "contrato" ? "ADENDO DE INCLUSÃO DE DEPENDENTE AO CONTRATO" : "ADENDO DE INCLUSÃO DE DEPENDENTE À FICHA PAR-Q",
+        secao: "NOVO(A) ALUNO(A) VINCULADO(A)",
+        nota: "O responsável legal já assinou este documento. Por este adendo, as mesmas cláusulas, termo de imagem e assinatura passam a valer também para o(a) aluno(a) abaixo.",
+      });
+      const nome = `${tipo === "contrato" ? "contrato" : "ficha-anamnese-parq"}-assinado-${o.aluno.replace(/[^\w]+/g, "_").slice(0, 40)}.pdf`;
+      const caminho = `${o.userId}/${Date.now()}-${nome}`;
+      const { error } = await supabase.storage.from(BUCKET).upload(caminho, blob, { contentType: "application/pdf" });
+      if (error) continue;
+      const { error: e2 } = await supabase.from("documentos").insert({
+        user_id: o.userId,
+        aluno_id: o.alunoId,
+        tipo,
+        nome_arquivo: nome,
+        caminho,
+        enviado_por_professor: true,
+        liberado: true,
+        liberado_em: new Date().toISOString(),
+      });
+      if (!e2) total++;
+    } catch (err) {
+      console.error("Falha ao aplicar documento assinado:", err);
+    }
+  }
+  return total;
+}
 
 const campoContrato = (chave: string) => CAMPOS_CONTRATO.find((c) => c.chave === chave);
 /** Mesmos planos, formas e vencimentos do contrato digital. */
@@ -354,6 +422,20 @@ function Painel({ professorId }: { professorId: string }) {
         },
         { onConflict: "aluno_id,referencia" },
       );
+    }
+
+    // Responsável que já assinou on-line: reaproveita o contrato e a ficha assinados para o novo filho.
+    if (r.aluno_id && !novoAluno.fisico && !novoArquivo) {
+      const n = await anexarAssinadosAoIrmao({
+        userId: novoAluno.userId,
+        alunoId: r.aluno_id,
+        aluno: novoAluno.nome.trim(),
+        nascimento: novoAluno.nascimento,
+        plano: planoTexto,
+        forma: novoAluno.forma,
+        vencimento: novoAluno.vencimento,
+      });
+      if (n > 0) toast.success(`Contrato/ficha assinados aplicados ao novo aluno (${n} documento${n > 1 ? "s" : ""}).`);
     }
 
     setCriandoAluno(false);
