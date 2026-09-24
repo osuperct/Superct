@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { Download, FileText, Save, Send } from "lucide-react";
+import { Download, FileText, Fingerprint, Save, Send } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Assinatura } from "@/components/Assinatura";
@@ -10,6 +11,8 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 import { gerarDocumentoPdf } from "@/lib/documentoPdf";
 import { BUCKET, DOCS, EMAIL_SUPER_CT, TERMO_IMAGEM, type TipoDoc } from "@/lib/documentos";
+import { registrarAssinatura } from "@/lib/assinatura.functions";
+import { biometriaDisponivel, confirmarBiometria, sha256Hex } from "@/lib/biometria";
 
 export const Route = createFileRoute("/documento/$tipo")({
   params: {
@@ -181,6 +184,12 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
   const [aceite, setAceite] = useState(false);
   const [aceiteClausulas, setAceiteClausulas] = useState(false);
   const [assinatura, setAssinatura] = useState<string | null>(null);
+  const [credBio, setCredBio] = useState<string | null>(null);
+  const [bioDisp, setBioDisp] = useState(false);
+  const registrar = useServerFn(registrarAssinatura);
+  useEffect(() => {
+    void biometriaDisponivel().then(setBioDisp);
+  }, []);
   const [ocupado, setOcupado] = useState(false);
   const [pdfPronto, setPdfPronto] = useState<{ url: string; nome: string } | null>(null);
   const [fichaPendente, setFichaPendente] = useState(false);
