@@ -78,8 +78,58 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
   const notas = atual ? lerNotas(atual.notas) : {};
   const media = mediaNotas(notas);
 
+  const recente = lista[0] ?? null;
+  const chaveVisto = recente ? `avaliacao-vista-${recente.id}` : "";
+  const [aviso, setAviso] = useState(false);
+  useEffect(() => {
+    if (demo || !recente) return;
+    try {
+      if (!localStorage.getItem(chaveVisto)) setAviso(true);
+    } catch {
+      /* ignore */
+    }
+  }, [demo, recente, chaveVisto]);
+
+  function fecharAviso(abrir: boolean) {
+    try {
+      localStorage.setItem(chaveVisto, "1");
+    } catch {
+      /* ignore */
+    }
+    setAviso(false);
+    if (abrir && recente) {
+      setEscolhida(recente.id);
+      setTimeout(() => document.getElementById("relatorio-mensal")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    }
+  }
+
+  const alunosRecentes = recente
+    ? Array.from(new Set(lista.filter((a) => a.referencia === recente.referencia).map((a) => nomeAluno(a.aluno_id))))
+    : [];
+
   return (
-    <section className="mt-4 overflow-hidden rounded-lg border border-evaluation-blue/30 bg-evaluation-surface shadow-evaluation">
+    <>
+    {aviso && recente && (
+      <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+        <div className="w-full max-w-sm rounded-lg border border-evaluation-blue/40 bg-evaluation-surface p-5 text-center shadow-evaluation">
+          <div className="flex items-end justify-center gap-3">
+            <img src={kael} alt="" className="h-16 w-auto object-contain" />
+            <Sparkles className="mb-4 size-8 fill-evaluation-star text-evaluation-star" />
+            <img src={miah} alt="" className="h-16 w-auto object-contain" />
+          </div>
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-evaluation-orange">Novo relatório publicado</p>
+          <h3 className="font-evaluation text-3xl leading-none text-foreground">RELATÓRIO DE {mesExtenso(recente.referencia).toUpperCase()}</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
+            A avaliação mensal de {alunosRecentes.join(", ")} já está disponível.
+          </p>
+          <div className="mt-4 flex flex-col gap-2">
+            <Button onClick={() => fecharAviso(true)}>VER RELATÓRIO</Button>
+            <Button variant="ghost" onClick={() => fecharAviso(false)}>FECHAR</Button>
+          </div>
+        </div>
+      </div>
+    )}
+    <section id="relatorio-mensal" className="mt-4 scroll-mt-4 overflow-hidden rounded-lg border border-evaluation-blue/30 bg-evaluation-surface shadow-evaluation">
       <header className="relative border-b border-evaluation-blue/20 bg-evaluation-header px-4 py-4">
         <div className="flex items-center justify-center gap-2">
           <div className="relative flex h-16 w-12 shrink-0 items-end justify-center">
