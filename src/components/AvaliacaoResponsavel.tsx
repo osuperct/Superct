@@ -117,13 +117,13 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
             <Sparkles className="mb-4 size-8 fill-evaluation-star text-evaluation-star" />
             <img src={miah} alt="" className="h-16 w-auto object-contain" />
           </div>
-          <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-evaluation-orange">Novo relatório publicado</p>
-          <h3 className="font-evaluation text-3xl leading-none text-foreground">RELATÓRIO DE {mesExtenso(recente.referencia).toUpperCase()}</h3>
+          <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-evaluation-orange">Nova avaliação publicada</p>
+          <h3 className="font-evaluation text-3xl leading-none text-foreground">AVALIAÇÃO DE {mesExtenso(recente.referencia).toUpperCase()}</h3>
           <p className="mt-2 text-sm text-muted-foreground">
             A avaliação mensal de {alunosRecentes.join(", ")} já está disponível.
           </p>
           <div className="mt-4 flex flex-col gap-2">
-            <Button onClick={() => fecharAviso(true)}>VER RELATÓRIO</Button>
+            <Button onClick={() => fecharAviso(true)}>VER AVALIAÇÃO</Button>
             <Button variant="ghost" onClick={() => fecharAviso(false)}>FECHAR</Button>
           </div>
         </div>
@@ -137,7 +137,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
             <Sparkles className="absolute right-0 top-0 size-5 fill-evaluation-star text-evaluation-star drop-shadow-evaluation-star" />
           </div>
           <div className="min-w-0 text-center">
-            <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-orange">Relatório mensal</p>
+            <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-orange">Avaliação mensal</p>
             <h2 className="font-evaluation text-[1.65rem] leading-none text-foreground">AVALIAÇÃO DO PROFESSOR</h2>
           </div>
           <div className="relative flex h-16 w-12 shrink-0 items-end justify-center">
@@ -248,7 +248,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
                 onClick={() => void baixar()}
                 className="mt-3 h-10 w-full font-mono text-[10px] uppercase tracking-widest"
               >
-                <Download className="size-3" /> BAIXAR RELATÓRIO EM PDF
+                <Download className="size-3" /> BAIXAR AVALIAÇÃO EM PDF
               </Button>
             </div>
           )}

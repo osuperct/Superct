@@ -39,7 +39,7 @@ async function executar(request: Request) {
       const corpo = {
         data: {
           title: "Nova avaliação disponível",
-          body: "A avaliação mensal do seu filho já está no app. Toque para ver o relatório.",
+          body: "A avaliação mensal do seu filho já está no app. Toque para ver a avaliação.",
           url: "https://osuperct.com/conta",
         },
         options: { ttl: 60 * 60 * 24, urgency: "high" as const },
