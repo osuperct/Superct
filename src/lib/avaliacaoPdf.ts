@@ -32,6 +32,66 @@ function estrelasTexto(nota: number | undefined) {
   return `${"*".repeat(nota)}${"-".repeat(10 - nota)}  ${nota}/10  ${faixaDaNota(nota).rotulo}`;
 }
 
+/** Remove o emoji do início do nome da conquista (o PDF usa ícones desenhados). */
+function nomeConquista(conquista: string) {
+  return conquista.replace(/^[^\p{L}\p{N}]+\s*/u, "").trim();
+}
+
+type IconeConquista = "trofeu" | "evolucao" | "alvo";
+
+function iconeDaConquista(conquista: string): IconeConquista {
+  if (conquista.includes("🏆")) return "trofeu";
+  if (conquista.includes("📈")) return "evolucao";
+  return "alvo";
+}
+
+/** Desenha o ícone da conquista (troféu, gráfico de evolução ou alvo) em vetor. */
+function desenharIcone(doc: jsPDF, tipo: IconeConquista, x: number, y: number, tamanho: number) {
+  const c = tamanho / 2;
+  const cx = x + c;
+  const cy = y + c;
+  if (tipo === "trofeu") {
+    doc.setFillColor(230, 120, 20);
+    doc.setDrawColor(150, 70, 0);
+    // taça
+    doc.roundedRect(cx - c * 0.55, y, c * 1.1, c * 0.9, 2, 2, "FD");
+    // alças
+    doc.setLineWidth(1.4);
+    doc.circle(cx - c * 0.72, y + c * 0.35, c * 0.26, "S");
+    doc.circle(cx + c * 0.72, y + c * 0.35, c * 0.26, "S");
+    // haste e base
+    doc.setFillColor(230, 120, 20);
+    doc.rect(cx - 1.5, y + c * 0.9, 3, c * 0.45, "F");
+    doc.roundedRect(cx - c * 0.45, y + c * 1.3, c * 0.9, c * 0.28, 1.5, 1.5, "FD");
+    // estrela na taça
+    doc.setFillColor(255, 220, 90);
+    doc.circle(cx, y + c * 0.42, c * 0.18, "F");
+    return;
+  }
+  if (tipo === "evolucao") {
+    doc.setDrawColor(41, 128, 255);
+    doc.setLineWidth(1.4);
+    doc.line(x + 1, y + tamanho - 1, x + 1, y + 1);
+    doc.line(x + 1, y + tamanho - 1, x + tamanho - 1, y + tamanho - 1);
+    doc.setDrawColor(34, 197, 94);
+    doc.setLineWidth(2);
+    const px = [x + 2, x + c * 0.75, x + c * 1.25, x + tamanho - 3];
+    const py = [y + tamanho - 4, y + c * 1.1, y + c * 1.35, y + 2.5];
+    for (let i = 0; i < px.length - 1; i += 1) doc.line(px[i]!, py[i]!, px[i + 1]!, py[i + 1]!);
+    // ponta da seta
+    doc.setFillColor(34, 197, 94);
+    doc.triangle(x + tamanho - 6.5, y + 1.5, x + tamanho - 1, y + 2, x + tamanho - 2.5, y + 7, "F");
+    return;
+  }
+  // alvo
+  doc.setFillColor(236, 72, 153);
+  doc.circle(cx, cy, c * 0.95, "F");
+  doc.setFillColor(255, 255, 255);
+  doc.circle(cx, cy, c * 0.62, "F");
+  doc.setFillColor(236, 72, 153);
+  doc.circle(cx, cy, c * 0.3, "F");
+}
+
 /** Relatório individual da avaliação mensal do aluno. */
 export async function relatorioAvaliacao(
   aluno: string,
@@ -78,8 +138,22 @@ export async function relatorioAvaliacao(
   doc.setFont("helvetica", "bold");
   doc.text(`Meta atual: ${avaliacao.meta ?? metaDeNotas(notas) ?? "—"}`, MARGEM, y);
   y += 16;
-  const conquistas = (avaliacao.conquistas ?? []).join(" · ") || "Participação do mês";
-  doc.text(`Conquistas: ${conquistas}`, MARGEM, y);
+  doc.setFont("helvetica", "bold");
+  doc.text("Conquistas:", MARGEM, y);
+  const listaConquistas = avaliacao.conquistas?.length ? avaliacao.conquistas : ["🎯 Participação do mês"];
+  doc.setFont("helvetica", "normal");
+  let xConquista = MARGEM + 62;
+  for (const conquista of listaConquistas) {
+    const nome = nomeConquista(conquista);
+    const larguraNome = doc.getTextWidth(nome);
+    if (xConquista + 12 + larguraNome > largura - MARGEM) {
+      y += 16;
+      xConquista = MARGEM;
+    }
+    desenharIcone(doc, iconeDaConquista(conquista), xConquista, y - 9, 11);
+    doc.text(nome, xConquista + 14, y);
+    xConquista += 14 + larguraNome + 14;
+  }
   y += 20;
 
   doc.setFont("helvetica", "bold");
