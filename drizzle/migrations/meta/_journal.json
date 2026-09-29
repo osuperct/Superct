@@ -29,6 +29,13 @@
       "when": 1790643957086,
       "tag": "0003_corrigir_publicar_avaliacoes_ambiguidade",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790644060709,
+      "tag": "0004_publicar_avaliacoes_pula_bloqueados",
+      "breakpoints": true
     }
   ]
 }
