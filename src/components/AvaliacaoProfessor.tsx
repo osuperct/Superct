@@ -217,7 +217,7 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
         value={observacoes}
         onChange={(e) => setObservacoes(e.target.value)}
         rows={3}
-        placeholder="Observação do professor (aparece no relatório da família)"
+        placeholder="Observação do professor (aparece na avaliação da família)"
         className="mt-3 w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
       />
 
@@ -278,7 +278,7 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
         PUBLICAR AGORA PARA O RESPONSÁVEL
       </button>
 
-      <h3 className="mt-6 font-display text-sm tracking-tight">HISTÓRICO E RELATÓRIO</h3>
+      <h3 className="mt-6 font-display text-sm tracking-tight">HISTÓRICO E AVALIAÇÃO</h3>
       {historico.length === 0 ? (
         <p className="mt-2 text-sm text-muted-foreground">Nenhuma avaliação registrada.</p>
       ) : (
@@ -306,7 +306,7 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
                 onClick={() => void baixar(escolhida)}
                 className="flex w-full items-center justify-center gap-2 rounded-md border border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:border-primary hover:text-primary"
               >
-                <Download className="size-3" /> BAIXAR RELATÓRIO EM PDF
+                <Download className="size-3" /> BAIXAR AVALIAÇÃO EM PDF
               </button>
             </>
           )}
