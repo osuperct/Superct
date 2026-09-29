@@ -57,8 +57,8 @@ function desenharIcone(doc: jsPDF, tipo: IconeConquista, x: number, y: number, t
     doc.roundedRect(cx - c * 0.55, y, c * 1.1, c * 0.9, 2, 2, "FD");
     // alças
     doc.setLineWidth(1.4);
-    doc.arc(cx - c * 0.75, y + c * 0.35, c * 0.28, -Math.PI / 2, Math.PI / 2, true);
-    doc.arc(cx + c * 0.75, y + c * 0.35, c * 0.28, Math.PI / 2, (Math.PI * 3) / 2, true);
+    doc.circle(cx - c * 0.72, y + c * 0.35, c * 0.26, "S");
+    doc.circle(cx + c * 0.72, y + c * 0.35, c * 0.26, "S");
     // haste e base
     doc.setFillColor(230, 120, 20);
     doc.rect(cx - 1.5, y + c * 0.9, 3, c * 0.45, "F");
