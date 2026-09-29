@@ -255,5 +255,6 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
         </div>
       )}
     </section>
+    </>
   );
 }
