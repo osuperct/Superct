@@ -331,21 +331,21 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
     }
     const nomeAssinante = valores["responsavel_nome"] ?? valores["contratante"] ?? "";
     let bio = credBio;
+    let temBio = bioDisp;
     if (!bio) {
-      if (!(await biometriaDisponivel())) {
-        toast.error("A biometria é obrigatória. Ative a digital, o rosto ou o bloqueio de tela do celular e tente de novo.");
-        return;
+      temBio = await biometriaDisponivel();
+      if (temBio) {
+        try {
+          bio = await confirmarBiometria(uid, nomeAssinante);
+        } catch {
+          bio = null;
+        }
+        if (!bio) {
+          toast.error("Confirme a biometria para salvar o documento.");
+          return;
+        }
+        setCredBio(bio);
       }
-      try {
-        bio = await confirmarBiometria(uid, nomeAssinante);
-      } catch {
-        bio = null;
-      }
-      if (!bio) {
-        toast.error("Confirme a biometria para salvar o documento.");
-        return;
-      }
-      setCredBio(bio);
     }
     const credBioFinal = bio;
     setOcupado(true);
