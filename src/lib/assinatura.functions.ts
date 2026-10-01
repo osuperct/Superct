@@ -23,8 +23,8 @@ export const registrarAssinatura = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const req = getRequest();
     const h = req.headers;
-    const url = process.env["SUPABASE_URL"] || import.meta.env.VITE_SUPABASE_URL;
-    const chave = process.env["SUPABASE_PUBLISHABLE_KEY"] || import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    const url = process.env["SUPABASE_URL"] || import.meta.env['VITE_SUPABASE_URL'];
+    const chave = process.env["SUPABASE_PUBLISHABLE_KEY"] || import.meta.env['VITE_SUPABASE_PUBLISHABLE_KEY'];
     const token = (h.get("authorization") ?? "").replace(/^Bearer\s+/i, "");
     if (!url || !chave || !token) {
       return { ok: false as const, erro: "Sua sessão expirou. Saia e entre de novo na conta." };
