@@ -329,8 +329,26 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       toast.error("Assine no quadro com a canetinha antes de salvar.");
       return;
     }
-    setOcupado(true);
     const nomeAssinante = valores["responsavel_nome"] ?? valores["contratante"] ?? "";
+    let bio = credBio;
+    if (!bio) {
+      if (!(await biometriaDisponivel())) {
+        toast.error("A biometria é obrigatória. Ative a digital, o rosto ou o bloqueio de tela do celular e tente de novo.");
+        return;
+      }
+      try {
+        bio = await confirmarBiometria(uid, nomeAssinante);
+      } catch {
+        bio = null;
+      }
+      if (!bio) {
+        toast.error("Confirme a biometria para salvar o documento.");
+        return;
+      }
+      setCredBio(bio);
+    }
+    const credBioFinal = bio;
+    setOcupado(true);
     const nomeAluno = (valores["aluno"] ?? valores["aluno_nome"] ?? "").trim();
 
     try {
@@ -367,7 +385,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
       const hash = await sha256Hex(JSON.stringify({ tipo, linhas, termo: TERMO_IMAGEM, assinatura }));
       const reg = await registrar({
-        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: !!credBio, biometriaCredencial: credBio },
+        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: true, biometriaCredencial: credBioFinal },
       });
       if (!reg.ok) {
         toast.error(reg.erro);
@@ -403,7 +421,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           assinadoEm: reg.assinadoEm,
           ip: reg.ip,
           ultimoLogin: reg.ultimoLogin,
-          biometria: !!credBio,
+          biometria: true,
           userAgent: reg.userAgent,
           hash,
         },
@@ -662,15 +680,15 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
                   toast.success("Biometria confirmada!");
                 }
               } catch {
-                toast.error("Biometria não confirmada. Tente de novo ou siga sem ela.");
+                toast.error("Biometria não confirmada. Tente de novo — ela é obrigatória.");
               }
             }}
             className="flex w-full items-center justify-center gap-2 rounded-md border border-primary px-4 py-2 font-display text-xs tracking-tight text-primary"
           >
-            <Fingerprint className="size-4" /> CONFIRMAR COM BIOMETRIA
+            <Fingerprint className="size-4" /> CONFIRMAR COM BIOMETRIA *
           </button>
         ) : (
-          <p className="text-[11px] text-muted-foreground">Este aparelho não oferece biometria; a assinatura segue validada pelo login.</p>
+          <p className="text-[11px] text-destructive">A biometria é obrigatória. Ative a digital, o rosto ou o bloqueio de tela do aparelho para poder salvar.</p>
         )}
       </section>
 
