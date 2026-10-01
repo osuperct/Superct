@@ -331,21 +331,21 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
     }
     const nomeAssinante = valores["responsavel_nome"] ?? valores["contratante"] ?? "";
     let bio = credBio;
+    let temBio = bioDisp;
     if (!bio) {
-      if (!(await biometriaDisponivel())) {
-        toast.error("A biometria é obrigatória. Ative a digital, o rosto ou o bloqueio de tela do celular e tente de novo.");
-        return;
+      temBio = await biometriaDisponivel();
+      if (temBio) {
+        try {
+          bio = await confirmarBiometria(uid, nomeAssinante);
+        } catch {
+          bio = null;
+        }
+        if (!bio) {
+          toast.error("Confirme a biometria para salvar o documento.");
+          return;
+        }
+        setCredBio(bio);
       }
-      try {
-        bio = await confirmarBiometria(uid, nomeAssinante);
-      } catch {
-        bio = null;
-      }
-      if (!bio) {
-        toast.error("Confirme a biometria para salvar o documento.");
-        return;
-      }
-      setCredBio(bio);
     }
     const credBioFinal = bio;
     setOcupado(true);
@@ -385,7 +385,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
       const hash = await sha256Hex(JSON.stringify({ tipo, linhas, termo: TERMO_IMAGEM, assinatura }));
       const reg = await registrar({
-        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: true, biometriaCredencial: credBioFinal },
+        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: !!credBioFinal, biometriaCredencial: credBioFinal },
       });
       if (!reg.ok) {
         toast.error(reg.erro);
@@ -421,7 +421,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           assinadoEm: reg.assinadoEm,
           ip: reg.ip,
           ultimoLogin: reg.ultimoLogin,
-          biometria: true,
+          biometria: !!credBioFinal,
           userAgent: reg.userAgent,
           hash,
         },
@@ -688,7 +688,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             <Fingerprint className="size-4" /> CONFIRMAR COM BIOMETRIA *
           </button>
         ) : (
-          <p className="text-[11px] text-destructive">A biometria é obrigatória. Ative a digital, o rosto ou o bloqueio de tela do aparelho para poder salvar.</p>
+          <p className="text-[11px] text-muted-foreground">Este aparelho não tem biometria nem bloqueio de tela ativado. O documento será salvo sem biometria, com o registro do login, data, hora e IP.</p>
         )}
       </section>
 
