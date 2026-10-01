@@ -362,6 +362,18 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         }
       }
 
+      const linhas = doc.campos.map((c) => ({ rotulo: c.rotulo, valor: valorCampo(c) }));
+      const nomeArquivo = `${doc.arquivo}-assinado-${new Date().toISOString().slice(0, 10)}.pdf`;
+      const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
+      const hash = await sha256Hex(JSON.stringify({ tipo, linhas, termo: TERMO_IMAGEM, assinatura }));
+      const reg = await registrar({
+        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: !!credBio, biometriaCredencial: credBio },
+      });
+      if (!reg.ok) {
+        toast.error(reg.erro);
+        return;
+      }
+
       const { error: erroFicha } = await supabase.from("fichas").insert({
         user_id: uid,
         tipo,
@@ -376,15 +388,6 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         enviado_em: new Date().toISOString(),
       });
       if (erroFicha) throw erroFicha;
-
-      const linhas = doc.campos.map((c) => ({ rotulo: c.rotulo, valor: valorCampo(c) }));
-      const nomeArquivo = `${doc.arquivo}-assinado-${new Date().toISOString().slice(0, 10)}.pdf`;
-      const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
-      const hash = await sha256Hex(JSON.stringify({ tipo, linhas, termo: TERMO_IMAGEM, assinatura }));
-      const reg = await registrar({
-        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: !!credBio, biometriaCredencial: credBio },
-      });
-      if (!reg.ok) throw new Error(reg.erro);
       const blob = await gerarDocumentoPdf({
         titulo: doc.titulo,
         linhas,
