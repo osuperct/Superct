@@ -688,7 +688,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             <Fingerprint className="size-4" /> CONFIRMAR COM BIOMETRIA *
           </button>
         ) : (
-          <p className="text-[11px] text-destructive">A biometria é obrigatória. Ative a digital, o rosto ou o bloqueio de tela do aparelho para poder salvar.</p>
+          <p className="text-[11px] text-muted-foreground">Este aparelho não tem biometria nem bloqueio de tela ativado. O documento será salvo sem biometria, com o registro do login, data, hora e IP.</p>
         )}
       </section>
 
