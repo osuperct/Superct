@@ -385,7 +385,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
       const caminho = `${uid}/${Date.now()}-${nomeArquivo}`;
       const hash = await sha256Hex(JSON.stringify({ tipo, linhas, termo: TERMO_IMAGEM, assinatura }));
       const reg = await registrar({
-        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: true, biometriaCredencial: credBioFinal },
+        data: { tipo, nomeAssinante, hashDocumento: hash, caminho, biometria: !!credBioFinal, biometriaCredencial: credBioFinal },
       });
       if (!reg.ok) {
         toast.error(reg.erro);
@@ -421,7 +421,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
           assinadoEm: reg.assinadoEm,
           ip: reg.ip,
           ultimoLogin: reg.ultimoLogin,
-          biometria: true,
+          biometria: !!credBioFinal,
           userAgent: reg.userAgent,
           hash,
         },
