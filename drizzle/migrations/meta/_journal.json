@@ -36,6 +36,13 @@
       "when": 1790644060709,
       "tag": "0004_publicar_avaliacoes_pula_bloqueados",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790863788710,
+      "tag": "0005_grant_assinaturas_eletronicas",
+      "breakpoints": true
     }
   ]
 }
