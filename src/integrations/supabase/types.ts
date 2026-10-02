@@ -417,6 +417,51 @@ export type Database = {
         }
         Relationships: []
       }
+      pedidos_loja: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          produto_id: string | null
+          produto_nome: string
+          quantidade: number
+          status: string
+          tamanho: string | null
+          telefone: string | null
+          updated_at: string
+          user_id: string | null
+          valor_total: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          produto_id?: string | null
+          produto_nome: string
+          quantidade?: number
+          status?: string
+          tamanho?: string | null
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valor_total?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          produto_id?: string | null
+          produto_nome?: string
+          quantidade?: number
+          status?: string
+          tamanho?: string | null
+          telefone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          valor_total?: number
+        }
+        Relationships: []
+      }
       perfis: {
         Row: {
           aceite_imagem: boolean

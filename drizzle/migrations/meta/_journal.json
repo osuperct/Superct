@@ -43,6 +43,13 @@
       "when": 1790863788710,
       "tag": "0005_grant_assinaturas_eletronicas",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790901862091,
+      "tag": "0006_pedidos_loja",
+      "breakpoints": true
     }
   ]
 }

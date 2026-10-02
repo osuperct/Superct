@@ -141,6 +141,9 @@ function CartaoProduto({ produto }: { produto: Produto }) {
   const [quantidade, setQuantidade] = useState(1);
   const [pagando, setPagando] = useState(false);
   const [aguardando, setAguardando] = useState(false);
+  const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [registrado, setRegistrado] = useState(false);
 
 
   const total = produto.preco * quantidade;
@@ -154,6 +157,32 @@ function CartaoProduto({ produto }: { produto: Produto }) {
       return;
     }
     setPagando(true);
+  }
+
+  /** Grava o pedido na área ADM (produto, tamanho, quantidade e contato). */
+  async function registrarPedido() {
+    if (registrado) return;
+    if (nome.trim().length < 2) {
+      toast.error("Informe seu nome para registrarmos o pedido.");
+      return;
+    }
+    try {
+      const { data: sessao } = await supabase.auth.getUser();
+      const { error } = await supabase.from("pedidos_loja").insert({
+        user_id: sessao.user?.id ?? null,
+        nome: nome.trim(),
+        telefone: telefone.trim() || null,
+        produto_id: produto.id,
+        produto_nome: produto.nome,
+        tamanho: tamanho,
+        quantidade,
+        valor_total: total,
+      });
+      if (error) throw error;
+      setRegistrado(true);
+    } catch {
+      toast.error("Não foi possível registrar o pedido. Avise no WhatsApp.");
+    }
   }
 
   const linkPagamento = produto.link_pagamento ?? LINK_INFINITEPAY;
@@ -283,11 +312,29 @@ function CartaoProduto({ produto }: { produto: Produto }) {
                 O pagamento é feito na InfinitePay do Super CT: escolha Pix ou cartão de crédito na própria
                 tela de pagamento.
               </p>
+              <div className="space-y-2">
+                <input
+                  value={nome}
+                  onChange={(e) => setNome(e.target.value)}
+                  placeholder="Seu nome (para identificarmos o pedido)"
+                  className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+                <input
+                  value={telefone}
+                  onChange={(e) => setTelefone(e.target.value)}
+                  placeholder="Seu WhatsApp (opcional)"
+                  inputMode="tel"
+                  className="w-full rounded-md border border-border bg-card/60 px-3 py-2 text-sm outline-none focus:border-primary"
+                />
+              </div>
               <a
                 href={linkPagamento}
                 target="_blank"
                 rel="noreferrer"
-                onClick={() => setAguardando(true)}
+                onClick={() => {
+                  void registrarPedido();
+                  setAguardando(true);
+                }}
                 className="block w-full rounded-md bg-primary px-4 py-2.5 text-center font-display text-xs tracking-tight text-primary-foreground"
               >
                 IR PARA O PAGAMENTO — {brl(total)}
