@@ -1,9 +1,96 @@
 import { useEffect, useState } from "react";
-import { CircleDollarSign } from "lucide-react";
+import { CircleDollarSign, Copy, CreditCard, QrCode } from "lucide-react";
+import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
 import { formatarDataIso, formatarValor, hojeIso, mesExtensoRef, refMes, type Mensalidade } from "@/lib/mensalidade";
 import { normalizarForma } from "@/lib/planoContrato";
+import { PIX_CHAVE, PIX_CHAVE_EXIBICAO } from "@/lib/pix";
+
+/** Links de pagamento por cartão (InfinitePay) conforme o valor da mensalidade. */
+const LINKS_CARTAO: Record<number, string> = {
+  120: "https://checkout.infinitepay.io/super_ct/SqorqgV3fs",
+  135: "https://checkout.infinitepay.io/super_ct/Ttp4RL6jMX",
+  140: "https://checkout.infinitepay.io/super_ct/TkUZfnEtG2",
+  150: "https://checkout.infinitepay.io/super_ct/k4h5ASLivL",
+  160: "https://checkout.infinitepay.io/super_ct/T0V5ffiPYL",
+  185: "https://checkout.infinitepay.io/super_ct/nOxMYWvpqa",
+};
+
+function linkCartao(valor: number | null) {
+  if (!valor) return null;
+  return LINKS_CARTAO[Math.round(valor)] ?? null;
+}
+
+function DialogPagamento({ mensalidade, onFechar }: { mensalidade: Mensalidade; onFechar: () => void }) {
+  const link = linkCartao(mensalidade.valor);
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+      <button aria-label="Fechar" onClick={onFechar} className="absolute inset-0 bg-black/70" />
+      <div className="relative w-full max-w-sm rounded-lg border border-border bg-card p-5 shadow-xl">
+        <h3 className="font-display text-lg tracking-tight">PAGAR MENSALIDADE</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
+          {mesExtensoRef(mensalidade.referencia)} · {formatarValor(mensalidade.valor)}
+        </p>
+
+        <div className="mt-4 space-y-3">
+          <div className="rounded-md border border-border p-3">
+            <p className="flex items-center gap-2 font-display text-sm">
+              <QrCode className="size-4 text-primary" /> PIX
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Chave (telefone):</p>
+            <div className="mt-1 flex items-center gap-2">
+              <code className="flex-1 rounded border border-border bg-muted/40 px-2 py-1.5 font-mono text-sm">
+                {PIX_CHAVE_EXIBICAO}
+              </code>
+              <button
+                onClick={() => {
+                  void navigator.clipboard
+                    .writeText(PIX_CHAVE.replace("+55", ""))
+                    .then(() => toast.success("Chave Pix copiada!"))
+                    .catch(() => toast.error("Não foi possível copiar."));
+                }}
+                className="flex items-center gap-1 rounded-md bg-primary px-3 py-1.5 font-display text-xs text-primary-foreground"
+              >
+                <Copy className="size-3.5" /> COPIAR
+              </button>
+            </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              Valor: {formatarValor(mensalidade.valor)} · Envie o comprovante pelo WhatsApp.
+            </p>
+          </div>
+
+          <div className="rounded-md border border-border p-3">
+            <p className="flex items-center gap-2 font-display text-sm">
+              <CreditCard className="size-4 text-primary" /> CARTÃO
+            </p>
+            {link ? (
+              <a
+                href={link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 block rounded-md bg-primary px-3 py-2 text-center font-display text-xs text-primary-foreground"
+              >
+                PAGAR {formatarValor(mensalidade.valor)} NO CARTÃO
+              </a>
+            ) : (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Link de cartão não disponível para este valor. Fale com o professor pelo WhatsApp.
+              </p>
+            )}
+          </div>
+        </div>
+
+        <button
+          onClick={onFechar}
+          className="mt-4 w-full rounded-md border border-border py-2 font-display text-xs text-muted-foreground"
+        >
+          FECHAR
+        </button>
+      </div>
+    </div>
+  );
+}
 
 type AlunoSimples = { id: string; nome: string; matricula: string | null };
 type Contrato = { vencimento: string; forma: string; plano: string };
