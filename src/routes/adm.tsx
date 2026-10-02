@@ -187,6 +187,7 @@ function AdmPage() {
       <AppMidias />
 
       <ProdutosAdm />
+      <PedidosAdm />
 
 
     </Casca>
