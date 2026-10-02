@@ -10,6 +10,7 @@ import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
 import { AvisosResponsavel } from "@/components/AvisosResponsavel";
 import { PresencaResponsavel } from "@/components/PresencaResponsavel";
+import { MensalidadeResponsavel } from "@/components/MensalidadeResponsavel";
 import { supabase } from "@/integrations/supabase/client";
 
 const BUCKET = "documentos-alunos";
@@ -980,6 +981,8 @@ function Painel({ session }: { session: Session }) {
       </section>
 
       <AvisosResponsavel uid={uid} />
+
+      <MensalidadeResponsavel uid={uid} alunos={alunos} />
 
       <PresencaResponsavel uid={uid} alunos={alunos} />
 
