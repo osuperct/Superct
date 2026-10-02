@@ -9,6 +9,7 @@ import { definirAcessoConta, definirAprovacaoConta, excluirConta, listarAcessosC
 import { AppMidias } from "@/components/AppMidias";
 import { ContratosAdm } from "@/components/ContratosAdm";
 import { ProdutosAdm } from "@/components/ProdutosAdm";
+import { PedidosAdm } from "@/components/PedidosAdm";
 import { supabase } from "@/integrations/supabase/client";
 import logoAdm from "@/assets/super-ct-logo-adm.jpg.asset.json";
 import { assetUrl } from "@/lib/assetUrl";
