@@ -141,6 +141,9 @@ function CartaoProduto({ produto }: { produto: Produto }) {
   const [quantidade, setQuantidade] = useState(1);
   const [pagando, setPagando] = useState(false);
   const [aguardando, setAguardando] = useState(false);
+  const [nome, setNome] = useState("");
+  const [telefone, setTelefone] = useState("");
+  const [registrado, setRegistrado] = useState(false);
 
 
   const total = produto.preco * quantidade;
@@ -154,6 +157,32 @@ function CartaoProduto({ produto }: { produto: Produto }) {
       return;
     }
     setPagando(true);
+  }
+
+  /** Grava o pedido na área ADM (produto, tamanho, quantidade e contato). */
+  async function registrarPedido() {
+    if (registrado) return;
+    if (nome.trim().length < 2) {
+      toast.error("Informe seu nome para registrarmos o pedido.");
+      return;
+    }
+    try {
+      const { data: sessao } = await supabase.auth.getUser();
+      const { error } = await supabase.from("pedidos_loja").insert({
+        user_id: sessao.user?.id ?? null,
+        nome: nome.trim(),
+        telefone: telefone.trim() || null,
+        produto_id: produto.id,
+        produto_nome: produto.nome,
+        tamanho: tamanho,
+        quantidade,
+        valor_total: total,
+      });
+      if (error) throw error;
+      setRegistrado(true);
+    } catch {
+      toast.error("Não foi possível registrar o pedido. Avise no WhatsApp.");
+    }
   }
 
   const linkPagamento = produto.link_pagamento ?? LINK_INFINITEPAY;
