@@ -113,7 +113,17 @@ function situacao(m: Mensalidade, venc: string) {
   return { texto: "A VENCER", cls: "bg-primary/15 text-primary border-primary/40" };
 }
 
-export function MensalidadeResponsavel({ uid, alunos }: { uid: string; alunos: AlunoSimples[] }) {
+export function MensalidadeResponsavel({
+  uid,
+  alunos,
+  compacto = false,
+  onAtraso,
+}: {
+  uid: string;
+  alunos: AlunoSimples[];
+  compacto?: boolean;
+  onAtraso?: (atrasada: boolean) => void;
+}) {
   const [mens, setMens] = useState<Mensalidade[]>([]);
   const [contratos, setContratos] = useState<Record<string, Contrato>>({});
   const [aba, setAba] = useState<"atual" | "pagas">("atual");
@@ -149,14 +159,25 @@ export function MensalidadeResponsavel({ uid, alunos }: { uid: string; alunos: A
     })();
   }, [uid]);
 
-  if (alunos.length === 0) return null;
   const mesAtual = refMes();
+  const temAtraso = alunos.some((al) => {
+    const dia = diaVencimento(contratos[al.id]?.vencimento ?? "");
+    return mens.some(
+      (m) => m.aluno_id === al.id && !m.pago && m.ativo && hojeIso() > dataVencimento(m.referencia, dia),
+    );
+  });
+
+  useEffect(() => {
+    onAtraso?.(temAtraso);
+  }, [onAtraso, temAtraso]);
+
+  if (alunos.length === 0) return null;
 
   return (
-    <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+    <section className={compacto ? "pb-4" : "mt-4 rounded-lg border border-border bg-card/40 p-4"}>
+      {!compacto && <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
         <CircleDollarSign className="size-5 text-primary" /> MENSALIDADE
-      </h2>
+      </h2>}
       <div className="mt-3 flex gap-2">
         {(["atual", "pagas"] as const).map((a) => (
           <button
@@ -241,7 +262,9 @@ export function MensalidadeResponsavel({ uid, alunos }: { uid: string; alunos: A
                   <div>
                     <dt className="text-muted-foreground">Situação</dt>
                     <dd>
-                      <span className={`rounded border px-2 py-0.5 font-mono text-[10px] ${sit.cls}`}>{sit.texto}</span>
+                      <span className={`rounded border px-2 py-0.5 font-mono text-[10px] ${sit.cls} ${sit.texto === "EM ATRASO" ? "animate-urgent-blink motion-reduce:animate-none" : ""}`}>
+                        {sit.texto}{sit.texto === "EM ATRASO" ? " !" : ""}
+                      </span>
                     </dd>
                   </div>
                 )}
@@ -249,7 +272,7 @@ export function MensalidadeResponsavel({ uid, alunos }: { uid: string; alunos: A
               {atual && !atual.pago && (
                 <button
                   onClick={() => setPagando(atual)}
-                  className="mt-3 w-full rounded-md bg-primary py-2 font-display text-xs text-primary-foreground"
+                  className={`mt-3 w-full rounded-md bg-primary py-2 font-display text-xs text-primary-foreground ${sit?.texto === "EM ATRASO" ? "animate-urgent-blink motion-reduce:animate-none" : ""}`}
                 >
                   PAGAR {formatarValor(atual.valor)}
                 </button>

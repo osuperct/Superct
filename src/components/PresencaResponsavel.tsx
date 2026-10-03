@@ -7,7 +7,7 @@ import { diasDeAula, hojeDia, isoDia, type Presenca } from "@/lib/presenca";
 
 type AlunoSimples = { id: string; nome: string };
 
-export function PresencaResponsavel({ uid, alunos }: { uid: string; alunos: AlunoSimples[] }) {
+export function PresencaResponsavel({ uid, alunos, compacto = false }: { uid: string; alunos: AlunoSimples[]; compacto?: boolean }) {
   const agora = new Date();
   const [ano, setAno] = useState(agora.getFullYear());
   const [mes, setMes] = useState(agora.getMonth() + 1);
@@ -41,11 +41,11 @@ export function PresencaResponsavel({ uid, alunos }: { uid: string; alunos: Alun
   if (alunos.length === 0) return null;
 
   return (
-    <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
-      <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-        <ClipboardCheck className="size-4 text-primary" /> PRESENÇA DO ALUNO
-      </h2>
-      <p className="mt-1 text-xs text-muted-foreground">
+    <section className={compacto ? "pb-4" : "mt-4 rounded-lg border border-border bg-card/40 p-4"}>
+      {!compacto && <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+        <ClipboardCheck className="size-4 text-primary" /> FREQUÊNCIA — LISTA DE CHAMADA
+      </h2>}
+      <p className={compacto ? "text-xs text-muted-foreground" : "mt-1 text-xs text-muted-foreground"}>
         Chamada do mês, de segunda a sexta. Dia azul = presente. Dia vazio = falta.
       </p>
 

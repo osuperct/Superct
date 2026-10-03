@@ -13,7 +13,15 @@ import {
   marcarLido,
 } from "@/lib/avisos";
 
-export function AvisosResponsavel({ uid }: { uid: string }) {
+export function AvisosResponsavel({
+  uid,
+  compacto = false,
+  onNaoLidos,
+}: {
+  uid: string;
+  compacto?: boolean;
+  onNaoLidos?: (quantidade: number) => void;
+}) {
   const [lista, setLista] = useState<Aviso[]>([]);
   const [lidos, setLidos] = useState<Set<string>>(new Set());
   const [abertos, setAbertos] = useState<Set<string>>(new Set());
@@ -53,6 +61,10 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
 
   const naoLidos = lista.filter((a) => !lidos.has(a.id)).length;
 
+  useEffect(() => {
+    onNaoLidos?.(naoLidos);
+  }, [naoLidos, onNaoLidos]);
+
   async function marcar(id: string) {
     setLidos((atual) => new Set(atual).add(id));
     await marcarLido(uid, id);
@@ -79,18 +91,18 @@ export function AvisosResponsavel({ uid }: { uid: string }) {
   const porMes = agruparPorMes(lista);
 
   return (
-    <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
-      <div className="flex items-start justify-between gap-2">
+    <section className={compacto ? "pb-4" : "mt-4 rounded-lg border border-border bg-card/40 p-4"}>
+      {!compacto && <div className="flex items-start justify-between gap-2">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <BellRing className="size-4 text-primary" /> QUADRO DE AVISOS
         </h2>
         {naoLidos > 0 && (
-          <span className="shrink-0 rounded-full bg-primary px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary-foreground">
+          <span className="animate-blink-pin shrink-0 rounded-full bg-primary px-2 py-1 font-mono text-[9px] uppercase tracking-widest text-primary-foreground motion-reduce:animate-none">
             {naoLidos} nova{naoLidos > 1 ? "s" : ""}
           </span>
         )}
-      </div>
-      <p className="mt-1 text-xs text-muted-foreground">
+      </div>}
+      <p className={compacto ? "text-xs text-muted-foreground" : "mt-1 text-xs text-muted-foreground"}>
         Mensagens enviadas pelo Super CT para todos os responsáveis.
       </p>
 

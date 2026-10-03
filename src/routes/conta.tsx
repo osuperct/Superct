@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { Eye, EyeOff, GraduationCap, Paperclip, Send, ShieldCheck, Upload, UserPlus } from "lucide-react";
+import { BellRing, CircleDollarSign, ClipboardCheck, GraduationCap, LogOut, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -11,6 +11,8 @@ import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
 import { AvisosResponsavel } from "@/components/AvisosResponsavel";
 import { PresencaResponsavel } from "@/components/PresencaResponsavel";
 import { MensalidadeResponsavel } from "@/components/MensalidadeResponsavel";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 const BUCKET = "documentos-alunos";
@@ -616,6 +618,10 @@ function Painel({ session }: { session: Session }) {
   const [enviandoArquivo, setEnviandoArquivo] = useState(false);
   const inputArquivo = useRef<HTMLInputElement>(null);
   const [mostrarDocs, setMostrarDocs] = useState(false);
+  const [topicosAbertos, setTopicosAbertos] = useState<string[]>([]);
+  const [avisosNaoLidos, setAvisosNaoLidos] = useState(0);
+  const [mensalidadeAtrasada, setMensalidadeAtrasada] = useState(false);
+  const [documentosNovos, setDocumentosNovos] = useState(0);
   const [avisoFechado, setAvisoFechado] = useState(false);
   const [alunoDocsAberto, setAlunoDocsAberto] = useState<string | null>(null);
 
@@ -672,6 +678,23 @@ function Painel({ session }: { session: Session }) {
   useEffect(() => {
     void recarregar();
   }, [recarregar]);
+
+  useEffect(() => {
+    if (!docsCarregados) return;
+    const chave = `documentos-vistos-${uid}`;
+    const vistoEm = window.localStorage.getItem(chave) ?? "";
+    setDocumentosNovos(
+      documentos.filter((d) => d.enviado_por_professor && d.liberado && d.created_at > vistoEm).length,
+    );
+  }, [docsCarregados, documentos, uid]);
+
+  function alterarTopicos(valores: string[]) {
+    setTopicosAbertos(valores);
+    if (valores.includes("documentos")) {
+      window.localStorage.setItem(`documentos-vistos-${uid}`, new Date().toISOString());
+      setDocumentosNovos(0);
+    }
+  }
 
   useEffect(() => {
     let ativo = true;
@@ -834,174 +857,55 @@ function Painel({ session }: { session: Session }) {
       )}
       <LembreteAcesso emailLogado={session.user.email} />
 
-      <div className="rounded-md border border-border bg-card/50 p-3">
-        <p className="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">Conectado como</p>
-        <p className="text-sm">{session.user.email}</p>
-      </div>
+      <Accordion type="multiple" value={topicosAbertos} onValueChange={alterarTopicos} className="mt-4 space-y-2">
+        <AccordionItem value="conectado" className="rounded-md border border-border bg-card/50 px-4">
+          <AccordionTrigger className="font-display text-base tracking-tight hover:no-underline">
+            <span className="flex min-w-0 items-center gap-2"><Mail className="size-4 shrink-0 text-primary" /> CONECTADO COMO</span>
+          </AccordionTrigger>
+          <AccordionContent>
+            <p className="break-all text-sm">{session.user.email}</p>
+            {ehProfessor && <Link to="/professor" className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm text-primary-foreground"><GraduationCap className="size-4" /> ÁREA DO PROFESSOR</Link>}
+            {ehAdm && <Link to="/adm" className="mt-2 flex items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/5 px-4 py-3 font-display text-sm text-primary"><ShieldCheck className="size-4" /> ÁREA ADM</Link>}
+            <Button type="button" variant="outline" className="mt-3 w-full" onClick={() => void supabase.auth.signOut()}><LogOut className="size-4" /> SAIR</Button>
+          </AccordionContent>
+        </AccordionItem>
 
-      {ehProfessor && (
-          <Link
-            to="/professor"
-            className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
-          >
-            <GraduationCap className="size-4" /> ÁREA DO PROFESSOR
-          </Link>
-      )}
-      {ehAdm && (
-          <Link
-            to="/adm"
-            className="mt-2 flex items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/5 px-4 py-3 font-display text-sm tracking-tight text-primary"
-          >
-            <ShieldCheck className="size-4" /> ÁREA ADM
-          </Link>
-      )}
+        <AccordionItem value="avisos" className="rounded-md border border-border bg-card/50 px-4">
+          <AccordionTrigger className="font-display text-base tracking-tight hover:no-underline">
+            <span className="flex min-w-0 items-center gap-2"><BellRing className="size-4 shrink-0 text-primary" /> QUADRO DE AVISOS {avisosNaoLidos > 0 && <span className="animate-blink-pin rounded-full bg-primary px-2 py-0.5 font-mono text-[9px] text-primary-foreground motion-reduce:animate-none">{avisosNaoLidos}</span>}</span>
+          </AccordionTrigger>
+          <AccordionContent><AvisosResponsavel uid={uid} compacto onNaoLidos={setAvisosNaoLidos} /></AccordionContent>
+        </AccordionItem>
 
+        <AccordionItem value="mensalidade" className={`rounded-md border bg-card/50 px-4 ${mensalidadeAtrasada ? "border-accent-red/60" : "border-border"}`}>
+          <AccordionTrigger className={`font-display text-base tracking-tight hover:no-underline ${mensalidadeAtrasada ? "animate-urgent-blink text-accent-red motion-reduce:animate-none" : ""}`}>
+            <span className="flex min-w-0 items-center gap-2"><CircleDollarSign className="size-4 shrink-0 text-primary" /> MENSALIDADE {mensalidadeAtrasada && <span aria-label="Mensalidade em atraso">!</span>}</span>
+          </AccordionTrigger>
+          <AccordionContent><MensalidadeResponsavel uid={uid} alunos={alunos} compacto onAtraso={setMensalidadeAtrasada} /></AccordionContent>
+        </AccordionItem>
 
-      <section className="mt-5 rounded-lg border border-border bg-card/40 p-4">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <UserPlus className="size-4 text-primary" /> ALUNOS E DOCUMENTOS
-        </h2>
-        <p className="mt-1 text-xs text-muted-foreground">
-          O aluno entra nesta lista quando o contrato dele é preenchido e assinado. Abaixo de cada nome ficam
-          todos os documentos daquele aluno.
-        </p>
-        <ul className="mt-3 space-y-3">
-          {alunos.map((a) => {
-            const docsAluno = documentos.filter((d) => d.aluno_id === a.id);
-            const doAluno = entregues.filter((e) => e.aluno_id === a.id);
-            const faltando = (["contrato", "ficha"] as const).filter(
-              (t) => !doAluno.some((e) => e.tipo === t),
-            );
+        <AccordionItem value="frequencia" className="rounded-md border border-border bg-card/50 px-4">
+          <AccordionTrigger className="font-display text-base tracking-tight hover:no-underline">
+            <span className="flex min-w-0 items-center gap-2"><ClipboardCheck className="size-4 shrink-0 text-primary" /> FREQUÊNCIA — LISTA DE CHAMADA</span>
+          </AccordionTrigger>
+          <AccordionContent><PresencaResponsavel uid={uid} alunos={alunos} compacto /></AccordionContent>
+        </AccordionItem>
 
-            return (
-              <li key={a.id} className="rounded-md border border-border bg-background/40 p-3">
-                <div className="flex items-start gap-2">
-                  <span className="min-w-0 flex-1 text-sm">
-                    {a.nome}
-                    {a.idade ? ` — ${a.idade} anos` : ""}
-                    {a.matricula && (
-                      <span className="ml-2 rounded border border-primary/60 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-primary">
-                        Matrícula {a.matricula}
-                      </span>
-                    )}
-                  </span>
-                </div>
-                <div className="mt-2 flex items-center justify-between gap-2">
-                  <span className="text-xs text-muted-foreground">
-                    {docsAluno.length} {docsAluno.length === 1 ? "arquivo" : "arquivos"}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setAlunoDocsAberto(alunoDocsAberto === a.id ? null : a.id)}
-                    className="flex items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
-                  >
-                    {alunoDocsAberto === a.id ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
-                    {alunoDocsAberto === a.id ? "OCULTAR" : "VER ARQUIVOS"}
-                  </button>
-                </div>
-                {alunoDocsAberto === a.id && (
-                  <ul className="mt-2 space-y-1">
-                    {docsAluno.map((d) => (
-                      <li key={d.id} className="flex items-center justify-between gap-2">
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate font-mono text-[10px] uppercase tracking-widest text-primary">
-                            {DESCRICAO_DOC[d.tipo] ?? "Documento anexado"}
-                          </span>
-                          <span className="block truncate text-[11px] text-muted-foreground">
-                            {d.nome_arquivo} • {new Date(d.created_at).toLocaleDateString("pt-BR")}
-                            {d.enviado_por_professor ? " • enviado pelo professor" : ""}
-                          </span>
-                          <span
-                            className={`mt-0.5 block font-mono text-[9px] uppercase tracking-widest ${
-                              d.liberado ? "text-primary" : "text-muted-foreground"
-                            }`}
-                          >
-                            {d.liberado ? "Conferido" : "Aguardando liberação"}
-                          </span>
-                        </span>
-                        {d.liberado && (
-                          <button
-                            type="button"
-                            onClick={() => abrir(d)}
-                            className="shrink-0 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase"
-                          >
-                            Ver
-                          </button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                {faltando.length > 0 && (
-                  <div className="mt-3 rounded-md border border-primary/60 bg-primary/10 p-3">
-                    <p className="text-[11px]">
-                      Falta concluir o preenchimento de {a.nome}:{" "}
-                      <span className="text-primary">
-                        {faltando.map((t) => (t === "contrato" ? "contrato" : "ficha de anamnese / PAR-Q")).join(" e ")}
-                      </span>
-                      .
-                    </p>
-                    {faltando.map((t) => (
-                      <Link
-                        key={t}
-                        to="/documento/$tipo"
-                        params={{ tipo: t }}
-                        className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-3 py-2 font-display text-xs tracking-tight text-primary-foreground"
-                      >
-                        {t === "contrato" ? "PREENCHER O CONTRATO AGORA" : "PREENCHER A FICHA / PAR-Q AGORA"}
-                        <Send className="size-3 shrink-0" />
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </li>
-            );
-          })}
-
-          {alunos.length === 0 && (
-            <li className="rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">
-              Nenhum aluno na lista. Preencha o contrato do aluno para incluí-lo aqui.
-            </li>
-          )}
-        </ul>
-        <Link
-          to="/documento/$tipo"
-          params={{ tipo: "contrato" }}
-          className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
-        >
-          PREENCHER CONTRATO DE UM ALUNO <Send className="size-4 shrink-0" />
-        </Link>
-        <Link
-          to="/documento/$tipo"
-          params={{ tipo: "ficha" }}
-          className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
-        >
-          PREENCHER FICHA PAR-Q DO ALUNO <Send className="size-4 shrink-0" />
-        </Link>
-      </section>
-
-      <AvisosResponsavel uid={uid} />
-
-      <MensalidadeResponsavel uid={uid} alunos={alunos} />
-
-      <PresencaResponsavel uid={uid} alunos={alunos} />
-
-      <AvaliacaoResponsavel uid={uid} alunos={alunos} />
-
-      {(
-        <section className="mt-4 rounded-lg border border-border bg-card/40 p-4">
+        <AccordionItem value="documentos" className={`rounded-md border bg-card/50 px-4 ${documentosNovos > 0 ? "border-primary/60" : "border-border"}`}>
+          <AccordionTrigger className={`font-display text-base tracking-tight hover:no-underline ${documentosNovos > 0 ? "animate-blink-pin motion-reduce:animate-none" : ""}`}>
+            <span className="flex min-w-0 items-center gap-2"><Paperclip className="size-4 shrink-0 text-primary" /> DOCUMENTOS DO ALUNO {documentosNovos > 0 && <span className="rounded-full bg-primary px-2 py-0.5 font-mono text-[9px] text-primary-foreground">{documentosNovos} NOVO{documentosNovos > 1 ? "S" : ""}</span>}</span>
+          </AccordionTrigger>
+          <AccordionContent>
+        <section>
 
           <div className="flex items-start justify-between gap-2">
-            <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-              <Paperclip className="size-4 text-primary" /> DOCUMENTOS DO ALUNO ({documentos.length})
-            </h2>
+            <h2 className="font-display text-sm tracking-tight">{documentos.length} {documentos.length === 1 ? "ARQUIVO" : "ARQUIVOS"}</h2>
             {documentos.length > 0 && (
               <button
                 type="button"
                 onClick={() => setMostrarDocs(!mostrarDocs)}
-                className="flex shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                    className="flex shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
               >
-                {mostrarDocs ? <EyeOff className="size-3" /> : <Eye className="size-3" />}
                 {mostrarDocs ? "OCULTAR" : "VER ARQUIVOS"}
               </button>
             )}
@@ -1090,8 +994,14 @@ function Painel({ session }: { session: Session }) {
           {documentos.length === 0 && (
             <p className="mt-4 text-sm text-muted-foreground">Nenhum documento anexado ainda.</p>
           )}
+          <Link to="/documento/$tipo" params={{ tipo: "contrato" }} className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm text-primary-foreground">PREENCHER CONTRATO <Send className="size-4" /></Link>
+          <Link to="/documento/$tipo" params={{ tipo: "ficha" }} className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm text-primary-foreground">PREENCHER FICHA PAR-Q <Send className="size-4" /></Link>
         </section>
-      )}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      <AvaliacaoResponsavel uid={uid} alunos={alunos} />
 
     </div>
   );
