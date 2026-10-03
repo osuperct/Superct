@@ -125,6 +125,17 @@
   }
 }
 
+@keyframes urgentBlink {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 7px var(--accent-red));
+  }
+  50% {
+    opacity: 0.45;
+    filter: drop-shadow(0 0 1px var(--accent-red));
+  }
+}
+
 @utility animate-neon {
   animation: neonPulse 2s infinite ease-in-out;
 }
@@ -143,6 +154,10 @@
 
 @utility animate-blink-pin {
   animation: blinkPin 1.2s infinite ease-in-out;
+}
+
+@utility animate-urgent-blink {
+  animation: urgentBlink 1s infinite ease-in-out;
 }
 
 @utility no-scrollbar {
