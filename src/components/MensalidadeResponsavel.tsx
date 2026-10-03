@@ -117,6 +117,7 @@ export function MensalidadeResponsavel({ uid, alunos }: { uid: string; alunos: A
   const [mens, setMens] = useState<Mensalidade[]>([]);
   const [contratos, setContratos] = useState<Record<string, Contrato>>({});
   const [aba, setAba] = useState<"atual" | "pagas">("atual");
+  const [pagando, setPagando] = useState<Mensalidade | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -245,10 +246,19 @@ export function MensalidadeResponsavel({ uid, alunos }: { uid: string; alunos: A
                   </div>
                 )}
               </dl>
+              {atual && !atual.pago && (
+                <button
+                  onClick={() => setPagando(atual)}
+                  className="mt-3 w-full rounded-md bg-primary py-2 font-display text-xs text-primary-foreground"
+                >
+                  PAGAR {formatarValor(atual.valor)}
+                </button>
+              )}
             </div>
           );
         })}
       </div>
+      {pagando && <DialogPagamento mensalidade={pagando} onFechar={() => setPagando(null)} />}
     </section>
   );
 }
