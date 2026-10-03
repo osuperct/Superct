@@ -159,7 +159,6 @@ export function MensalidadeResponsavel({
     })();
   }, [uid]);
 
-  if (alunos.length === 0) return null;
   const mesAtual = refMes();
   const temAtraso = alunos.some((al) => {
     const dia = diaVencimento(contratos[al.id]?.vencimento ?? "");
@@ -171,6 +170,8 @@ export function MensalidadeResponsavel({
   useEffect(() => {
     onAtraso?.(temAtraso);
   }, [onAtraso, temAtraso]);
+
+  if (alunos.length === 0) return null;
 
   return (
     <section className={compacto ? "pb-4" : "mt-4 rounded-lg border border-border bg-card/40 p-4"}>
