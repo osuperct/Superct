@@ -681,6 +681,10 @@ function Painel({ session }: { session: Session }) {
   useEffect(() => {
     if (!docsCarregados) return;
     const chave = `documentos-vistos-${uid}`;
+    if (window.localStorage.getItem(chave) === null) {
+      window.localStorage.setItem(chave, JSON.stringify(documentos.filter((d) => d.liberado).map((d) => d.id)));
+      return;
+    }
     let vistos: string[] = [];
     try {
       vistos = JSON.parse(window.localStorage.getItem(chave) ?? "[]") as string[];
