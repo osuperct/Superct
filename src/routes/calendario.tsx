@@ -29,6 +29,8 @@ export const Route = createFileRoute("/calendario")({
         property: "og:description",
         content: "Veja os feriados, emendas e recessos do Super CT mês a mês.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CalendarioPage,

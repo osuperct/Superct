@@ -34,6 +34,8 @@ export const Route = createFileRoute("/conta")({
         property: "og:description",
         content: "Cadastro do responsável, documentos do aluno e formulários online do Super CT.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ContaPage,
