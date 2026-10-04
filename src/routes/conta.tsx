@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { BellRing, CircleDollarSign, ClipboardCheck, GraduationCap, LogOut, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
+import { BellRing, CircleDollarSign, ClipboardCheck, Eye, EyeOff, GraduationCap, LogOut, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -34,6 +34,8 @@ export const Route = createFileRoute("/conta")({
         property: "og:description",
         content: "Cadastro do responsável, documentos do aluno e formulários online do Super CT.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ContaPage,
@@ -623,7 +625,6 @@ function Painel({ session }: { session: Session }) {
   const [mensalidadeAtrasada, setMensalidadeAtrasada] = useState(false);
   const [documentosNovos, setDocumentosNovos] = useState(0);
   const [avisoFechado, setAvisoFechado] = useState(false);
-  const [alunoDocsAberto, setAlunoDocsAberto] = useState<string | null>(null);
 
   const [entregues, setEntregues] = useState<{ tipo: string; aluno_id: string | null }[]>([]);
   const [docsCarregados, setDocsCarregados] = useState(false);
@@ -682,16 +683,26 @@ function Painel({ session }: { session: Session }) {
   useEffect(() => {
     if (!docsCarregados) return;
     const chave = `documentos-vistos-${uid}`;
-    const vistoEm = window.localStorage.getItem(chave) ?? "";
+    if (window.localStorage.getItem(chave) === null) {
+      window.localStorage.setItem(chave, JSON.stringify(documentos.filter((d) => d.liberado).map((d) => d.id)));
+      return;
+    }
+    let vistos: string[] = [];
+    try {
+      vistos = JSON.parse(window.localStorage.getItem(chave) ?? "[]") as string[];
+    } catch {
+      vistos = [];
+    }
     setDocumentosNovos(
-      documentos.filter((d) => d.enviado_por_professor && d.liberado && d.created_at > vistoEm).length,
+      documentos.filter((d) => d.enviado_por_professor && d.liberado && !vistos.includes(d.id)).length,
     );
   }, [docsCarregados, documentos, uid]);
 
   function alterarTopicos(valores: string[]) {
     setTopicosAbertos(valores);
     if (valores.includes("documentos")) {
-      window.localStorage.setItem(`documentos-vistos-${uid}`, new Date().toISOString());
+      setMostrarDocs(true);
+      window.localStorage.setItem(`documentos-vistos-${uid}`, JSON.stringify(documentos.filter((d) => d.liberado).map((d) => d.id)));
       setDocumentosNovos(0);
     }
   }
@@ -874,14 +885,14 @@ function Painel({ session }: { session: Session }) {
           <AccordionTrigger className="font-display text-base tracking-tight hover:no-underline">
             <span className="flex min-w-0 items-center gap-2"><BellRing className="size-4 shrink-0 text-primary" /> QUADRO DE AVISOS {avisosNaoLidos > 0 && <span className="animate-blink-pin rounded-full bg-primary px-2 py-0.5 font-mono text-[9px] text-primary-foreground motion-reduce:animate-none">{avisosNaoLidos}</span>}</span>
           </AccordionTrigger>
-          <AccordionContent><AvisosResponsavel uid={uid} compacto onNaoLidos={setAvisosNaoLidos} /></AccordionContent>
+          <AccordionContent forceMount className="data-[state=closed]:hidden"><AvisosResponsavel uid={uid} compacto onNaoLidos={setAvisosNaoLidos} /></AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="mensalidade" className={`rounded-md border bg-card/50 px-4 ${mensalidadeAtrasada ? "border-accent-red/60" : "border-border"}`}>
           <AccordionTrigger className={`font-display text-base tracking-tight hover:no-underline ${mensalidadeAtrasada ? "animate-urgent-blink text-accent-red motion-reduce:animate-none" : ""}`}>
             <span className="flex min-w-0 items-center gap-2"><CircleDollarSign className="size-4 shrink-0 text-primary" /> MENSALIDADE {mensalidadeAtrasada && <span aria-label="Mensalidade em atraso">!</span>}</span>
           </AccordionTrigger>
-          <AccordionContent><MensalidadeResponsavel uid={uid} alunos={alunos} compacto onAtraso={setMensalidadeAtrasada} /></AccordionContent>
+          <AccordionContent forceMount className="data-[state=closed]:hidden"><MensalidadeResponsavel uid={uid} alunos={alunos} compacto onAtraso={setMensalidadeAtrasada} /></AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="frequencia" className="rounded-md border border-border bg-card/50 px-4">
@@ -904,7 +915,7 @@ function Painel({ session }: { session: Session }) {
               <button
                 type="button"
                 onClick={() => setMostrarDocs(!mostrarDocs)}
-                    className="flex shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
+                className="flex shrink-0 items-center gap-1 rounded-md border border-border px-2 py-1 font-mono text-[9px] uppercase text-muted-foreground"
               >
                 {mostrarDocs ? "OCULTAR" : "VER ARQUIVOS"}
               </button>
