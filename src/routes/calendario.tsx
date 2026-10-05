@@ -7,6 +7,8 @@ import { listarTurmas, type Turma } from "@/lib/turmas";
 import { assetUrl } from "@/lib/assetUrl";
 import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
 import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
+import semanaSuperCt from "@/assets/semana-super-ct.jpg.asset.json";
+
 
 const turmasPadrao = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
@@ -202,6 +204,20 @@ function CalendarioPage() {
         </section>
 
         <section className="mt-8">
+          <h2 className="font-display text-xl tracking-tight">SEMANA SUPER CT</h2>
+          <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Movimento, diversão, evolução — sempre!
+          </p>
+          <img
+            src={assetUrl(semanaSuperCt)}
+            alt="Arte da semana do Super CT: segunda com step e esportes, terça funcional, quarta ginástica e escalada, quinta circuitos e desafios e sexta brincadeiras"
+            loading="lazy"
+            className="mt-3 w-full rounded-lg border border-border"
+          />
+        </section>
+
+        <section className="mt-8">
+
           <div className="mb-2 flex items-center gap-2">
             <Clock className="size-4 text-primary" />
             <h2 className="font-display text-xl tracking-tight">TURMAS E HORÁRIOS</h2>
