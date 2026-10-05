@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight, CalendarDays, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, CalendarDays, Clock, Zap } from "lucide-react";
 
 import { DIAS_SEMANA, MESES, diaExtenso, marcacoesDoAno } from "@/lib/feriados";
 import { listarTurmas, type Turma } from "@/lib/turmas";
@@ -86,7 +86,7 @@ function CalendarioPage() {
         <section className="mt-6">
 
           <h2 className="flex items-center gap-2 font-display text-3xl tracking-tighter">
-            <CalendarDays className="size-6 text-primary" />
+            <Zap className="size-6 text-primary" />
             SEMANA <span className="text-primary">SUPER CT</span>
           </h2>
           <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
