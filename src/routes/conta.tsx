@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { BellRing, CircleDollarSign, ClipboardCheck, Eye, EyeOff, GraduationCap, LogOut, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
+import { BellRing, CircleDollarSign, ClipboardCheck, Eye, EyeOff, GraduationCap, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -874,8 +874,8 @@ function Painel({ session }: { session: Session }) {
           <p className="mt-1 break-all text-sm">{session.user.email}</p>
           {ehProfessor && <Link to="/professor" className="mt-3 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm text-primary-foreground"><GraduationCap className="size-4" /> ÁREA DO PROFESSOR</Link>}
           {ehAdm && <Link to="/adm" className="mt-2 flex items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/5 px-4 py-3 font-display text-sm text-primary"><ShieldCheck className="size-4" /> ÁREA ADM</Link>}
-          <Button type="button" variant="outline" className="mt-3 w-full" onClick={() => void supabase.auth.signOut()}><LogOut className="size-4" /> SAIR</Button>
         </div>
+
 
 
         <AccordionItem value="avisos" className="rounded-md border border-border bg-card/50 px-4">
