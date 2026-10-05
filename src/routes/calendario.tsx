@@ -100,7 +100,16 @@ function CalendarioPage() {
           />
         </section>
 
+        <h1 className="mt-8 flex items-center gap-2 font-display text-3xl tracking-tighter">
+          <CalendarDays className="size-6 text-primary" />
+          CALENDÁRIO <span className="text-primary">{ano}</span>
+        </h1>
+        <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          Mês vigente: {MESES[hoje.getMonth()]} de {anoVigente}
+        </p>
+
         <section className="mt-6 rounded-lg border border-border bg-card/60 p-4">
+
 
           <header className="flex items-center justify-between">
             <button
