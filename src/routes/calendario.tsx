@@ -7,6 +7,8 @@ import { listarTurmas, type Turma } from "@/lib/turmas";
 import { assetUrl } from "@/lib/assetUrl";
 import mascoteMenino from "@/assets/mascote-menino.jpg.asset.json";
 import mascoteMenina from "@/assets/mascote-menina.jpg.asset.json";
+import semanaSuperCt from "@/assets/semana-super-ct.jpg.asset.json";
+
 
 const turmasPadrao = [
   { turma: "1", horario: "08:30 às 10:30", idade: "04 a 12 anos", dias: "Segunda a sexta" },
