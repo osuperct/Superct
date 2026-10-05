@@ -79,12 +79,14 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
   const media = mediaNotas(notas);
 
   const recente = lista[0] ?? null;
-  const chaveVisto = recente ? `avaliacao-vista-${recente.id}` : "";
+  const chaveVisto = recente ? `avaliacao-vista-${uid}-${recente.referencia}` : "";
   const [aviso, setAviso] = useState(false);
   useEffect(() => {
     if (demo || !recente) return;
     try {
-      if (!localStorage.getItem(chaveVisto)) setAviso(true);
+      const mesJaLido = localStorage.getItem(chaveVisto);
+      const avaliacaoJaLida = localStorage.getItem(`avaliacao-vista-${recente.id}`);
+      setAviso(!mesJaLido && !avaliacaoJaLida);
     } catch {
       /* ignore */
     }
@@ -93,6 +95,9 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
   function fecharAviso(abrir: boolean) {
     try {
       localStorage.setItem(chaveVisto, "1");
+      for (const avaliacao of lista.filter((item) => item.referencia === recente?.referencia)) {
+        localStorage.setItem(`avaliacao-vista-${avaliacao.id}`, "1");
+      }
     } catch {
       /* ignore */
     }
@@ -124,7 +129,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
           </p>
           <div className="mt-4 flex flex-col gap-2">
             <Button onClick={() => fecharAviso(true)}>VER AVALIAÇÃO</Button>
-            <Button variant="ghost" onClick={() => fecharAviso(false)}>FECHAR</Button>
+            <Button variant="ghost" onClick={() => fecharAviso(false)}>MARCAR COMO LIDA</Button>
           </div>
         </div>
       </div>
