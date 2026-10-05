@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { BellRing, CircleDollarSign, ClipboardCheck, Eye, EyeOff, GraduationCap, LogOut, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
+import { BellRing, CircleDollarSign, ClipboardCheck, Eye, EyeOff, GraduationCap, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
