@@ -85,7 +85,6 @@ export const CAMPOS_CONTRATO: CampoDoc[] = [
       "Plano semestral 6x de R$150,00",
     ],
   },
-  { chave: "vencimento", rotulo: "Dia de vencimento", obrigatorio: true, opcoes: ["5", "10", "20", "25"] },
   { chave: "forma_pagamento", rotulo: "Forma de pagamento", opcoes: ["Pix", "Dinheiro", "Cartão", "Cartão Recorrente (link)"] },
   { chave: "observacoes", rotulo: "Observações", longo: true },
 ];
@@ -112,7 +111,7 @@ export const CLAUSULAS_CONTRATO: { titulo: string; texto: string }[] = [
   {
     titulo: "CLÁUSULA 4ª — VALORES, MATRÍCULA E FORMA DE PAGAMENTO",
     texto:
-      "4.1. A taxa de matrícula/cadastro indicada neste contrato deverá ser paga no ato da assinatura deste instrumento. 4.2. Pela prestação dos serviços integrados, o CONTRATANTE pagará a mensalidade unificada do plano escolhido, com vencimento no dia indicado de cada mês. 4.3. O pagamento poderá ser efetuado via PIX (chave celular 35988223596) ou via cartão de crédito, conforme acordado entre as partes. 4.4. Os valores poderão ser reajustados anualmente conforme atualização da tabela vigente do CT, mediante comunicação prévia aos responsáveis.",
+      "4.1. A taxa de matrícula/cadastro indicada neste contrato deverá ser paga no ato da assinatura deste instrumento. 4.2. Pela prestação dos serviços integrados, o CONTRATANTE pagará a mensalidade unificada do plano escolhido, com vencimento no dia do mês correspondente ao da assinatura deste instrumento. 4.3. O pagamento poderá ser efetuado via PIX (chave celular 35988223596) ou via cartão de crédito, conforme acordado entre as partes. 4.4. Os valores poderão ser reajustados anualmente conforme atualização da tabela vigente do CT, mediante comunicação prévia aos responsáveis.",
   },
   {
     titulo: "CLÁUSULA 5ª — INADIMPLÊNCIA E REATIVAÇÃO DE MATRÍCULA",
