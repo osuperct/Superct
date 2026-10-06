@@ -293,12 +293,14 @@ function Index() {
   // Capas e fotos enviadas pela Área ADM entram no lugar (ou junto) das originais.
   const cards: Modalidade[] = modalidades.map((m) => {
     const capa = midias.find((x) => x.tipo === "capa" && x.grupo === m.nome && x.url);
+    // Fotos novas por último na lista do banco = primeiro na abertura do card.
     const extras = midias
       .filter((x) => x.tipo === "foto" && x.grupo === m.nome && x.url)
-      .map((x) => ({ src: x.url!, alt: x.descricao ?? `Foto do Super CT — ${m.nome}` }));
+      .map((x) => ({ src: x.url!, alt: x.descricao ?? `Foto do Super CT — ${m.nome}` }))
+      .reverse();
     const imagem = capa?.url ?? m.imagem;
     const alt = (capa ? (capa.descricao ?? m.alt) : m.alt) ?? undefined;
-    const base: Modalidade = { ...m, fotos: [...(m.fotos ?? []), ...extras] };
+    const base: Modalidade = { ...m, fotos: [...extras, ...(m.fotos ?? [])] };
     if (imagem) base.imagem = imagem;
     if (alt) base.alt = alt;
     return base;
