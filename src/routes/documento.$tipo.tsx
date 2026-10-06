@@ -398,6 +398,8 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
         ...(alunoId ? { aluno_id: alunoId } : {}),
         dados: {
           ...valores,
+          // Vencimento da mensalidade = dia em que o contrato é assinado.
+          vencimento: tipo === "contrato" ? String(new Date().getDate()) : undefined,
           aceite_imagem: true,
           aceite_clausulas: doc.clausulas ? true : undefined,
           assinado_online: true,
