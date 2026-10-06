@@ -311,7 +311,8 @@ function Index() {
     const capa = midias.find((x) => x.tipo === "capa" && x.grupo === nome && x.url);
     const fotos = midias
       .filter((x) => x.tipo === "foto" && x.grupo === nome && x.url)
-      .map((x) => ({ src: x.url!, alt: x.descricao ?? `Foto do Super CT — ${nome}` }));
+      .map((x) => ({ src: x.url!, alt: x.descricao ?? `Foto do Super CT — ${nome}` }))
+      .reverse();
     const novo: Modalidade = {
       nome,
       texto: capa?.descricao ?? "",
