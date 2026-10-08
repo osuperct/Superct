@@ -1,5 +1,3 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft, Handshake } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { assetUrl } from "@/lib/assetUrl";
 import dany from "@/assets/parceiro-dany.jpg.asset.json";
@@ -42,20 +40,6 @@ const parceiros = [
   },
 ];
 
-export const Route = createFileRoute("/parceiros")({
-  head: () => ({
-    meta: [
-      { title: "Parceiros do CT — Super CT" },
-      { name: "description", content: "Conheça os parceiros do Super CT: Dany Baby Kids, Musicativar e Thassia Tamaso, com benefícios para nossos alunos e contato pelo WhatsApp." },
-      { property: "og:title", content: "Parceiros do CT — Super CT" },
-      { property: "og:description", content: "Descontos em roupas, brinquedos, educação musical e nutrição para alunos do Super CT." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-    ],
-  }),
-  component: ParceirosPage,
-});
-
 function WhatsAppIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -64,17 +48,9 @@ function WhatsAppIcon() {
   );
 }
 
-function ParceirosPage() {
+export function ParceirosResponsavel() {
   return (
-    <div className="min-h-screen bg-background pl-16 text-foreground">
-      <main className="mx-auto max-w-6xl px-4 py-10 md:px-8">
-        <Button asChild variant="ghost" size="sm" className="mb-6 text-muted-foreground">
-          <Link to="/"><ArrowLeft /> Voltar</Link>
-        </Button>
-        <h1 className="flex flex-wrap items-center gap-2 font-display text-3xl">
-          <Handshake className="size-7 shrink-0 text-primary" /> PARCEIROS <span className="text-primary">DO CT</span>
-        </h1>
-        <div className="mt-8 grid items-stretch gap-6 lg:grid-cols-3">
+        <div className="grid items-stretch gap-6 md:grid-cols-2">
           {parceiros.map((parceiro) => (
             <article key={parceiro.nome} className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card">
               <img src={assetUrl(parceiro.imagem)} alt={`Parceria Super CT + ${parceiro.nome}`} className="aspect-[4/5] w-full object-contain" />
@@ -95,7 +71,5 @@ function ParceirosPage() {
             </article>
           ))}
         </div>
-      </main>
-    </div>
   );
 }
