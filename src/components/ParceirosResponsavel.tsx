@@ -3,6 +3,7 @@ import { assetUrl } from "@/lib/assetUrl";
 import dany from "@/assets/parceiro-dany.jpg.asset.json";
 import musicativar from "@/assets/parceiro-musicativar.jpg.asset.json";
 import thassia from "@/assets/parceiro-thassia.jpg.asset.json";
+import parceirosBanner from "@/assets/parceiros-super-ct.jpg.asset.json";
 
 const parceiros = [
   {
@@ -50,6 +51,8 @@ function WhatsAppIcon() {
 
 export function ParceirosResponsavel() {
   return (
+      <div className="space-y-6">
+        <img src={assetUrl(parceirosBanner)} alt="Parceiros do Super CT — Conheça nossos parceiros especiais" className="mx-auto h-auto w-full max-w-sm" />
         <div className="grid items-stretch gap-6 md:grid-cols-2">
           {parceiros.map((parceiro) => (
             <article key={parceiro.nome} className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card">
@@ -71,5 +74,6 @@ export function ParceirosResponsavel() {
             </article>
           ))}
         </div>
+      </div>
   );
 }
