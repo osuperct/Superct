@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Render partner benefits only inside the existing responsible-account panel as an expandable topic; do not expose a separate partner route or shared-menu entry, so visibility follows the account panel's access checks.
+- Render the public partner showcase on the home page with dedicated logo-only assets, separate from benefit artwork, to keep offers and contacts exclusive to the account panel.
