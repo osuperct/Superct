@@ -652,7 +652,7 @@ function Formulario({ tipo, session }: { tipo: TipoDoc; session: Session }) {
             {doc.clausulas.map((c) => (
               <article key={c.titulo}>
                 <h3 className="font-display text-[11px] tracking-tight text-primary">{c.titulo}</h3>
-                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{c.texto}</p>
+                <p className="mt-1 whitespace-pre-line text-[11px] leading-relaxed text-muted-foreground">{c.texto}</p>
               </article>
             ))}
           </div>

@@ -134,6 +134,54 @@ export const CLAUSULAS_CONTRATO: { titulo: string; texto: string }[] = [
       "O cancelamento deverá ser solicitado formalmente por escrito pelo RESPONSÁVEL LEGAL com antecedência mínima de 10 (dez) dias. A ausência do aluno não isenta o pagamento das mensalidades sem o cancelamento formal.",
   },
   {
+    titulo: "CLÁUSULA — DOS PLANOS SEMESTRAL E ANUAL, CANCELAMENTO E RESCISÃO ANTECIPADA",
+    texto: `1. Da vigência e das condições comerciais
+
+A SUPER CT oferece planos de contratação por período determinado, nas modalidades semestral, com vigência de 6 (seis) meses, e anual, com vigência de 12 (doze) meses, contados a partir da data de início estabelecida no contrato.
+
+Os planos poderão oferecer condições comerciais diferenciadas em relação à contratação mensal, em razão do período de permanência contratado, conforme os valores e as condições informados previamente ao CONTRATANTE.
+
+2. Do pedido de cancelamento
+
+O CONTRATANTE poderá solicitar o cancelamento antecipado do plano a qualquer momento, mediante comunicação por escrito à SUPER CT, inclusive por meio eletrônico que permita comprovar a solicitação.
+
+O pedido será registrado com a respectiva data, não podendo o cancelamento ser impedido exclusivamente em razão da existência de parcelas vincendas.
+
+3. Da multa por cancelamento antecipado
+
+Em caso de cancelamento antecipado por iniciativa do CONTRATANTE, sem descumprimento contratual imputável à SUPER CT, poderá ser aplicada multa rescisória de 15% (quinze por cento) sobre o saldo proporcional correspondente ao período contratado ainda não usufruído, observados os limites legais, a proporcionalidade e a vedação de cobrança abusiva.
+
+A multa não incidirá sobre o período já usufruído nem corresponderá automaticamente à cobrança integral dos meses restantes.
+
+4. Do cálculo e da restituição de valores
+
+Para fins de apuração, será considerado o valor total do plano contratado, distribuído proporcionalmente ao período de vigência.
+
+Do valor total pago antecipadamente, será descontado o valor correspondente ao período já usufruído. Sobre o saldo proporcional do período não usufruído será calculada a multa rescisória de 15% (quinze por cento).
+
+Após esse cálculo, eventual saldo positivo em favor do CONTRATANTE será restituído, observados os procedimentos aplicáveis à forma de pagamento utilizada.
+
+A SUPER CT fornecerá, quando solicitado, demonstrativo discriminado dos valores considerados, incluindo o período usufruído, o saldo remanescente, a multa calculada e eventual valor a restituir.
+
+5. Do pagamento por cartão de crédito
+
+Quando o plano semestral ou anual for contratado mediante pagamento do valor total parcelado no cartão de crédito, o parcelamento constituirá forma de pagamento do valor contratado, não representando, por si só, contratação de planos mensais independentes.
+
+O cancelamento não ocasionará automaticamente o estorno das parcelas na fatura. Havendo restituição devida, a SUPER CT adotará as providências cabíveis junto à operadora ou adquirente do cartão, respeitando os direitos do CONTRATANTE.
+
+6. Das hipóteses de cancelamento sem multa
+
+A multa rescisória não será aplicada quando o cancelamento decorrer de descumprimento contratual imputável à SUPER CT ou de outra hipótese em que a legislação assegure ao CONTRATANTE a rescisão sem penalidade.
+
+Nas contratações realizadas fora do estabelecimento comercial, inclusive pela internet, serão respeitados os direitos de arrependimento previstos no artigo 49 do Código de Defesa do Consumidor, quando aplicáveis.
+
+7. Da transparência e da legislação aplicável
+
+As condições de vigência, pagamento, cancelamento e multa serão apresentadas ao CONTRATANTE antes da conclusão da contratação, em linguagem clara e acessível.
+
+Esta cláusula será interpretada em conformidade com o Código de Defesa do Consumidor e demais normas aplicáveis, não prevalecendo qualquer disposição que implique renúncia a direitos legalmente assegurados ao CONTRATANTE.`,
+  },
+  {
     titulo: "CLÁUSULA 9ª — COLÔNIA DE FÉRIAS E REMANEJAMENTO",
     texto:
       "Durante os períodos de férias escolares, o Super CT realiza 2 (dois) eventos de Colônia de Férias (programação especial não inclusa na mensalidade regular, facultativa mediante aquisição de ingresso). Nesses períodos, das 13h00 às 17h00, os horários regulares do turno da tarde poderão ser temporariamente reajustados para o turno da manhã ou após as 17h00.",
