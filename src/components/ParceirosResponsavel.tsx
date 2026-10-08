@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Instagram } from "lucide-react";
 import { assetUrl } from "@/lib/assetUrl";
 import dany from "@/assets/parceiro-dany.jpg.asset.json";
 import musicativar from "@/assets/parceiro-musicativar.jpg.asset.json";
@@ -16,6 +17,7 @@ const parceiros = [
     whatsapp: "5535992709798",
     condicoes: "Consulte condições.",
     imagem: dany,
+    instagram: "https://www.instagram.com/dany.babykids_?mdxt=MTQxZm5hNXhnODlhMQ==",
   },
   {
     nome: "Musicativar",
@@ -27,6 +29,7 @@ const parceiros = [
     whatsapp: "5535936180750",
     condicoes: "Consulte informações.",
     imagem: musicativar,
+    instagram: "https://www.instagram.com/musicativar?mdxt=YW8xeG5nM2h2eXky",
   },
   {
     nome: "Thassia Tamaso",
@@ -38,6 +41,7 @@ const parceiros = [
     whatsapp: "5535998971280",
     condicoes: "Consulte condições.",
     imagem: thassia,
+    instagram: "https://www.instagram.com/nutrithassiatamaso?rpxt=ZjFmNmM0dXlyOWVi",
   },
 ];
 
@@ -57,6 +61,9 @@ export function ParceirosResponsavel() {
           {parceiros.map((parceiro) => (
             <article key={parceiro.nome} className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card">
               <img src={assetUrl(parceiro.imagem)} alt={`Parceria Super CT + ${parceiro.nome}`} className="aspect-[4/5] w-full object-contain" />
+              <Button asChild variant="ghost" size="icon" className="mx-auto mt-2 text-primary">
+                <a href={parceiro.instagram} target="_blank" rel="noopener noreferrer" aria-label={`Instagram de ${parceiro.nome}`} title={`Instagram de ${parceiro.nome}`}><Instagram className="size-5" /></a>
+              </Button>
               <div className="flex flex-1 flex-col p-5">
                 <p className="text-xs text-muted-foreground">{parceiro.categoria}</p>
                 <h2 className="mt-1 font-display text-2xl">{parceiro.nome}</h2>

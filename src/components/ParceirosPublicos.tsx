@@ -1,4 +1,6 @@
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Instagram } from "lucide-react";
 import { assetUrl } from "@/lib/assetUrl";
 import dany from "@/assets/parceiro-dany-logo-branco.jpg";
 import musicativar from "@/assets/parceiro-musicativar-logo.jpg.asset.json";
@@ -14,11 +16,16 @@ export function ParceirosPublicos({ open, onOpenChange }: { open: boolean; onOpe
         <img src={assetUrl(parceirosBanner)} alt="Parceiros do Super CT — Conheça nossos parceiros especiais" className="mx-auto h-auto w-full max-w-sm" />
         <div className="grid grid-cols-1 items-center gap-4 sm:grid-cols-3">
           {[
-            { nome: "Dany Baby Kids", imagem: dany },
-            { nome: "Musicativar", imagem: assetUrl(musicativar) },
-            { nome: "Thassia Tamaso", imagem: thassia },
+            { nome: "Dany Baby Kids", imagem: dany, instagram: "https://www.instagram.com/dany.babykids_?mdxt=MTQxZm5hNXhnODlhMQ==" },
+            { nome: "Musicativar", imagem: assetUrl(musicativar), instagram: "https://www.instagram.com/musicativar?mdxt=YW8xeG5nM2h2eXky" },
+            { nome: "Thassia Tamaso", imagem: thassia, instagram: "https://www.instagram.com/nutrithassiatamaso?rpxt=ZjFmNmM0dXlyOWVi" },
           ].map((parceiro) => (
-            <img key={parceiro.nome} src={parceiro.imagem} alt={`Logo ${parceiro.nome}`} className="mx-auto aspect-square w-full max-w-56 object-contain" />
+            <div key={parceiro.nome} className="flex min-w-0 flex-col items-center gap-2">
+              <img src={parceiro.imagem} alt={`Logo ${parceiro.nome}`} className="mx-auto aspect-square w-full max-w-56 object-contain" />
+              <Button asChild variant="ghost" size="icon" className="text-primary">
+                <a href={parceiro.instagram} target="_blank" rel="noopener noreferrer" aria-label={`Instagram de ${parceiro.nome}`} title={`Instagram de ${parceiro.nome}`}><Instagram className="size-5" /></a>
+              </Button>
+            </div>
           ))}
         </div>
       </DialogContent>
