@@ -9,5 +9,5 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Render partner benefits only inside the existing responsible-account panel as an expandable topic; do not expose a separate partner route or shared-menu entry, so visibility follows the account panel's access checks.
-- Render the public partner showcase on the home page with dedicated logo-only assets, separate from benefit artwork, to keep offers and contacts exclusive to the account panel.
+- Render partner benefits only inside the existing responsible-account panel as an expandable topic; public navigation must not expose benefit content, so visibility follows the account panel's access checks.
+- Render the public partner showcase in a dialog opened from the side rail with dedicated logo-only assets, not in the home page scroll or a separate route, to keep offers and contacts exclusive to the account panel.

@@ -10,9 +10,6 @@ import { listarTextos, type Textos } from "@/lib/textos";
 import { listarTurmas, type Turma } from "@/lib/turmas";
 
 import logoAsset from "@/assets/super-ct-logo-sem-fundo.png.asset.json";
-import danyLogo from "@/assets/parceiro-dany-logo.jpg.asset.json";
-import musicativarLogo from "@/assets/parceiro-musicativar-logo.jpg.asset.json";
-import thassiaLogo from "@/assets/parceiro-thassia-logo.jpg.asset.json";
 
 const logo = assetUrl(logoAsset);
 import arena from "@/assets/IMG_20260901_175621.jpg.asset.json";
@@ -451,22 +448,6 @@ function Index() {
             <p className="text-xs text-secondary/80">
               Jogos motores dinâmicos que misturam desafio, risada e superação.
             </p>
-          </div>
-        </section>
-
-        <section id="parceiros" className="px-4 py-12" aria-labelledby="parceiros-titulo">
-          <div className="mb-8 flex items-center gap-2">
-            <div className="h-[2px] w-8 bg-primary" />
-            <h2 id="parceiros-titulo" className="font-display text-2xl uppercase tracking-tight">PARCEIROS DO CT</h2>
-          </div>
-          <div className="grid grid-cols-3 items-center gap-3">
-            {[
-              { nome: "Dany Baby Kids", imagem: danyLogo },
-              { nome: "Musicativar", imagem: musicativarLogo },
-              { nome: "Thassia Tamaso", imagem: thassiaLogo },
-            ].map((parceiro) => (
-              <img key={parceiro.nome} src={assetUrl(parceiro.imagem)} alt={`Logo ${parceiro.nome}`} loading="lazy" className="aspect-square w-full object-contain" />
-            ))}
           </div>
         </section>
 

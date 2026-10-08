@@ -12,10 +12,13 @@ import {
   GraduationCap,
   ShieldCheck,
   ShoppingBag,
+  Handshake,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { useSidebarControl } from "./SidebarContext";
+import { Button } from "@/components/ui/button";
+import { ParceirosPublicos } from "./ParceirosPublicos";
 
 const itens = [
   { to: "/", label: "Início", icon: Home },
@@ -33,6 +36,7 @@ export function SideRail() {
   const [recolhida, setRecolhida] = useState(false);
   const [professor, setProfessor] = useState(false);
   const [adm, setAdm] = useState(false);
+  const [parceirosAbertos, setParceirosAbertos] = useState(false);
   const estaRecolhida = !aberta || forcarRecolhida;
 
   useEffect(() => {
@@ -93,8 +97,10 @@ export function SideRail() {
     ...(adm ? [{ to: "/adm", label: "ADM", icon: ShieldCheck } as const] : []),
   ];
 
-  if (estaRecolhida) {
-    return (
+  return (
+    <>
+    <ParceirosPublicos open={parceirosAbertos} onOpenChange={setParceirosAbertos} />
+    {estaRecolhida ? (
       <button
         type="button"
         aria-label="Abrir menu lateral"
@@ -107,10 +113,7 @@ export function SideRail() {
       >
         <ChevronRight className="size-4" />
       </button>
-    );
-  }
-
-  return (
+    ) : (
     <aside className="fixed left-0 top-16 z-[60] md:top-1/2 md:-translate-y-1/2">
       <nav
         className={`flex flex-col gap-1 rounded-r-lg border border-l-0 border-border bg-background/70 py-2 pl-1 pr-1.5 backdrop-blur-md transition-transform duration-300 ease-out ${
@@ -131,6 +134,17 @@ export function SideRail() {
             <span className="font-mono text-[8px] uppercase">{item.label}</span>
           </Link>
         ))}
+        <Button
+          type="button"
+          variant="ghost"
+          aria-label="Parceiros"
+          title="Parceiros do CT"
+          onClick={() => { setParceirosAbertos(true); setAberta(false); }}
+          className="flex h-auto w-12 flex-col items-center gap-0.5 rounded-md px-1 py-2 text-muted-foreground"
+        >
+          <Handshake className="size-5" />
+          <span className="font-mono text-[8px] uppercase">Parceiros</span>
+        </Button>
         <button
           type="button"
           aria-label="Recolher menu lateral"
@@ -141,5 +155,7 @@ export function SideRail() {
         </button>
       </nav>
     </aside>
+    )}
+    </>
   );
 }
