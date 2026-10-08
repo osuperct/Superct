@@ -96,8 +96,14 @@ export async function gerarDocumentoPdf(opcoes: {
       }
       doc.setFont("helvetica", "bold");
       doc.setFontSize(9.5);
-      doc.text(clausula.titulo, margem, y);
-      y += 12;
+      for (const parte of doc.splitTextToSize(clausula.titulo, largura) as string[]) {
+        if (y > 780) {
+          doc.addPage();
+          y = margem;
+        }
+        doc.text(parte, margem, y);
+        y += 12;
+      }
       doc.setFont("helvetica", "normal");
       doc.setFontSize(9);
       for (const parte of doc.splitTextToSize(clausula.texto, largura) as string[]) {
