@@ -61,8 +61,8 @@ export function ParceirosResponsavel() {
           {parceiros.map((parceiro) => (
             <article key={parceiro.nome} className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card">
               <img src={assetUrl(parceiro.imagem)} alt={`Parceria Super CT + ${parceiro.nome}`} className="aspect-[4/5] w-full object-contain" />
-              <Button asChild variant="outline" className="mx-auto mt-3 h-auto max-w-[calc(100%-2rem)] gap-3 whitespace-normal border-primary/50 px-4 py-3 text-primary hover:bg-primary/10 hover:text-primary [&_svg]:size-8 [&_svg]:shrink-0">
-                <a href={parceiro.instagram} target="_blank" rel="noopener noreferrer" aria-label={`Venha nos conhecer! Instagram de ${parceiro.nome}`} title={`Instagram de ${parceiro.nome}`}><Instagram /><span className="text-left text-sm font-semibold">Venha nos conhecer!</span></a>
+              <Button asChild variant="outline" className="mx-auto mt-1 h-16 w-[calc(100%-2rem)] max-w-56 gap-2 whitespace-normal border-primary/50 px-3 py-2 text-primary hover:bg-primary/10 hover:text-primary [&_svg]:size-8 [&_svg]:shrink-0">
+                <a href={parceiro.instagram} target="_blank" rel="noopener noreferrer" aria-label={`Acesse nosso perfil! Instagram de ${parceiro.nome}`} title={`Instagram de ${parceiro.nome}`}><Instagram /><span className="text-left text-sm font-semibold">Acesse nosso perfil!</span></a>
               </Button>
               <div className="flex flex-1 flex-col p-5">
                 <p className="text-xs text-muted-foreground">{parceiro.categoria}</p>
