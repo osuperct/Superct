@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Keep the public partner directory in its own TanStack content route with an entry in the shared side menu, so partner benefits and contacts remain directly accessible.

@@ -12,6 +12,7 @@ import {
   GraduationCap,
   ShieldCheck,
   ShoppingBag,
+  Handshake,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -22,6 +23,7 @@ const itens = [
   { to: "/conta", label: "Conta", icon: UserRound },
   { to: "/calendario", label: "Agenda", icon: CalendarDays },
   { to: "/loja", label: "Loja", icon: ShoppingBag },
+  { to: "/parceiros", label: "Parceiros", icon: Handshake },
   { to: "/jogo", label: "Jogo", icon: Gamepad2 },
   { to: "/herois", label: "Heróis", icon: Shield },
   { to: "/viloes", label: "Vilões", icon: Skull },
@@ -128,7 +130,7 @@ export function SideRail() {
             className="flex w-12 flex-col items-center gap-0.5 rounded-md px-1 py-2 transition-colors active:scale-95"
           >
             <item.icon className="size-5" />
-            <span className="font-mono text-[8px] uppercase tracking-widest">{item.label}</span>
+            <span className="font-mono text-[8px] uppercase">{item.label}</span>
           </Link>
         ))}
         <button

@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Criar área Parceiros do CT com as informações das três artes e contatos individuais no WhatsApp.
+
 - [x] Fazer a loja carregar produtos e fotos na hospedagem externa
 - [x] Fazer login e cadastro funcionarem no domínio externo
 - [x] Validar loja e login no site publicado
