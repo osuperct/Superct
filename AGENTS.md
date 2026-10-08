@@ -9,4 +9,4 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 
-- Keep the public partner directory in its own TanStack content route with an entry in the shared side menu, so partner benefits and contacts remain directly accessible.
+- Render partner benefits only inside the existing responsible-account panel as an expandable topic; do not expose a separate partner route or shared-menu entry, so visibility follows the account panel's access checks.

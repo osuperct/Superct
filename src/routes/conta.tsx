@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
-import { BellRing, CircleDollarSign, ClipboardCheck, Eye, EyeOff, GraduationCap, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
+import { BellRing, CircleDollarSign, ClipboardCheck, Eye, EyeOff, GraduationCap, Handshake, Mail, Paperclip, Send, ShieldCheck, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { entrarComCpfOuEmail, pedirNovaSenha } from "@/lib/auth.functions";
@@ -11,6 +11,7 @@ import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
 import { AvisosResponsavel } from "@/components/AvisosResponsavel";
 import { PresencaResponsavel } from "@/components/PresencaResponsavel";
 import { MensalidadeResponsavel } from "@/components/MensalidadeResponsavel";
+import { ParceirosResponsavel } from "@/components/ParceirosResponsavel";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -1006,6 +1007,12 @@ function Painel({ session }: { session: Session }) {
           <Link to="/documento/$tipo" params={{ tipo: "ficha" }} className="mt-2 flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm text-primary-foreground">PREENCHER FICHA PAR-Q <Send className="size-4" /></Link>
         </section>
           </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="parceiros" className="rounded-md border border-border bg-card/50 px-4">
+          <AccordionTrigger className="font-display text-base hover:no-underline">
+            <span className="flex min-w-0 items-center gap-2"><Handshake className="size-4 shrink-0 text-primary" /> PARCEIROS DO CT</span>
+          </AccordionTrigger>
+          <AccordionContent><ParceirosResponsavel /></AccordionContent>
         </AccordionItem>
       </Accordion>
 

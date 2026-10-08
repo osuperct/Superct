@@ -12,7 +12,6 @@ import {
   GraduationCap,
   ShieldCheck,
   ShoppingBag,
-  Handshake,
 } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -23,7 +22,6 @@ const itens = [
   { to: "/conta", label: "Conta", icon: UserRound },
   { to: "/calendario", label: "Agenda", icon: CalendarDays },
   { to: "/loja", label: "Loja", icon: ShoppingBag },
-  { to: "/parceiros", label: "Parceiros", icon: Handshake },
   { to: "/jogo", label: "Jogo", icon: Gamepad2 },
   { to: "/herois", label: "Heróis", icon: Shield },
   { to: "/viloes", label: "Vilões", icon: Skull },
