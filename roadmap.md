@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Incluir edição completa de parcerias na área APP e sincronizar a janela pública e o painel do responsável, preservando informações privadas.
+- [x] Incluir edição completa de parcerias na área APP e sincronizar a janela pública e o painel do responsável, preservando informações privadas.
 
 - [x] Criar área Parceiros do CT com as informações das três artes e contatos individuais no WhatsApp.
 

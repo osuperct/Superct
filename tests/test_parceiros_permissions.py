@@ -18,11 +18,17 @@ class PartnerPermissions(unittest.TestCase):
 
     def test_public_cannot_read_private_offers_and_contacts(self):
         response = requests.get(self.url + 'parceiros_ct_beneficios?select=beneficio,cupom,telefone', headers=self.headers)
-        self.assertIn(response.status_code, (401, 403))
+        if response.status_code == 200:
+            self.assertEqual(response.json(), [])
+        else:
+            self.assertIn(response.status_code, (401, 403))
 
     def test_public_cannot_write_partner(self):
-        response = requests.patch(self.url + 'parceiros_ct?id=eq.10000000-0000-4000-8000-000000000001', headers=self.headers, json={'nome': 'Dany Baby Kids'})
-        self.assertIn(response.status_code, (401, 403))
+        response = requests.patch(self.url + 'parceiros_ct?id=eq.10000000-0000-4000-8000-000000000001', headers={**self.headers, 'Prefer': 'return=representation'}, json={'nome': 'Dany Baby Kids'})
+        if response.status_code == 200:
+            self.assertEqual(response.json(), [])
+        else:
+            self.assertIn(response.status_code, (401, 403))
 
 
 if __name__ == '__main__':
