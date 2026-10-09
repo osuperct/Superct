@@ -18,6 +18,7 @@ export function ParceirosResponsavel() {
   if (isError) return <Button variant="outline" onClick={() => void refetch()}>Tentar novamente</Button>;
   return (
       <div className="space-y-6">
+        <h2 className="font-display text-xl">{data.config.titulo}</h2>
         <ImagemParceiro caminho={data.config.banner_responsavel} alt="Parceiros do Super CT — Conheça nossos parceiros especiais" className="mx-auto h-auto w-full max-w-sm" />
         <div className="grid items-stretch gap-6 md:grid-cols-2">
           {data.parceiros.map((publico) => {
@@ -27,9 +28,9 @@ export function ParceirosResponsavel() {
             return (
             <article key={parceiro.id} className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card">
               <ImagemParceiro caminho={parceiro.imagem_url} alt={`Parceria Super CT + ${parceiro.nome}`} className="aspect-[4/5] w-full object-contain" />
-              <Button asChild variant="outline" className="mx-auto mt-1 h-16 w-[calc(100%-2rem)] max-w-56 gap-2 whitespace-normal border-primary/50 px-3 py-2 text-primary hover:bg-primary/10 hover:text-primary [&_svg]:size-8 [&_svg]:shrink-0">
+              {linkSeguro(parceiro.instagram) && <Button asChild variant="outline" className="mx-auto mt-1 h-16 w-[calc(100%-2rem)] max-w-56 gap-2 whitespace-normal border-primary/50 px-3 py-2 text-primary hover:bg-primary/10 hover:text-primary [&_svg]:size-8 [&_svg]:shrink-0">
                 <a href={parceiro.instagram} target="_blank" rel="noopener noreferrer" aria-label={`Acesse nosso perfil! Instagram de ${parceiro.nome}`} title={`Instagram de ${parceiro.nome}`}><Instagram /><span className="text-left text-sm font-semibold">Acesse nosso perfil!</span></a>
-              </Button>
+              </Button>}
               <div className="flex flex-1 flex-col p-5">
                 <p className="text-xs text-muted-foreground">{parceiro.categoria}</p>
                 <h2 className="mt-1 font-display text-2xl">{parceiro.nome}</h2>
@@ -38,7 +39,7 @@ export function ParceirosResponsavel() {
                 <p className="mt-2 text-sm leading-relaxed">{parceiro.beneficio}</p>
                 {parceiro.cupom && <p className="mt-3 text-sm">Cupom: <strong className="font-mono text-secondary">{parceiro.cupom}</strong></p>}
                 <p className="mb-5 mt-3 text-xs text-muted-foreground">{parceiro.condicoes}</p>
-                <Button asChild variant="outline" className="mt-auto w-full border-whatsapp/40 text-whatsapp hover:text-whatsapp">
+                {parceiro.telefone && <Button asChild variant="outline" className="mt-auto w-full border-whatsapp/40 text-whatsapp hover:text-whatsapp">
                   <a href={whatsappParceiro(parceiro.telefone)} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp de ${parceiro.nome}: ${parceiro.telefone}`} title={`Falar com ${parceiro.nome} no WhatsApp`}>
                     <WhatsAppIcon /> {parceiro.telefone}
                   </a>
