@@ -417,6 +417,101 @@ export type Database = {
         }
         Relationships: []
       }
+      parceiros_ct: {
+        Row: {
+          ativo: boolean
+          id: string
+          instagram: string
+          logo_url: string
+          nome: string
+          ordem: number
+        }
+        Insert: {
+          ativo?: boolean
+          id?: string
+          instagram?: string
+          logo_url?: string
+          nome?: string
+          ordem?: number
+        }
+        Update: {
+          ativo?: boolean
+          id?: string
+          instagram?: string
+          logo_url?: string
+          nome?: string
+          ordem?: number
+        }
+        Relationships: []
+      }
+      parceiros_ct_beneficios: {
+        Row: {
+          beneficio: string
+          categoria: string
+          condicoes: string
+          cupom: string
+          desconto: string
+          descricao: string
+          id: string
+          imagem_url: string
+          telefone: string
+        }
+        Insert: {
+          beneficio?: string
+          categoria?: string
+          condicoes?: string
+          cupom?: string
+          desconto?: string
+          descricao?: string
+          id: string
+          imagem_url?: string
+          telefone?: string
+        }
+        Update: {
+          beneficio?: string
+          categoria?: string
+          condicoes?: string
+          cupom?: string
+          desconto?: string
+          descricao?: string
+          id?: string
+          imagem_url?: string
+          telefone?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parceiros_ct_beneficios_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "parceiros_ct"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parceiros_ct_config: {
+        Row: {
+          banner_publico: string
+          banner_responsavel: string
+          id: number
+          introducao: string
+          titulo: string
+        }
+        Insert: {
+          banner_publico?: string
+          banner_responsavel?: string
+          id?: number
+          introducao?: string
+          titulo?: string
+        }
+        Update: {
+          banner_publico?: string
+          banner_responsavel?: string
+          id?: number
+          introducao?: string
+          titulo?: string
+        }
+        Relationships: []
+      }
       pedidos_loja: {
         Row: {
           created_at: string
@@ -888,6 +983,7 @@ export type Database = {
         Returns: Json
       }
       rotulo_criterio: { Args: { _chave: string }; Returns: string }
+      salvar_parceiro_ct: { Args: { dados: Json }; Returns: string }
       valor_do_plano: { Args: { _texto: string }; Returns: number }
       vincular_alunos_dos_contratos: { Args: never; Returns: number }
     }

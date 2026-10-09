@@ -1,49 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Instagram } from "lucide-react";
-import { assetUrl } from "@/lib/assetUrl";
-import dany from "@/assets/parceiro-dany.jpg.asset.json";
-import musicativar from "@/assets/parceiro-musicativar.jpg.asset.json";
-import thassia from "@/assets/parceiro-thassia.jpg.asset.json";
-import parceirosBanner from "@/assets/parceiros-super-ct.jpg.asset.json";
-
-const parceiros = [
-  {
-    nome: "Dany Baby Kids",
-    categoria: "Roupas e brinquedos infantis",
-    desconto: "10%",
-    beneficio: "Alunos do CT ganham 10% de desconto nos produtos da loja.",
-    cupom: "SUPERS10",
-    telefone: "35 99270-9798",
-    whatsapp: "5535992709798",
-    condicoes: "Consulte condições.",
-    imagem: dany,
-    instagram: "https://www.instagram.com/dany.babykids_?mdxt=MTQxZm5hNXhnODlhMQ==",
-  },
-  {
-    nome: "Musicativar",
-    categoria: "Educação Musical",
-    desconto: "10%",
-    beneficio: "Alunos do CT ganham 10% de desconto na mensalidade individual.",
-    cupom: "SUPERCT10",
-    telefone: "35 9.3618-0750",
-    whatsapp: "5535936180750",
-    condicoes: "Consulte informações.",
-    imagem: musicativar,
-    instagram: "https://www.instagram.com/musicativar?mdxt=YW8xeG5nM2h2eXky",
-  },
-  {
-    nome: "Thassia Tamaso",
-    categoria: "Nutricionista",
-    descricao: "Saúde, nutrição e desempenho!",
-    desconto: "50%",
-    beneficio: "Aluno do Super CT ganha 50% de desconto na consulta.",
-    telefone: "35 99897-1280",
-    whatsapp: "5535998971280",
-    condicoes: "Consulte condições.",
-    imagem: thassia,
-    instagram: "https://www.instagram.com/nutrithassiatamaso?rpxt=ZjFmNmM0dXlyOWVi",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import { parceirosQuery, linkSeguro, whatsappParceiro } from "@/lib/parceiros";
+import { ImagemParceiro } from "@/components/ImagemParceiro";
 
 function WhatsAppIcon() {
   return (
@@ -54,32 +13,40 @@ function WhatsAppIcon() {
 }
 
 export function ParceirosResponsavel() {
+  const { data, isPending, isError, refetch } = useQuery(parceirosQuery(true));
+  if (isPending) return <p className="text-sm text-muted-foreground">Carregando parcerias…</p>;
+  if (isError) return <Button variant="outline" onClick={() => void refetch()}>Tentar novamente</Button>;
   return (
       <div className="space-y-6">
-        <img src={assetUrl(parceirosBanner)} alt="Parceiros do Super CT — Conheça nossos parceiros especiais" className="mx-auto h-auto w-full max-w-sm" />
+        <h2 className="font-display text-xl">{data.config.titulo}</h2>
+        <ImagemParceiro caminho={data.config.banner_responsavel} alt="Parceiros do Super CT — Conheça nossos parceiros especiais" className="mx-auto h-auto w-full max-w-sm" />
         <div className="grid items-stretch gap-6 md:grid-cols-2">
-          {parceiros.map((parceiro) => (
-            <article key={parceiro.nome} className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card">
-              <img src={assetUrl(parceiro.imagem)} alt={`Parceria Super CT + ${parceiro.nome}`} className="aspect-[4/5] w-full object-contain" />
-              <Button asChild variant="outline" className="mx-auto mt-1 h-16 w-[calc(100%-2rem)] max-w-56 gap-2 whitespace-normal border-primary/50 px-3 py-2 text-primary hover:bg-primary/10 hover:text-primary [&_svg]:size-8 [&_svg]:shrink-0">
+          {data.parceiros.map((publico) => {
+            const beneficio = data.beneficios.find((b) => b.id === publico.id);
+            if (!beneficio) return null;
+            const parceiro = { ...publico, ...beneficio };
+            return (
+            <article key={parceiro.id} className="flex min-w-0 flex-col overflow-hidden rounded-lg border border-border bg-card">
+              <ImagemParceiro caminho={parceiro.imagem_url} alt={`Parceria Super CT + ${parceiro.nome}`} className="aspect-[4/5] w-full object-contain" />
+              {linkSeguro(parceiro.instagram) && <Button asChild variant="outline" className="mx-auto mt-1 h-16 w-[calc(100%-2rem)] max-w-56 gap-2 whitespace-normal border-primary/50 px-3 py-2 text-primary hover:bg-primary/10 hover:text-primary [&_svg]:size-8 [&_svg]:shrink-0">
                 <a href={parceiro.instagram} target="_blank" rel="noopener noreferrer" aria-label={`Acesse nosso perfil! Instagram de ${parceiro.nome}`} title={`Instagram de ${parceiro.nome}`}><Instagram /><span className="text-left text-sm font-semibold">Acesse nosso perfil!</span></a>
-              </Button>
+              </Button>}
               <div className="flex flex-1 flex-col p-5">
                 <p className="text-xs text-muted-foreground">{parceiro.categoria}</p>
                 <h2 className="mt-1 font-display text-2xl">{parceiro.nome}</h2>
                 {parceiro.descricao && <p className="mt-2 text-sm text-muted-foreground">{parceiro.descricao}</p>}
-                <p className="mt-5 font-display text-3xl text-primary">{parceiro.desconto} DE DESCONTO</p>
+                {parceiro.desconto && <p className="mt-5 font-display text-3xl text-primary">{parceiro.desconto} DE DESCONTO</p>}
                 <p className="mt-2 text-sm leading-relaxed">{parceiro.beneficio}</p>
                 {parceiro.cupom && <p className="mt-3 text-sm">Cupom: <strong className="font-mono text-secondary">{parceiro.cupom}</strong></p>}
                 <p className="mb-5 mt-3 text-xs text-muted-foreground">{parceiro.condicoes}</p>
-                <Button asChild variant="outline" className="mt-auto w-full border-whatsapp/40 text-whatsapp hover:text-whatsapp">
-                  <a href={`https://wa.me/${parceiro.whatsapp}`} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp de ${parceiro.nome}: ${parceiro.telefone}`} title={`Falar com ${parceiro.nome} no WhatsApp`}>
+                {parceiro.telefone && <Button asChild variant="outline" className="mt-auto w-full border-whatsapp/40 text-whatsapp hover:text-whatsapp">
+                  <a href={whatsappParceiro(parceiro.telefone)} target="_blank" rel="noopener noreferrer" aria-label={`WhatsApp de ${parceiro.nome}: ${parceiro.telefone}`} title={`Falar com ${parceiro.nome} no WhatsApp`}>
                     <WhatsAppIcon /> {parceiro.telefone}
                   </a>
-                </Button>
+                </Button>}
               </div>
             </article>
-          ))}
+          ); })}
         </div>
       </div>
   );
