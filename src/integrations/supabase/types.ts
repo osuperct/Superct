@@ -983,6 +983,7 @@ export type Database = {
         Returns: Json
       }
       rotulo_criterio: { Args: { _chave: string }; Returns: string }
+      salvar_parceiro_ct: { Args: { dados: Json }; Returns: string }
       valor_do_plano: { Args: { _texto: string }; Returns: number }
       vincular_alunos_dos_contratos: { Args: never; Returns: number }
     }

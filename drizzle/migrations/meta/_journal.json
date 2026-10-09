@@ -57,6 +57,13 @@
       "when": 1791504742432,
       "tag": "0007_editable_ct_partners",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791504787126,
+      "tag": "0008_save_ct_partner_atomically",
+      "breakpoints": true
     }
   ]
 }
