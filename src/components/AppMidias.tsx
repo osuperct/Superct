@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Clock, Film, Image as ImageIcon, Smartphone, Trash2, Type, Upload, Volume2, VolumeX } from "lucide-react";
 import { toast } from "sonner";
 
+import { ParceirosAdm } from "@/components/ParceirosAdm";
 import { CortarImagem } from "@/components/CortarImagem";
 import { criarTurma, excluirTurma, listarTurmas, salvarTurma, type Turma } from "@/lib/turmas";
 import { CHAVES_TEXTO, listarTextos, salvarTexto, type Textos } from "@/lib/textos";
@@ -103,7 +104,7 @@ export function AppMidias() {
         aria-expanded={aberto}
       >
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <Smartphone className="size-4 text-primary" /> APP — FOTOS E VÍDEOS
+          <Smartphone className="size-4 text-primary" /> APP — FOTOS, VÍDEOS E PARCERIAS
         </h2>
         {aberto ? <ChevronUp className="size-5 text-primary" /> : <ChevronDown className="size-5 text-primary" />}
       </button>
@@ -338,6 +339,8 @@ export function AppMidias() {
 
       {/* -------- TEXTOS -------- */}
       <TextosPagina />
+
+      <ParceirosAdm />
 
       {/* -------- VÍDEOS -------- */}
       <div className="mt-4 rounded-md border border-border bg-background/40 p-3">
