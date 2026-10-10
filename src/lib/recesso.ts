@@ -10,6 +10,12 @@ As datas de suspensão das atividades regulares serão comunicadas antecipadamen
 Os períodos de recesso integrarão o calendário de funcionamento apresentado no momento da contratação, com informação clara sobre sua repercussão na prestação dos serviços e nos valores dos planos.`,
 };
 
+export type EstadoAvisoRecesso = "consultando" | "pendente" | "erro" | "liberado";
+
+export function recessoBloqueiaAcesso(enabled: boolean, estado: EstadoAvisoRecesso): boolean {
+  return enabled && estado !== "liberado";
+}
+
 export function contratosPendentes<T extends { id: string; aluno_id: string | null; nome_arquivo: string; created_at: string }>(documentos: T[], aceites: string[]): T[] {
   const ultimos = new Map<string, T>();
   for (const doc of [...documentos].sort((a, b) => b.created_at.localeCompare(a.created_at))) {
