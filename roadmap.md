@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Remover “Confirmar depois” e impedir fechar o aviso ou acessar a conta antes da confirmação do recesso.
+- [x] Remover “Confirmar depois” e impedir fechar o aviso ou acessar a conta antes da confirmação do recesso; verificado com sessão autenticada, sem registrar concordância.
 
 - [x] Corrigir a consulta do aviso de recesso ao entrar na conta e verificar com sessão autenticada, inclusive sem a consulta antiga disponível.
 
