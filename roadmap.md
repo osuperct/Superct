@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Corrigir a consulta do aviso de recesso ao entrar na conta e verificar com sessão autenticada.
+
 - [x] Marcar o recesso de 24/12/2026 a 03/01/2027 no calendário do app e validar os dois meses.
 
 - [x] Incluir cláusula anual de recesso nos novos contratos.
