@@ -12,6 +12,7 @@ import { RECESSO, recessoBloqueiaAcesso, type EstadoAvisoRecesso } from "@/lib/r
 import { prepararRecesso, confirmarRecesso } from "@/lib/recesso.functions";
 import { consultarAvisoRecesso } from "@/lib/recessoConsulta";
 import { supabase } from "@/integrations/supabase/client";
+import recessoNatal from "@/assets/recesso-natal-super-ct.jpg";
 
 export function RecessoResponsavel({ uid, enabled, onConfirmado }: { uid: string; enabled: boolean; onConfirmado: () => void }) {
   const preparar = useServerFn(prepararRecesso);
@@ -56,6 +57,7 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado }: { uid: string
   return <>
     <Dialog open={recessoBloqueiaAcesso(enabled, estado)}>
       <DialogContent showCloseButton={false} onEscapeKeyDown={(event) => event.preventDefault()} onInteractOutside={(event) => event.preventDefault()} className="max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-lg border-primary/50">
+        <img src={recessoNatal} alt="Personagens do Super CT com camisetas do uniforme e gorros de Papai Noel, ao lado de uma árvore de Natal e presentes" className="aspect-[2/1] w-full rounded-md object-cover" />
         <DialogHeader>
           <CalendarDays className="mb-2 size-8 text-primary" />
           <DialogTitle className="pr-6 font-display text-2xl">RECESSO SUPER CT</DialogTitle>
