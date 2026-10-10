@@ -9,10 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { biometriaDisponivel } from "@/lib/biometria";
 import { RECESSO } from "@/lib/recesso";
-import { consultarRecesso, prepararRecesso, confirmarRecesso } from "@/lib/recesso.functions";
+import { prepararRecesso, confirmarRecesso } from "@/lib/recesso.functions";
+import { consultarAvisoRecesso } from "@/lib/recessoConsulta";
+import { supabase } from "@/integrations/supabase/client";
 
 export function RecessoResponsavel({ uid, enabled, onConfirmado }: { uid: string; enabled: boolean; onConfirmado: () => void }) {
-  const consultar = useServerFn(consultarRecesso);
   const preparar = useServerFn(prepararRecesso);
   const confirmar = useServerFn(confirmarRecesso);
   const [aberto, setAberto] = useState(false);
@@ -24,14 +25,16 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado }: { uid: string
   const [salvando, setSalvando] = useState(false);
   const [bio, setBio] = useState<boolean | null>(null);
   const [erro, setErro] = useState("");
+  const [tentativa, setTentativa] = useState(0);
 
   useEffect(() => {
     if (!enabled) return;
     let ativo = true;
-    void consultar().then((r) => { if (ativo) { setPendente(r.mostrar); setAberto(r.mostrar); setContratos(r.contratos); } }).catch(() => { if (ativo) setErro("Não foi possível consultar o aviso de recesso."); });
+    setErro("");
+    void consultarAvisoRecesso(supabase).then((r) => { if (ativo) { setPendente(r.mostrar); setAberto(r.mostrar); setContratos(r.contratos); } }).catch((e) => { if (ativo) setErro(e instanceof Error ? e.message : "Não foi possível consultar o aviso de recesso."); });
     void biometriaDisponivel().then((r) => { if (ativo) setBio(r); });
     return () => { ativo = false; };
-  }, [uid, enabled, consultar]);
+  }, [uid, enabled, tentativa]);
 
   async function aceitar() {
     if (!visto || !concordo || !leu || !bio || salvando || !contratos) return;
@@ -50,7 +53,7 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado }: { uid: string
   if (!enabled) return null;
   return <>
     {pendente && !aberto && <Button variant="outline" className="mt-4 w-full" onClick={() => setAberto(true)}><CalendarDays className="size-4" /> AVISO DE RECESSO — CONFIRMAÇÃO PENDENTE</Button>}
-    {erro && !aberto && <p role="alert" className="mt-3 text-sm text-destructive">{erro}</p>}
+    {erro && !aberto && <div className="mt-3"><p role="alert" className="text-sm text-destructive">{erro}</p><Button variant="outline" className="mt-2" onClick={() => setTentativa((t) => t + 1)}>TENTAR NOVAMENTE</Button></div>}
     <Dialog open={aberto} onOpenChange={(value) => { if (!salvando) setAberto(value); }}>
       <DialogContent className="max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-lg border-primary/50">
         <DialogHeader>
