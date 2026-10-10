@@ -16,7 +16,7 @@ type DocumentoContrato = {
 
 function prioridadeDocumento(documento: DocumentoContrato): number {
   const nome = documento.nome_arquivo.toLowerCase();
-  if (nome.includes("contrato-adendo")) return 3;
+  if (nome.includes("contrato-adendo") || nome.includes("contrato-recesso")) return 3;
   if (nome.includes("assinado")) return 2;
   if (!nome.includes("contrato-corrigido")) return 1;
   return 0;

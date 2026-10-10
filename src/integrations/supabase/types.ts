@@ -772,6 +772,91 @@ export type Database = {
         }
         Relationships: []
       }
+      recesso_aceites: {
+        Row: {
+          aceito_em: string
+          assinatura_id: string
+          documento_aditivo_id: string
+          documento_original_id: string
+          id: string
+          user_id: string
+          versao: string
+        }
+        Insert: {
+          aceito_em?: string
+          assinatura_id: string
+          documento_aditivo_id: string
+          documento_original_id: string
+          id?: string
+          user_id: string
+          versao: string
+        }
+        Update: {
+          aceito_em?: string
+          assinatura_id?: string
+          documento_aditivo_id?: string
+          documento_original_id?: string
+          id?: string
+          user_id?: string
+          versao?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recesso_aceites_assinatura_id_fkey"
+            columns: ["assinatura_id"]
+            isOneToOne: false
+            referencedRelation: "assinaturas_eletronicas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recesso_aceites_documento_aditivo_id_fkey"
+            columns: ["documento_aditivo_id"]
+            isOneToOne: false
+            referencedRelation: "documentos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recesso_aceites_documento_original_id_fkey"
+            columns: ["documento_original_id"]
+            isOneToOne: false
+            referencedRelation: "documentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recesso_desafios: {
+        Row: {
+          challenge: string
+          created_at: string
+          id: string
+          origin: string
+          rp_id: string
+          usado_em: string | null
+          user_id: string
+          versao: string
+        }
+        Insert: {
+          challenge: string
+          created_at?: string
+          id?: string
+          origin: string
+          rp_id: string
+          usado_em?: string | null
+          user_id: string
+          versao: string
+        }
+        Update: {
+          challenge?: string
+          created_at?: string
+          id?: string
+          origin?: string
+          rp_id?: string
+          usado_em?: string | null
+          user_id?: string
+          versao?: string
+        }
+        Relationships: []
+      }
       textos_app: {
         Row: {
           chave: string
@@ -981,6 +1066,19 @@ export type Database = {
       publicar_avaliacoes_do_mes: {
         Args: { _referencia?: string }
         Returns: Json
+      }
+      recesso_arquivar: {
+        Args: {
+          _agente: string
+          _arquivos: Json
+          _credencial: string
+          _desafio: string
+          _email: string
+          _ip: string
+          _nome: string
+          _user_id: string
+        }
+        Returns: undefined
       }
       rotulo_criterio: { Args: { _chave: string }; Returns: string }
       salvar_parceiro_ct: { Args: { dados: Json }; Returns: string }
