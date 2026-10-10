@@ -1,4 +1,6 @@
-export type TipoMarcacao = "nacional" | "local" | "emenda";
+import { RECESSO } from "@/lib/recesso";
+
+export type TipoMarcacao = "nacional" | "local" | "emenda" | "recesso";
 
 export type Marcacao = {
   /** YYYY-MM-DD */
@@ -70,6 +72,21 @@ export function marcacoesDoAno(ano: number): Marcacao[] {
     const anterior = somaDias(new Date(`${m.data}T12:00:00Z`), -1);
     if (mapa.has(anterior)) continue;
     mapa.set(anterior, { data: anterior, nome: `Emenda de ${m.nome}`, tipo: "emenda" });
+  }
+
+  const diaRecesso = new Date(`${RECESSO.inicio}T12:00:00Z`);
+  while (true) {
+    const data = iso(diaRecesso.getUTCFullYear(), diaRecesso.getUTCMonth() + 1, diaRecesso.getUTCDate());
+    if (data > RECESSO.fim) break;
+    if (diaRecesso.getUTCFullYear() === ano) {
+      const feriado = mapa.get(data);
+      mapa.set(data, {
+        data,
+        nome: `Recesso de fim de ano — Super CT${feriado?.tipo === "nacional" ? ` (${feriado.nome})` : ""}`,
+        tipo: "recesso",
+      });
+    }
+    diaRecesso.setUTCDate(diaRecesso.getUTCDate() + 1);
   }
 
   return [...mapa.values()].sort((a, b) => a.data.localeCompare(b.data));

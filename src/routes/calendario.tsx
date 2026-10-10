@@ -177,7 +177,7 @@ function CalendarioPage() {
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block size-3 rounded-sm bg-primary" aria-hidden="true" />
-            feriado / fechado
+            feriado / recesso / fechado
           </span>
           <span className="inline-flex items-center gap-1.5">
             <span className="inline-block size-3 rounded-sm border-2 border-primary bg-transparent" aria-hidden="true" />
@@ -211,6 +211,8 @@ function CalendarioPage() {
                       {diaExtenso(m.data)} •{" "}
                       {m.tipo === "emenda"
                         ? "Recesso (emenda de feriado)"
+                        : m.tipo === "recesso"
+                          ? "Recesso de fim de ano — atividades suspensas"
                         : m.tipo === "local"
                           ? "Recesso — feriado local"
                           : "Recesso — feriado nacional"}
