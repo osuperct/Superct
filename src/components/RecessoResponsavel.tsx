@@ -14,7 +14,7 @@ import { consultarAvisoRecesso } from "@/lib/recessoConsulta";
 import { supabase } from "@/integrations/supabase/client";
 import recessoNatal from "@/assets/recesso-natal-super-ct.jpg";
 
-export function RecessoResponsavel({ uid, enabled, onConfirmado }: { uid: string; enabled: boolean; onConfirmado: () => void }) {
+export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChange }: { uid: string; enabled: boolean; onConfirmado: () => void; onBloqueioChange?: (bloqueado: boolean) => void }) {
   const preparar = useServerFn(prepararRecesso);
   const confirmar = useServerFn(confirmarRecesso);
   const [consulta, setConsulta] = useState<{ uid: string; estado: EstadoAvisoRecesso } | null>(null);
@@ -52,10 +52,15 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado }: { uid: string
     } finally { setSalvando(false); }
   }
 
-  if (!enabled) return null;
   const estado = consulta?.uid === uid ? consulta.estado : "consultando";
+  const acessoBloqueado = recessoBloqueiaAcesso(enabled, estado);
+  useEffect(() => {
+    onBloqueioChange?.(acessoBloqueado);
+  }, [acessoBloqueado, onBloqueioChange]);
+
+  if (!enabled) return null;
   return <>
-    <Dialog open={recessoBloqueiaAcesso(enabled, estado)}>
+    <Dialog open={acessoBloqueado}>
       <DialogContent showCloseButton={false} onEscapeKeyDown={(event) => event.preventDefault()} onInteractOutside={(event) => event.preventDefault()} className="max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-lg border-primary/50">
         <img src={recessoNatal} alt="Personagens do Super CT com camisetas do uniforme e gorros de Papai Noel, ao lado de uma árvore de Natal e presentes" className="aspect-[2/1] w-full rounded-md object-cover" />
         <DialogHeader>

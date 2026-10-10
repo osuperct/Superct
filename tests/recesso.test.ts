@@ -1,10 +1,16 @@
 import { test, expect } from "bun:test";
 import { PDFDocument } from "pdf-lib";
-import { RECESSO, contratosPendentes, recessoBloqueiaAcesso } from "../src/lib/recesso";
+import { RECESSO, contratosPendentes, recessoBloqueiaAcesso, avaliacaoPodeNotificar } from "../src/lib/recesso";
 import { gerarAditivoRecesso } from "../src/lib/recessoPdf";
 
 test("recesso começa em 24/12/2026", () => { expect(RECESSO.inicio).toBe("2026-12-24"); });
 test("recesso termina em 03/01/2027", () => { expect(RECESSO.fim).toBe("2027-01-03"); });
+test("avaliação não encobre o aviso da cláusula e recesso ao entrar", () => {
+  expect(avaliacaoPodeNotificar(true, false, true)).toBe(false);
+  expect(avaliacaoPodeNotificar(false, false, false)).toBe(false);
+  expect(avaliacaoPodeNotificar(true, true, false)).toBe(false);
+  expect(avaliacaoPodeNotificar(true, false, false)).toBe(true);
+});
 test("responsável não segue na conta enquanto a confirmação de recesso estiver pendente", () => {
   expect(recessoBloqueiaAcesso(true, "pendente")).toBe(true);
   expect(recessoBloqueiaAcesso(true, "consultando")).toBe(true);
