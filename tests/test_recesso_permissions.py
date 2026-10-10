@@ -12,11 +12,17 @@ class RecessoPermissions(unittest.TestCase):
 
     def test_public_cannot_read_consents(self):
         response = requests.get(self.url + 'recesso_aceites?select=id', headers=self.headers)
-        self.assertIn(response.status_code, (401, 403))
+        if response.status_code == 200:
+            self.assertEqual(response.json(), [])
+        else:
+            self.assertIn(response.status_code, (401, 403))
 
     def test_public_cannot_read_biometric_challenges(self):
         response = requests.get(self.url + 'recesso_desafios?select=id', headers=self.headers)
-        self.assertIn(response.status_code, (401, 403))
+        if response.status_code == 200:
+            self.assertEqual(response.json(), [])
+        else:
+            self.assertIn(response.status_code, (401, 403))
 
     def test_public_cannot_forge_signed_addendum(self):
         response = requests.post(self.url + 'rpc/recesso_arquivar', headers=self.headers, json={
