@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Marcar o recesso de 24/12/2026 a 03/01/2027 no calendário do app e validar os dois meses.
+- [x] Marcar o recesso de 24/12/2026 a 03/01/2027 no calendário do app e validar os dois meses.
 
 - [x] Incluir cláusula anual de recesso nos novos contratos.
 - [x] Mostrar aviso de 24/12/2026 a 03/01/2027 com leitura, concordância biométrica e aditivo arquivado sem repetir após confirmação.
