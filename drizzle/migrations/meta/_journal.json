@@ -64,6 +64,13 @@
       "when": 1791504787126,
       "tag": "0008_save_ct_partner_atomically",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791670117081,
+      "tag": "0009_recesso_confirmacao_biometrica",
+      "breakpoints": true
     }
   ]
 }
