@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Incluir cláusula anual de recesso nos novos contratos.
+- [ ] Mostrar aviso de 24/12/2026 a 03/01/2027 com leitura, concordância biométrica e aditivo arquivado sem repetir após confirmação.
+- [ ] Validar permissões, geração do aditivo e confirmação na conta.
+
 - [x] Incluir edição completa de parcerias na área APP e sincronizar a janela pública e o painel do responsável, preservando informações privadas.
 
 - [x] Criar área Parceiros do CT com as informações das três artes e contatos individuais no WhatsApp.
