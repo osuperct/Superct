@@ -7,6 +7,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { RECESSO, contratosPendentes } from "@/lib/recesso";
 import { gerarAditivoRecesso } from "@/lib/recessoPdf";
 import { BUCKET } from "@/lib/documentos";
+import { consultarAvisoRecesso } from "@/lib/recessoConsulta";
 
 async function hash(bytes: Uint8Array) {
   const digest = await crypto.subtle.digest("SHA-256", new Uint8Array(bytes));
@@ -15,16 +16,7 @@ async function hash(bytes: Uint8Array) {
 
 export const consultarRecesso = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    const [{ data: perfil, error: ep }, { data: documentos, error: ed }, { data: aceites, error: ea }] = await Promise.all([
-      context.supabase.from("perfis").select("aprovado, bloqueado_em").eq("id", context.userId).maybeSingle(),
-      context.supabase.from("documentos").select("id, aluno_id, nome_arquivo, created_at").eq("user_id", context.userId).eq("tipo", "contrato"),
-      context.supabase.from("recesso_aceites").select("documento_original_id").eq("user_id", context.userId).eq("versao", RECESSO.versao),
-    ]);
-    if (ep || ed || ea) throw new Error("Não foi possível consultar o aviso de recesso.");
-    const pendentes = contratosPendentes(documentos ?? [], (aceites ?? []).map((a) => a.documento_original_id));
-    return { mostrar: Boolean(perfil?.aprovado && !perfil.bloqueado_em && (pendentes.length > 0 || !aceites?.length)), contratos: pendentes.length };
-  });
+  .handler(async ({ context }) => consultarAvisoRecesso(context.supabase));
 
 export const prepararRecesso = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
