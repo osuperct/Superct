@@ -16,6 +16,10 @@ export function recessoBloqueiaAcesso(enabled: boolean, estado: EstadoAvisoReces
   return enabled && estado !== "liberado";
 }
 
+export function avaliacaoPodeNotificar(perfilCarregado: boolean, avisoDocumentos: boolean, recessoBloqueado: boolean): boolean {
+  return perfilCarregado && !avisoDocumentos && !recessoBloqueado;
+}
+
 export function contratosPendentes<T extends { id: string; aluno_id: string | null; nome_arquivo: string; created_at: string }>(documentos: T[], aceites: string[]): T[] {
   const ultimos = new Map<string, T>();
   for (const doc of [...documentos].sort((a, b) => b.created_at.localeCompare(a.created_at))) {

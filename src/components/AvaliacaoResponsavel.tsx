@@ -24,7 +24,7 @@ import {
 
 type Alu = { id: string; nome: string };
 
-export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; alunos: Alu[]; demo?: Avaliacao[] }) {
+export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true }: { uid: string; alunos: Alu[]; demo?: Avaliacao[]; avisoHabilitado?: boolean }) {
   const [lista, setLista] = useState<Avaliacao[]>(demo ?? []);
   const [escolhida, setEscolhida] = useState<string>(demo?.[0]?.id ?? "");
 
@@ -114,7 +114,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo }: { uid: string; aluno
 
   return (
     <>
-    {aviso && recente && (
+    {avisoHabilitado && aviso && recente && (
       <div className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
         <div className="w-full max-w-sm rounded-lg border border-evaluation-blue/40 bg-evaluation-surface p-5 text-center shadow-evaluation">
           <div className="flex items-end justify-center gap-3">

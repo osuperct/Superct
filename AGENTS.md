@@ -15,3 +15,4 @@
 - Verify recess consent using server-issued, expiring WebAuthn challenges and server validation; archive appended original contracts and immutable per-contract receipts atomically to prevent false consent and repeated notices.
 - Read recess notice eligibility with the signed-in browser client and RLS, sharing the read helper with server callers, so external hosting configuration cannot prevent the notice; keep biometric consent and archival server-validated.
 - Keep the recess dialog controlled by account-scoped eligibility state, blocking dismissal during pending reads, read failures and unconfirmed consent so the responsible-account UI cannot bypass the confirmation gate.
+- Gate evaluation popups using the account-scoped recess dialog state so mandatory recess consent takes priority without marking unread evaluations as read.
