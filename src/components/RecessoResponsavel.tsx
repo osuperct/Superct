@@ -39,7 +39,7 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado }: { uid: string
     try {
       const inicio = await preparar();
       const resposta = await startRegistration({ optionsJSON: JSON.parse(inicio.optionsJSON) });
-      const resultado = await confirmar({ data: { desafio: inicio.id, visto: true, concordo: true, resposta } });
+      const resultado = await confirmar({ data: { desafio: inicio.id, visto: true, concordo: true, resposta: { ...resposta, clientExtensionResults: { ...resposta.clientExtensionResults } } } });
       setPendente(false); setAberto(false); onConfirmado();
       toast.success(`Concordância registrada e aditivo arquivado em ${resultado.quantidade} contrato(s).`);
     } catch (e) {
