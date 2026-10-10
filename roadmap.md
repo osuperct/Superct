@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Remover “Confirmar depois” e impedir fechar o aviso ou acessar a conta antes da confirmação do recesso.
+
 - [x] Corrigir a consulta do aviso de recesso ao entrar na conta e verificar com sessão autenticada, inclusive sem a consulta antiga disponível.
 
 - [x] Marcar o recesso de 24/12/2026 a 03/01/2027 no calendário do app e validar os dois meses.

@@ -1,10 +1,17 @@
 import { test, expect } from "bun:test";
 import { PDFDocument } from "pdf-lib";
-import { RECESSO, contratosPendentes } from "../src/lib/recesso";
+import { RECESSO, contratosPendentes, recessoBloqueiaAcesso } from "../src/lib/recesso";
 import { gerarAditivoRecesso } from "../src/lib/recessoPdf";
 
 test("recesso começa em 24/12/2026", () => { expect(RECESSO.inicio).toBe("2026-12-24"); });
 test("recesso termina em 03/01/2027", () => { expect(RECESSO.fim).toBe("2027-01-03"); });
+test("responsável não segue na conta enquanto a confirmação de recesso estiver pendente", () => {
+  expect(recessoBloqueiaAcesso(true, "pendente")).toBe(true);
+  expect(recessoBloqueiaAcesso(true, "consultando")).toBe(true);
+  expect(recessoBloqueiaAcesso(true, "erro")).toBe(true);
+  expect(recessoBloqueiaAcesso(true, "liberado")).toBe(false);
+  expect(recessoBloqueiaAcesso(false, "pendente")).toBe(false);
+});
 const documento = (id: string, aluno_id = "aluno-1", nome_arquivo = "contrato-assinado.pdf", created_at = "2026-10-01") => ({ id, aluno_id, nome_arquivo, created_at });
 test("concordância registrada não volta a solicitar confirmação para o mesmo contrato", () => {
   expect(contratosPendentes([documento("original"), documento("aditivo", "aluno-1", "contrato-recesso-v1.pdf", "2026-10-10")], ["original"])).toHaveLength(0);
