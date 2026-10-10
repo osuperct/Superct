@@ -1,3 +1,5 @@
+import { RECESSO } from "@/lib/recesso";
+
 export const EMAIL_SUPER_CT = "osuper.c.t@gmail.com";
 export const BUCKET = "documentos-alunos";
 
@@ -190,6 +192,7 @@ Esta cláusula será interpretada em conformidade com o Código de Defesa do Con
     titulo: "CLÁUSULA 10ª — AUTORIZAÇÃO DE USO DE IMAGEM",
     texto: TERMO_IMAGEM,
   },
+  { titulo: RECESSO.titulo, texto: RECESSO.texto },
   {
     titulo: "CLÁUSULA 11ª — FORO",
     texto:
