@@ -869,7 +869,7 @@ function Painel({ session }: { session: Session }) {
         </div>
       )}
       <LembreteAcesso emailLogado={session.user.email} />
-      <RecessoResponsavel uid={uid} enabled={aprovado === true && !bloqueado && !mostrarAvisoInicial} onConfirmado={() => void carregar()} />
+      <RecessoResponsavel uid={uid} enabled={aprovado === true && !bloqueado && !mostrarAvisoInicial} onConfirmado={() => void recarregar()} />
 
       <Accordion type="multiple" value={topicosAbertos} onValueChange={alterarTopicos} className="mt-4 space-y-2">
         <div className="rounded-md border border-border bg-card/50 px-4 py-3">

@@ -48,12 +48,12 @@ export const prepararRecesso = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin.from("recesso_desafios").insert({ user_id: context.userId, origin: url.origin, rp_id: url.hostname, challenge: options.challenge, versao: RECESSO.versao }).select("id").single();
     if (error || !data) throw new Error("Não foi possível iniciar a confirmação.");
-    return { id: data.id, options };
+    return { id: data.id, optionsJSON: JSON.stringify(options) };
   });
 
 const respostaSchema = z.object({
   id: z.string().min(1).max(2000), rawId: z.string().min(1).max(2000), type: z.literal("public-key"),
-  response: z.object({ clientDataJSON: z.string().min(1).max(16000), attestationObject: z.string().min(1).max(100000), transports: z.array(z.enum(["ble", "cable", "hybrid", "internal", "nfc", "smart-card", "usb"])).optional(), publicKeyAlgorithm: z.number().optional(), publicKey: z.string().optional(), authenticatorData: z.string().optional() }),
+  response: z.object({ clientDataJSON: z.string().min(1).max(16000), attestationObject: z.string().min(1).max(100000), transports: z.array(z.string().max(30)).max(10).optional(), publicKeyAlgorithm: z.number().optional(), publicKey: z.string().max(16000).optional(), authenticatorData: z.string().max(16000).optional() }),
   clientExtensionResults: z.record(z.unknown()), authenticatorAttachment: z.enum(["platform", "cross-platform"]).optional(),
 });
 
