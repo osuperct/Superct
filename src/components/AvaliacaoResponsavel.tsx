@@ -232,7 +232,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
 
           <div className="grid grid-cols-2 gap-1.5">
             <Button type="button" size="sm" variant={modo === "mes" ? "default" : "outline"} onClick={() => setModo("mes")}>
-              <List className="size-4" /> HISTÓRICO POR MÊS
+              <List className="size-4" /> HISTÓRICO
             </Button>
             <Button type="button" size="sm" variant={modo === "grafico" ? "default" : "outline"} onClick={() => setModo("grafico")}>
               <IconeGrafico className="size-4" /> VER GRÁFICO
