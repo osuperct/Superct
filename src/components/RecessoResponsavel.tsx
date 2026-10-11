@@ -8,7 +8,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { biometriaDisponivel } from "@/lib/biometria";
-import { RECESSO, recessoBloqueiaAcesso, type EstadoAvisoRecesso } from "@/lib/recesso";
+import { RECESSO, recessoBloqueiaAcesso, recessoPodeConfirmar, type EstadoAvisoRecesso } from "@/lib/recesso";
+import { useSidebarControl } from "@/components/SidebarContext";
 import { prepararRecesso, confirmarRecesso } from "@/lib/recesso.functions";
 import { consultarAvisoRecesso } from "@/lib/recessoConsulta";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,11 +18,10 @@ import recessoNatal from "@/assets/recesso-natal-super-ct.jpg";
 export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChange }: { uid: string; enabled: boolean; onConfirmado: () => void; onBloqueioChange?: (bloqueado: boolean) => void }) {
   const preparar = useServerFn(prepararRecesso);
   const confirmar = useServerFn(confirmarRecesso);
+  const { setForcarRecolhida } = useSidebarControl();
   const [consulta, setConsulta] = useState<{ uid: string; estado: EstadoAvisoRecesso } | null>(null);
   const [contratos, setContratos] = useState(0);
-  const [leu, setLeu] = useState(false);
-  const [visto, setVisto] = useState(false);
-  const [concordo, setConcordo] = useState(false);
+  const [aceitou, setAceitou] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [bio, setBio] = useState<boolean | null>(null);
   const [erro, setErro] = useState("");
@@ -32,14 +32,14 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
     let ativo = true;
     setErro("");
     setConsulta({ uid, estado: "consultando" });
-    setLeu(false); setVisto(false); setConcordo(false);
+    setAceitou(false);
     void consultarAvisoRecesso(supabase).then((r) => { if (ativo) { setConsulta({ uid, estado: r.mostrar ? "pendente" : "liberado" }); setContratos(r.contratos); } }).catch((e) => { if (ativo) { setConsulta({ uid, estado: "erro" }); setErro(e instanceof Error ? e.message : "Não foi possível consultar o aviso de recesso."); } });
     void biometriaDisponivel().then((r) => { if (ativo) setBio(r); });
     return () => { ativo = false; };
   }, [uid, enabled, tentativa]);
 
   async function aceitar() {
-    if (!visto || !concordo || !leu || !bio || salvando || !contratos) return;
+    if (!recessoPodeConfirmar(aceitou, bio, contratos, salvando)) return;
     setSalvando(true); setErro("");
     try {
       const inicio = await preparar();
@@ -57,6 +57,10 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
   useEffect(() => {
     onBloqueioChange?.(acessoBloqueado);
   }, [acessoBloqueado, onBloqueioChange]);
+  useEffect(() => {
+    setForcarRecolhida(acessoBloqueado);
+    return () => setForcarRecolhida(false);
+  }, [acessoBloqueado, setForcarRecolhida]);
 
   if (!enabled) return null;
   return <>
@@ -66,21 +70,20 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
         <DialogHeader>
           <CalendarDays className="mb-2 size-8 text-primary" />
           <DialogTitle className="pr-6 font-display text-2xl">RECESSO SUPER CT</DialogTitle>
-          <DialogDescription className="pt-2 text-base">Aviso prévio: as atividades regulares estarão suspensas de <strong className="text-foreground">24/12/2026 a 03/01/2027</strong>, inclusive.</DialogDescription>
+          <DialogDescription className="pt-2 text-base">Aviso prévio de recesso de Natal: as atividades regulares estarão suspensas de <strong className="text-foreground">24/12/2026 a 03/01/2027</strong>.</DialogDescription>
         </DialogHeader>
         {estado === "consultando" ? <p role="status" className="flex items-center gap-2 text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin" />Consultando aviso de recesso…</p> : estado === "erro" ? <div><p role="alert" className="text-sm text-destructive">{erro}</p><Button variant="outline" className="mt-2" onClick={() => setTentativa((t) => t + 1)}>TENTAR NOVAMENTE</Button></div> : <>
-        <Accordion type="single" collapsible onValueChange={(value) => { if (value) setLeu(true); }}>
+        <Accordion type="single" collapsible>
           <AccordionItem value="clausula">
             <AccordionTrigger className="text-xs">Ler toda a cláusula de recesso</AccordionTrigger>
             <AccordionContent className="space-y-3 text-xs leading-relaxed"><h3 className="font-semibold">{RECESSO.titulo}</h3><p className="whitespace-pre-line">{RECESSO.texto}</p></AccordionContent>
           </AccordionItem>
         </Accordion>
-        <label className="flex items-start gap-3 text-sm"><Checkbox checked={visto} disabled={!leu || salvando} onCheckedChange={(v) => setVisto(v === true)} /><span>Marcar como visto: li toda a cláusula.</span></label>
-        <label className="flex items-start gap-3 text-sm"><Checkbox checked={concordo} disabled={!visto || salvando} onCheckedChange={(v) => setConcordo(v === true)} /><span>Estou ciente e concordo com o recesso e com a inclusão desta cláusula como aditivo ao contrato.</span></label>
+        <label className="flex items-start gap-3 text-sm"><Checkbox checked={aceitou} disabled={salvando} onCheckedChange={(v) => setAceitou(v === true)} /><span>Li e aceito os termos</span></label>
         {bio === false && <p className="text-xs text-muted-foreground">Este aparelho não oferece confirmação biométrica ou bloqueio de tela compatível. Use um aparelho compatível para confirmar; nenhum aditivo será registrado sem essa verificação.</p>}
         {contratos === 0 && <p className="text-xs text-muted-foreground">Seu contrato assinado precisa estar anexado para receber o aditivo. Caso tenha sido entregue em papel, solicite à administração que anexe uma cópia.</p>}
         {erro && <p role="alert" className="text-sm text-destructive">{erro}</p>}
-        <Button disabled={!bio || !visto || !concordo || !contratos || salvando} onClick={() => void aceitar()} className="h-auto min-h-11 whitespace-normal py-3">{salvando ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}{salvando ? "REGISTRANDO ADITIVO…" : "CONFIRMAR COM BIOMETRIA"}</Button>
+        <Button disabled={!recessoPodeConfirmar(aceitou, bio, contratos, salvando)} onClick={() => void aceitar()} className="h-auto min-h-11 whitespace-normal py-3">{salvando ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}{salvando ? "REGISTRANDO ADITIVO…" : "OK"}</Button>
         </>}
       </DialogContent>
     </Dialog>
