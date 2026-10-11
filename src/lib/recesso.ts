@@ -33,8 +33,10 @@ export function recessoPodeConfirmar(aceitou: boolean, biometria: boolean | null
   return aceitou && biometria === true && contratos > 0 && !salvando;
 }
 
+// "consultando" não mostra o aviso: quem já concordou não deve vê-lo piscar antes da resposta.
+// O bloqueio só vale quando a leitura conclui (pendente/erro) — o aceite é validado pela leitura, não pelo bloqueio.
 export function recessoBloqueiaAcesso(enabled: boolean, estado: EstadoAvisoRecesso): boolean {
-  return enabled && estado !== "liberado";
+  return enabled && (estado === "pendente" || estado === "erro");
 }
 
 export function avaliacaoPodeNotificar(perfilCarregado: boolean, avisoDocumentos: boolean, recessoBloqueado: boolean): boolean {
