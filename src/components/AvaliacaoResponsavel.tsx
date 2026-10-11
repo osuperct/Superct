@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Calendar, Download, Sparkles, Target } from "lucide-react";
+import { Calendar, ChevronDown, Download, LineChart as IconeGrafico, List, Sparkles, Target } from "lucide-react";
 import { toast } from "sonner";
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -27,6 +27,8 @@ type Alu = { id: string; nome: string };
 export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true }: { uid: string; alunos: Alu[]; demo?: Avaliacao[]; avisoHabilitado?: boolean }) {
   const [lista, setLista] = useState<Avaliacao[]>(demo ?? []);
   const [escolhida, setEscolhida] = useState<string>(demo?.[0]?.id ?? "");
+  const [aberto, setAberto] = useState(false);
+  const [modo, setModo] = useState<"mes" | "grafico">("mes");
 
   useEffect(() => {
     if (demo) return;
@@ -144,6 +146,8 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
     setAviso(false);
     if (abrir && recente) {
       setEscolhida(recente.id);
+      setAberto(true);
+      setModo("mes");
       setTimeout(() => document.getElementById("relatorio-mensal")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
   }
@@ -175,7 +179,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
       </div>
     )}
     <section id="relatorio-mensal" className="mt-4 scroll-mt-4 overflow-hidden rounded-lg border border-evaluation-blue/30 bg-evaluation-surface shadow-evaluation">
-      <header className="relative border-b border-evaluation-blue/20 bg-evaluation-header px-4 py-4">
+      <header role="button" tabIndex={0} aria-expanded={aberto} onClick={() => setAberto((v) => !v)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setAberto((v) => !v); } }} className="relative cursor-pointer border-b border-evaluation-blue/20 bg-evaluation-header px-4 py-4">
         <div className="flex items-center justify-center gap-2">
           <div className="relative flex h-16 w-12 shrink-0 items-end justify-center">
             <img src={kael} alt="Kal-El segurando uma estrela" className="h-14 w-auto object-contain drop-shadow-evaluation-blue" />
@@ -193,17 +197,18 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
         <p className="mt-2 text-center text-xs text-muted-foreground">
           Publicada todo dia 28 para acompanhar cada conquista.
         </p>
-        <div className="mt-3 grid grid-cols-3 gap-1.5">
+        <ChevronDown className={`absolute right-3 top-3 size-5 text-muted-foreground transition-transform ${aberto ? "rotate-180" : ""}`} />
+        {aberto && <div className="mt-3 grid grid-cols-3 gap-1.5">
           {FAIXAS.map((f) => (
             <span key={f.rotulo} className={`rounded-md border border-current/20 bg-background/30 px-1 py-1.5 text-center font-mono text-[8px] uppercase tracking-wider ${f.classe}`}>
               <strong className="block">{f.rotulo}</strong>
               {f.ate === 3 ? "1–3" : f.ate === 6 ? "4–6" : "7–10"} estrelas
             </span>
           ))}
-        </div>
+        </div>}
       </header>
 
-      {lista.length === 0 ? (
+      {!aberto ? null : lista.length === 0 ? (
         <div className="px-4 py-6 text-center">
           <Sparkles className="mx-auto size-7 text-evaluation-star/50" />
           <p className="mt-2 text-sm text-muted-foreground">Nenhuma avaliação disponível ainda.</p>
@@ -225,7 +230,37 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
             </select>
           </div>
 
-          {atual && (
+          <div className="grid grid-cols-2 gap-1.5">
+            <Button type="button" size="sm" variant={modo === "mes" ? "default" : "outline"} onClick={() => setModo("mes")}>
+              <List className="size-4" /> HISTÓRICO POR MÊS
+            </Button>
+            <Button type="button" size="sm" variant={modo === "grafico" ? "default" : "outline"} onClick={() => setModo("grafico")}>
+              <IconeGrafico className="size-4" /> VER GRÁFICO
+            </Button>
+          </div>
+
+          {atual && modo === "grafico" && (
+            <div className="rounded-md border border-evaluation-blue/25 bg-background/35 p-3">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                Evolução de {nomeAluno(atual.aluno_id)} · média mensal
+              </p>
+              <div className="mt-3 h-52 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={evolucao} margin={{ top: 8, right: 10, left: -22, bottom: 0 }}>
+                    <XAxis dataKey="mes" tick={{ fontSize: 10 }} stroke="currentColor" />
+                    <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} stroke="currentColor" />
+                    <Tooltip formatter={(v: number) => [`${v}/10`, "Média"]} />
+                    <Line type="monotone" dataKey="media" stroke="var(--primary)" strokeWidth={3} dot={{ r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+              <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                O gráfico se atualiza automaticamente a cada nova avaliação publicada no dia 28.
+              </p>
+            </div>
+          )}
+
+          {atual && modo === "mes" && (
             <div className="rounded-md border border-evaluation-blue/25 bg-background/35 p-3 shadow-inner">
               <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-primary">
                 <Sparkles className="size-3" /> Nova avaliação · {nomeAluno(atual.aluno_id)} —{" "}
@@ -238,19 +273,6 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
                 </div>
                 <TrofeuColorido className="size-12 shrink-0 drop-shadow-evaluation-star" />
               </div>
-
-              {evolucao.length > 1 && (
-                <div className="mt-3 h-36 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={evolucao} margin={{ top: 5, right: 8, left: -22, bottom: 0 }}>
-                      <XAxis dataKey="mes" tick={{ fontSize: 10 }} stroke="currentColor" />
-                      <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} stroke="currentColor" />
-                      <Tooltip formatter={(v: number) => [`${v}/10`, "Média"]} />
-                      <Line type="monotone" dataKey="media" stroke="hsl(var(--primary))" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              )}
 
               <ul className="mt-3 space-y-2 rounded-md border border-border bg-evaluation-surface/80 p-3">
                 {CRITERIOS.map((c) => (
