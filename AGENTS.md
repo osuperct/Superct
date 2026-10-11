@@ -18,3 +18,4 @@
 - Gate evaluation popups using the account-scoped recess dialog state so mandatory recess consent takes priority without marking unread evaluations as read.
 - Drive sidebar forced collapse from the recess access gate and map the single terms acceptance to the existing server consent fields; preserve server-validated biometric archival.
 - Bind recess WebAuthn challenges to an explicit browser origin validated against exact app hosts rather than proxy-rewritten request headers, and validate the same stored origin during verification.
+- Recess biometric consent fetches its challenge from an authenticated RPC before the OK tap and verifies/archives with a request-scoped user client (no service key), because Android Chrome drops the gesture after network waits and the external host lacks private server env vars.

@@ -1080,6 +1080,24 @@ export type Database = {
         }
         Returns: undefined
       }
+      recesso_iniciar: {
+        Args: { _origin: string }
+        Returns: {
+          challenge: string
+          id: string
+          rp_id: string
+        }[]
+      }
+      recesso_registrar: {
+        Args: {
+          _agente: string
+          _arquivos: Json
+          _credencial: string
+          _desafio: string
+          _ip: string
+        }
+        Returns: undefined
+      }
       rotulo_criterio: { Args: { _chave: string }; Returns: string }
       salvar_parceiro_ct: { Args: { dados: Json }; Returns: string }
       valor_do_plano: { Args: { _texto: string }; Returns: number }
