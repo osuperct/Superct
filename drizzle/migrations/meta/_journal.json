@@ -71,6 +71,13 @@
       "when": 1791670117081,
       "tag": "0009_recesso_confirmacao_biometrica",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791678284818,
+      "tag": "0010_recesso_biometria_sem_chave_servidor",
+      "breakpoints": true
     }
   ]
 }
