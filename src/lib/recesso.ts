@@ -12,6 +12,17 @@ Os períodos de recesso integrarão o calendário de funcionamento apresentado n
 
 export type EstadoAvisoRecesso = "consultando" | "pendente" | "erro" | "liberado";
 
+export function origemConfirmacaoRecesso(origem: string): URL {
+  const url = new URL(origem);
+  const projeto = "f98de061-dc8c-43b5-9c7f-56210aba7b2d";
+  const hosts = ["osuperct.com", "www.osuperct.com", "superct.lovable.app", `${projeto}.lovableproject.com`, `id-preview--${projeto}.lovable.app`];
+  const local = url.hostname === "localhost" && ["http:", "https:"].includes(url.protocol);
+  if (url.origin !== origem || url.username || url.password || (!local && (url.protocol !== "https:" || url.port || !hosts.includes(url.hostname)))) {
+    throw new Error("Endereço não autorizado para confirmar o recesso.");
+  }
+  return url;
+}
+
 export function recessoPodeConfirmar(aceitou: boolean, biometria: boolean | null, contratos: number, salvando: boolean): boolean {
   return aceitou && biometria === true && contratos > 0 && !salvando;
 }

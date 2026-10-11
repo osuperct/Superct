@@ -1,10 +1,21 @@
 import { test, expect } from "bun:test";
 import { PDFDocument } from "pdf-lib";
-import { RECESSO, contratosPendentes, recessoBloqueiaAcesso, avaliacaoPodeNotificar, recessoPodeConfirmar } from "../src/lib/recesso";
+import { RECESSO, contratosPendentes, recessoBloqueiaAcesso, avaliacaoPodeNotificar, recessoPodeConfirmar, origemConfirmacaoRecesso } from "../src/lib/recesso";
 import { gerarAditivoRecesso } from "../src/lib/recessoPdf";
 
 test("recesso começa em 24/12/2026", () => { expect(RECESSO.inicio).toBe("2026-12-24"); });
 test("recesso termina em 03/01/2027", () => { expect(RECESSO.fim).toBe("2027-01-03"); });
+test("desafio biométrico preserva a origem real da prévia e do site", () => {
+  const preview = "https://f98de061-dc8c-43b5-9c7f-56210aba7b2d.lovableproject.com";
+  expect(origemConfirmacaoRecesso(preview).hostname).toBe("f98de061-dc8c-43b5-9c7f-56210aba7b2d.lovableproject.com");
+  expect(origemConfirmacaoRecesso("https://osuperct.com").origin).toBe("https://osuperct.com");
+  expect(origemConfirmacaoRecesso("http://localhost:8080").hostname).toBe("localhost");
+});
+test("desafio rejeita origens externas e imitações do domínio", () => {
+  for (const origem of ["https://evil.example", "https://osuperct.com.evil.example", "http://osuperct.com", "https://osuperct.com/conta", "https://outro.lovableproject.com"]) {
+    expect(() => origemConfirmacaoRecesso(origem)).toThrow();
+  }
+});
 test("uma única seleção dos termos permite iniciar a confirmação biométrica", () => {
   expect(recessoPodeConfirmar(false, true, 1, false)).toBe(false);
   expect(recessoPodeConfirmar(true, true, 1, false)).toBe(true);

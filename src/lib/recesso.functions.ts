@@ -4,7 +4,7 @@ import { generateRegistrationOptions, verifyRegistrationResponse } from "@simple
 import type { RegistrationResponseJSON } from "@simplewebauthn/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { RECESSO, contratosPendentes } from "@/lib/recesso";
+import { RECESSO, contratosPendentes, origemConfirmacaoRecesso } from "@/lib/recesso";
 import { gerarAditivoRecesso } from "@/lib/recessoPdf";
 import { BUCKET } from "@/lib/documentos";
 import { consultarAvisoRecesso } from "@/lib/recessoConsulta";
@@ -20,17 +20,13 @@ export const consultarRecesso = createServerFn({ method: "POST" })
 
 export const prepararRecesso = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator(z.object({ origin: z.string().max(300) }))
+  .handler(async ({ context, data: entrada }) => {
     const { data: perfil } = await context.supabase.from("perfis").select("aprovado, bloqueado_em, nome_responsavel").eq("id", context.userId).maybeSingle();
     if (!perfil?.aprovado || perfil.bloqueado_em) throw new Error("Acesso não liberado.");
-    const req = getRequest();
-    const origin = req.headers.get("origin");
-    if (!origin) throw new Error("Abra o aviso novamente para confirmar.");
-    const url = new URL(origin);
-    const host = new URL(req.url).hostname;
-    const conhecidos = ["osuperct.com", "www.osuperct.com", "superct.lovable.app", "localhost"];
-    const preview = url.hostname.endsWith(".lovable.app") && url.hostname.includes("f98de061-dc8c-43b5-9c7f-56210aba7b2d");
-    if (url.hostname !== host && !conhecidos.includes(url.hostname) && !preview) throw new Error("Origem inválida.");
+    // Preview proxies can rewrite the Origin header to localhost. Validate the
+    // explicit browser origin against exact app hosts and bind it to the challenge.
+    const url = origemConfirmacaoRecesso(entrada.origin);
     const options = await generateRegistrationOptions({
       rpName: "Super CT — Recesso", rpID: url.hostname, userName: context.userId,
       userDisplayName: perfil.nome_responsavel, userID: new TextEncoder().encode(context.userId),
