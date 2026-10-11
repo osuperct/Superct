@@ -36,7 +36,8 @@ test("avaliação não encobre o aviso da cláusula e recesso ao entrar", () => 
 });
 test("responsável não segue na conta enquanto a confirmação de recesso estiver pendente", () => {
   expect(recessoBloqueiaAcesso(true, "pendente")).toBe(true);
-  expect(recessoBloqueiaAcesso(true, "consultando")).toBe(true);
+  // Quem já concordou não deve ver o aviso piscar durante a consulta.
+  expect(recessoBloqueiaAcesso(true, "consultando")).toBe(false);
   expect(recessoBloqueiaAcesso(true, "erro")).toBe(true);
   expect(recessoBloqueiaAcesso(true, "liberado")).toBe(false);
   expect(recessoBloqueiaAcesso(false, "pendente")).toBe(false);
