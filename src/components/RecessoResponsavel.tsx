@@ -42,13 +42,15 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
     if (!recessoPodeConfirmar(aceitou, bio, contratos, salvando)) return;
     setSalvando(true); setErro("");
     try {
-      const inicio = await preparar();
-      const resposta = await startRegistration({ optionsJSON: JSON.parse(inicio.optionsJSON) });
+      const inicio = await preparar({ data: { origin: window.location.origin } });
+      const optionsJSON = JSON.parse(inicio.optionsJSON);
+      if (optionsJSON.rp?.id !== window.location.hostname) throw new Error("Não foi possível abrir a biometria neste endereço. Recarregue a página e tente novamente.");
+      const resposta = await startRegistration({ optionsJSON });
       const resultado = await confirmar({ data: { desafio: inicio.id, visto: true, concordo: true, resposta: { ...resposta, clientExtensionResults: { ...resposta.clientExtensionResults } } } });
       setConsulta({ uid, estado: "liberado" }); onConfirmado();
       toast.success(`Concordância registrada e aditivo arquivado em ${resultado.quantidade} contrato(s).`);
     } catch (e) {
-      setErro(e instanceof Error && e.name !== "NotAllowedError" ? e.message : "Confirmação cancelada. O aditivo não foi registrado.");
+      setErro(e instanceof Error && e.name !== "NotAllowedError" ? e.message : "O navegador não concluiu a confirmação do aparelho. Se a biometria não abriu, acesse sua conta diretamente no Chrome, fora da janela de prévia, e tente novamente. Nenhum aditivo foi registrado.");
     } finally { setSalvando(false); }
   }
 
