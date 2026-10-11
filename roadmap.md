@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Ajustar texto de Natal, recolher o menu lateral e usar uma única seleção “Li e aceito os termos” com OK e biometria obrigatória.
+
 - [x] Impedir que a notificação de avaliação encubra o aviso obrigatório da cláusula de recesso; conferido com conta conectada e avaliação não lida, sem registrar concordância.
 
 - [x] Remover “Confirmar depois” e impedir fechar o aviso ou acessar a conta antes da confirmação do recesso; verificado com sessão autenticada, sem registrar concordância.
