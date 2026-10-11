@@ -49,7 +49,6 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
         if (!ativo) return;
         const linha = Array.isArray(data) ? data[0] : null;
         if (error || !linha) { console.error("recesso_iniciar", error?.message); setErro("Não foi possível preparar a biometria. Desmarque e marque novamente “Li e aceito os termos”."); setPreparo(null); return; }
-        setErro("");
         setPreparo({ id: linha.id, challenge: linha.challenge, rpId: linha.rp_id, em: Date.now() });
       });
     };
