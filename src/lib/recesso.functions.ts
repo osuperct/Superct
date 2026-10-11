@@ -1,8 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
-import { verifyRegistrationResponse } from "@simplewebauthn/server";
-import type { RegistrationResponseJSON } from "@simplewebauthn/server";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
 import { RECESSO, contratosPendentes } from "@/lib/recesso";
