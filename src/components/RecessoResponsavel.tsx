@@ -109,7 +109,7 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
         <DialogHeader>
           <CalendarDays className="mb-2 size-8 text-primary" />
           <DialogTitle className="pr-6 font-display text-2xl">Aviso prévio sobre o <span className="text-evaluation-orange">recesso de fim de ano do Super CT</span></DialogTitle>
-          <DialogDescription className="pt-2 text-base">Aviso prévio de recesso de Natal: as atividades regulares estarão suspensas nos dias <strong className="text-foreground">24, 28, 29, 30 e 31 de dezembro de 2026</strong>.</DialogDescription>
+          <DialogDescription className="sr-only">Aviso de recesso do Super CT.</DialogDescription>
         </DialogHeader>
         {estado === "consultando" ? <p role="status" className="flex items-center gap-2 text-sm text-muted-foreground"><LoaderCircle className="size-4 animate-spin" />Consultando aviso de recesso…</p> : estado === "erro" ? <div><p role="alert" className="text-sm text-destructive">{erro}</p><Button variant="outline" className="mt-2" onClick={() => setTentativa((t) => t + 1)}>TENTAR NOVAMENTE</Button></div> : <>
         <Accordion type="single" collapsible>
