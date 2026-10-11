@@ -1,5 +1,7 @@
 # Roadmap
 
+- [ ] Corrigir a origem da confirmação biométrica no aviso e verificar o OK sem registrar consentimento real.
+
 - [x] Ajustar texto de Natal, recolher o menu lateral e usar uma única seleção “Li e aceito os termos” com OK e biometria obrigatória; verificado na conta conectada sem registrar aceite, com 10 testes aprovados.
 
 - [x] Impedir que a notificação de avaliação encubra o aviso obrigatório da cláusula de recesso; conferido com conta conectada e avaliação não lida, sem registrar concordância.
