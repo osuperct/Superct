@@ -78,6 +78,13 @@
       "when": 1791678284818,
       "tag": "0010_recesso_biometria_sem_chave_servidor",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791679617332,
+      "tag": "0011_avaliacoes_lidas",
+      "breakpoints": true
     }
   ]
 }

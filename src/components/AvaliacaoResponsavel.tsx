@@ -83,23 +83,63 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
   const [aviso, setAviso] = useState(false);
   useEffect(() => {
     if (demo || !recente) return;
+    let ativo = true;
+    const doMes = lista.filter((item) => item.referencia === recente.referencia).map((item) => item.id);
+    let lidoLocal = false;
     try {
-      const mesJaLido = localStorage.getItem(chaveVisto);
-      const avaliacaoJaLida = localStorage.getItem(`avaliacao-vista-${recente.id}`);
-      setAviso(!mesJaLido && !avaliacaoJaLida);
+      lidoLocal = !!localStorage.getItem(chaveVisto) || !!localStorage.getItem(`avaliacao-vista-${recente.id}`);
     } catch {
       /* ignore */
     }
-  }, [demo, recente, chaveVisto]);
+    if (lidoLocal) {
+      setAviso(false);
+      return;
+    }
+    void supabase
+      .from("avaliacoes_lidas")
+      .select("avaliacao_id")
+      .eq("user_id", uid)
+      .in("avaliacao_id", doMes)
+      .then(({ data, error }) => {
+        if (!ativo) return;
+        if (error) {
+          setAviso(false);
+          return;
+        }
+        const lidas = new Set((data ?? []).map((r) => r.avaliacao_id));
+        const jaLido = doMes.length > 0 && doMes.every((id) => lidas.has(id));
+        if (jaLido) {
+          try {
+            localStorage.setItem(chaveVisto, "1");
+          } catch {
+            /* ignore */
+          }
+        }
+        setAviso(!jaLido);
+      });
+    return () => {
+      ativo = false;
+    };
+  }, [demo, recente, chaveVisto, lista, uid]);
 
   function fecharAviso(abrir: boolean) {
+    const doMes = lista.filter((item) => item.referencia === recente?.referencia);
     try {
       localStorage.setItem(chaveVisto, "1");
-      for (const avaliacao of lista.filter((item) => item.referencia === recente?.referencia)) {
+      for (const avaliacao of doMes) {
         localStorage.setItem(`avaliacao-vista-${avaliacao.id}`, "1");
       }
     } catch {
       /* ignore */
+    }
+    if (!demo && doMes.length > 0) {
+      void supabase
+        .from("avaliacoes_lidas")
+        .upsert(
+          doMes.map((a) => ({ user_id: uid, avaliacao_id: a.id })),
+          { onConflict: "user_id,avaliacao_id", ignoreDuplicates: true },
+        )
+        .then(() => undefined);
     }
     setAviso(false);
     if (abrir && recente) {
