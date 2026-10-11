@@ -2,12 +2,18 @@ export const RECESSO = {
   versao: "recesso-2026-2027-v1",
   inicio: "2026-12-24",
   fim: "2027-01-03",
-  titulo: "CLÁUSULA — DO CALENDÁRIO ANUAL E RECESSO DE FIM DE ANO",
+  titulo: "CLÁUSULA — DO CALENDÁRIO ANUAL, RECESSO DE FIM DE ANO E MENSALIDADE FIXA",
   texto: `O SUPER CT poderá estabelecer períodos de recesso durante as festividades de Carnaval, Natal e Ano-Novo, conforme calendário anual previamente informado aos CONTRATANTES.
 
 As datas de suspensão das atividades regulares serão comunicadas antecipadamente, por meios oficiais de comunicação do SUPER CT.
 
-Os períodos de recesso integrarão o calendário de funcionamento apresentado no momento da contratação, com informação clara sobre sua repercussão na prestação dos serviços e nos valores dos planos.`,
+Os períodos de recesso integrarão o calendário de funcionamento apresentado no momento da contratação, com informação clara sobre sua repercussão na prestação dos serviços e nos valores dos planos.
+
+Parágrafo primeiro — Da mensalidade fixa: O CONTRATANTE declara estar ciente de que o valor da mensalidade contratada é fixo, correspondendo ao plano de atividades oferecido pelo SUPER CT ao longo do calendário anual, não sendo calculado proporcionalmente à quantidade de dias úteis ou aulas existentes em cada mês.
+
+Parágrafo segundo — Dos recessos programados: Os períodos de recesso previamente estabelecidos e informados no calendário anual já estarão considerados na composição do valor da mensalidade fixa, não implicando, por si só, descontos proporcionais ou reposições automáticas das atividades, desde que respeitadas as condições contratadas e a legislação aplicável.
+
+Parágrafo terceiro — Da ciência e concordância: Ao assinar o presente contrato ou aditivo, o CONTRATANTE declara ter recebido informações claras sobre os períodos de recesso, o calendário de funcionamento e a sistemática de cobrança da mensalidade fixa, manifestando sua ciência e concordância com as condições estabelecidas.`,
 };
 
 export type EstadoAvisoRecesso = "consultando" | "pendente" | "erro" | "liberado";
