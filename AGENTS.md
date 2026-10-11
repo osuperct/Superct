@@ -16,3 +16,4 @@
 - Read recess notice eligibility with the signed-in browser client and RLS, sharing the read helper with server callers, so external hosting configuration cannot prevent the notice; keep biometric consent and archival server-validated.
 - Keep the recess dialog controlled by account-scoped eligibility state, blocking dismissal during pending reads, read failures and unconfirmed consent so the responsible-account UI cannot bypass the confirmation gate.
 - Gate evaluation popups using the account-scoped recess dialog state so mandatory recess consent takes priority without marking unread evaluations as read.
+- Drive sidebar forced collapse from the recess access gate and map the single terms acceptance to the existing server consent fields; preserve server-validated biometric archival.

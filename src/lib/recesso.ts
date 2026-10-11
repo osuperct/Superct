@@ -12,6 +12,10 @@ Os períodos de recesso integrarão o calendário de funcionamento apresentado n
 
 export type EstadoAvisoRecesso = "consultando" | "pendente" | "erro" | "liberado";
 
+export function recessoPodeConfirmar(aceitou: boolean, biometria: boolean | null, contratos: number, salvando: boolean): boolean {
+  return aceitou && biometria === true && contratos > 0 && !salvando;
+}
+
 export function recessoBloqueiaAcesso(enabled: boolean, estado: EstadoAvisoRecesso): boolean {
   return enabled && estado !== "liberado";
 }

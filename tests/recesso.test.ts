@@ -1,10 +1,22 @@
 import { test, expect } from "bun:test";
 import { PDFDocument } from "pdf-lib";
-import { RECESSO, contratosPendentes, recessoBloqueiaAcesso, avaliacaoPodeNotificar } from "../src/lib/recesso";
+import { RECESSO, contratosPendentes, recessoBloqueiaAcesso, avaliacaoPodeNotificar, recessoPodeConfirmar } from "../src/lib/recesso";
 import { gerarAditivoRecesso } from "../src/lib/recessoPdf";
 
 test("recesso começa em 24/12/2026", () => { expect(RECESSO.inicio).toBe("2026-12-24"); });
 test("recesso termina em 03/01/2027", () => { expect(RECESSO.fim).toBe("2027-01-03"); });
+test("uma única seleção dos termos permite iniciar a confirmação biométrica", () => {
+  expect(recessoPodeConfirmar(false, true, 1, false)).toBe(false);
+  expect(recessoPodeConfirmar(true, true, 1, false)).toBe(true);
+});
+test("OK não permite confirmar sem biometria disponível", () => {
+  expect(recessoPodeConfirmar(true, false, 1, false)).toBe(false);
+  expect(recessoPodeConfirmar(true, null, 1, false)).toBe(false);
+});
+test("confirmação requer contrato e não pode ser repetida durante o registro", () => {
+  expect(recessoPodeConfirmar(true, true, 0, false)).toBe(false);
+  expect(recessoPodeConfirmar(true, true, 1, true)).toBe(false);
+});
 test("avaliação não encobre o aviso da cláusula e recesso ao entrar", () => {
   expect(avaliacaoPodeNotificar(true, false, true)).toBe(false);
   expect(avaliacaoPodeNotificar(false, false, false)).toBe(false);
