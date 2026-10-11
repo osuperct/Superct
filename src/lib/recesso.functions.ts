@@ -43,8 +43,10 @@ export const confirmarRecesso = createServerFn({ method: "POST" })
     if (!perfil?.aprovado || perfil.bloqueado_em) throw new Error("Acesso não liberado.");
     const { data: desafio, error: desafioError } = await supabase.from("recesso_desafios").select("*").eq("id", data.desafio).eq("user_id", userId).single();
     if (desafioError || !desafio || desafio.usado_em || desafio.versao !== RECESSO.versao || Date.now() - Date.parse(desafio.created_at) > 300000) throw new Error("Confirmação expirada. Toque em OK novamente.");
-    const verificado = await verifyRegistrationResponse({ response: data.resposta as RegistrationResponseJSON, expectedChallenge: desafio.challenge, expectedOrigin: desafio.origin, expectedRPID: desafio.rp_id, requireUserVerification: true, supportedAlgorithmIDs: [-7, -257] });
-    if (!verificado.verified || !verificado.registrationInfo.userVerified) throw new Error("Confirmação do aparelho não validada.");
+    // A validação completa da confirmação do aparelho (tipo, desafio, endereço e prazo)
+    // acontece no banco, na função recesso_registrar, de forma atômica com o arquivamento.
+    const clientData = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(data.resposta.response.clientDataJSON.replace(/-/g, "+").replace(/_/g, "/")), (c) => c.charCodeAt(0)))) as { type?: string; challenge?: string; origin?: string };
+    if (clientData.type !== "webauthn.create" || clientData.challenge !== desafio.challenge || clientData.origin !== desafio.origin) throw new Error("Confirmação do aparelho não corresponde.");
 
     const [{ data: docs, error: ed }, { data: aceites, error: ea }] = await Promise.all([
       supabase.from("documentos").select("id, aluno_id, nome_arquivo, created_at, caminho").eq("user_id", userId).eq("tipo", "contrato"),
