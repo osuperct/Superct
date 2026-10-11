@@ -115,7 +115,7 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
         {bio === false && <p className="text-xs text-muted-foreground">Este aparelho não oferece confirmação biométrica ou bloqueio de tela compatível. Use um aparelho compatível para confirmar; nenhum aditivo será registrado sem essa verificação.</p>}
         {contratos === 0 && <p className="text-xs text-muted-foreground">Seu contrato assinado precisa estar anexado para receber o aditivo. Caso tenha sido entregue em papel, solicite à administração que anexe uma cópia.</p>}
         {erro && <p role="alert" className="text-sm text-destructive">{erro}</p>}
-        <Button disabled={!recessoPodeConfirmar(aceitou, bio, contratos, salvando)} onClick={() => void aceitar()} className="h-auto min-h-11 whitespace-normal py-3">{salvando ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}{salvando ? "REGISTRANDO ADITIVO…" : "OK"}</Button>
+        <Button disabled={!recessoPodeConfirmar(aceitou, bio, contratos, salvando) || !preparo} onClick={() => void aceitar()} className="h-auto min-h-11 whitespace-normal py-3">{salvando || (aceitou && !preparo && bio === true && contratos > 0) ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}{salvando ? "REGISTRANDO ADITIVO…" : aceitou && !preparo && bio === true && contratos > 0 ? "PREPARANDO BIOMETRIA…" : "OK"}</Button>
         </>}
       </DialogContent>
     </Dialog>
