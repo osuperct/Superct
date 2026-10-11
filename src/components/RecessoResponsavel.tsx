@@ -27,6 +27,14 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
   const [tentativa, setTentativa] = useState(0);
   const [preparo, setPreparo] = useState<{ id: string; challenge: string; rpId: string; em: number } | null>(null);
   const [tentativaPreparo, setTentativaPreparo] = useState(0);
+  // Embedded windows (like the editor preview) can be denied WebAuthn by the parent page's permissions policy.
+  const [janelaBloqueada, setJanelaBloqueada] = useState(false);
+  useEffect(() => {
+    let embutida = true;
+    try { embutida = window.top !== window.self; } catch { embutida = true; }
+    const politica = (document as Document & { featurePolicy?: { allowsFeature: (f: string) => boolean } }).featurePolicy;
+    setJanelaBloqueada(embutida && politica ? !politica.allowsFeature("publickey-credentials-create") : false);
+  }, []);
 
   useEffect(() => {
     if (!enabled) return;
@@ -111,10 +119,11 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
           </AccordionItem>
         </Accordion>
         <label className="flex items-start gap-3 text-sm"><Checkbox checked={aceitou} disabled={salvando} onCheckedChange={(v) => setAceitou(v === true)} /><span>Li e aceito os termos</span></label>
+        {janelaBloqueada && <div role="note" className="space-y-2 rounded-md border border-primary/50 p-3 text-sm"><p>Nesta janela de prévia o celular não deixa abrir a biometria. Abra o app em uma aba própria do navegador para confirmar.</p><Button type="button" variant="outline" className="w-full" onClick={() => window.open(window.location.href, "_blank", "noopener")}>ABRIR EM NOVA ABA</Button></div>}
         {bio === false && <p className="text-xs text-muted-foreground">Este aparelho não oferece confirmação biométrica ou bloqueio de tela compatível. Use um aparelho compatível para confirmar; nenhum aditivo será registrado sem essa verificação.</p>}
         {contratos === 0 && <p className="text-xs text-muted-foreground">Seu contrato assinado precisa estar anexado para receber o aditivo. Caso tenha sido entregue em papel, solicite à administração que anexe uma cópia.</p>}
         {erro && <p role="alert" className="text-sm text-destructive">{erro}</p>}
-        <Button disabled={!recessoPodeConfirmar(aceitou, bio, contratos, salvando) || !preparo} onClick={() => void aceitar()} className="h-auto min-h-11 whitespace-normal py-3">{salvando || (aceitou && !preparo && bio === true && contratos > 0) ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}{salvando ? "REGISTRANDO ADITIVO…" : aceitou && !preparo && bio === true && contratos > 0 ? "PREPARANDO BIOMETRIA…" : "OK"}</Button>
+        <Button disabled={!recessoPodeConfirmar(aceitou, bio, contratos, salvando) || !preparo || janelaBloqueada} onClick={() => void aceitar()} className="h-auto min-h-11 whitespace-normal py-3">{salvando || (aceitou && !preparo && bio === true && contratos > 0) ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}{salvando ? "REGISTRANDO ADITIVO…" : aceitou && !preparo && bio === true && contratos > 0 ? "PREPARANDO BIOMETRIA…" : "OK"}</Button>
         </>}
       </DialogContent>
     </Dialog>
