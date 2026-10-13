@@ -95,7 +95,7 @@ export function RenovacoesAdm() {
         </Button>
       </DialogTrigger>
     </section>
-    <DialogContent showCloseButton={false} aria-describedby={undefined} className="flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-screen-sm flex-col gap-0 overflow-hidden rounded-lg p-0">
+    <DialogContent showCloseButton={false} aria-describedby={undefined} className="z-[70] flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-screen-sm flex-col gap-0 overflow-hidden rounded-lg bg-background p-0">
       <DialogHeader className="shrink-0 border-b border-border p-4 pr-14 text-left">
         <DialogTitle className="flex items-center gap-2 font-display text-lg leading-snug"><RefreshCw className="size-4 shrink-0 text-primary" /> RENOVAÇÃO DE PLANOS</DialogTitle>
       </DialogHeader>
