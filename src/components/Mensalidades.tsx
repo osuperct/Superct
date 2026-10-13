@@ -741,8 +741,10 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
         <select value={filtro} onChange={(e) => setFiltro(e.target.value as typeof filtro)} className="rounded-md border border-border bg-background px-2 py-1.5 text-sm">
           <option value="todos">Todos</option>
           <option value="pagos">Pagos</option>
-          <option value="atraso">Atrasos</option>
+          <option value="pago com atraso">Pagos com atraso</option>
+          <option value="em atraso">Atrasados</option>
         </select>
+
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
         Recebido: <span className="text-primary">{formatarValor(pagos.reduce((s, l) => s + l.valor, 0))}</span> • {pagos.length} de {linhas.length} na lista
