@@ -106,14 +106,15 @@ export function Mensalidades({
     [alunos],
   );
 
-  const [abertos, setAbertos] = useState<Set<string>>(new Set(ordenados.map((a) => a.id)));
-  const [todosAbertos, setTodosAbertos] = useState(true);
-  const [listaVisivel, setListaVisivel] = useState(true);
+  const [abertos, setAbertos] = useState<Set<string>>(new Set());
+  const [todosAbertos, setTodosAbertos] = useState(false);
+  const [listaVisivel, setListaVisivel] = useState(false);
   const [busca, setBusca] = useState("");
   const [situacao, setSituacao] = useState<"todos" | "pagos" | "atraso" | "vencer">("todos");
-  const [formasMinimizado, setFormasMinimizado] = useState(false);
+  const [formasMinimizado, setFormasMinimizado] = useState(true);
   const [filtroForma, setFiltroForma] = useState<"todas" | FormaContrato>("todas");
-  const [projecaoMinimizada, setProjecaoMinimizada] = useState(false);
+  const [projecaoMinimizada, setProjecaoMinimizada] = useState(true);
+
 
   const toggleAluno = (id: string) => {
     setAbertos((prev) => {
