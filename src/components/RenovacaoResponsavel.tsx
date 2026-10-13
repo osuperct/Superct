@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { biometriaDisponivel, sha256Hex } from "@/lib/biometria";
+import { biometriaDisponivel } from "@/lib/biometria";
 import { CLAUSULAS_CONTRATO, BUCKET } from "@/lib/documentos";
 import { RECESSO } from "@/lib/recesso";
 import { dataBr, gerarAditivoRenovacao, textoRenovacao } from "@/lib/renovacao";
@@ -92,7 +92,7 @@ export function RenovacaoResponsavel({ uid, enabled, onConfirmado }: { uid: stri
       const caminho = `${uid}/renovacao/${atual.id}-${nome}`;
       const { error: eu } = await supabase.storage.from(BUCKET).upload(caminho, pdf, { contentType: "application/pdf" });
       if (eu) throw new Error("Não foi possível arquivar a renovação. Tente novamente.");
-      const { error } = await supabase.rpc("renovacao_registrar", { _desafio: atual.id, _credencial: JSON.stringify(resposta), _agente: navigator.userAgent.slice(0, 500), _caminho: caminho, _nome_arquivo: nome, _hash: await sha256Hex(Array.from(pdf.slice(0, 200000)).join(",")) });
+      const { error } = await supabase.rpc("renovacao_registrar", { _desafio: atual.id, _credencial: JSON.stringify(resposta), _agente: navigator.userAgent.slice(0, 500), _caminho: caminho, _nome_arquivo: nome, _hash: Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", new Uint8Array(pdf))), (b) => b.toString(16).padStart(2, "0")).join("") });
       if (error) { await supabase.storage.from(BUCKET).remove([caminho]); throw new Error("Não foi possível registrar a renovação. Toque em OK e tente outra vez."); }
       setRenov(null); onConfirmado();
       toast.success("Renovação confirmada! O contrato atualizado já está nos documentos do aluno.");
