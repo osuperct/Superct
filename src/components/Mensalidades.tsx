@@ -735,6 +735,7 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
     .filter((l) => filtro === "todos" || (filtro === "pagos" ? l.status === "pago" : l.status === filtro));
   const pagos = linhas.filter((l) => l.status.startsWith("pago"));
   return (
+    <Dialog open={aberto} onOpenChange={setAberto}>
     <section className="rounded-lg border border-border bg-card p-4">
       <DialogTrigger asChild>
         <button
