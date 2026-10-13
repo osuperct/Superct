@@ -475,8 +475,10 @@ export function Mensalidades({
               </li>
             )}
           </ul>
+        </>
         )}
       </section>
+
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
