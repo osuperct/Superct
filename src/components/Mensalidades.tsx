@@ -766,7 +766,7 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
         </button>
       </DialogClose>
       <div className="min-h-0 overflow-y-auto overscroll-contain p-4">
-
+      <div className="mt-3 flex flex-wrap gap-2">
         <select value={mes} onChange={(e) => setMes(e.target.value)} className="rounded-md border border-border bg-background px-2 py-1.5 text-sm">
           {meses.map((r) => <option key={r} value={r}>{mesExtensoRef(r)}</option>)}
         </select>
