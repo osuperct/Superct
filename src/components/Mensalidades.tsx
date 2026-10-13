@@ -755,6 +755,18 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
               <span className="block">{formatarValor(l.valor)}</span>
               <span className={`font-mono text-[10px] uppercase tracking-widest ${l.status === "em atraso" ? "text-destructive" : l.status === "pago com atraso" ? "text-evaluation-orange" : l.status === "pago" ? "text-primary" : "text-muted-foreground"}`}>{l.status}</span>
             </span>
+            <button
+              type="button"
+              disabled={salvandoId === l.a.id}
+              onClick={() => void marcarPago(l.a, l.m, !(l.m?.pago ?? false))}
+              className={`shrink-0 rounded-md px-2 py-1 font-display text-[10px] tracking-tight ${
+                l.m?.pago
+                  ? "bg-primary text-primary-foreground"
+                  : "border border-border text-muted-foreground"
+              }`}
+            >
+              {salvandoId === l.a.id ? "SALVANDO…" : l.m?.pago ? "PAGO" : "MARCAR PAGO"}
+            </button>
           </li>
         ))}
         {linhas.length === 0 && <li className="text-xs text-muted-foreground">Nenhuma mensalidade neste mês.</li>}
