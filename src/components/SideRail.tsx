@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
+import { Link, useRouter } from "@tanstack/react-router";
 import {
   Home,
   Gamepad2,
@@ -31,12 +31,14 @@ const itens = [
 ] as const;
 
 export function SideRail() {
+  const router = useRouter();
   const { forcarRecolhida } = useSidebarControl();
   const [aberta, setAberta] = useState(true);
   const [recolhida, setRecolhida] = useState(false);
   const [professor, setProfessor] = useState(false);
   const [adm, setAdm] = useState(false);
   const [parceirosAbertos, setParceirosAbertos] = useState(false);
+  const [avisosNaoLidos, setAvisosNaoLidos] = useState(0);
   const estaRecolhida = !aberta || forcarRecolhida;
 
   useEffect(() => {
