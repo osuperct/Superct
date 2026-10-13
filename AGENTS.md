@@ -20,3 +20,4 @@
 - Bind recess WebAuthn challenges to an explicit browser origin validated against exact app hosts rather than proxy-rewritten request headers, and validate the same stored origin during verification.
 - Recess biometric consent fetches its challenge from an authenticated RPC before the OK tap and verifies/archives with a request-scoped user client (no service key), because Android Chrome drops the gesture after network waits and the external host lacks private server env vars.
 - Contract renewals live in renovacoes_contrato (ADM creates pending rows); the responsible confirms via WebAuthn and the renovacao_registrar RPC atomically archives the addendum and updates the contract, so consent cannot be faked or skipped.
+- Keep ADM renewal management in the existing renewal component with a bounded, scrollable dialog, so configuration stays on the administrative page without overflowing the viewport.
