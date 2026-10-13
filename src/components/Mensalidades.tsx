@@ -759,6 +759,9 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
         ))}
         {linhas.length === 0 && <li className="text-xs text-muted-foreground">Nenhuma mensalidade neste mês.</li>}
       </ul>
+      </>
+      )}
     </section>
+
   );
 }
