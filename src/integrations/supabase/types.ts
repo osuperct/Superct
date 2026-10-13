@@ -1196,6 +1196,17 @@ export type Database = {
         }
         Returns: undefined
       }
+      renovacao_aplicar_direta: {
+        Args: {
+          _ficha_id: string
+          _fim: string
+          _forma: string
+          _inicio: string
+          _plano: string
+          _vencimento: string
+        }
+        Returns: Json
+      }
       renovacao_iniciar: {
         Args: { _origin: string; _renovacao: string }
         Returns: {
