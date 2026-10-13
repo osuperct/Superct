@@ -716,7 +716,7 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
       return { a, m, venc, status, valor: Number(m?.valor ?? plano?.valor ?? 0) };
     })
     .filter((l): l is NonNullable<typeof l> => !!l)
-    .filter((l) => filtro === "todos" || (filtro === "atraso" ? l.status === "em atraso" || l.status === "pago com atraso" : l.status.startsWith("pago")));
+    .filter((l) => filtro === "todos" || (filtro === "pagos" ? l.status === "pago" : l.status === filtro));
   const pagos = linhas.filter((l) => l.status.startsWith("pago"));
   return (
     <section className="rounded-lg border border-border bg-card p-4">
