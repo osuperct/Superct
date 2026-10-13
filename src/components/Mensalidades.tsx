@@ -355,7 +355,7 @@ export function Mensalidades({
             onClick={toggleTodos}
             className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground"
           >
-            {listaVisivel ? (
+            {todosAbertos ? (
               <>
                 <ChevronUp className="size-3" /> RECOLHER TODOS
               </>
@@ -367,13 +367,8 @@ export function Mensalidades({
           </button>
         </div>
 
-        {!listaVisivel ? (
-          <p className="rounded-md border border-border bg-background/40 p-3 text-sm text-muted-foreground">
-            {ordenados.length} aluno{ordenados.length === 1 ? "" : "s"} matriculado{ordenados.length === 1 ? "" : "s"}.
-            Clique em <span className="text-primary">ABRIR TODOS</span> para ver a lista.
-          </p>
-        ) : (
-          <ul className="space-y-2">
+        <ul className="space-y-2">
+
             {listaFiltrada.map((a) => {
               const m = doMes(a.id);
               const ativo = m?.ativo ?? true;
