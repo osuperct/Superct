@@ -10,6 +10,15 @@ import { lerPlano } from "@/lib/planoContrato";
 const PLANOS = CAMPOS_CONTRATO.find((c) => c.chave === "valor")?.opcoes ?? [];
 const FORMAS = ["Cartão", "Pix", "Dinheiro", "Cartão Recorrente (link)"];
 
+/** Planos semestral/anual: cartão de crédito com o valor total dividido em 6x ou 12x. */
+function formaParcelada(planoTexto: string): string | null {
+  const meses = mesesDoPlano(planoTexto);
+  if (!meses) return null;
+  const { valor } = lerPlano(planoTexto);
+  if (!valor) return `Cartão de crédito parcelado em ${meses}x`;
+  return `Cartão de crédito parcelado em ${meses}x de R$ ${valor.toFixed(2).replace(".", ",")}`;
+}
+
 type Item = ContratoAdm & { fim: string; dias: number; pendente: boolean };
 
 export function RenovacoesAdm() {
