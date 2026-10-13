@@ -716,7 +716,7 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
       return { a, m, venc, status, valor: Number(m?.valor ?? plano?.valor ?? 0) };
     })
     .filter((l): l is NonNullable<typeof l> => !!l)
-    .filter((l) => filtro === "todos" || (filtro === "atraso" ? l.status === "em atraso" || l.status === "pago com atraso" : l.status.startsWith("pago")));
+    .filter((l) => filtro === "todos" || (filtro === "pagos" ? l.status === "pago" : l.status === filtro));
   const pagos = linhas.filter((l) => l.status.startsWith("pago"));
   return (
     <section className="rounded-lg border border-border bg-card p-4">
@@ -741,8 +741,10 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
         <select value={filtro} onChange={(e) => setFiltro(e.target.value as typeof filtro)} className="rounded-md border border-border bg-background px-2 py-1.5 text-sm">
           <option value="todos">Todos</option>
           <option value="pagos">Pagos</option>
-          <option value="atraso">Atrasos</option>
+          <option value="pago com atraso">Pagos com atraso</option>
+          <option value="em atraso">Atrasados</option>
         </select>
+
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
         Recebido: <span className="text-primary">{formatarValor(pagos.reduce((s, l) => s + l.valor, 0))}</span> • {pagos.length} de {linhas.length} na lista
