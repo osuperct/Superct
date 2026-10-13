@@ -667,6 +667,7 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const [mes, setMes] = useState(refMes(new Date(), -1));
   const [filtro, setFiltro] = useState<"todos" | "atraso" | "pagos">("todos");
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
+  const [dataPago, setDataPago] = useState<Record<string, string>>({});
   const [minimizada, setMinimizada] = useState(true);
 
   // Histórico a partir de setembro de 2026.
@@ -688,10 +689,22 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
         valor: m?.valor ?? null,
         forma: pago ? (m?.forma ?? FORMAS[0]!) : null,
         pago,
-        pago_em: pago ? (m?.pago_em ?? hojeIso()) : null,
+        pago_em: pago ? (dataPago[a.id] ?? m?.pago_em ?? hojeIso()) : null,
       },
       { onConflict: "aluno_id,referencia" },
     );
+    setSalvandoId(null);
+    if (error) {
+      toast.error("Não foi possível salvar.");
+      return;
+    }
+    recarregar();
+  }
+
+  /** Atualiza só a data em que foi pago, sem mexer no restante. */
+  async function salvarDataPago(a: Alu, m: Mensalidade, data: string) {
+    setSalvandoId(a.id);
+    const { error } = await supabase.from("mensalidades").update({ pago_em: data }).eq("id", m.id);
     setSalvandoId(null);
     if (error) {
       toast.error("Não foi possível salvar.");
@@ -762,18 +775,36 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
               <span className="block">{formatarValor(l.valor)}</span>
               <span className={`font-mono text-[10px] uppercase tracking-widest ${l.status === "em atraso" ? "text-destructive" : l.status === "pago com atraso" ? "text-evaluation-orange" : l.status === "pago" ? "text-primary" : "text-muted-foreground"}`}>{l.status}</span>
             </span>
-            <button
-              type="button"
-              disabled={salvandoId === l.a.id}
-              onClick={() => void marcarPago(l.a, l.m, !(l.m?.pago ?? false))}
-              className={`shrink-0 rounded-md px-2 py-1 font-display text-[10px] tracking-tight ${
-                l.m?.pago
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-border text-muted-foreground"
-              }`}
-            >
-              {salvandoId === l.a.id ? "SALVANDO…" : l.m?.pago ? "PAGO" : "MARCAR PAGO"}
-            </button>
+            <span className="flex shrink-0 items-center gap-1.5">
+              <input
+                type="date"
+                value={l.m?.pago ? (l.m.pago_em ?? "") : (dataPago[l.a.id] ?? hoje)}
+                max={hoje}
+                onChange={(e) => {
+                  const data = e.target.value;
+                  if (!data) return;
+                  if (l.m?.pago && l.m) {
+                    void salvarDataPago(l.a, l.m, data);
+                  } else {
+                    setDataPago((d) => ({ ...d, [l.a.id]: data }));
+                  }
+                }}
+                className="w-[120px] rounded-md border border-border bg-background px-1.5 py-1 text-[10px]"
+                aria-label={`Data em que ${l.a.nome} pagou`}
+              />
+              <button
+                type="button"
+                disabled={salvandoId === l.a.id}
+                onClick={() => void marcarPago(l.a, l.m, !(l.m?.pago ?? false))}
+                className={`rounded-md px-2 py-1 font-display text-[10px] tracking-tight ${
+                  l.m?.pago
+                    ? "bg-primary text-primary-foreground"
+                    : "border border-border text-muted-foreground"
+                }`}
+              >
+                {salvandoId === l.a.id ? "SALVANDO…" : l.m?.pago ? "PAGO" : "MARCAR PAGO"}
+              </button>
+            </span>
           </li>
         ))}
         {linhas.length === 0 && <li className="text-xs text-muted-foreground">Nenhuma mensalidade neste mês.</li>}
