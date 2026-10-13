@@ -171,9 +171,6 @@ export function Mensalidades({
     return s + (m && !m.pago ? Number(m.valor ?? 0) : m ? 0 : 0);
   }, 0);
 
-  const atrasados = mensalidades
-    .filter((m) => m.ativo && !m.pago && m.referencia < mesAtual)
-    .sort((a, b) => a.referencia.localeCompare(b.referencia));
 
   const planoDoAluno = (alunoId: string) => planos.find((p) => p.alunoId === alunoId);
 
@@ -649,30 +646,6 @@ export function Mensalidades({
           </>
         )}
 
-        <h3 className="mt-4 font-display text-sm tracking-tight">
-          ATRASADOS ({atrasados.length})
-        </h3>
-        <ul className="mt-2 space-y-1.5">
-          {atrasados.map((m) => {
-            const alu = alunos.find((a) => a.id === m.aluno_id);
-            return (
-              <li
-                key={m.id}
-                className="flex items-center justify-between gap-2 rounded-md border border-destructive/50 bg-destructive/5 px-3 py-2 text-xs"
-              >
-                <span>
-                  {alu?.nome ?? "Aluno"} • {mesExtensoRef(m.referencia)}
-                </span>
-                <span className="font-mono text-[10px] tracking-widest text-destructive">
-                  {formatarValor(m.valor)}
-                </span>
-              </li>
-            );
-          })}
-          {atrasados.length === 0 && (
-            <li className="text-xs text-muted-foreground">Nenhuma mensalidade em atraso.</li>
-          )}
-        </ul>
       </section>
       <ConferenciaMes alunos={ordenados} mensalidades={mensalidades} planos={planos} recarregar={recarregar} />
     </>
@@ -683,7 +656,9 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const [mes, setMes] = useState(refMes(new Date(), -1));
   const [filtro, setFiltro] = useState<"todos" | "atraso" | "pagos">("todos");
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
+  const [minimizada, setMinimizada] = useState(false);
   const meses = Array.from({ length: 12 }, (_, i) => refMes(new Date(), -i));
+
 
   async function marcarPago(a: Alu, m: Mensalidade | undefined, pago: boolean) {
     setSalvandoId(a.id);
@@ -728,8 +703,21 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const pagos = linhas.filter((l) => l.status.startsWith("pago"));
   return (
     <section className="rounded-lg border border-border bg-card p-4">
-      <h3 className="font-display text-sm tracking-tight">CONFERÊNCIA DE PAGAMENTOS POR MÊS</h3>
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="font-display text-sm tracking-tight">CONFERÊNCIA DE PAGAMENTOS POR MÊS</h3>
+        <button
+          type="button"
+          onClick={() => setMinimizada((v) => !v)}
+          className="rounded-md border border-border bg-background p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+          aria-label={minimizada ? "Expandir conferência de pagamentos" : "Minimizar conferência de pagamentos"}
+        >
+          {minimizada ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
+        </button>
+      </div>
+      {!minimizada && (
+      <>
       <div className="mt-3 flex flex-wrap gap-2">
+
         <select value={mes} onChange={(e) => setMes(e.target.value)} className="rounded-md border border-border bg-background px-2 py-1.5 text-sm">
           {meses.map((r) => <option key={r} value={r}>{mesExtensoRef(r)}</option>)}
         </select>
@@ -771,6 +759,9 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
         ))}
         {linhas.length === 0 && <li className="text-xs text-muted-foreground">Nenhuma mensalidade neste mês.</li>}
       </ul>
+      </>
+      )}
     </section>
+
   );
 }
