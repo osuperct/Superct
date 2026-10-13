@@ -656,7 +656,9 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const [mes, setMes] = useState(refMes(new Date(), -1));
   const [filtro, setFiltro] = useState<"todos" | "atraso" | "pagos">("todos");
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
+  const [minimizada, setMinimizada] = useState(false);
   const meses = Array.from({ length: 12 }, (_, i) => refMes(new Date(), -i));
+
 
   async function marcarPago(a: Alu, m: Mensalidade | undefined, pago: boolean) {
     setSalvandoId(a.id);
