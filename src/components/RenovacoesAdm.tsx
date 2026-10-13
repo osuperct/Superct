@@ -54,7 +54,7 @@ export function RenovacoesAdm() {
     const hoje = new Date();
     const inicio = i.dias < 0 ? hoje.toISOString().slice(0, 10) : i.fim;
     const planoAtual = String(i.dados["valor"] ?? "");
-    setForm({ plano: planoAtual, forma: formaParcelada(planoAtual) ?? String(i.dados["forma_pagamento"] ?? "Cartão") || "Cartão", inicio, vencimento: String(Number(inicio.slice(8, 10))) });
+    setForm({ plano: planoAtual, forma: formaParcelada(planoAtual) ?? (String(i.dados["forma_pagamento"] ?? "") || "Cartão"), inicio, vencimento: String(Number(inicio.slice(8, 10))) });
     setEditando(i.id);
   }
 
