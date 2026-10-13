@@ -674,15 +674,39 @@ export function Mensalidades({
           )}
         </ul>
       </section>
-      <ConferenciaMes alunos={ordenados} mensalidades={mensalidades} planos={planos} />
+      <ConferenciaMes alunos={ordenados} mensalidades={mensalidades} planos={planos} recarregar={recarregar} />
     </>
   );
 }
 
-function ConferenciaMes({ alunos, mensalidades, planos }: { alunos: Alu[]; mensalidades: Mensalidade[]; planos: PlanoContrato[] }) {
+function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: Alu[]; mensalidades: Mensalidade[]; planos: PlanoContrato[]; recarregar: () => void }) {
   const [mes, setMes] = useState(refMes(new Date(), -1));
   const [filtro, setFiltro] = useState<"todos" | "atraso" | "pagos">("todos");
+  const [salvandoId, setSalvandoId] = useState<string | null>(null);
   const meses = Array.from({ length: 12 }, (_, i) => refMes(new Date(), -i));
+
+  async function marcarPago(a: Alu, m: Mensalidade | undefined, pago: boolean) {
+    setSalvandoId(a.id);
+    const { error } = await supabase.from("mensalidades").upsert(
+      {
+        aluno_id: a.id,
+        user_id: a.user_id,
+        referencia: mes,
+        ativo: m?.ativo ?? true,
+        valor: m?.valor ?? null,
+        forma: pago ? (m?.forma ?? FORMAS[0]!) : null,
+        pago,
+        pago_em: pago ? (m?.pago_em ?? hojeIso()) : null,
+      },
+      { onConflict: "aluno_id,referencia" },
+    );
+    setSalvandoId(null);
+    if (error) {
+      toast.error("Não foi possível salvar.");
+      return;
+    }
+    recarregar();
+  }
   const hoje = hojeIso();
   const linhas = alunos
     .map((a) => {
