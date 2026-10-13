@@ -1,8 +1,9 @@
 import { DatePicker } from "@/components/ui/datepicker";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { BellRing, ChevronDown, ChevronUp, CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
+import { BellRing, ChevronDown, ChevronRight, ChevronUp, CircleDollarSign, CreditCard, TrendingUp, X } from "lucide-react";
 import { toast } from "sonner";
 import { RenovacoesAdm } from "@/components/RenovacoesAdm";
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -670,7 +671,7 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const [filtro, setFiltro] = useState<"todos" | "atraso" | "pagos">("todos");
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
   const [dataPago, setDataPago] = useState<Record<string, string>>({});
-  const [minimizada, setMinimizada] = useState(true);
+  const [aberto, setAberto] = useState(false);
 
   // Histórico a partir de setembro de 2026.
   const mesInicial = "2026-09";
@@ -734,22 +735,38 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
     .filter((l) => filtro === "todos" || (filtro === "pagos" ? l.status === "pago" : l.status === filtro));
   const pagos = linhas.filter((l) => l.status.startsWith("pago"));
   return (
+    <Dialog open={aberto} onOpenChange={setAberto}>
     <section className="rounded-lg border border-border bg-card p-4">
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="font-display text-sm tracking-tight">CONFERÊNCIA DE PAGAMENTOS POR MÊS</h3>
+      <DialogTrigger asChild>
         <button
           type="button"
-          onClick={() => setMinimizada((v) => !v)}
-          className="rounded-md border border-border bg-background p-1.5 text-muted-foreground transition-colors hover:text-foreground"
-          aria-label={minimizada ? "Expandir conferência de pagamentos" : "Minimizar conferência de pagamentos"}
+          className="flex w-full items-center justify-between gap-2"
+          aria-label="Abrir conferência de pagamentos"
         >
-          {minimizada ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
+          <span className="flex items-center gap-2 font-display text-sm tracking-tight">
+            <TrendingUp className="size-4 text-primary" /> CONFERÊNCIA DE PAGAMENTOS POR MÊS
+          </span>
+          <ChevronRight className="size-5 shrink-0 text-primary" />
         </button>
-      </div>
-      {!minimizada && (
-      <>
+      </DialogTrigger>
+    </section>
+    <DialogContent showCloseButton={false} aria-describedby={undefined} className="z-[70] flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-screen-sm flex-col gap-0 overflow-hidden rounded-lg bg-background p-0">
+      <DialogHeader className="shrink-0 border-b border-border p-4 pr-14 text-left">
+        <DialogTitle className="flex items-center gap-2 font-display text-base leading-snug">
+          <TrendingUp className="size-4 shrink-0 text-primary" /> CONFERÊNCIA DE PAGAMENTOS POR MÊS
+        </DialogTitle>
+      </DialogHeader>
+      <DialogClose asChild>
+        <button
+          type="button"
+          aria-label="Fechar conferência de pagamentos"
+          className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <X className="size-4" />
+        </button>
+      </DialogClose>
+      <div className="min-h-0 overflow-y-auto overscroll-contain p-4">
       <div className="mt-3 flex flex-wrap gap-2">
-
         <select value={mes} onChange={(e) => setMes(e.target.value)} className="rounded-md border border-border bg-background px-2 py-1.5 text-sm">
           {meses.map((r) => <option key={r} value={r}>{mesExtensoRef(r)}</option>)}
         </select>
@@ -766,7 +783,7 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
       </p>
       <ul className="mt-3 space-y-1.5">
         {linhas.map((l) => (
-          <li key={l.a.id} className={`flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-xs ${l.status === "em atraso" ? "border-destructive/50 bg-destructive/5" : "border-border"}`}>
+          <li key={l.a.id} className={`flex flex-col gap-2 rounded-md border px-3 py-2 text-xs sm:flex-row sm:items-center sm:justify-between ${l.status === "em atraso" ? "border-destructive/50 bg-destructive/5" : "border-border"}`}>
             <span>
               {l.a.nome}
               <span className="block text-[10px] text-muted-foreground">
@@ -811,9 +828,9 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
         ))}
         {linhas.length === 0 && <li className="text-xs text-muted-foreground">Nenhuma mensalidade neste mês.</li>}
       </ul>
-      </>
-      )}
-    </section>
+      </div>
+    </DialogContent>
+    </Dialog>
 
   );
 }
