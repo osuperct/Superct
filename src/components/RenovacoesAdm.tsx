@@ -64,14 +64,28 @@ export function RenovacoesAdm() {
     setSalvando(true);
     const { parcelas, valor } = lerPlano(form.plano);
     const formaFinal = formaParcelada(form.plano) ?? form.forma;
-    const { error } = await supabase.from("renovacoes_contrato").insert({
-      user_id: i.userId, aluno_id: i.alunoId, ficha_id: i.id, plano: form.plano, forma: formaFinal,
-      inicio: form.inicio, fim: somarMeses(form.inicio, meses ?? 1), vencimento: form.vencimento.replace(/\D/g, ""),
-      valor_total: valor ? valor * parcelas : null,
-    });
-    setSalvando(false);
-    if (error) { toast.error("Não foi possível criar a renovação."); return; }
-    toast.success("Renovação enviada! O responsável verá o aviso no próximo login para confirmar com a biometria.");
+    const fim = somarMeses(form.inicio, meses ?? 1);
+    if (meses) {
+      // Plano de longa duração (semestral/anual): aplica direto, sem aviso nem biometria.
+      const { data, error } = await supabase.rpc("renovacao_aplicar_direta", {
+        _ficha_id: i.id, _plano: form.plano, _forma: formaFinal,
+        _inicio: form.inicio, _fim: fim, _vencimento: form.vencimento.replace(/\D/g, ""),
+      });
+      setSalvando(false);
+      const r = data as { ok?: boolean; erro?: string } | null;
+      if (error || !r?.ok) { toast.error(r?.erro ?? "Não foi possível aplicar a renovação."); return; }
+      toast.success("Renovação aplicada! O contrato e as mensalidades já foram atualizados, sem aviso ao responsável.");
+    } else {
+      // Migração para plano mensal: aviso único com confirmação por biometria.
+      const { error } = await supabase.from("renovacoes_contrato").insert({
+        user_id: i.userId, aluno_id: i.alunoId, ficha_id: i.id, plano: form.plano, forma: formaFinal,
+        inicio: form.inicio, fim, vencimento: form.vencimento.replace(/\D/g, ""),
+        valor_total: valor ? valor * parcelas : null,
+      });
+      setSalvando(false);
+      if (error) { toast.error("Não foi possível criar a renovação."); return; }
+      toast.success("Aviso de mudança para o plano mensal enviado! O responsável confirma com a biometria no próximo login.");
+    }
     setEditando(""); void carregar();
   }
 
