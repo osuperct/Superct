@@ -171,9 +171,6 @@ export function Mensalidades({
     return s + (m && !m.pago ? Number(m.valor ?? 0) : m ? 0 : 0);
   }, 0);
 
-  const atrasados = mensalidades
-    .filter((m) => m.ativo && !m.pago && m.referencia < mesAtual)
-    .sort((a, b) => a.referencia.localeCompare(b.referencia));
 
   const planoDoAluno = (alunoId: string) => planos.find((p) => p.alunoId === alunoId);
 
@@ -649,30 +646,6 @@ export function Mensalidades({
           </>
         )}
 
-        <h3 className="mt-4 font-display text-sm tracking-tight">
-          ATRASADOS ({atrasados.length})
-        </h3>
-        <ul className="mt-2 space-y-1.5">
-          {atrasados.map((m) => {
-            const alu = alunos.find((a) => a.id === m.aluno_id);
-            return (
-              <li
-                key={m.id}
-                className="flex items-center justify-between gap-2 rounded-md border border-destructive/50 bg-destructive/5 px-3 py-2 text-xs"
-              >
-                <span>
-                  {alu?.nome ?? "Aluno"} • {mesExtensoRef(m.referencia)}
-                </span>
-                <span className="font-mono text-[10px] tracking-widest text-destructive">
-                  {formatarValor(m.valor)}
-                </span>
-              </li>
-            );
-          })}
-          {atrasados.length === 0 && (
-            <li className="text-xs text-muted-foreground">Nenhuma mensalidade em atraso.</li>
-          )}
-        </ul>
       </section>
       <ConferenciaMes alunos={ordenados} mensalidades={mensalidades} planos={planos} recarregar={recarregar} />
     </>
