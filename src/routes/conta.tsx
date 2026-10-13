@@ -660,6 +660,7 @@ function Painel({ session }: { session: Session }) {
 
   const [ehProfessor, setEhProfessor] = useState(false);
   const [ehAdm, setEhAdm] = useState(false);
+  const [papeisUid, setPapeisUid] = useState<string | null>(null);
   const [aprovado, setAprovado] = useState<boolean | null>(null);
   const [docsFisicos, setDocsFisicos] = useState(false);
   const [bloqueado, setBloqueado] = useState(false);
@@ -724,6 +725,7 @@ function Painel({ session }: { session: Session }) {
         if (ativo) {
           setEhProfessor((data ?? []).some((p) => p.role === "professor"));
           setEhAdm((data ?? []).some((p) => p.role === "adm"));
+          setPapeisUid(uid);
         }
       });
     return () => {
@@ -874,7 +876,7 @@ function Painel({ session }: { session: Session }) {
         </div>
       )}
       <LembreteAcesso emailLogado={session.user.email} />
-      <RecessoResponsavel uid={uid} enabled={aprovado === true && !bloqueado && !mostrarAvisoInicial} onConfirmado={() => void recarregar()} onBloqueioChange={atualizarBloqueioRecesso} />
+      <RecessoResponsavel uid={uid} enabled={aprovado === true && !bloqueado && !mostrarAvisoInicial && papeisUid === uid && !ehProfessor && !ehAdm} onConfirmado={() => void recarregar()} onBloqueioChange={atualizarBloqueioRecesso} />
 
       <Accordion type="multiple" value={topicosAbertos} onValueChange={alterarTopicos} className="mt-4 space-y-2">
         <div className="rounded-md border border-border bg-card/50 px-4 py-3">
