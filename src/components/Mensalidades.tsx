@@ -674,6 +674,67 @@ export function Mensalidades({
           )}
         </ul>
       </section>
+      <ConferenciaMes alunos={ordenados} mensalidades={mensalidades} planos={planos} />
     </>
+  );
+}
+
+function ConferenciaMes({ alunos, mensalidades, planos }: { alunos: Alu[]; mensalidades: Mensalidade[]; planos: PlanoContrato[] }) {
+  const [mes, setMes] = useState(refMes(new Date(), -1));
+  const [filtro, setFiltro] = useState<"todos" | "atraso" | "pagos">("todos");
+  const meses = Array.from({ length: 12 }, (_, i) => refMes(new Date(), -i));
+  const hoje = hojeIso();
+  const linhas = alunos
+    .map((a) => {
+      const m = mensalidades.find((x) => x.aluno_id === a.id && x.referencia === mes);
+      if (m && !m.ativo) return null;
+      const plano = planos.find((p) => p.alunoId === a.id);
+      if (!m && !plano) return null;
+      const dia = Number(String(plano?.vencimento ?? "").replace(/\D+/g, "")) || 10;
+      const [ano, mm] = mes.split("-").map(Number);
+      const ultimo = new Date(ano ?? 2026, mm ?? 1, 0).getDate();
+      const venc = `${mes.slice(0, 8)}${String(Math.min(dia, ultimo)).padStart(2, "0")}`;
+      const status = m?.pago
+        ? m.pago_em && m.pago_em > venc ? "pago com atraso" : "pago"
+        : hoje > venc ? "em atraso" : "a vencer";
+      return { a, m, venc, status, valor: Number(m?.valor ?? plano?.valor ?? 0) };
+    })
+    .filter((l): l is NonNullable<typeof l> => !!l)
+    .filter((l) => filtro === "todos" || (filtro === "atraso" ? l.status === "em atraso" || l.status === "pago com atraso" : l.status.startsWith("pago")));
+  const pagos = linhas.filter((l) => l.status.startsWith("pago"));
+  return (
+    <section className="rounded-lg border border-border bg-card p-4">
+      <h3 className="font-display text-sm tracking-tight">CONFERÊNCIA DE PAGAMENTOS POR MÊS</h3>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <select value={mes} onChange={(e) => setMes(e.target.value)} className="rounded-md border border-border bg-background px-2 py-1.5 text-sm">
+          {meses.map((r) => <option key={r} value={r}>{mesExtensoRef(r)}</option>)}
+        </select>
+        <select value={filtro} onChange={(e) => setFiltro(e.target.value as typeof filtro)} className="rounded-md border border-border bg-background px-2 py-1.5 text-sm">
+          <option value="todos">Todos</option>
+          <option value="pagos">Pagos</option>
+          <option value="atraso">Atrasos</option>
+        </select>
+      </div>
+      <p className="mt-2 text-xs text-muted-foreground">
+        Recebido: <span className="text-primary">{formatarValor(pagos.reduce((s, l) => s + l.valor, 0))}</span> • {pagos.length} de {linhas.length} na lista
+      </p>
+      <ul className="mt-3 space-y-1.5">
+        {linhas.map((l) => (
+          <li key={l.a.id} className={`flex items-center justify-between gap-2 rounded-md border px-3 py-2 text-xs ${l.status === "em atraso" ? "border-destructive/50 bg-destructive/5" : "border-border"}`}>
+            <span>
+              {l.a.nome}
+              <span className="block text-[10px] text-muted-foreground">
+                vence {formatarDataIso(l.venc)}{l.m?.pago ? ` • pago ${formatarDataIso(l.m.pago_em)}${l.m.forma ? ` (${l.m.forma})` : ""}` : ""}
+              </span>
+            </span>
+            <span className="text-right">
+              <span className="block">{formatarValor(l.valor)}</span>
+              <span className={`font-mono text-[10px] uppercase tracking-widest ${l.status === "em atraso" ? "text-destructive" : l.status === "pago com atraso" ? "text-evaluation-orange" : l.status === "pago" ? "text-primary" : "text-muted-foreground"}`}>{l.status}</span>
+            </span>
+          </li>
+        ))}
+        {linhas.length === 0 && <li className="text-xs text-muted-foreground">Nenhuma mensalidade neste mês.</li>}
+      </ul>
+    </section>
   );
 }
