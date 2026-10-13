@@ -66,6 +66,58 @@ export function SideRail() {
     };
   }, []);
 
+  /** Conta os recados do Super CT que ainda não foram lidos. */
+  const checarAvisos = useCallback(async () => {
+    const { data: sessao } = await supabase.auth.getUser();
+    const uid = sessao.user?.id;
+    if (!uid) {
+      setAvisosNaoLidos(0);
+      return;
+    }
+    const [resAvisos, resLidos] = await Promise.all([
+      supabase.from("avisos").select("id").order("created_at", { ascending: false }).limit(30),
+      supabase.from("avisos_lidos").select("aviso_id").eq("user_id", uid),
+    ]);
+    const idsLidos = new Set(
+      (resLidos.data ?? []).map((r) => (r as { aviso_id: string }).aviso_id),
+    );
+    setAvisosNaoLidos(
+      (resAvisos.data ?? []).filter((a) => !idsLidos.has((a as { id: string }).id)).length,
+    );
+  }, []);
+
+  useEffect(() => {
+    void checarAvisos();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => void checarAvisos());
+    const canal = supabase
+      .channel("avisos-badge-rail")
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "avisos" }, () => {
+        void checarAvisos();
+      })
+      .subscribe();
+    const cancelar = router.subscribe("onResolved", () => void checarAvisos());
+    return () => {
+      sub.subscription.unsubscribe();
+      cancelar();
+      void supabase.removeChannel(canal);
+    };
+  }, [checarAvisos, router]);
+
+  // Coloca o número no ícone do app na tela do celular, como no WhatsApp.
+  useEffect(() => {
+    const nav = navigator as Navigator & {
+      setAppBadge?: (n?: number) => Promise<void>;
+      clearAppBadge?: () => Promise<void>;
+    };
+    try {
+      if (avisosNaoLidos > 0) void nav.setAppBadge?.(avisosNaoLidos);
+      else void nav.clearAppBadge?.();
+    } catch {
+      // Aparelho sem suporte ao selo numérico.
+    }
+  }, [avisosNaoLidos]);
+
+
   useEffect(() => {
     if (!aberta) {
       setRecolhida(false);
@@ -130,10 +182,15 @@ export function SideRail() {
             activeOptions={{ exact: item.to === "/" }}
             activeProps={{ className: "bg-primary text-primary-foreground" }}
             inactiveProps={{ className: "text-muted-foreground" }}
-            className="flex w-12 flex-col items-center gap-0.5 rounded-md px-1 py-2 transition-colors active:scale-95"
+            className="relative flex w-12 flex-col items-center gap-0.5 rounded-md px-1 py-2 transition-colors active:scale-95"
           >
             <item.icon className="size-5" />
             <span className="font-mono text-[8px] uppercase">{item.label}</span>
+            {item.to === "/conta" && avisosNaoLidos > 0 && (
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 font-mono text-[8px] font-bold leading-none text-destructive-foreground">
+                {avisosNaoLidos > 9 ? "9+" : avisosNaoLidos}
+              </span>
+            )}
           </Link>
         ))}
         <Button
