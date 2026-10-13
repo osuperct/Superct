@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { BellRing, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
+import { BellRing, ChevronRight, RefreshCw, X } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { listarContratos, type ContratoAdm } from "@/lib/adm";
 import { CAMPOS_CONTRATO } from "@/lib/documentos";
 import { DIAS_AVISO_RENOVACAO, dataBr, diasAte, fimDoContrato, mesesDoPlano, somarMeses } from "@/lib/renovacao";
 import { lerPlano } from "@/lib/planoContrato";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const PLANOS = CAMPOS_CONTRATO.find((c) => c.chave === "valor")?.opcoes ?? [];
 const FORMAS = ["Cartão", "Pix", "Dinheiro", "Cartão Recorrente (link)"];
@@ -78,6 +80,7 @@ export function RenovacoesAdm() {
   }
 
   return (
+    <Dialog open={aberto} onOpenChange={(value) => { setAberto(value); if (!value) setEditando(""); }}>
     <section className="rounded-lg border border-border bg-card/40 p-4">
       {aVencer.length > 0 && (
         <div role="alert" className="mb-3 flex items-start gap-2 rounded-md border border-evaluation-orange/60 bg-evaluation-orange/10 p-3 text-sm">
@@ -85,13 +88,23 @@ export function RenovacoesAdm() {
           <span>{aVencer.length} plano(s) semestral/anual vencendo em até {DIAS_AVISO_RENOVACAO} dias: {aVencer.map((i) => `${i.aluno} (${dataBr(i.fim)})`).join(", ")}.</span>
         </div>
       )}
-      <button type="button" onClick={() => setAberto((v) => !v)} aria-expanded={aberto} className="flex w-full items-center justify-between gap-2 text-left">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight"><RefreshCw className="size-4 text-primary" /> RENOVAÇÃO DE PLANOS</h2>
-        {aberto ? <ChevronUp className="size-5 text-primary" /> : <ChevronDown className="size-5 text-primary" />}
-      </button>
-      <p className="mt-1 text-xs text-muted-foreground">Planos semestrais e anuais com data de término. Escolha o novo plano para enviar a renovação ao responsável.</p>
-      {aberto && (itens === null ? <p className="mt-3 text-xs text-muted-foreground">Carregando…</p> : (
-        <ul className="mt-3 max-h-[26rem] space-y-2 overflow-y-auto pr-1">
+      <DialogTrigger asChild>
+        <Button variant="ghost" className="h-auto w-full justify-between gap-2 whitespace-normal p-0 text-left hover:bg-transparent">
+          <span className="flex items-center gap-2 font-display text-lg"><RefreshCw className="size-4 shrink-0 text-primary" /> RENOVAÇÃO DE PLANOS</span>
+          <ChevronRight className="size-5 shrink-0 text-primary" />
+        </Button>
+      </DialogTrigger>
+    </section>
+    <DialogContent showCloseButton={false} aria-describedby={undefined} className="flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-screen-sm flex-col gap-0 overflow-hidden rounded-lg p-0">
+      <DialogHeader className="shrink-0 border-b border-border p-4 pr-14 text-left">
+        <DialogTitle className="flex items-center gap-2 font-display text-lg leading-snug"><RefreshCw className="size-4 shrink-0 text-primary" /> RENOVAÇÃO DE PLANOS</DialogTitle>
+      </DialogHeader>
+      <DialogClose asChild>
+        <Button variant="ghost" size="icon" aria-label="Fechar renovação de planos" className="absolute right-3 top-3"><X /></Button>
+      </DialogClose>
+      <div className="min-h-0 overflow-y-auto overscroll-contain p-4">
+      {itens === null ? <p className="text-xs text-muted-foreground">Carregando…</p> : (
+        <ul className="space-y-2">
           {itens.map((i) => (
             <li key={i.id} className={`rounded-md border p-3 ${i.dias <= DIAS_AVISO_RENOVACAO && !i.pendente ? "border-evaluation-orange/70" : "border-border"} bg-background/60`}>
               <p className="font-display text-sm tracking-tight">{i.aluno || "(aluno)"}</p>
@@ -101,9 +114,9 @@ export function RenovacoesAdm() {
                 {i.pendente ? " • renovação aguardando biometria" : ""}
               </p>
               {!i.pendente && (
-                <button type="button" onClick={() => abrir(i)} className="mt-2 rounded-md border border-primary px-3 py-1.5 font-display text-[11px] tracking-tight text-primary">
+                <Button variant="outline" size="sm" onClick={() => abrir(i)} className="mt-2 border-primary font-display text-[11px] text-primary">
                   {editando === i.id ? "FECHAR" : "RENOVAR PLANO"}
-                </button>
+                </Button>
               )}
               {editando === i.id && (
                 <div className="mt-3 space-y-2 border-t border-border pt-3 text-sm">
@@ -119,16 +132,18 @@ export function RenovacoesAdm() {
                     <input type="date" value={form.inicio} onChange={(e) => setForm((f) => ({ ...f, inicio: e.target.value }))} className="w-full rounded-md border border-border bg-card/60 px-3 py-2" /></label>
                   <label className="block space-y-1"><span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Dia do vencimento</span>
                     <input inputMode="numeric" value={form.vencimento} onChange={(e) => setForm((f) => ({ ...f, vencimento: e.target.value }))} className="w-full rounded-md border border-border bg-card/60 px-3 py-2" /></label>
-                  <button type="button" disabled={salvando} onClick={() => void salvar(i)} className="w-full rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground disabled:opacity-60">
+                  <Button disabled={salvando} onClick={() => void salvar(i)} className="h-auto w-full whitespace-normal py-2 font-display text-xs">
                     {salvando ? "ENVIANDO…" : "ENVIAR RENOVAÇÃO PARA O RESPONSÁVEL"}
-                  </button>
+                  </Button>
                 </div>
               )}
             </li>
           ))}
           {itens.length === 0 && <li className="text-xs text-muted-foreground">Nenhum plano semestral ou anual encontrado.</li>}
         </ul>
-      ))}
-    </section>
+      )}
+      </div>
+    </DialogContent>
+    </Dialog>
   );
 }
