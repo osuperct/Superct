@@ -2,6 +2,7 @@ import { DatePicker } from "@/components/ui/datepicker";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BellRing, ChevronDown, ChevronUp, CircleDollarSign, CreditCard, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { RenovacoesAdm } from "@/components/RenovacoesAdm";
 
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -325,6 +326,7 @@ export function Mensalidades({
         </p>
         {listaVisivel && (
         <>
+        <RenovacoesAdm />
 
 
         <div className="mt-3 flex flex-wrap gap-2">
