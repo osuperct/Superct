@@ -53,7 +53,8 @@ export function RenovacoesAdm() {
     if (editando === i.id) { setEditando(""); return; }
     const hoje = new Date();
     const inicio = i.dias < 0 ? hoje.toISOString().slice(0, 10) : i.fim;
-    setForm({ plano: String(i.dados["valor"] ?? ""), forma: String(i.dados["forma_pagamento"] ?? "Cartão") || "Cartão", inicio, vencimento: String(Number(inicio.slice(8, 10))) });
+    const planoAtual = String(i.dados["valor"] ?? "");
+    setForm({ plano: planoAtual, forma: formaParcelada(planoAtual) ?? String(i.dados["forma_pagamento"] ?? "Cartão") || "Cartão", inicio, vencimento: String(Number(inicio.slice(8, 10))) });
     setEditando(i.id);
   }
 
@@ -62,8 +63,9 @@ export function RenovacoesAdm() {
     if (!form.plano || !form.inicio || !form.vencimento) { toast.error("Preencha plano, início e vencimento."); return; }
     setSalvando(true);
     const { parcelas, valor } = lerPlano(form.plano);
+    const formaFinal = formaParcelada(form.plano) ?? form.forma;
     const { error } = await supabase.from("renovacoes_contrato").insert({
-      user_id: i.userId, aluno_id: i.alunoId, ficha_id: i.id, plano: form.plano, forma: form.forma,
+      user_id: i.userId, aluno_id: i.alunoId, ficha_id: i.id, plano: form.plano, forma: formaFinal,
       inicio: form.inicio, fim: somarMeses(form.inicio, meses ?? 1), vencimento: form.vencimento.replace(/\D/g, ""),
       valor_total: valor ? valor * parcelas : null,
     });
@@ -104,7 +106,7 @@ export function RenovacoesAdm() {
               {editando === i.id && (
                 <div className="mt-3 space-y-2 border-t border-border pt-3 text-sm">
                   <label className="block space-y-1"><span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Plano de pagamento</span>
-                    <select value={form.plano} onChange={(e) => setForm((f) => ({ ...f, plano: e.target.value }))} className="w-full rounded-md border border-border bg-card/60 px-3 py-2">
+                    <select value={form.plano} onChange={(e) => setForm((f) => ({ ...f, plano: e.target.value, forma: formaParcelada(e.target.value) ?? f.forma }))} className="w-full rounded-md border border-border bg-card/60 px-3 py-2">
                       {[...new Set([...PLANOS, form.plano].filter(Boolean))].map((p) => <option key={p} value={p}>{p}</option>)}
                     </select></label>
                   <label className="block space-y-1"><span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Forma de pagamento</span>
