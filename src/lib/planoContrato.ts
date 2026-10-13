@@ -40,7 +40,8 @@ function numeroBr(texto: string) {
 
 /** "Plano anual 12x de R$140,00" -> { parcelas: 12, valor: 140 } */
 export function lerPlano(planoTexto: string) {
-  const parcelasMatch = planoTexto.match(/(\d+)\s*x/i);
+  // "2x na semana" é frequência, não parcelamento.
+  const parcelasMatch = planoTexto.match(/(\d+)\s*x(?!\s*(?:na|por)\s*semana)/i);
   const parcelas = parcelasMatch ? Number(parcelasMatch[1]) : 1;
   // Sem "R$" também vale: "120,00", "Outro valor — 120", "12x de 140,00".
   const semParcelas = planoTexto.replace(/(\d+)\s*x/gi, " ");
