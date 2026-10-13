@@ -703,8 +703,21 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const pagos = linhas.filter((l) => l.status.startsWith("pago"));
   return (
     <section className="rounded-lg border border-border bg-card p-4">
-      <h3 className="font-display text-sm tracking-tight">CONFERÊNCIA DE PAGAMENTOS POR MÊS</h3>
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="font-display text-sm tracking-tight">CONFERÊNCIA DE PAGAMENTOS POR MÊS</h3>
+        <button
+          type="button"
+          onClick={() => setMinimizada((v) => !v)}
+          className="rounded-md border border-border bg-background p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+          aria-label={minimizada ? "Expandir conferência de pagamentos" : "Minimizar conferência de pagamentos"}
+        >
+          {minimizada ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
+        </button>
+      </div>
+      {!minimizada && (
+      <>
       <div className="mt-3 flex flex-wrap gap-2">
+
         <select value={mes} onChange={(e) => setMes(e.target.value)} className="rounded-md border border-border bg-background px-2 py-1.5 text-sm">
           {meses.map((r) => <option key={r} value={r}>{mesExtensoRef(r)}</option>)}
         </select>
