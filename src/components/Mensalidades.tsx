@@ -304,15 +304,28 @@ export function Mensalidades({
       )}
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <CircleDollarSign className="size-4 text-primary" /> MATRÍCULAS E MENSALIDADES
-        </h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+            <CircleDollarSign className="size-4 text-primary" /> MATRÍCULAS E MENSALIDADES
+          </h2>
+          <button
+            type="button"
+            onClick={() => setListaVisivel((v) => !v)}
+            className="rounded-md border border-border bg-background p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={listaVisivel ? "Minimizar matrículas e mensalidades" : "Expandir matrículas e mensalidades"}
+          >
+            {listaVisivel ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+          </button>
+        </div>
         <p className="mt-1 text-xs text-muted-foreground">
           Referência: {mesExtensoRef(mesAtual)} • {ativosMes.length} ativas de {ordenados.length}
         </p>
         <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           Recebido {formatarValor(recebido)} • A receber {formatarValor(aReceber)}
         </p>
+        {listaVisivel && (
+        <>
+
 
         <div className="mt-3 flex flex-wrap gap-2">
           <input
