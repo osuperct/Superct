@@ -669,7 +669,12 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
   const [minimizada, setMinimizada] = useState(true);
 
-  const meses = Array.from({ length: 12 }, (_, i) => refMes(new Date(), -i));
+  // Histórico a partir de setembro de 2026.
+  const mesInicial = "2026-09";
+  const meses = Array.from({ length: 12 }, (_, i) => refMes(new Date(), -i)).filter(
+    (m) => m >= mesInicial,
+  );
+
 
 
   async function marcarPago(a: Alu, m: Mensalidade | undefined, pago: boolean) {
