@@ -8,6 +8,7 @@ import { cadastrarProfessor } from "@/lib/adm.functions";
 import { definirAcessoConta, definirAprovacaoConta, excluirConta, listarAcessosContas, type ContaAcesso } from "@/lib/adm";
 import { AppMidias } from "@/components/AppMidias";
 import { ContratosAdm } from "@/components/ContratosAdm";
+import { RenovacoesAdm } from "@/components/RenovacoesAdm";
 import { ProdutosAdm } from "@/components/ProdutosAdm";
 import { PedidosAdm } from "@/components/PedidosAdm";
 import { supabase } from "@/integrations/supabase/client";
@@ -180,6 +181,8 @@ function AdmPage() {
       </section>
 
       <Aprovacoes />
+
+      <RenovacoesAdm />
 
       <ContratosAdm />
 

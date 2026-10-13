@@ -9,6 +9,7 @@ import { apenasDigitos, cpfValido, formatarCpf } from "@/lib/cpf";
 
 import { AvaliacaoResponsavel } from "@/components/AvaliacaoResponsavel";
 import { RecessoResponsavel } from "@/components/RecessoResponsavel";
+import { RenovacaoResponsavel } from "@/components/RenovacaoResponsavel";
 import { avaliacaoPodeNotificar } from "@/lib/recesso";
 import { AvisosResponsavel } from "@/components/AvisosResponsavel";
 import { PresencaResponsavel } from "@/components/PresencaResponsavel";
@@ -877,6 +878,7 @@ function Painel({ session }: { session: Session }) {
       )}
       <LembreteAcesso emailLogado={session.user.email} />
       <RecessoResponsavel uid={uid} enabled={aprovado === true && !bloqueado && !mostrarAvisoInicial && papeisUid === uid && !ehProfessor && !ehAdm} onConfirmado={() => void recarregar()} onBloqueioChange={atualizarBloqueioRecesso} />
+      <RenovacaoResponsavel uid={uid} enabled={aprovado === true && !bloqueado && !mostrarAvisoInicial && papeisUid === uid && !ehProfessor && !ehAdm && estadoRecesso?.uid === uid && !estadoRecesso.bloqueado} onConfirmado={() => void recarregar()} />
 
       <Accordion type="multiple" value={topicosAbertos} onValueChange={alterarTopicos} className="mt-4 space-y-2">
         <div className="rounded-md border border-border bg-card/50 px-4 py-3">

@@ -1,0 +1,121 @@
+import { useCallback, useEffect, useState } from "react";
+import { BellRing, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { listarContratos, type ContratoAdm } from "@/lib/adm";
+import { CAMPOS_CONTRATO } from "@/lib/documentos";
+import { DIAS_AVISO_RENOVACAO, dataBr, diasAte, fimDoContrato, mesesDoPlano, somarMeses } from "@/lib/renovacao";
+import { lerPlano } from "@/lib/planoContrato";
+
+const PLANOS = CAMPOS_CONTRATO.find((c) => c.chave === "valor")?.opcoes ?? [];
+const FORMAS = ["Cartão", "Pix", "Dinheiro", "Cartão Recorrente (link)"];
+
+type Item = ContratoAdm & { fim: string; dias: number; pendente: boolean };
+
+export function RenovacoesAdm() {
+  const [itens, setItens] = useState<Item[] | null>(null);
+  const [aberto, setAberto] = useState(false);
+  const [editando, setEditando] = useState("");
+  const [form, setForm] = useState({ plano: "", forma: "Cartão", inicio: "", vencimento: "" });
+  const [salvando, setSalvando] = useState(false);
+
+  const carregar = useCallback(async () => {
+    try {
+      const [contratos, { data: pend }] = await Promise.all([
+        listarContratos(),
+        supabase.from("renovacoes_contrato").select("ficha_id").eq("status", "pendente"),
+      ]);
+      const pendentes = new Set((pend ?? []).map((p) => p.ficha_id));
+      const lista: Item[] = [];
+      for (const c of contratos) {
+        if (!mesesDoPlano(String(c.dados["valor"] ?? ""))) continue;
+        const fim = fimDoContrato(c.dados);
+        if (!fim) continue;
+        lista.push({ ...c, fim, dias: diasAte(fim), pendente: pendentes.has(c.id) });
+      }
+      setItens(lista.sort((a, b) => a.dias - b.dias));
+    } catch { setItens([]); }
+  }, []);
+  useEffect(() => { void carregar(); }, [carregar]);
+
+  const aVencer = (itens ?? []).filter((i) => i.dias <= DIAS_AVISO_RENOVACAO && !i.pendente);
+
+  function abrir(i: Item) {
+    if (editando === i.id) { setEditando(""); return; }
+    const hoje = new Date();
+    const inicio = i.dias < 0 ? hoje.toISOString().slice(0, 10) : i.fim;
+    setForm({ plano: String(i.dados["valor"] ?? ""), forma: String(i.dados["forma_pagamento"] ?? "Cartão") || "Cartão", inicio, vencimento: String(Number(inicio.slice(8, 10))) });
+    setEditando(i.id);
+  }
+
+  async function salvar(i: Item) {
+    const meses = mesesDoPlano(form.plano);
+    if (!form.plano || !form.inicio || !form.vencimento) { toast.error("Preencha plano, início e vencimento."); return; }
+    setSalvando(true);
+    const { parcelas, valor } = lerPlano(form.plano);
+    const { error } = await supabase.from("renovacoes_contrato").insert({
+      user_id: i.userId, aluno_id: i.alunoId, ficha_id: i.id, plano: form.plano, forma: form.forma,
+      inicio: form.inicio, fim: somarMeses(form.inicio, meses ?? 1), vencimento: form.vencimento.replace(/\D/g, ""),
+      valor_total: valor ? valor * parcelas : null,
+    });
+    setSalvando(false);
+    if (error) { toast.error("Não foi possível criar a renovação."); return; }
+    toast.success("Renovação enviada! O responsável verá o aviso no próximo login para confirmar com a biometria.");
+    setEditando(""); void carregar();
+  }
+
+  return (
+    <section className="rounded-lg border border-border bg-card/40 p-4">
+      {aVencer.length > 0 && (
+        <div role="alert" className="mb-3 flex items-start gap-2 rounded-md border border-evaluation-orange/60 bg-evaluation-orange/10 p-3 text-sm">
+          <BellRing className="mt-0.5 size-4 shrink-0 animate-pulse text-evaluation-orange" />
+          <span>{aVencer.length} plano(s) semestral/anual vencendo em até {DIAS_AVISO_RENOVACAO} dias: {aVencer.map((i) => `${i.aluno} (${dataBr(i.fim)})`).join(", ")}.</span>
+        </div>
+      )}
+      <button type="button" onClick={() => setAberto((v) => !v)} aria-expanded={aberto} className="flex w-full items-center justify-between gap-2 text-left">
+        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight"><RefreshCw className="size-4 text-primary" /> RENOVAÇÃO DE PLANOS</h2>
+        {aberto ? <ChevronUp className="size-5 text-primary" /> : <ChevronDown className="size-5 text-primary" />}
+      </button>
+      <p className="mt-1 text-xs text-muted-foreground">Planos semestrais e anuais com data de término. Escolha o novo plano para enviar a renovação ao responsável.</p>
+      {aberto && (itens === null ? <p className="mt-3 text-xs text-muted-foreground">Carregando…</p> : (
+        <ul className="mt-3 max-h-[26rem] space-y-2 overflow-y-auto pr-1">
+          {itens.map((i) => (
+            <li key={i.id} className={`rounded-md border p-3 ${i.dias <= DIAS_AVISO_RENOVACAO && !i.pendente ? "border-evaluation-orange/70" : "border-border"} bg-background/60`}>
+              <p className="font-display text-sm tracking-tight">{i.aluno || "(aluno)"}</p>
+              <p className="text-xs text-muted-foreground">Responsável: {i.responsavel || "—"} • {i.dados["valor"]}</p>
+              <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-primary">
+                Termina {dataBr(i.fim)} • {i.dias < 0 ? `venceu há ${-i.dias} dia(s)` : i.dias === 0 ? "vence hoje" : `faltam ${i.dias} dia(s)`}
+                {i.pendente ? " • renovação aguardando biometria" : ""}
+              </p>
+              {!i.pendente && (
+                <button type="button" onClick={() => abrir(i)} className="mt-2 rounded-md border border-primary px-3 py-1.5 font-display text-[11px] tracking-tight text-primary">
+                  {editando === i.id ? "FECHAR" : "RENOVAR PLANO"}
+                </button>
+              )}
+              {editando === i.id && (
+                <div className="mt-3 space-y-2 border-t border-border pt-3 text-sm">
+                  <label className="block space-y-1"><span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Plano de pagamento</span>
+                    <select value={form.plano} onChange={(e) => setForm((f) => ({ ...f, plano: e.target.value }))} className="w-full rounded-md border border-border bg-card/60 px-3 py-2">
+                      {[...new Set([...PLANOS, form.plano].filter(Boolean))].map((p) => <option key={p} value={p}>{p}</option>)}
+                    </select></label>
+                  <label className="block space-y-1"><span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Forma de pagamento</span>
+                    <select value={form.forma} onChange={(e) => setForm((f) => ({ ...f, forma: e.target.value }))} className="w-full rounded-md border border-border bg-card/60 px-3 py-2">
+                      {[...new Set([...FORMAS, form.forma])].map((p) => <option key={p}>{p}</option>)}
+                    </select></label>
+                  <label className="block space-y-1"><span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Início do novo período</span>
+                    <input type="date" value={form.inicio} onChange={(e) => setForm((f) => ({ ...f, inicio: e.target.value }))} className="w-full rounded-md border border-border bg-card/60 px-3 py-2" /></label>
+                  <label className="block space-y-1"><span className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Dia do vencimento</span>
+                    <input inputMode="numeric" value={form.vencimento} onChange={(e) => setForm((f) => ({ ...f, vencimento: e.target.value }))} className="w-full rounded-md border border-border bg-card/60 px-3 py-2" /></label>
+                  <button type="button" disabled={salvando} onClick={() => void salvar(i)} className="w-full rounded-md bg-primary px-4 py-2 font-display text-xs tracking-tight text-primary-foreground disabled:opacity-60">
+                    {salvando ? "ENVIANDO…" : "ENVIAR RENOVAÇÃO PARA O RESPONSÁVEL"}
+                  </button>
+                </div>
+              )}
+            </li>
+          ))}
+          {itens.length === 0 && <li className="text-xs text-muted-foreground">Nenhum plano semestral ou anual encontrado.</li>}
+        </ul>
+      ))}
+    </section>
+  );
+}

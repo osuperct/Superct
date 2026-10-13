@@ -883,6 +883,78 @@ export type Database = {
         }
         Relationships: []
       }
+      renovacoes_contrato: {
+        Row: {
+          aceita_em: string | null
+          aluno_id: string | null
+          assinatura_id: string | null
+          created_at: string
+          criado_por: string | null
+          documento_id: string | null
+          ficha_id: string
+          fim: string
+          forma: string
+          id: string
+          inicio: string
+          plano: string
+          status: string
+          user_id: string
+          valor_total: number | null
+          vencimento: string
+        }
+        Insert: {
+          aceita_em?: string | null
+          aluno_id?: string | null
+          assinatura_id?: string | null
+          created_at?: string
+          criado_por?: string | null
+          documento_id?: string | null
+          ficha_id: string
+          fim: string
+          forma: string
+          id?: string
+          inicio: string
+          plano: string
+          status?: string
+          user_id: string
+          valor_total?: number | null
+          vencimento: string
+        }
+        Update: {
+          aceita_em?: string | null
+          aluno_id?: string | null
+          assinatura_id?: string | null
+          created_at?: string
+          criado_por?: string | null
+          documento_id?: string | null
+          ficha_id?: string
+          fim?: string
+          forma?: string
+          id?: string
+          inicio?: string
+          plano?: string
+          status?: string
+          user_id?: string
+          valor_total?: number | null
+          vencimento?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "renovacoes_contrato_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "renovacoes_contrato_ficha_id_fkey"
+            columns: ["ficha_id"]
+            isOneToOne: false
+            referencedRelation: "fichas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       textos_app: {
         Row: {
           chave: string
@@ -1121,6 +1193,25 @@ export type Database = {
           _credencial: string
           _desafio: string
           _ip: string
+        }
+        Returns: undefined
+      }
+      renovacao_iniciar: {
+        Args: { _origin: string; _renovacao: string }
+        Returns: {
+          challenge: string
+          id: string
+          rp_id: string
+        }[]
+      }
+      renovacao_registrar: {
+        Args: {
+          _agente: string
+          _caminho: string
+          _credencial: string
+          _desafio: string
+          _hash: string
+          _nome_arquivo: string
         }
         Returns: undefined
       }
