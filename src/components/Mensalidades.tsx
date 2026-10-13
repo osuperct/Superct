@@ -692,7 +692,7 @@ function ConferenciaMes({ alunos, mensalidades, planos }: { alunos: Alu[]; mensa
       if (!m && !plano) return null;
       const dia = Number(String(plano?.vencimento ?? "").replace(/\D+/g, "")) || 10;
       const [ano, mm] = mes.split("-").map(Number);
-      const ultimo = new Date(ano, mm, 0).getDate();
+      const ultimo = new Date(ano ?? 2026, mm ?? 1, 0).getDate();
       const venc = `${mes.slice(0, 8)}${String(Math.min(dia, ultimo)).padStart(2, "0")}`;
       const status = m?.pago
         ? m.pago_em && m.pago_em > venc ? "pago com atraso" : "pago"
