@@ -106,14 +106,15 @@ export function Mensalidades({
     [alunos],
   );
 
-  const [abertos, setAbertos] = useState<Set<string>>(new Set(ordenados.map((a) => a.id)));
-  const [todosAbertos, setTodosAbertos] = useState(true);
-  const [listaVisivel, setListaVisivel] = useState(true);
+  const [abertos, setAbertos] = useState<Set<string>>(new Set());
+  const [todosAbertos, setTodosAbertos] = useState(false);
+  const [listaVisivel, setListaVisivel] = useState(false);
   const [busca, setBusca] = useState("");
   const [situacao, setSituacao] = useState<"todos" | "pagos" | "atraso" | "vencer">("todos");
-  const [formasMinimizado, setFormasMinimizado] = useState(false);
+  const [formasMinimizado, setFormasMinimizado] = useState(true);
   const [filtroForma, setFiltroForma] = useState<"todas" | FormaContrato>("todas");
-  const [projecaoMinimizada, setProjecaoMinimizada] = useState(false);
+  const [projecaoMinimizada, setProjecaoMinimizada] = useState(true);
+
 
   const toggleAluno = (id: string) => {
     setAbertos((prev) => {
@@ -303,15 +304,28 @@ export function Mensalidades({
       )}
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
-        <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
-          <CircleDollarSign className="size-4 text-primary" /> MATRÍCULAS E MENSALIDADES
-        </h2>
+        <div className="flex items-center justify-between gap-2">
+          <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
+            <CircleDollarSign className="size-4 text-primary" /> MATRÍCULAS E MENSALIDADES
+          </h2>
+          <button
+            type="button"
+            onClick={() => setListaVisivel((v) => !v)}
+            className="rounded-md border border-border bg-background p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label={listaVisivel ? "Minimizar matrículas e mensalidades" : "Expandir matrículas e mensalidades"}
+          >
+            {listaVisivel ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+          </button>
+        </div>
         <p className="mt-1 text-xs text-muted-foreground">
           Referência: {mesExtensoRef(mesAtual)} • {ativosMes.length} ativas de {ordenados.length}
         </p>
         <p className="mt-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
           Recebido {formatarValor(recebido)} • A receber {formatarValor(aReceber)}
         </p>
+        {listaVisivel && (
+        <>
+
 
         <div className="mt-3 flex flex-wrap gap-2">
           <input
@@ -341,7 +355,7 @@ export function Mensalidades({
             onClick={toggleTodos}
             className="flex items-center gap-1 rounded-md border border-border bg-background px-2 py-1 text-xs text-muted-foreground"
           >
-            {listaVisivel ? (
+            {todosAbertos ? (
               <>
                 <ChevronUp className="size-3" /> RECOLHER TODOS
               </>
@@ -353,13 +367,8 @@ export function Mensalidades({
           </button>
         </div>
 
-        {!listaVisivel ? (
-          <p className="rounded-md border border-border bg-background/40 p-3 text-sm text-muted-foreground">
-            {ordenados.length} aluno{ordenados.length === 1 ? "" : "s"} matriculado{ordenados.length === 1 ? "" : "s"}.
-            Clique em <span className="text-primary">ABRIR TODOS</span> para ver a lista.
-          </p>
-        ) : (
-          <ul className="space-y-2">
+        <ul className="space-y-2">
+
             {listaFiltrada.map((a) => {
               const m = doMes(a.id);
               const ativo = m?.ativo ?? true;
@@ -466,8 +475,10 @@ export function Mensalidades({
               </li>
             )}
           </ul>
+        </>
         )}
       </section>
+
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
@@ -656,7 +667,8 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const [mes, setMes] = useState(refMes(new Date(), -1));
   const [filtro, setFiltro] = useState<"todos" | "atraso" | "pagos">("todos");
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
-  const [minimizada, setMinimizada] = useState(false);
+  const [minimizada, setMinimizada] = useState(true);
+
   const meses = Array.from({ length: 12 }, (_, i) => refMes(new Date(), -i));
 
 
