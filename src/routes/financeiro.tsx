@@ -112,7 +112,8 @@ function FinanceiroPage() {
         porNome.set(chave, aluno);
       }
     }
-    const alunosUnicos = [...porNome.values()];
+    // Cadastro bloqueado = inativo: não entra em matrículas, conferência nem projeção.
+    const alunosUnicos = [...porNome.values()].filter((al) => !bloqueados.has(al.user_id));
     const mantidos = new Set(alunosUnicos.map((al) => al.id));
 
     setAlunos(alunosUnicos);
