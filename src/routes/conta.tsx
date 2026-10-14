@@ -232,13 +232,28 @@ function Autenticacao() {
     }
     setRecuperando(true);
     setAviso(null);
-    const r = await pedirSenha({
-      data: { identificador: alvo, redirectTo: `${window.location.origin}/reset-password` },
-    });
-    setRecuperando(false);
-    if (!r.ok) {
-      setAviso(r.erro);
-      return;
+    const redirectTo = `${window.location.origin}/reset-password`;
+    if (alvo.includes("@")) {
+      // Envio direto pelo navegador: não depende da configuração do servidor.
+      const { error } = await supabase.auth.resetPasswordForEmail(alvo.toLowerCase(), { redirectTo });
+      setRecuperando(false);
+      if (error) {
+        setAviso("Não foi possível enviar o link agora. Tente de novo em alguns minutos.");
+        return;
+      }
+    } else {
+      try {
+        const r = await pedirSenha({ data: { identificador: alvo, redirectTo } });
+        setRecuperando(false);
+        if (!r.ok) {
+          setAviso(r.erro);
+          return;
+        }
+      } catch {
+        setRecuperando(false);
+        setAviso("Não conseguimos enviar pelo CPF agora. Digite seu e-mail no lugar do CPF e toque de novo em esqueci a senha.");
+        return;
+      }
     }
     setAviso(
       "Se existir uma conta com esse CPF ou e-mail, enviamos um link para criar uma nova senha. Confira sua caixa de entrada e o spam.",
