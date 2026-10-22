@@ -47,6 +47,15 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
     return () => { ativo = false; };
   }, [uid, enabled, tentativa]);
 
+  // Contract signed after the notice loaded: re-read quietly so OK unlocks without reloading.
+  useEffect(() => {
+    if (!enabled || contratos > 0 || consulta?.estado !== "pendente") return;
+    const t = window.setInterval(() => {
+      void consultarAvisoRecesso(supabase).then((r) => { setContratos(r.contratos); if (!r.mostrar) setConsulta({ uid, estado: "liberado" }); }).catch(() => {});
+    }, 5000);
+    return () => window.clearInterval(t);
+  }, [enabled, contratos, consulta?.estado, uid]);
+
   // Android Chrome only opens the biometric prompt when it starts right after the tap.
   // Fetch the challenge as soon as the terms are accepted, so OK calls it without waiting on the network.
   useEffect(() => {
