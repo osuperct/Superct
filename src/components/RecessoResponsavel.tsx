@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { biometriaDisponivel } from "@/lib/biometria";
+import { biometriaDisponivel, confirmacaoSemBiometria } from "@/lib/biometria";
 import { RECESSO, recessoBloqueiaAcesso, recessoPodeConfirmar, type EstadoAvisoRecesso } from "@/lib/recesso";
 import { useSidebarControl } from "@/components/SidebarContext";
 import { confirmarRecesso } from "@/lib/recesso.functions";
@@ -59,7 +59,7 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
   // Android Chrome only opens the biometric prompt when it starts right after the tap.
   // Fetch the challenge as soon as the terms are accepted, so OK calls it without waiting on the network.
   useEffect(() => {
-    if (!aceitou || bio !== true || contratos === 0) { setPreparo(null); return; }
+    if (!aceitou || bio === null || contratos === 0) { setPreparo(null); return; }
     let ativo = true;
     const buscar = () => {
       void supabase.rpc("recesso_iniciar", { _origin: window.location.origin }).then(({ data, error }) => {
@@ -77,11 +77,11 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
   async function aceitar() {
     if (!recessoPodeConfirmar(aceitou, bio, contratos, salvando)) return;
     if (!preparo || Date.now() - preparo.em > 4.5 * 60 * 1000) { setTentativaPreparo((t) => t + 1); setErro("Preparando a biometria… toque em OK novamente em instantes."); return; }
-    if (preparo.rpId !== window.location.hostname) { setErro("Não foi possível abrir a biometria neste endereço. Recarregue a página e tente novamente."); return; }
+    if (bio === true && preparo.rpId !== window.location.hostname) { setErro("Não foi possível abrir a biometria neste endereço. Recarregue a página e tente novamente."); return; }
     setSalvando(true); setErro("");
     const atual = preparo;
     try {
-      const resposta = await startRegistration({ optionsJSON: {
+      const resposta = bio === false ? confirmacaoSemBiometria(atual.challenge) : await startRegistration({ optionsJSON: {
         challenge: atual.challenge,
         rp: { id: atual.rpId, name: "Super CT — Recesso" },
         user: { id: btoa(uid.slice(0, 48)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""), name: uid, displayName: "Responsável Super CT" },
@@ -129,10 +129,10 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
         </Accordion>
         <label className="flex items-start gap-3 text-sm"><Checkbox checked={aceitou} disabled={salvando} onCheckedChange={(v) => setAceitou(v === true)} /><span>Li e aceito os termos</span></label>
         {janelaBloqueada && <div role="note" className="space-y-2 rounded-md border border-primary/50 p-3 text-sm"><p>Nesta janela de prévia o celular não deixa abrir a biometria. Abra o app em uma aba própria do navegador para confirmar.</p><Button type="button" variant="outline" className="w-full" onClick={() => window.open(window.location.href, "_blank", "noopener")}>ABRIR EM NOVA ABA</Button></div>}
-        {bio === false && <p className="text-xs text-muted-foreground">Este aparelho não oferece confirmação biométrica ou bloqueio de tela compatível. Use um aparelho compatível para confirmar; nenhum aditivo será registrado sem essa verificação.</p>}
+        {bio === false && <p className="text-xs text-muted-foreground">Este aparelho não oferece confirmação biométrica ou bloqueio de tela compatível. Ao tocar em OK, você confirma pelo seu login, com a mesma validade.</p>}
         {contratos === 0 && <p className="text-xs text-muted-foreground">Seu contrato assinado precisa estar anexado para receber o aditivo. Caso tenha sido entregue em papel, solicite à administração que anexe uma cópia.</p>}
         {erro && <p role="alert" className="text-sm text-destructive">{erro}</p>}
-        <Button disabled={!recessoPodeConfirmar(aceitou, bio, contratos, salvando) || !preparo || janelaBloqueada} onClick={() => void aceitar()} className="h-auto min-h-11 whitespace-normal py-3">{salvando || (aceitou && !preparo && bio === true && contratos > 0) ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}{salvando ? "REGISTRANDO ADITIVO…" : aceitou && !preparo && bio === true && contratos > 0 ? "PREPARANDO BIOMETRIA…" : "OK"}</Button>
+        <Button disabled={!recessoPodeConfirmar(aceitou, bio, contratos, salvando) || !preparo || (bio === true && janelaBloqueada)} onClick={() => void aceitar()} className="h-auto min-h-11 whitespace-normal py-3">{salvando || (aceitou && !preparo && bio !== null && contratos > 0) ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}{salvando ? "REGISTRANDO ADITIVO…"   : aceitou && !preparo && bio !== null && contratos > 0 ? "PREPARANDO BIOMETRIA…" : "OK"}</Button>
         </>}
       </DialogContent>
     </Dialog>

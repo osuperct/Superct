@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
-import { biometriaDisponivel } from "@/lib/biometria";
+import { biometriaDisponivel, confirmacaoSemBiometria } from "@/lib/biometria";
 import { CLAUSULAS_CONTRATO, BUCKET } from "@/lib/documentos";
 import { RECESSO } from "@/lib/recesso";
 import { dataBr, gerarAditivoRenovacao, textoRenovacao } from "@/lib/renovacao";
@@ -41,7 +41,7 @@ export function RenovacaoResponsavel({ uid, enabled, onConfirmado }: { uid: stri
   }, [uid, enabled]);
 
   useEffect(() => {
-    if (!aceitou || bio !== true || !renov) { setPreparo(null); return; }
+    if (!aceitou || bio === null || !renov) { setPreparo(null); return; }
     let ativo = true;
     const buscar = () => {
       void supabase.rpc("renovacao_iniciar", { _origin: window.location.origin, _renovacao: renov.id }).then(({ data, error }) => {
@@ -65,7 +65,7 @@ export function RenovacaoResponsavel({ uid, enabled, onConfirmado }: { uid: stri
     setSalvando(true); setErro("");
     const atual = preparo;
     try {
-      const resposta = await startRegistration({ optionsJSON: {
+      const resposta = bio === false ? confirmacaoSemBiometria(atual.challenge) : await startRegistration({ optionsJSON: {
         challenge: atual.challenge,
         rp: { id: atual.rpId, name: "Super CT — Renovação" },
         user: { id: btoa(uid.slice(0, 48)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""), name: uid, displayName: "Responsável Super CT" },
@@ -128,11 +128,11 @@ export function RenovacaoResponsavel({ uid, enabled, onConfirmado }: { uid: stri
           </AccordionItem>
         </Accordion>
         <label className="flex items-start gap-3 text-sm"><Checkbox checked={aceitou} disabled={salvando} onCheckedChange={(v) => setAceitou(v === true)} /><span>Li e aceito os termos da renovação</span></label>
-        {bio === false && <p className="text-xs text-muted-foreground">Este aparelho não oferece biometria ou bloqueio de tela compatível. Use um aparelho compatível para confirmar.</p>}
+        {bio === false && <p className="text-xs text-muted-foreground">Este aparelho não oferece biometria ou bloqueio de tela compatível. Ao tocar em OK, você confirma pelo seu login, com a mesma validade.</p>}
         {erro && <p role="alert" className="text-sm text-destructive">{erro}</p>}
-        <Button disabled={!aceitou || bio !== true || !preparo || salvando} onClick={() => void confirmar()} className="h-auto min-h-11 py-3">
-          {salvando || (aceitou && bio === true && !preparo) ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}
-          {salvando ? "REGISTRANDO RENOVAÇÃO…" : aceitou && bio === true && !preparo ? "PREPARANDO BIOMETRIA…" : "OK"}
+        <Button disabled={!aceitou || bio === null || !preparo || salvando} onClick={() => void confirmar()} className="h-auto min-h-11 py-3">
+          {salvando || (aceitou && bio !== null && !preparo) ? <LoaderCircle className="size-4 animate-spin" /> : <Fingerprint className="size-5" />}
+          {salvando ? "REGISTRANDO RENOVAÇÃO…" : aceitou && bio !== null && !preparo ? "PREPARANDO BIOMETRIA…" : "OK"}
         </Button>
       </DialogContent>
     </Dialog>
