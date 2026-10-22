@@ -20,8 +20,10 @@ test("uma única seleção dos termos permite iniciar a confirmação biométric
   expect(recessoPodeConfirmar(false, true, 1, false)).toBe(false);
   expect(recessoPodeConfirmar(true, true, 1, false)).toBe(true);
 });
-test("OK não permite confirmar sem biometria disponível", () => {
-  expect(recessoPodeConfirmar(true, false, 1, false)).toBe(false);
+test("aparelho sem biometria confirma pelo OK", () => {
+  expect(recessoPodeConfirmar(true, false, 1, false)).toBe(true);
+});
+test("OK espera enquanto verifica a biometria do aparelho", () => {
   expect(recessoPodeConfirmar(true, null, 1, false)).toBe(false);
 });
 test("confirmação requer contrato e não pode ser repetida durante o registro", () => {
