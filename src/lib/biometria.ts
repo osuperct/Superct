@@ -30,6 +30,16 @@ export async function confirmarBiometria(uid: string, nome: string): Promise<str
   return cred?.id ?? null;
 }
 
+/** Aparelho sem biometria/bloqueio: confirmação pelo login + toque em OK, marcada como "sem_biometria". */
+export function confirmacaoSemBiometria(challenge: string) {
+  const b64 = (s: string) => btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return {
+    id: "sem-biometria", rawId: "sem-biometria", type: "public-key" as const,
+    response: { clientDataJSON: b64(JSON.stringify({ type: "webauthn.create", challenge, origin: window.location.origin, metodo: "sem_biometria_login_ok" })), attestationObject: "sem-biometria" },
+    clientExtensionResults: {}, authenticatorAttachment: "platform" as const,
+  };
+}
+
 export async function sha256Hex(texto: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(texto));
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
