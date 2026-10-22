@@ -30,7 +30,8 @@ export function origemConfirmacaoRecesso(origem: string): URL {
 }
 
 export function recessoPodeConfirmar(aceitou: boolean, biometria: boolean | null, contratos: number, salvando: boolean): boolean {
-  return aceitou && biometria === true && contratos > 0 && !salvando;
+  // Sem biometria no aparelho (false), o OK confirma pelo login; só espera enquanto ainda verifica (null).
+  return aceitou && biometria !== null && contratos > 0 && !salvando;
 }
 
 // "consultando" não mostra o aviso: quem já concordou não deve vê-lo piscar antes da resposta.
