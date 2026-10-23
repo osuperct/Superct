@@ -58,7 +58,7 @@ function Casca({ children }: { children: React.ReactNode }) {
 }
 
 type Alu = { id: string; nome: string; idade: number | null; matricula: string | null; user_id: string; created_at: string };
-type Perfil = { id: string; nome_responsavel: string; telefone: string | null };
+type Perfil = { id: string; nome_responsavel: string; telefone: string | null; bloqueado_em?: string | null };
 
 const OPCOES = [
   { id: "ativos", rotulo: "Alunos ativos" },
@@ -98,7 +98,7 @@ function RelatoriosPage() {
 
     const [{ data: a }, { data: p }, { data: m }, { data: pr }] = await Promise.all([
       supabase.from("alunos").select("id, nome, idade, matricula, user_id, created_at").order("nome"),
-      supabase.from("perfis").select("id, nome_responsavel, telefone"),
+      supabase.from("perfis").select("id, nome_responsavel, telefone, bloqueado_em"),
       supabase.from("mensalidades").select("id, aluno_id, user_id, referencia, ativo, valor, pago, pago_em, forma"),
       supabase.from("presencas").select("id, aluno_id, user_id, dia").gte("dia", inicio).lte("dia", fim),
     ]);
@@ -119,7 +119,8 @@ function RelatoriosPage() {
     return perfis.find((p) => p.id === alu?.user_id)?.nome_responsavel ?? "—";
   };
   const ativoNoMes = (alunoId: string) =>
-    mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
+    !perfis.find((p) => p.id === alunos.find((a) => a.id === alunoId)?.user_id)?.bloqueado_em &&
+    (mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true);
 
   function montarSecao(id: OpcaoId): SecaoRelatorio {
     if (id === "ativos") {
