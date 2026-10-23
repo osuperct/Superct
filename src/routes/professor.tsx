@@ -497,6 +497,10 @@ function Painel({ professorId }: { professorId: string }) {
 
   const porNome = [...alunosUnicos].sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
   const termoBusca = buscaAlunos.trim().toLowerCase();
+  const nAtivos = porNome.filter((a) => estaAtivo(a.id)).length;
+  const nInativos = porNome.length - nAtivos;
+  const nRecentes = alunosUnicos.filter((a) => new Date(a.created_at).getTime() >= limite).length;
+
   const alunosFiltrados: Alu[] = (() => {
     let lista: Alu[] =
       filtroAlunos === "recentes"
@@ -562,16 +566,6 @@ function Painel({ professorId }: { professorId: string }) {
         {!alunosMinimizado && (
           <>
             <div className="mt-3 flex flex-wrap items-center gap-2">
-              <select
-                value={filtroAlunos}
-                onChange={(e) => setFiltroAlunos(e.target.value as typeof filtroAlunos)}
-                className="rounded-md border border-border bg-background px-2 py-1.5 text-xs"
-              >
-                <option value="recentes">Mais recentes (15 dias)</option>
-                <option value="todos">Todos (A–Z)</option>
-                <option value="ativos">Ativos</option>
-                <option value="inativos">Inativos</option>
-              </select>
               <input
                 type="text"
                 value={buscaAlunos}
@@ -579,6 +573,33 @@ function Painel({ professorId }: { professorId: string }) {
                 placeholder="Buscar aluno ou responsável"
                 className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-xs"
               />
+              <div
+                role="group"
+                aria-label="Filtrar alunos por situação"
+                className="flex items-center gap-1 rounded-md border border-border bg-background p-1"
+              >
+                {([
+                  ["todos", `TODOS (${porNome.length})`],
+                  ["ativos", `ATIVOS (${nAtivos})`],
+                  ["inativos", `INATIVOS (${nInativos})`],
+                  ["recentes", `RECENTES (${nRecentes})`],
+                ] as const).map(([valor, rotulo]) => (
+                  <button
+                    key={valor}
+                    type="button"
+                    aria-pressed={filtroAlunos === valor}
+                    onClick={() => setFiltroAlunos(valor)}
+                    className={`rounded px-2 py-1 font-display text-[10px] tracking-tight ${
+                      filtroAlunos === valor
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground"
+                    }`}
+                  >
+                    {rotulo}
+                  </button>
+                ))}
+              </div>
+
             </div>
 
             <ul className="mt-3 space-y-2">
