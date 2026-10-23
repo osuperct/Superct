@@ -461,8 +461,12 @@ function Painel({ professorId }: { professorId: string }) {
 
   const mesRef = refMes();
 
-  const estaAtivo = (alunoId: string) =>
-    mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
+  // Cadastro bloqueado = matrícula inativa, independente da mensalidade.
+  const estaAtivo = (alunoId: string) => {
+    const alu = alunos.find((a) => a.id === alunoId);
+    if (alu && perfis.find((p) => p.id === alu.user_id)?.bloqueado_em) return false;
+    return mensalidades.find((m) => m.aluno_id === alunoId && m.referencia === mesRef)?.ativo ?? true;
+  };
   const limite = Date.now() - 15 * 24 * 60 * 60 * 1000;
 
   // Pai e mãe podem cadastrar o mesmo aluno: mantém só um registro por nome.
