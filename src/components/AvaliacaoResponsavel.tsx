@@ -71,7 +71,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
   );
 
   useEffect(() => {
-    if (!mesHist && lista.length > 0) setMesHist(lista[0].referencia);
+    if (!mesHist && lista.length > 0) setMesHist(lista[0]?.referencia ?? "");
   }, [lista, mesHist]);
 
   async function baixar(alvo: Avaliacao) {
