@@ -29,6 +29,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
   const [escolhida, setEscolhida] = useState<string>(demo?.[0]?.id ?? "");
   const [aberto, setAberto] = useState(false);
   const [modo, setModo] = useState<"mes" | "grafico">("mes");
+  const [mesHist, setMesHist] = useState<string>("");
 
   useEffect(() => {
     if (demo) return;
@@ -52,6 +53,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
 
 
   const atual = lista.find((a) => a.id === escolhida) ?? null;
+  const mensal = atual && mesHist ? (lista.find((a) => a.aluno_id === atual.aluno_id && a.referencia === mesHist) ?? null) : null;
   const nomeAluno = (id: string) => alunos.find((al) => al.id === id)?.nome ?? "Aluno";
 
   const evolucao = useMemo(() => {
@@ -63,21 +65,29 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
       .map((a) => ({ mes: mesCurto(a.referencia), media: mediaNotas(lerNotas(a.notas)) }));
   }, [lista, atual]);
 
-  async function baixar() {
-    if (!atual) return;
+  const meses = useMemo(
+    () => Array.from(new Set(lista.map((a) => a.referencia))).sort((x, y) => (x < y ? 1 : x > y ? -1 : 0)),
+    [lista],
+  );
+
+  useEffect(() => {
+    if (!mesHist && lista.length > 0) setMesHist(lista[0]?.referencia ?? "");
+  }, [lista, mesHist]);
+
+  async function baixar(alvo: Avaliacao) {
     try {
       const blob = await relatorioAvaliacao(
-        nomeAluno(atual.aluno_id),
-        atual,
-        lista.filter((a) => a.aluno_id === atual.aluno_id),
+        nomeAluno(alvo.aluno_id),
+        alvo,
+        lista.filter((a) => a.aluno_id === alvo.aluno_id),
       );
-      baixarBlob(blob, `avaliacao-${atual.referencia}.pdf`);
+      baixarBlob(blob, `avaliacao-${alvo.referencia}.pdf`);
     } catch {
       toast.error("Não foi possível gerar o PDF.");
     }
   }
 
-  const notas = atual ? lerNotas(atual.notas) : {};
+  const notas = mensal ? lerNotas(mensal.notas) : {};
   const media = mediaNotas(notas);
 
   const recente = lista[0] ?? null;
@@ -148,6 +158,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
       setEscolhida(recente.id);
       setAberto(true);
       setModo("mes");
+      setMesHist(recente.referencia);
       setTimeout(() => document.getElementById("relatorio-mensal")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
   }
@@ -219,7 +230,11 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
             <Calendar className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <select
               value={escolhida}
-              onChange={(e) => setEscolhida(e.target.value)}
+              onChange={(e) => {
+                setEscolhida(e.target.value);
+                const alvo = lista.find((a) => a.id === e.target.value);
+                if (alvo) setMesHist(alvo.referencia);
+              }}
               className="w-full max-w-full min-w-0 appearance-none truncate rounded-md bg-transparent py-2.5 pl-9 pr-3 text-sm"
             >
               {lista.map((a) => (
@@ -231,7 +246,15 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
           </div>
 
           <div className="grid grid-cols-2 gap-1.5">
-            <Button type="button" size="sm" variant={modo === "mes" ? "default" : "outline"} onClick={() => setModo("mes")}>
+            <Button
+              type="button"
+              size="sm"
+              variant={modo === "mes" ? "default" : "outline"}
+              onClick={() => {
+                setMesHist(atual?.referencia ?? lista[0]?.referencia ?? "");
+                setModo("mes");
+              }}
+            >
               <List className="size-4" /> HISTÓRICO
             </Button>
             <Button type="button" size="sm" variant={modo === "grafico" ? "default" : "outline"} onClick={() => setModo("grafico")}>
@@ -262,61 +285,84 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
 
           {atual && modo === "mes" && (
             <div className="rounded-md border border-evaluation-blue/25 bg-background/35 p-3 shadow-inner">
-              <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-primary">
-                <Sparkles className="size-3" /> Nova avaliação · {nomeAluno(atual.aluno_id)} —{" "}
-                {mesExtenso(atual.referencia)}
-              </p>
-              <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-evaluation-orange/25 bg-evaluation-orange/10 p-3">
-                <div>
-                  <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">Avaliação geral</p>
-                  <p className="font-evaluation text-4xl leading-none text-evaluation-orange">{media.toFixed(1)}<span className="text-base text-muted-foreground">/10</span></p>
-                </div>
-                <TrofeuColorido className="size-12 shrink-0 drop-shadow-evaluation-star" />
+              <div className="relative rounded-md border border-border bg-background/40">
+                <Calendar className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <select
+                  value={mesHist}
+                  onChange={(e) => setMesHist(e.target.value)}
+                  aria-label="Selecionar mês do histórico"
+                  className="w-full max-w-full min-w-0 appearance-none truncate rounded-md bg-transparent py-2.5 pl-9 pr-3 text-sm"
+                >
+                  {meses.map((m) => (
+                    <option key={m} value={m}>
+                      {mesExtenso(m)}
+                    </option>
+                  ))}
+                </select>
               </div>
-
-              <ul className="mt-3 space-y-2 rounded-md border border-border bg-evaluation-surface/80 p-3">
-                {CRITERIOS.map((c) => (
-                  <li key={c.chave} className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <span className="text-muted-foreground">{c.rotulo}</span>
-                    <Estrelas nota={notas[c.chave]} />
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <div className="flex items-center gap-3 rounded-md border border-evaluation-orange/30 bg-evaluation-orange/10 p-3">
-                  <TrofeuColorido className="size-10 shrink-0" />
-                  <div className="min-w-0">
-                    <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-orange">Meta atual</p>
-                    <p className="text-xs leading-snug">{atual.meta ?? metaDeNotas(notas) ?? "—"}</p>
+              {mensal ? (
+                <>
+                  <p className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-primary">
+                    <Sparkles className="size-3" /> Avaliação · {nomeAluno(mensal.aluno_id)} —{" "}
+                    {mesExtenso(mensal.referencia)}
+                  </p>
+                  <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-evaluation-orange/25 bg-evaluation-orange/10 p-3">
+                    <div>
+                      <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">Avaliação geral</p>
+                      <p className="font-evaluation text-4xl leading-none text-evaluation-orange">{media.toFixed(1)}<span className="text-base text-muted-foreground">/10</span></p>
+                    </div>
+                    <TrofeuColorido className="size-12 shrink-0 drop-shadow-evaluation-star" />
                   </div>
-                </div>
-                <div className="flex items-center gap-3 rounded-md border border-evaluation-pink/30 bg-evaluation-pink/10 p-3">
-                  <MedalhaColorida className="size-10 shrink-0" />
-                  <div className="min-w-0">
-                    <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-pink">Conquistas</p>
-                    <p className="text-xs leading-snug">
-                      {(atual.conquistas ?? []).length > 0
-                        ? (atual.conquistas ?? []).join(" · ")
-                        : "Participação do mês"}
+
+                  <ul className="mt-3 space-y-2 rounded-md border border-border bg-evaluation-surface/80 p-3">
+                    {CRITERIOS.map((c) => (
+                      <li key={c.chave} className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span className="text-muted-foreground">{c.rotulo}</span>
+                        <Estrelas nota={notas[c.chave]} />
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <div className="flex items-center gap-3 rounded-md border border-evaluation-orange/30 bg-evaluation-orange/10 p-3">
+                      <TrofeuColorido className="size-10 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-orange">Meta atual</p>
+                        <p className="text-xs leading-snug">{mensal.meta ?? metaDeNotas(notas) ?? "—"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-md border border-evaluation-pink/30 bg-evaluation-pink/10 p-3">
+                      <MedalhaColorida className="size-10 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-pink">Conquistas</p>
+                        <p className="text-xs leading-snug">
+                          {(mensal.conquistas ?? []).length > 0
+                            ? (mensal.conquistas ?? []).join(" · ")
+                            : "Participação do mês"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  {mensal.observacoes && (
+                    <p className="mt-3 rounded-md border-l-2 border-evaluation-blue bg-evaluation-blue/10 p-3 text-xs leading-relaxed">
+                      <span className="text-muted-foreground">Professor: </span>
+                      {mensal.observacoes}
                     </p>
-                  </div>
-                </div>
-              </div>
-              {atual.observacoes && (
-                <p className="mt-3 rounded-md border-l-2 border-evaluation-blue bg-evaluation-blue/10 p-3 text-xs leading-relaxed">
-                  <span className="text-muted-foreground">Professor: </span>
-                  {atual.observacoes}
+                  )}
+
+                  <Button
+                    type="button"
+                    onClick={() => void baixar(mensal)}
+                    className="mt-3 h-10 w-full font-mono text-[10px] uppercase tracking-widest"
+                  >
+                    <Download className="size-3" /> BAIXAR AVALIAÇÃO EM PDF
+                  </Button>
+                </>
+              ) : (
+                <p className="mt-3 text-center text-sm text-muted-foreground">
+                  Nenhuma avaliação de {nomeAluno(atual.aluno_id)} neste mês.
                 </p>
               )}
-
-              <Button
-                type="button"
-                onClick={() => void baixar()}
-                className="mt-3 h-10 w-full font-mono text-[10px] uppercase tracking-widest"
-              >
-                <Download className="size-3" /> BAIXAR AVALIAÇÃO EM PDF
-              </Button>
             </div>
           )}
         </div>
