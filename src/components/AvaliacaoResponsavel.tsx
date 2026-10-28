@@ -29,6 +29,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
   const [escolhida, setEscolhida] = useState<string>(demo?.[0]?.id ?? "");
   const [aberto, setAberto] = useState(false);
   const [modo, setModo] = useState<"mes" | "grafico">("mes");
+  const [mesHist, setMesHist] = useState<string>("");
 
   useEffect(() => {
     if (demo) return;
@@ -52,6 +53,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
 
 
   const atual = lista.find((a) => a.id === escolhida) ?? null;
+  const mensal = atual && mesHist ? (lista.find((a) => a.aluno_id === atual.aluno_id && a.referencia === mesHist) ?? null) : null;
   const nomeAluno = (id: string) => alunos.find((al) => al.id === id)?.nome ?? "Aluno";
 
   const evolucao = useMemo(() => {
@@ -63,21 +65,29 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
       .map((a) => ({ mes: mesCurto(a.referencia), media: mediaNotas(lerNotas(a.notas)) }));
   }, [lista, atual]);
 
-  async function baixar() {
-    if (!atual) return;
+  const meses = useMemo(
+    () => Array.from(new Set(lista.map((a) => a.referencia))).sort((x, y) => (x < y ? 1 : x > y ? -1 : 0)),
+    [lista],
+  );
+
+  useEffect(() => {
+    if (!mesHist && lista.length > 0) setMesHist(lista[0].referencia);
+  }, [lista, mesHist]);
+
+  async function baixar(alvo: Avaliacao) {
     try {
       const blob = await relatorioAvaliacao(
-        nomeAluno(atual.aluno_id),
-        atual,
-        lista.filter((a) => a.aluno_id === atual.aluno_id),
+        nomeAluno(alvo.aluno_id),
+        alvo,
+        lista.filter((a) => a.aluno_id === alvo.aluno_id),
       );
-      baixarBlob(blob, `avaliacao-${atual.referencia}.pdf`);
+      baixarBlob(blob, `avaliacao-${alvo.referencia}.pdf`);
     } catch {
       toast.error("Não foi possível gerar o PDF.");
     }
   }
 
-  const notas = atual ? lerNotas(atual.notas) : {};
+  const notas = mensal ? lerNotas(mensal.notas) : {};
   const media = mediaNotas(notas);
 
   const recente = lista[0] ?? null;
@@ -148,6 +158,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
       setEscolhida(recente.id);
       setAberto(true);
       setModo("mes");
+      setMesHist(recente.referencia);
       setTimeout(() => document.getElementById("relatorio-mensal")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
   }
@@ -219,7 +230,11 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
             <Calendar className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
             <select
               value={escolhida}
-              onChange={(e) => setEscolhida(e.target.value)}
+              onChange={(e) => {
+                setEscolhida(e.target.value);
+                const alvo = lista.find((a) => a.id === e.target.value);
+                if (alvo) setMesHist(alvo.referencia);
+              }}
               className="w-full max-w-full min-w-0 appearance-none truncate rounded-md bg-transparent py-2.5 pl-9 pr-3 text-sm"
             >
               {lista.map((a) => (
@@ -231,7 +246,15 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
           </div>
 
           <div className="grid grid-cols-2 gap-1.5">
-            <Button type="button" size="sm" variant={modo === "mes" ? "default" : "outline"} onClick={() => setModo("mes")}>
+            <Button
+              type="button"
+              size="sm"
+              variant={modo === "mes" ? "default" : "outline"}
+              onClick={() => {
+                setMesHist(atual?.referencia ?? lista[0]?.referencia ?? "");
+                setModo("mes");
+              }}
+            >
               <List className="size-4" /> HISTÓRICO
             </Button>
             <Button type="button" size="sm" variant={modo === "grafico" ? "default" : "outline"} onClick={() => setModo("grafico")}>
