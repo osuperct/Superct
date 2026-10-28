@@ -285,61 +285,84 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
 
           {atual && modo === "mes" && (
             <div className="rounded-md border border-evaluation-blue/25 bg-background/35 p-3 shadow-inner">
-              <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-primary">
-                <Sparkles className="size-3" /> Nova avaliação · {nomeAluno(atual.aluno_id)} —{" "}
-                {mesExtenso(atual.referencia)}
-              </p>
-              <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-evaluation-orange/25 bg-evaluation-orange/10 p-3">
-                <div>
-                  <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">Avaliação geral</p>
-                  <p className="font-evaluation text-4xl leading-none text-evaluation-orange">{media.toFixed(1)}<span className="text-base text-muted-foreground">/10</span></p>
-                </div>
-                <TrofeuColorido className="size-12 shrink-0 drop-shadow-evaluation-star" />
+              <div className="relative rounded-md border border-border bg-background/40">
+                <Calendar className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <select
+                  value={mesHist}
+                  onChange={(e) => setMesHist(e.target.value)}
+                  aria-label="Selecionar mês do histórico"
+                  className="w-full max-w-full min-w-0 appearance-none truncate rounded-md bg-transparent py-2.5 pl-9 pr-3 text-sm"
+                >
+                  {meses.map((m) => (
+                    <option key={m} value={m}>
+                      {mesExtenso(m)}
+                    </option>
+                  ))}
+                </select>
               </div>
-
-              <ul className="mt-3 space-y-2 rounded-md border border-border bg-evaluation-surface/80 p-3">
-                {CRITERIOS.map((c) => (
-                  <li key={c.chave} className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                    <span className="text-muted-foreground">{c.rotulo}</span>
-                    <Estrelas nota={notas[c.chave]} />
-                  </li>
-                ))}
-              </ul>
-
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <div className="flex items-center gap-3 rounded-md border border-evaluation-orange/30 bg-evaluation-orange/10 p-3">
-                  <TrofeuColorido className="size-10 shrink-0" />
-                  <div className="min-w-0">
-                    <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-orange">Meta atual</p>
-                    <p className="text-xs leading-snug">{atual.meta ?? metaDeNotas(notas) ?? "—"}</p>
+              {mensal ? (
+                <>
+                  <p className="mt-3 flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-widest text-primary">
+                    <Sparkles className="size-3" /> Avaliação · {nomeAluno(mensal.aluno_id)} —{" "}
+                    {mesExtenso(mensal.referencia)}
+                  </p>
+                  <div className="mt-3 flex items-center justify-between gap-3 rounded-md border border-evaluation-orange/25 bg-evaluation-orange/10 p-3">
+                    <div>
+                      <p className="font-mono text-[8px] uppercase tracking-widest text-muted-foreground">Avaliação geral</p>
+                      <p className="font-evaluation text-4xl leading-none text-evaluation-orange">{media.toFixed(1)}<span className="text-base text-muted-foreground">/10</span></p>
+                    </div>
+                    <TrofeuColorido className="size-12 shrink-0 drop-shadow-evaluation-star" />
                   </div>
-                </div>
-                <div className="flex items-center gap-3 rounded-md border border-evaluation-pink/30 bg-evaluation-pink/10 p-3">
-                  <MedalhaColorida className="size-10 shrink-0" />
-                  <div className="min-w-0">
-                    <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-pink">Conquistas</p>
-                    <p className="text-xs leading-snug">
-                      {(atual.conquistas ?? []).length > 0
-                        ? (atual.conquistas ?? []).join(" · ")
-                        : "Participação do mês"}
+
+                  <ul className="mt-3 space-y-2 rounded-md border border-border bg-evaluation-surface/80 p-3">
+                    {CRITERIOS.map((c) => (
+                      <li key={c.chave} className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                        <span className="text-muted-foreground">{c.rotulo}</span>
+                        <Estrelas nota={notas[c.chave]} />
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    <div className="flex items-center gap-3 rounded-md border border-evaluation-orange/30 bg-evaluation-orange/10 p-3">
+                      <TrofeuColorido className="size-10 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-orange">Meta atual</p>
+                        <p className="text-xs leading-snug">{mensal.meta ?? metaDeNotas(notas) ?? "—"}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-md border border-evaluation-pink/30 bg-evaluation-pink/10 p-3">
+                      <MedalhaColorida className="size-10 shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-mono text-[8px] uppercase tracking-widest text-evaluation-pink">Conquistas</p>
+                        <p className="text-xs leading-snug">
+                          {(mensal.conquistas ?? []).length > 0
+                            ? (mensal.conquistas ?? []).join(" · ")
+                            : "Participação do mês"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  {mensal.observacoes && (
+                    <p className="mt-3 rounded-md border-l-2 border-evaluation-blue bg-evaluation-blue/10 p-3 text-xs leading-relaxed">
+                      <span className="text-muted-foreground">Professor: </span>
+                      {mensal.observacoes}
                     </p>
-                  </div>
-                </div>
-              </div>
-              {atual.observacoes && (
-                <p className="mt-3 rounded-md border-l-2 border-evaluation-blue bg-evaluation-blue/10 p-3 text-xs leading-relaxed">
-                  <span className="text-muted-foreground">Professor: </span>
-                  {atual.observacoes}
+                  )}
+
+                  <Button
+                    type="button"
+                    onClick={() => void baixar(mensal)}
+                    className="mt-3 h-10 w-full font-mono text-[10px] uppercase tracking-widest"
+                  >
+                    <Download className="size-3" /> BAIXAR AVALIAÇÃO EM PDF
+                  </Button>
+                </>
+              ) : (
+                <p className="mt-3 text-center text-sm text-muted-foreground">
+                  Nenhuma avaliação de {nomeAluno(atual.aluno_id)} neste mês.
                 </p>
               )}
-
-              <Button
-                type="button"
-                onClick={() => void baixar()}
-                className="mt-3 h-10 w-full font-mono text-[10px] uppercase tracking-widest"
-              >
-                <Download className="size-3" /> BAIXAR AVALIAÇÃO EM PDF
-              </Button>
             </div>
           )}
         </div>
