@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CircleDollarSign } from "lucide-react";
+import { ResumoFinanceiro } from "@/components/ResumoFinanceiro";
 
 import { supabase } from "@/integrations/supabase/client";
 import { Mensalidades } from "@/components/Mensalidades";
