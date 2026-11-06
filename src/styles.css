@@ -160,6 +160,21 @@
   animation: urgentBlink 1s infinite ease-in-out;
 }
 
+@keyframes videoIn {
+  from {
+    opacity: 0.25;
+    transform: translateX(calc(-50% + 26px));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%);
+  }
+}
+
+@utility animate-video-in {
+  animation: videoIn 0.32s var(--ease-out-expo) backwards;
+}
+
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar {
