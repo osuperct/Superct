@@ -14,6 +14,7 @@ const PADRAO: VideoApp[] = [assetUrl(video2), assetUrl(video1), assetUrl(video3)
   fim: null,
 }));
 
+const ZONA_CONTROLES = 74; // altura da barra nativa de controles: o gesto ali não troca de vídeo
 const MINIMO_DEDU = 52; // deslize horizontal mínimo, em px, para passar para o próximo vídeo
 const LIMITE_VISUAL = 70; // tope do deslocamento visual durante o deslize
 
@@ -21,11 +22,9 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
   const lista = videos && videos.length > 0 ? videos : PADRAO;
   const [atual, setAtual] = useState(0);
   const [deslocamento, setDeslocamento] = useState(0);
-  const [pausado, setPausado] = useState(false);
   const ref = useRef<HTMLVideoElement>(null);
   const area = useRef<HTMLDivElement>(null);
-  const toque = useRef<{ x: number; y: number; dx: number; dy: number } | null>(null);
-  const ignorarClique = useRef(false);
+  const toque = useRef<{ x: number; y: number; dx: number; dy: number; valido: boolean } | null>(null);
   const item = lista[Math.min(atual, lista.length - 1)]!;
 
   const proximo = () => setAtual((i) => (i + 1) % lista.length);
@@ -36,7 +35,6 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
     if (!v) return;
     v.muted = !item.com_som;
     if (item.inicio > 0) v.currentTime = item.inicio;
-    setPausado(false);
     const tocar = () => v.play().catch(() => {});
     tocar();
     v.addEventListener("canplay", tocar);
@@ -45,44 +43,33 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
 
   const aoIniciar = (e: TouchEvent<HTMLDivElement>) => {
     const t = e.touches[0];
-    if (!t) return;
-    toque.current = { x: t.clientX, y: t.clientY, dx: 0, dy: 0 };
+    if (!t || lista.length < 2) return;
+    const caixa = area.current?.getBoundingClientRect();
+    const naBarra = caixa ? t.clientY > caixa.bottom - ZONA_CONTROLES : false;
+    toque.current = { x: t.clientX, y: t.clientY, dx: 0, dy: 0, valido: !naBarra };
   };
 
   const aoMover = (e: TouchEvent<HTMLDivElement>) => {
     const inicio = toque.current;
     const t = e.touches[0];
-    if (!inicio || !t) return;
+    if (!inicio?.valido || !t) return;
     const dx = t.clientX - inicio.x;
     const dy = t.clientY - inicio.y;
     if (Math.abs(dx) <= Math.abs(dy)) return; // é rolagem da página para cima/baixo
     inicio.dx = dx;
     inicio.dy = dy;
-    if (lista.length > 1) setDeslocamento(Math.max(-LIMITE_VISUAL, Math.min(LIMITE_VISUAL, dx)));
+    setDeslocamento(Math.max(-LIMITE_VISUAL, Math.min(LIMITE_VISUAL, dx)));
   };
 
   const aoSoltar = () => {
     const inicio = toque.current;
     toque.current = null;
     setDeslocamento(0);
-    if (!inicio) return;
-    if (Math.abs(inicio.dx) > 12) ignorarClique.current = true; // foi deslize, não toque
-    if (lista.length < 2) return;
+    if (!inicio?.valido) return;
     if (Math.abs(inicio.dx) < MINIMO_DEDU) return;
     if (Math.abs(inicio.dx) < Math.abs(inicio.dy) * 1.2) return;
     if (inicio.dx < 0) proximo();
     else anterior();
-  };
-
-  const alternar = () => {
-    if (ignorarClique.current) {
-      ignorarClique.current = false;
-      return;
-    }
-    const v = ref.current;
-    if (!v) return;
-    if (v.paused) void v.play().catch(() => {});
-    else v.pause();
   };
 
   const deslizando = deslocamento !== 0;
@@ -102,7 +89,6 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
         onTouchMove={aoMover}
         onTouchEnd={aoSoltar}
         onTouchCancel={aoSoltar}
-        onClick={alternar}
       >
         <video
           ref={ref}
@@ -118,8 +104,7 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
           muted={!item.com_som}
           playsInline
           preload="auto"
-          onPlay={() => setPausado(false)}
-          onPause={() => setPausado(true)}
+          controls
           onTimeUpdate={(e) => {
             const v = e.currentTarget;
             if (item.fim && v.currentTime >= item.fim) {
@@ -133,16 +118,6 @@ export function VideoShowcase({ videos }: { videos?: VideoApp[] }) {
           }}
           onEnded={proximo}
         />
-
-        {pausado && (
-          <div className="pointer-events-none absolute inset-0 grid place-items-center">
-            <span className="grid h-14 w-14 place-items-center rounded-full bg-black/55 ring-1 ring-primary/60">
-              <svg viewBox="0 0 24 24" className="ml-1 h-6 w-6 fill-primary" aria-hidden="true">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            </span>
-          </div>
-        )}
 
         {lista.length > 1 && (
           <div className="pointer-events-none absolute bottom-2 left-2 flex gap-1">
