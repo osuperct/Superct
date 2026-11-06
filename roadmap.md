@@ -1,33 +1,16 @@
 # Roadmap
 
-- [x] Atualizar somente o aviso de Natal para os dias 24, 28, 29, 30 e 31 de dezembro de 2026, preservando confirmação obrigatória e calendário.
+## Melhorias gerais (pedido de 06/11/2026: "Todos")
+- [ ] 1. ADM: Painel do dia (cadastros, documentos, atrasos, renovações, pedidos, comprovantes)
+- [ ] 2. ADM: Documentos pendentes com cobrança por WhatsApp
+- [ ] 3. ADM: Ficha única do aluno
+- [ ] 4. ADM: Busca geral
+- [ ] 5. Professor: chamada rápida de hoje
+- [ ] 6. Professor: avaliação em sequência (próximo aluno + quem falta)
+- [ ] 7. Professor: aviso para turma (alunos escolhidos)
+- [ ] 8. Responsável: resumo no topo
+- [ ] 9. Responsável: lembrete automático 3 dias antes e no dia
+- [ ] 10. Responsável: envio de comprovante Pix; ADM confirma
 
-- [x] Corrigir a origem da confirmação biométrica no aviso; OK chama a confirmação obrigatória do aparelho e o desafio preserva o endereço da prévia, sem gerar credencial ou registrar aceite no teste; 12 testes aprovados.
-
-- [x] Ajustar texto de Natal, recolher o menu lateral e usar uma única seleção “Li e aceito os termos” com OK e biometria obrigatória; verificado na conta conectada sem registrar aceite, com 10 testes aprovados.
-
-- [x] Impedir que a notificação de avaliação encubra o aviso obrigatório da cláusula de recesso; conferido com conta conectada e avaliação não lida, sem registrar concordância.
-
-- [x] Remover “Confirmar depois” e impedir fechar o aviso ou acessar a conta antes da confirmação do recesso; verificado com sessão autenticada, sem registrar concordância.
-
-- [x] Corrigir a consulta do aviso de recesso ao entrar na conta e verificar com sessão autenticada, inclusive sem a consulta antiga disponível.
-
-- [x] Marcar o recesso de 24/12/2026 a 03/01/2027 no calendário do app e validar os dois meses.
-
-- [x] Incluir cláusula anual de recesso nos novos contratos.
-- [x] Mostrar aviso de 24/12/2026 a 03/01/2027 com leitura, concordância biométrica e aditivo arquivado sem repetir após confirmação.
-- [x] Validar permissões, geração do aditivo e leitura do aviso na conta conectada, sem forjar concordância real.
-- [x] Biometria do recesso: preparo antecipado e confirmação sem chaves privadas, testada com leitor simulado até a etapa do contrato.
-- [ ] Confirmar biometria e arquivamento em aparelho real: depende da concordância do responsável e contrato anexado; não simular aceite jurídico na conta do usuário.
-
-- [x] Incluir edição completa de parcerias na área APP e sincronizar a janela pública e o painel do responsável, preservando informações privadas.
-
-- [x] Criar área Parceiros do CT com as informações das três artes e contatos individuais no WhatsApp.
-
-- [x] Fazer a loja carregar produtos e fotos na hospedagem externa
-- [x] Fazer login e cadastro funcionarem no domínio externo
-- [x] Validar loja e login no site publicado
-- [x] Remover toda a interface e integração de notificações push/Firebase.
-- [x] Abrir lista de chamada completa em tela flutuante separada com barra de rolagem.
-
-- [x] Notificacoes push via WebPushr (aviso de ativacao para responsaveis + envio na area do professor)
+## Pendente externo
+- [ ] Confirmar biometria e arquivamento em aparelho real (depende do responsável).

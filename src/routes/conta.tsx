@@ -1,3 +1,5 @@
+import { ResumoResponsavel } from "@/components/ResumoResponsavel";
+import type { ResumoMensalidade } from "@/components/MensalidadeResponsavel";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { Session } from "@supabase/supabase-js";
@@ -642,6 +644,7 @@ function Painel({ session }: { session: Session }) {
   const [topicosAbertos, setTopicosAbertos] = useState<string[]>([]);
   const [avisosNaoLidos, setAvisosNaoLidos] = useState(0);
   const [mensalidadeAtrasada, setMensalidadeAtrasada] = useState(false);
+  const [resumoMens, setResumoMens] = useState<ResumoMensalidade[]>([]);
   const [documentosNovos, setDocumentosNovos] = useState(0);
   const [avisoFechado, setAvisoFechado] = useState(false);
   const [estadoRecesso, setEstadoRecesso] = useState<{ uid: string; bloqueado: boolean } | null>(null);
@@ -903,7 +906,7 @@ function Painel({ session }: { session: Session }) {
           {ehAdm && <Link to="/adm" className="mt-2 flex items-center justify-center gap-2 rounded-md border border-primary/60 bg-primary/5 px-4 py-3 font-display text-sm text-primary"><ShieldCheck className="size-4" /> ÁREA ADM</Link>}
         </div>
 
-
+        {!ehProfessor && !ehAdm && <ResumoResponsavel uid={uid} mensalidades={resumoMens} avisosNaoLidos={avisosNaoLidos} />}
 
         <AccordionItem value="avisos" className="rounded-md border border-border bg-card/50 px-4">
           <AccordionTrigger className="font-display text-base tracking-tight hover:no-underline">
@@ -916,7 +919,7 @@ function Painel({ session }: { session: Session }) {
           <AccordionTrigger className={`font-display text-base tracking-tight hover:no-underline ${mensalidadeAtrasada ? "animate-urgent-blink text-accent-red motion-reduce:animate-none" : ""}`}>
             <span className="flex min-w-0 items-center gap-2"><CircleDollarSign className="size-4 shrink-0 text-primary" /> MENSALIDADE {mensalidadeAtrasada && <span aria-label="Mensalidade em atraso">!</span>}</span>
           </AccordionTrigger>
-          <AccordionContent forceMount className="data-[state=closed]:hidden"><MensalidadeResponsavel uid={uid} alunos={alunos} compacto onAtraso={setMensalidadeAtrasada} /></AccordionContent>
+          <AccordionContent forceMount className="data-[state=closed]:hidden"><MensalidadeResponsavel uid={uid} alunos={alunos} compacto onAtraso={setMensalidadeAtrasada} onResumo={setResumoMens} /></AccordionContent>
         </AccordionItem>
 
         <AccordionItem value="frequencia" className="rounded-md border border-border bg-card/50 px-4">

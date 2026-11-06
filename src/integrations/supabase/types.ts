@@ -206,6 +206,7 @@ export type Database = {
       }
       avisos: {
         Row: {
+          alunos_destino: string[] | null
           autor_id: string
           created_at: string
           id: string
@@ -214,6 +215,7 @@ export type Database = {
           titulo: string
         }
         Insert: {
+          alunos_destino?: string[] | null
           autor_id: string
           created_at?: string
           id?: string
@@ -222,6 +224,7 @@ export type Database = {
           titulo: string
         }
         Update: {
+          alunos_destino?: string[] | null
           autor_id?: string
           created_at?: string
           id?: string
@@ -271,6 +274,7 @@ export type Database = {
           liberado_em: string | null
           nome_arquivo: string
           oculto_responsavel: boolean
+          pagamento_conferido_em: string | null
           tipo: string
           user_id: string
         }
@@ -284,6 +288,7 @@ export type Database = {
           liberado_em?: string | null
           nome_arquivo: string
           oculto_responsavel?: boolean
+          pagamento_conferido_em?: string | null
           tipo?: string
           user_id: string
         }
@@ -297,6 +302,7 @@ export type Database = {
           liberado_em?: string | null
           nome_arquivo?: string
           oculto_responsavel?: boolean
+          pagamento_conferido_em?: string | null
           tipo?: string
           user_id?: string
         }
@@ -347,6 +353,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      lembretes_vencimento: {
+        Row: {
+          aluno_id: string
+          enviado_em: string
+          referencia: string
+          tipo: string
+        }
+        Insert: {
+          aluno_id: string
+          enviado_em?: string
+          referencia: string
+          tipo: string
+        }
+        Update: {
+          aluno_id?: string
+          enviado_em?: string
+          referencia?: string
+          tipo?: string
+        }
+        Relationships: []
       }
       mensalidades: {
         Row: {

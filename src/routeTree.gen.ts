@@ -24,6 +24,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ViloesRouteImport } from './routes/viloes'
 import { Route as DocumentoTipoRouteImport } from './routes/documento.$tipo'
 import { Route as ApiPublicAvaliacaoMensalRouteImport } from './routes/api/public/avaliacao-mensal'
+import { Route as ApiPublicLembreteVencimentoRouteImport } from './routes/api/public/lembrete-vencimento'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -101,6 +102,12 @@ const ApiPublicAvaliacaoMensalRoute =
     path: '/api/public/avaliacao-mensal',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicLembreteVencimentoRoute =
+  ApiPublicLembreteVencimentoRouteImport.update({
+    id: '/api/public/lembrete-vencimento',
+    path: '/api/public/lembrete-vencimento',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
   '/api/public/avaliacao-mensal': typeof ApiPublicAvaliacaoMensalRoute
+  '/api/public/lembrete-vencimento': typeof ApiPublicLembreteVencimentoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -135,6 +143,7 @@ export interface FileRoutesByTo {
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
   '/api/public/avaliacao-mensal': typeof ApiPublicAvaliacaoMensalRoute
+  '/api/public/lembrete-vencimento': typeof ApiPublicLembreteVencimentoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -153,6 +162,7 @@ export interface FileRoutesById {
   '/viloes': typeof ViloesRoute
   '/documento/$tipo': typeof DocumentoTipoRoute
   '/api/public/avaliacao-mensal': typeof ApiPublicAvaliacaoMensalRoute
+  '/api/public/lembrete-vencimento': typeof ApiPublicLembreteVencimentoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/viloes'
     | '/documento/$tipo'
     | '/api/public/avaliacao-mensal'
+    | '/api/public/lembrete-vencimento'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/viloes'
     | '/documento/$tipo'
     | '/api/public/avaliacao-mensal'
+    | '/api/public/lembrete-vencimento'
   id:
     | '__root__'
     | '/'
@@ -206,6 +218,7 @@ export interface FileRouteTypes {
     | '/viloes'
     | '/documento/$tipo'
     | '/api/public/avaliacao-mensal'
+    | '/api/public/lembrete-vencimento'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,6 +237,7 @@ export interface RootRouteChildren {
   ViloesRoute: typeof ViloesRoute
   DocumentoTipoRoute: typeof DocumentoTipoRoute
   ApiPublicAvaliacaoMensalRoute: typeof ApiPublicAvaliacaoMensalRoute
+  ApiPublicLembreteVencimentoRoute: typeof ApiPublicLembreteVencimentoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -333,6 +347,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicAvaliacaoMensalRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/lembrete-vencimento': {
+      id: '/api/public/lembrete-vencimento'
+      path: '/api/public/lembrete-vencimento'
+      fullPath: '/api/public/lembrete-vencimento'
+      preLoaderRoute: typeof ApiPublicLembreteVencimentoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -352,6 +373,7 @@ const rootRouteChildren: RootRouteChildren = {
   ViloesRoute: ViloesRoute,
   DocumentoTipoRoute: DocumentoTipoRoute,
   ApiPublicAvaliacaoMensalRoute: ApiPublicAvaliacaoMensalRoute,
+  ApiPublicLembreteVencimentoRoute: ApiPublicLembreteVencimentoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

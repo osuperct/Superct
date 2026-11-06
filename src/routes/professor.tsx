@@ -696,7 +696,12 @@ function Painel({ professorId }: { professorId: string }) {
         professorId={professorId}
       />
 
-      <AvisosProfessor uid={professorId} />
+      <AvisosProfessor
+        uid={professorId}
+        alunos={porNome
+          .filter((a) => estaAtivo(a.id) && !perfis.find((p) => p.id === a.user_id)?.bloqueado_em)
+          .sort((x, y) => x.nome.localeCompare(y.nome, "pt-BR"))}
+      />
 
       <EnvioPush />
 

@@ -7,6 +7,7 @@ export type Aviso = {
   autor_id: string;
   created_at: string;
   imagem_url: string | null;
+  alunos_destino?: string[] | null;
   imagem?: string | null;
 };
 
@@ -15,7 +16,7 @@ export const BUCKET_AVISOS = "avisos";
 export async function listarAvisos(limite = 30) {
   const { data } = await supabase
     .from("avisos")
-    .select("id, titulo, mensagem, autor_id, created_at, imagem_url")
+    .select("id, titulo, mensagem, autor_id, created_at, imagem_url, alunos_destino")
     .order("created_at", { ascending: false })
     .limit(limite);
   return await comImagens((data ?? []) as Aviso[]);
@@ -53,13 +54,20 @@ export async function marcarLido(userId: string, avisoId: string) {
   await supabase.from("avisos_lidos").insert({ user_id: userId, aviso_id: avisoId });
 }
 
-export async function enviarAviso(autorId: string, titulo: string, mensagem: string, imagem?: File | null) {
+export async function enviarAviso(
+  autorId: string,
+  titulo: string,
+  mensagem: string,
+  imagem?: File | null,
+  alunosDestino?: string[] | null,
+) {
   const caminho = imagem ? await enviarImagemAviso(imagem) : null;
   const { error } = await supabase.from("avisos").insert({
     autor_id: autorId,
     titulo: titulo.trim(),
     mensagem: mensagem.trim(),
     imagem_url: caminho,
+    alunos_destino: alunosDestino && alunosDestino.length > 0 ? alunosDestino : null,
   });
   if (error) throw error;
 }

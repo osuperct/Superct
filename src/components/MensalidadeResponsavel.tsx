@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { CircleDollarSign, Copy, CreditCard, QrCode } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { CircleDollarSign, Copy, CreditCard, QrCode, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +24,32 @@ function linkCartao(valor: number | null) {
 
 function DialogPagamento({ mensalidade, onFechar }: { mensalidade: Mensalidade; onFechar: () => void }) {
   const link = linkCartao(mensalidade.valor);
+  const [enviando, setEnviando] = useState(false);
+  const [enviado, setEnviado] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+
+  async function enviarComprovante(arquivo: File): Promise<void> {
+    if (arquivo.size > 10 * 1024 * 1024) { toast.error("Arquivo muito grande (máximo 10 MB)."); return; }
+    setEnviando(true);
+    const caminho = `${mensalidade.user_id}/comprovante-${Date.now()}-${arquivo.name.replace(/[^\w.\-]+/g, "_")}`;
+    const { error } = await supabase.storage.from("documentos-alunos").upload(caminho, arquivo);
+    if (!error) {
+      const { error: e2 } = await supabase.from("documentos").insert({
+        user_id: mensalidade.user_id,
+        aluno_id: mensalidade.aluno_id,
+        tipo: "comprovante",
+        nome_arquivo: `Comprovante ${mesExtensoRef(mensalidade.referencia)} - ${arquivo.name}`,
+        caminho,
+      });
+      setEnviando(false);
+      if (e2) { toast.error("Não foi possível enviar o comprovante."); return; }
+      setEnviado(true);
+      toast.success("Comprovante enviado! A administração vai conferir.");
+      return;
+    }
+    setEnviando(false);
+    toast.error("Não foi possível enviar o comprovante.");
+  }
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
       <button aria-label="Fechar" onClick={onFechar} className="absolute inset-0 bg-black/70" />
@@ -56,8 +82,26 @@ function DialogPagamento({ mensalidade, onFechar }: { mensalidade: Mensalidade; 
               </button>
             </div>
             <p className="mt-2 text-[11px] text-muted-foreground">
-              Valor: {formatarValor(mensalidade.valor)} · Envie o comprovante pelo WhatsApp.
+              Valor: {formatarValor(mensalidade.valor)} · Depois de pagar, envie a foto do comprovante aqui.
             </p>
+            <input
+              ref={input}
+              type="file"
+              accept="image/*,application/pdf"
+              className="hidden"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) void enviarComprovante(f);
+              }}
+            />
+            <button
+              type="button"
+              disabled={enviando || enviado}
+              onClick={() => input.current?.click()}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-md border border-primary px-3 py-2 font-display text-xs text-primary disabled:opacity-60"
+            >
+              <Upload className="size-3.5" /> {enviado ? "COMPROVANTE ENVIADO ✓" : enviando ? "ENVIANDO…" : "ENVIAR COMPROVANTE DO PIX"}
+            </button>
           </div>
 
           <div className="rounded-md border border-border p-3">
@@ -92,6 +136,7 @@ function DialogPagamento({ mensalidade, onFechar }: { mensalidade: Mensalidade; 
   );
 }
 
+export type ResumoMensalidade = { nome: string; situacao: string | null; venc: string; valor: number | null };
 type AlunoSimples = { id: string; nome: string; matricula: string | null };
 type Contrato = { vencimento: string; forma: string; plano: string };
 
@@ -118,11 +163,13 @@ export function MensalidadeResponsavel({
   alunos,
   compacto = false,
   onAtraso,
+  onResumo,
 }: {
   uid: string;
   alunos: AlunoSimples[];
   compacto?: boolean;
   onAtraso?: (atrasada: boolean) => void;
+  onResumo?: (itens: ResumoMensalidade[]) => void;
 }) {
   const [mens, setMens] = useState<Mensalidade[]>([]);
   const [contratos, setContratos] = useState<Record<string, Contrato>>({});
@@ -170,6 +217,20 @@ export function MensalidadeResponsavel({
   useEffect(() => {
     onAtraso?.(temAtraso);
   }, [onAtraso, temAtraso]);
+
+  useEffect(() => {
+    if (!onResumo) return;
+    onResumo(
+      alunos.map((al) => {
+        const dia = diaVencimento(contratos[al.id]?.vencimento ?? "");
+        const doAluno = mens.filter((m) => m.aluno_id === al.id);
+        const pend = doAluno.filter((m) => !m.pago && m.ativo).sort((a, b) => a.referencia.localeCompare(b.referencia));
+        const atual = pend[0] ?? doAluno.find((m) => m.referencia === mesAtual);
+        const venc = dataVencimento(atual?.referencia ?? mesAtual, dia);
+        return { nome: al.nome, situacao: atual ? situacao(atual, venc).texto : null, venc, valor: atual?.valor ?? null };
+      }),
+    );
+  }, [onResumo, alunos, mens, contratos, mesAtual]);
 
   if (alunos.length === 0) return null;
 

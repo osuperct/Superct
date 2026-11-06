@@ -25,6 +25,7 @@ export function ListaChamada({
   const [salvando, setSalvando] = useState<string | null>(null);
   const [busca, setBusca] = useState("");
   const [aberto, setAberto] = useState(false);
+  const [hojeAberto, setHojeAberto] = useState(false);
   const { setForcarRecolhida } = useSidebarControl();
 
   const dias = useMemo(() => diasDeAula(ano, mes), [ano, mes]);
@@ -54,11 +55,20 @@ export function ListaChamada({
   }, [carregar]);
 
   useEffect(() => {
-    setForcarRecolhida(aberto);
+    setForcarRecolhida(aberto || hojeAberto);
     return () => {
       setForcarRecolhida(false);
     };
-  }, [aberto, setForcarRecolhida]);
+  }, [aberto, hojeAberto, setForcarRecolhida]);
+
+  function abrirHoje() {
+    const d = new Date();
+    setAno(d.getFullYear());
+    setMes(d.getMonth() + 1);
+    setBusca("");
+    setHojeAberto(true);
+  }
+  const presentesHoje = alunos.filter((a) => marcadas.has(`${a.id}|${hoje}`)).length;
 
   function mudarMes(passo: number) {
     const d = new Date(ano, mes - 1 + passo, 1);
@@ -124,6 +134,46 @@ export function ListaChamada({
           <ChevronRight className="size-4" />
         </button>
       </div>
+
+      <button
+        type="button"
+        onClick={abrirHoje}
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+      >
+        <ClipboardCheck className="size-4" /> CHAMADA DE HOJE
+      </button>
+
+      <Dialog open={hojeAberto} onOpenChange={setHojeAberto}>
+        <DialogContent className="flex max-h-[90vh] flex-col overflow-hidden">
+          <DialogHeader>
+            <DialogTitle>CHAMADA DE HOJE — {hoje.split("-").reverse().join("/")}</DialogTitle>
+          </DialogHeader>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            Toque no nome para marcar presença • {presentesHoje} presente{presentesHoje === 1 ? "" : "s"}
+          </p>
+          <Input type="text" placeholder="Buscar aluno..." value={busca} onChange={(e) => setBusca(e.target.value)} className="text-sm" />
+          <ul className="flex-1 space-y-1.5 overflow-y-auto pr-1">
+            {alunosOrdenados.map((a) => {
+              const presente = marcadas.has(`${a.id}|${hoje}`);
+              return (
+                <li key={a.id}>
+                  <button
+                    type="button"
+                    onClick={() => void alternar(a, hoje)}
+                    aria-pressed={presente}
+                    className={`flex w-full items-center justify-between gap-2 rounded-md border px-3 py-3 text-left text-sm transition-colors ${
+                      presente ? "border-secondary bg-secondary text-secondary-foreground" : "border-border bg-background/40"
+                    }`}
+                  >
+                    <span className="truncate">{a.nome}</span>
+                    <span className="shrink-0 font-display text-xs">{presente ? "PRESENTE ✓" : "—"}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={aberto} onOpenChange={setAberto}>
         <DialogTrigger asChild>

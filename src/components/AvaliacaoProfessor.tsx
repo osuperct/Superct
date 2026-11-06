@@ -56,8 +56,33 @@ function Resumo({ avaliacao }: { avaliacao: Avaliacao }) {
 
 export function AvaliacaoProfessor({ alunos, professorId }: { alunos: Alu[]; professorId: string }) {
   const [sel, setSel] = useState<Alu | null>(null);
+  const [feitos, setFeitos] = useState<Set<string>>(new Set());
 
-  if (sel) return <Ficha aluno={sel} professorId={professorId} voltar={() => setSel(null)} />;
+  const carregarFeitos = useCallback(async () => {
+    const { data } = await supabase.from("avaliacoes").select("aluno_id").eq("referencia", referenciaMesAtual());
+    setFeitos(new Set((data ?? []).map((x) => x.aluno_id)));
+  }, []);
+
+  useEffect(() => {
+    void carregarFeitos();
+  }, [carregarFeitos, sel]);
+
+  const faltam = alunos.filter((a) => !feitos.has(a.id));
+
+  if (sel) {
+    const proximo = faltam.find((a) => a.id !== sel.id) ?? null;
+    return (
+      <Ficha
+        key={sel.id}
+        aluno={sel}
+        professorId={professorId}
+        voltar={() => setSel(null)}
+        proximo={proximo}
+        restantes={faltam.filter((a) => a.id !== sel.id).length}
+        irPara={(a) => setSel(a)}
+      />
+    );
+  }
 
   return (
     <section className="rounded-lg border border-border bg-card/40 p-4">
@@ -75,6 +100,22 @@ export function AvaliacaoProfessor({ alunos, professorId }: { alunos: Alu[]; pro
           </span>
         ))}
       </div>
+      <div className="mt-3 rounded-md border border-border bg-background/40 p-3">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+          {mesExtenso(referenciaMesAtual())}: {alunos.length - faltam.length} de {alunos.length} avaliados
+        </p>
+        {faltam.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setSel(faltam[0] ?? null)}
+            className="mt-2 w-full rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground"
+          >
+            AVALIAR EM SEQUÊNCIA ({faltam.length} FALTAM)
+          </button>
+        ) : (
+          <p className="mt-1 text-sm text-primary">Todos avaliados neste mês! 🎉</p>
+        )}
+      </div>
       <div className="mt-3">
         <select
           value=""
@@ -90,7 +131,7 @@ export function AvaliacaoProfessor({ alunos, professorId }: { alunos: Alu[]; pro
           <option value="">Selecione o aluno</option>
           {alunos.map((a) => (
             <option key={a.id} value={a.id}>
-              {a.nome} {a.matricula ? `— ${a.matricula}` : "— avaliar"}
+              {feitos.has(a.id) ? "✓ " : "• "}{a.nome} {a.matricula ? `— ${a.matricula}` : ""}
             </option>
           ))}
         </select>
@@ -100,7 +141,21 @@ export function AvaliacaoProfessor({ alunos, professorId }: { alunos: Alu[]; pro
   );
 }
 
-function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string; voltar: () => void }) {
+function Ficha({
+  aluno,
+  professorId,
+  voltar,
+  proximo,
+  restantes,
+  irPara,
+}: {
+  aluno: Alu;
+  professorId: string;
+  voltar: () => void;
+  proximo: Alu | null;
+  restantes: number;
+  irPara: (a: Alu) => void;
+}) {
   const referencia = referenciaMesAtual();
   const [notas, setNotas] = useState<Notas>(VAZIO);
   const [observacoes, setObservacoes] = useState("");
@@ -138,7 +193,7 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
 
   const media = mediaNotas(notas);
 
-  async function salvar(publicar: boolean) {
+  async function salvar(publicar: boolean, seguir = false) {
     if (CRITERIOS.some((c) => !notas[c.chave])) {
       toast.error("Dê a nota em estrelas de todos os aspectos.");
       return;
@@ -168,6 +223,11 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
         ? `Avaliação de ${mesExtenso(referencia)} publicada para o responsável.`
         : `Avaliação de ${mesExtenso(referencia)} salva.`,
     );
+    if (seguir && proximo) {
+      irPara(proximo);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     void carregar();
   }
 
@@ -261,6 +321,16 @@ function Ficha({ aluno, professorId, voltar }: { aluno: Alu; professorId: string
         })()}
       </div>
 
+      {proximo && (
+        <button
+          type="button"
+          onClick={() => void salvar(false, true)}
+          disabled={salvando}
+          className="mt-3 w-full rounded-md bg-primary px-4 py-3 font-display text-sm tracking-tight text-primary-foreground disabled:opacity-60"
+        >
+          SALVAR E IR PARA {proximo.nome.split(" ")[0]?.toUpperCase()} ({restantes} FALTAM)
+        </button>
+      )}
       <button
         type="button"
         onClick={() => void salvar(false)}

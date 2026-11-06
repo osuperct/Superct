@@ -10,6 +10,8 @@ import { AppMidias } from "@/components/AppMidias";
 import { ContratosAdm } from "@/components/ContratosAdm";
 import { ProdutosAdm } from "@/components/ProdutosAdm";
 import { PedidosAdm } from "@/components/PedidosAdm";
+import { PainelDia } from "@/components/PainelDia";
+import { BuscaAdm } from "@/components/BuscaAdm";
 import { supabase } from "@/integrations/supabase/client";
 import logoAdm from "@/assets/super-ct-logo-adm.jpg.asset.json";
 import { assetUrl } from "@/lib/assetUrl";
@@ -148,6 +150,8 @@ function AdmPage() {
 
   return (
     <Casca>
+      <PainelDia />
+      <BuscaAdm />
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
           <CircleDollarSign className="size-4 text-primary" /> MATRÍCULAS ATIVAS OU INATIVAS
@@ -179,7 +183,7 @@ function AdmPage() {
         </Link>
       </section>
 
-      <Aprovacoes />
+      <div id="aprovacoes" className="scroll-mt-4"><Aprovacoes /></div>
 
       <ContratosAdm />
 
@@ -188,7 +192,7 @@ function AdmPage() {
       <AppMidias />
 
       <ProdutosAdm />
-      <PedidosAdm />
+      <div id="pedidos" className="scroll-mt-4"><PedidosAdm /></div>
 
 
     </Casca>
