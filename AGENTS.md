@@ -21,3 +21,6 @@
 - Recess biometric consent fetches its challenge from an authenticated RPC before the OK tap and verifies/archives with a request-scoped user client (no service key), because Android Chrome drops the gesture after network waits and the external host lacks private server env vars.
 - Contract renewals live in renovacoes_contrato (ADM creates pending rows); the responsible confirms via WebAuthn and the renovacao_registrar RPC atomically archives the addendum and updates the contract, so consent cannot be faked or skipped.
 - Keep ADM renewal management in the existing renewal component with a bounded, scrollable dialog, so configuration stays on the administrative page without overflowing the viewport.
+
+- Payment receipts are documentos rows with tipo "comprovante"; ADM confirms via pagamento_conferido_em so they never count as contracts.
+- Targeted notices use avisos.alunos_destino (null = everyone), enforced by RLS so other families cannot read them.
