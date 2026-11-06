@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { CalendarCheck, FileWarning, MessageCircle, Receipt, RefreshCw, ShoppingBag, UserPlus, Wallet } from "lucide-react";
+import { CalendarCheck, FileWarning, MessageCircle, Receipt, RefreshCw, ShoppingBag, UserPlus, Wallet, X } from "lucide-react";
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const BUCKET = "documentos-alunos";
 
@@ -133,8 +133,22 @@ export function PainelDia() {
       </div>
 
       <Dialog open={aberto === "docs"} onOpenChange={(v) => setAberto(v ? "docs" : null)}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>DOCUMENTOS FALTANDO</DialogTitle></DialogHeader>
+        <DialogContent showCloseButton={false} aria-describedby={undefined} className="z-[70] flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-screen-sm flex-col gap-0 overflow-hidden rounded-lg bg-background p-0">
+          <DialogHeader className="shrink-0 border-b border-border p-4 pr-14 text-left">
+            <DialogTitle className="flex items-center gap-2 font-display text-base leading-snug">
+              <FileWarning className="size-4 shrink-0 text-primary" /> DOCUMENTOS FALTANDO
+            </DialogTitle>
+          </DialogHeader>
+          <DialogClose asChild>
+            <button
+              type="button"
+              aria-label="Fechar documentos faltando"
+              className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <X className="size-4" />
+            </button>
+          </DialogClose>
+          <div className="min-h-0 overflow-y-auto overscroll-contain p-4">
           {pendentes.length === 0 && <p className="text-sm text-muted-foreground">Todos entregaram contrato e PAR-Q. 🎉</p>}
           <ul className="space-y-2">
             {pendentes.map(({ perfil, falta }) => (
@@ -156,12 +170,27 @@ export function PainelDia() {
               </li>
             ))}
           </ul>
+          </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={aberto === "comp"} onOpenChange={(v) => setAberto(v ? "comp" : null)}>
-        <DialogContent className="max-h-[85vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>COMPROVANTES PIX</DialogTitle></DialogHeader>
+        <DialogContent showCloseButton={false} aria-describedby={undefined} className="z-[70] flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-screen-sm flex-col gap-0 overflow-hidden rounded-lg bg-background p-0">
+          <DialogHeader className="shrink-0 border-b border-border p-4 pr-14 text-left">
+            <DialogTitle className="flex items-center gap-2 font-display text-base leading-snug">
+              <Receipt className="size-4 shrink-0 text-primary" /> COMPROVANTES PIX
+            </DialogTitle>
+          </DialogHeader>
+          <DialogClose asChild>
+            <button
+              type="button"
+              aria-label="Fechar comprovantes Pix"
+              className="absolute right-3 top-3 rounded-md p-1.5 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <X className="size-4" />
+            </button>
+          </DialogClose>
+          <div className="min-h-0 overflow-y-auto overscroll-contain p-4">
           {comprovantes.length === 0 && <p className="text-sm text-muted-foreground">Nenhum comprovante novo.</p>}
           <ul className="space-y-2">
             {comprovantes.map((c) => (
@@ -182,6 +211,7 @@ export function PainelDia() {
               </li>
             ))}
           </ul>
+          </div>
         </DialogContent>
       </Dialog>
     </section>
