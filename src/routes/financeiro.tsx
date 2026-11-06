@@ -70,6 +70,7 @@ function FinanceiroPage() {
   const [mensalidades, setMensalidades] = useState<Mensalidade[]>([]);
   const [planos, setPlanos] = useState<PlanoContrato[]>([]);
   const [responsaveis, setResponsaveis] = useState<Record<string, string>>({});
+  const [telefones, setTelefones] = useState<Record<string, string>>({});
 
   const carregar = useCallback(async () => {
     const { data: papeis } = await supabase.from("user_roles").select("role");
@@ -91,10 +92,13 @@ function FinanceiroPage() {
         .eq("tipo", "contrato")
         .order("created_at", { ascending: false }),
       supabase.from("documentos").select("aluno_id, tipo, liberado").eq("tipo", "contrato"),
-      supabase.from("perfis").select("id, nome_responsavel, documentos_fisicos, bloqueado_em"),
+      supabase.from("perfis").select("id, nome_responsavel, telefone, documentos_fisicos, bloqueado_em"),
     ]);
     setResponsaveis(
       Object.fromEntries((perfis ?? []).map((p) => [p.id, p.nome_responsavel ?? ""])),
+    );
+    setTelefones(
+      Object.fromEntries((perfis ?? []).map((p) => [p.id, (p as { telefone?: string | null }).telefone ?? ""])),
     );
 
     // Remove duplicados: mesmo aluno cadastrado pelo pai e pela mãe vira um só,
@@ -196,6 +200,13 @@ function FinanceiroPage() {
 
   return (
     <Casca>
+      <ResumoFinanceiro
+        alunos={alunos}
+        mensalidades={mensalidades}
+        planos={planos}
+        responsaveis={responsaveis}
+        telefones={telefones}
+      />
       <Mensalidades
         alunos={alunos}
         mensalidades={mensalidades}
