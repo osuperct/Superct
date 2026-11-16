@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { supabase } from "@/integrations/supabase/client";
+import { gerarPdfSuper } from "@/lib/superPdf";
+import { FileDown } from "lucide-react";
 import { TrofeuColorido } from "@/components/AvaliacaoEmblemas";
 import {
   MAX_VOLTAS,
@@ -379,11 +381,49 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
           </Topico>
         </>
       )}
+      <Topico titulo="RELATÓRIO EM PDF" icone={<FileDown className="size-4 text-primary" />}>
+        <RelatorioPdfSuper alunos={alunos} aluno={aluno} />
+      </Topico>
       <Topico titulo="RANKING" icone={<Trophy className="size-4 text-primary" />}>
         <RankingSuper chave={registros.length} />
       </Topico>
     </Janela>
     </>
+  );
+}
+
+function RelatorioPdfSuper({ alunos, aluno }: { alunos: Alu[]; aluno: Alu | null }) {
+  const hoje = new Date();
+  const [mes, setMes] = useState(`${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`);
+  const [gerando, setGerando] = useState(false);
+  async function gerar(escopo: "mes" | "ano" | "aluno") {
+    setGerando(true);
+    const [a, m] = mes.split("-").map(Number) as [number, number];
+    let q = supabase.from("avaliacoes_super").select("*").order("created_at");
+    let titulo = "";
+    if (escopo === "aluno" && aluno) { q = q.eq("aluno_id", aluno.id); titulo = aluno.nome; }
+    else if (escopo === "ano") { q = q.gte("created_at", `${a}-01-01`).lt("created_at", `${a + 1}-01-01`); titulo = `Ano ${a}`; }
+    else {
+      const fim = m === 12 ? `${a + 1}-01-01` : `${a}-${String(m + 1).padStart(2, "0")}-01`;
+      q = q.gte("created_at", `${mes}-01`).lt("created_at", fim);
+      titulo = new Date(a, m - 1, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+    }
+    const { data, error } = await q;
+    if (error) { setGerando(false); toast.error("Não foi possível gerar o PDF."); return; }
+    try { await gerarPdfSuper(titulo, escopo === "aluno" && aluno ? [aluno] : alunos, (data ?? []) as RegistroSuper[]); }
+    catch { toast.error("Não foi possível gerar o PDF."); }
+    setGerando(false);
+  }
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-muted-foreground">Baixe o relatório dos alunos avaliados: TAF, corrida, salto a distância e salto na caixa.</p>
+      <input type="month" value={mes} onChange={(e) => setMes(e.target.value)} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
+      <div className="grid grid-cols-2 gap-2">
+        <button type="button" disabled={gerando} onClick={() => void gerar("mes")} className="rounded-md bg-primary py-3 font-display text-xs text-primary-foreground disabled:opacity-50">PDF DO MÊS</button>
+        <button type="button" disabled={gerando} onClick={() => void gerar("ano")} className="rounded-md border border-primary py-3 font-display text-xs disabled:opacity-50">PDF DO ANO</button>
+      </div>
+      {aluno && <button type="button" disabled={gerando} onClick={() => void gerar("aluno")} className="w-full rounded-md border border-border py-3 font-display text-xs disabled:opacity-50">PDF SÓ DE {aluno.nome.split(" ")[0]?.toUpperCase()}</button>}
+    </div>
   );
 }
 
