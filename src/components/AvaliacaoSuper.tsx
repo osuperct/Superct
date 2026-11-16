@@ -529,7 +529,7 @@ export function SuperResponsavel({ uid, alunos, avisoHabilitado = true }: { uid:
           <div className="mt-3 space-y-2">
             <BotaoSuper titulo="TAF SUPER CT" descricao="Avaliação anual do aluno de aptidão física e desenvolvimento." icone={<Trophy className="size-4 text-primary" />} onClick={() => setTela("taf")} />
             <BotaoSuper titulo="SUPER EXERCÍCIOS" descricao="Avaliação rotineira do aluno na corrida, salto à distância e na caixa Cross." icone={<Zap className="size-4 text-primary" />} onClick={() => setTela("exercicios")} />
-            <BotaoSuper titulo="RANKING DA ÁREA SUPER" descricao="Comparação com os demais alunos avaliados." icone={<Trophy className="size-4 text-primary" />} onClick={() => setTela("ranking")} />
+            <BotaoSuper titulo="RANKING DA ÁREA SUPER" descricao="Acompanhe sua criança e os demais resultados dos super alunos do CT!" icone={<Trophy className="size-4 text-primary" />} onClick={() => setTela("ranking")} />
           </div>
         ) : (
           <div className="mt-3">
