@@ -1,0 +1,2 @@
+ALTER TABLE public.avaliacoes_super DROP CONSTRAINT IF EXISTS avaliacoes_super_tipo_check;
+ALTER TABLE public.avaliacoes_super ADD CONSTRAINT avaliacoes_super_tipo_check CHECK (tipo IN ('taf','corrida','salto'));

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronDown, Timer, Trophy, Zap } from "lucide-react";
+import { ChevronDown, MoveRight, Timer, Trophy, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -15,11 +15,17 @@ import {
   lerCorrida,
   limitar,
   trofeusTaf,
+  CAIXAS_SALTO,
+  DISTANCIAS_SALTO,
+  MAX_TEMPO_CAIXA_MS,
+  type CaixaSalto,
+  formatarMetros,
+  lerSalto,
 } from "@/lib/avaliacaoSuper";
 
 type Alu = { id: string; nome: string; user_id: string };
 
-function Cronometro({ aoParar, rotulo = "PARAR E GRAVAR" }: { aoParar: (ms: number) => void; rotulo?: string }) {
+function Cronometro({ aoParar, rotulo = "PARAR E GRAVAR", maxMs }: { aoParar: (ms: number) => void; rotulo?: string; maxMs?: number }) {
   const [inicio, setInicio] = useState<number | null>(null);
   const [agora, setAgora] = useState(0);
   const [final, setFinal] = useState<number | null>(null);
@@ -31,7 +37,10 @@ function Cronometro({ aoParar, rotulo = "PARAR E GRAVAR" }: { aoParar: (ms: numb
       if (ref.current) window.clearInterval(ref.current);
     };
   }, [inicio]);
-  const ms = inicio !== null ? agora - inicio : (final ?? 0);
+  useEffect(() => {
+    if (inicio !== null && maxMs && agora - inicio >= maxMs) { setInicio(null); setFinal(maxMs); aoParar(maxMs); }
+  }, [agora, inicio, maxMs, aoParar]);
+  const ms = inicio !== null ? Math.min(agora - inicio, maxMs ?? Infinity) : (final ?? 0);
   return (
     <div className="rounded-md border border-border bg-background/60 p-3 text-center">
       <p className="font-mono text-3xl tabular-nums text-primary">{formatarTempo(ms)}</p>
@@ -40,7 +49,7 @@ function Cronometro({ aoParar, rotulo = "PARAR E GRAVAR" }: { aoParar: (ms: numb
           {final === null ? "INICIAR" : "REINICIAR"}
         </button>
       ) : (
-        <button type="button" onClick={() => { const t = Date.now() - inicio; setInicio(null); setFinal(t); aoParar(t); }} className="mt-2 w-full rounded-md bg-destructive px-4 py-3 font-display text-sm text-destructive-foreground">
+        <button type="button" onClick={() => { const t = Math.min(Date.now() - inicio, maxMs ?? Infinity); setInicio(null); setFinal(t); aoParar(t); }} className="mt-2 w-full rounded-md bg-destructive px-4 py-3 font-display text-sm text-destructive-foreground">
           {rotulo}
         </button>
       )}
@@ -81,6 +90,13 @@ export function HistoricoSuper({ registros }: { registros: RegistroSuper[] }) {
     .sort((a, b) => a.created_at.localeCompare(b.created_at))
     .map((r) => ({ r, c: lerCorrida(r.dados) }))
     .filter((x) => x.c);
+  const saltos = registros
+    .filter((r) => r.tipo === "salto")
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))
+    .map((r) => ({ r, s: lerSalto(r.dados) }))
+    .filter((x) => x.s);
+  const distancias = saltos.filter((x) => x.s!.modo === "distancia");
+  const nomeCaixa = (c: CaixaSalto) => CAIXAS_SALTO.find((x) => x.chave === c)?.rotulo ?? c;
   if (registros.length === 0) return <p className="text-sm text-muted-foreground">Nenhuma avaliação Super ainda.</p>;
   return (
     <div className="space-y-4">
@@ -139,6 +155,29 @@ export function HistoricoSuper({ registros }: { registros: RegistroSuper[] }) {
           </div>
         </div>
       )}
+      {saltos.length > 0 && (
+        <div>
+          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">SUPER SALTO</p>
+          <ul className="mt-1 space-y-1 text-xs">
+            {saltos.slice().reverse().map(({ r, s }) => (
+              <li key={r.id} className="flex justify-between gap-2 border-b border-border/50 py-1">
+                <span className="text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</span>
+                <span>{s!.modo === "distancia" ? `Distância: ${formatarMetros(s!.metros)}` : `Caixa ${nomeCaixa(s!.caixa)}: ${formatarTempo(s!.tempo_ms)}`}</span>
+              </li>
+            ))}
+          </ul>
+          {distancias.length > 1 && (
+            <div className="mt-2 h-40">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={distancias.map(({ r, s }) => ({ dia: new Date(r.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }), metros: s!.modo === "distancia" ? s!.metros : 0 }))}>
+                  <XAxis dataKey="dia" fontSize={10} /><YAxis domain={[0, 3]} fontSize={10} width={24} /><Tooltip />
+                  <Line dataKey="metros" name="Distância (m)" stroke="var(--primary)" strokeWidth={2} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -151,6 +190,7 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
   const [voltasTaf, setVoltasTaf] = useState(1);
   const [voltas, setVoltas] = useState(1);
   const [salvando, setSalvando] = useState(false);
+  const [caixa, setCaixa] = useState<CaixaSalto>("slim");
   const aluno = alunos.find((a) => a.id === alunoId) ?? null;
   const tafAno = registros.find((r) => r.tipo === "taf" && r.ano === ano) ?? null;
 
@@ -186,6 +226,14 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
     const { error } = await supabase.from("avaliacoes_super").insert({ aluno_id: aluno.id, user_id: aluno.user_id, professor_id: professorId, tipo: "corrida", ano, dados: { tempo_ms: ms, voltas } });
     if (error) { toast.error("Não foi possível gravar a corrida."); return; }
     toast.success(`Corrida gravada: ${formatarTempo(ms)} · ${voltas} volta(s)`);
+    void carregar(aluno.id);
+  }
+
+  async function salvarSalto(dados: { modo: "distancia"; metros: number } | { modo: "caixa"; caixa: CaixaSalto; tempo_ms: number }) {
+    if (!aluno) return;
+    const { error } = await supabase.from("avaliacoes_super").insert({ aluno_id: aluno.id, user_id: aluno.user_id, professor_id: professorId, tipo: "salto", ano, dados });
+    if (error) { toast.error("Não foi possível gravar o salto."); return; }
+    toast.success(dados.modo === "distancia" ? `Salto gravado: ${formatarMetros(dados.metros)}` : `Salto na caixa gravado: ${formatarTempo(dados.tempo_ms)}`);
     void carregar(aluno.id);
   }
 
@@ -228,6 +276,27 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
             <Voltas valor={voltas} onChange={setVoltas} />
             <div className="mt-2"><Cronometro aoParar={(ms) => void salvarCorrida(ms)} /></div>
           </Topico>
+          <Topico titulo="SUPER SALTO" icone={<MoveRight className="size-4 text-primary" />}>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Salto a distância</p>
+            <p className="text-xs text-muted-foreground">Toque na distância alcançada para gravar.</p>
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {DISTANCIAS_SALTO.map((m) => (
+                <button key={m} type="button" onClick={() => void salvarSalto({ modo: "distancia", metros: m })} className="rounded-md border border-border py-3 font-display text-sm hover:border-primary">
+                  {formatarMetros(m)}
+                </button>
+              ))}
+            </div>
+            <p className="mt-4 font-mono text-[10px] uppercase tracking-widest text-primary">Salto na caixa</p>
+            <p className="text-xs text-muted-foreground">Escolha a caixa. Máximo de 1 minuto — ao parar (ou ao chegar em 1 minuto) o tempo é gravado.</p>
+            <div className="mt-2 grid grid-cols-4 gap-1">
+              {CAIXAS_SALTO.map((c) => (
+                <button key={c.chave} type="button" onClick={() => setCaixa(c.chave)} className={`rounded-md border py-2 text-xs ${caixa === c.chave ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>
+                  {c.rotulo}
+                </button>
+              ))}
+            </div>
+            <div className="mt-2"><Cronometro maxMs={MAX_TEMPO_CAIXA_MS} aoParar={(ms) => void salvarSalto({ modo: "caixa", caixa, tempo_ms: ms })} /></div>
+          </Topico>
           <Topico titulo="HISTÓRICO E GRÁFICO" icone={<Zap className="size-4 text-primary" />}>
             <HistoricoSuper registros={registros} />
           </Topico>
@@ -249,7 +318,7 @@ export function SuperResponsavel({ uid, alunos }: { uid: string; alunos: { id: s
   const atual = comDados.find((a) => a.id === alunoId) ?? comDados[0]!;
   return (
     <div className="border-t border-evaluation-blue/20 p-4">
-      <h4 className="flex items-center gap-2 font-display text-base"><Zap className="size-4 text-primary" /> ÁREA SUPER · TAF E CORRIDA</h4>
+      <h4 className="flex items-center gap-2 font-display text-base"><Zap className="size-4 text-primary" /> ÁREA SUPER · TAF, CORRIDA E SALTO</h4>
       {comDados.length > 1 && (
         <select value={atual.id} onChange={(e) => setAlunoId(e.target.value)} className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
           {comDados.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}

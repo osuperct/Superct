@@ -17,7 +17,7 @@ export type DadosTaf = { [K in ProvaTaf]?: number | undefined } & { corrida?: Co
 export type RegistroSuper = {
   id: string;
   aluno_id: string;
-  tipo: "taf" | "corrida";
+  tipo: "taf" | "corrida" | "salto";
   ano: number;
   dados: unknown;
   created_at: string;
@@ -49,3 +49,24 @@ export function lerCorrida(d: unknown): Corrida | null {
   if (!c || typeof c.tempo_ms !== "number") return null;
   return { tempo_ms: c.tempo_ms, voltas: limitar(c.voltas ?? 1, MAX_VOLTAS, 1) };
 }
+
+export const DISTANCIAS_SALTO = [0.5, 1, 1.5, 2, 2.5, 3] as const;
+export const CAIXAS_SALTO = [
+  { chave: "slim", rotulo: "Slim" },
+  { chave: "pequena", rotulo: "Pequena" },
+  { chave: "media", rotulo: "Média" },
+  { chave: "grande", rotulo: "Grande" },
+] as const;
+export type CaixaSalto = (typeof CAIXAS_SALTO)[number]["chave"];
+export const MAX_TEMPO_CAIXA_MS = 60_000;
+export type Salto = { modo: "distancia"; metros: number } | { modo: "caixa"; caixa: CaixaSalto; tempo_ms: number };
+
+export function lerSalto(d: unknown): Salto | null {
+  const s = d as Record<string, unknown> | null;
+  if (!s) return null;
+  if (s.modo === "distancia" && typeof s.metros === "number" && (DISTANCIAS_SALTO as readonly number[]).includes(s.metros)) return { modo: "distancia", metros: s.metros };
+  if (s.modo === "caixa" && typeof s.tempo_ms === "number" && CAIXAS_SALTO.some((c) => c.chave === s.caixa))
+    return { modo: "caixa", caixa: s.caixa as CaixaSalto, tempo_ms: Math.min(MAX_TEMPO_CAIXA_MS, Math.max(0, s.tempo_ms)) };
+  return null;
+}
+export const formatarMetros = (m: number) => `${m.toFixed(1).replace(".", ",")} m`;
