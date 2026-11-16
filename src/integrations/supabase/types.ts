@@ -248,6 +248,32 @@ export type Database = {
           },
         ]
       }
+      avaliacoes_super_lidas: {
+        Row: {
+          avaliacao_id: string
+          lida_em: string
+          user_id: string
+        }
+        Insert: {
+          avaliacao_id: string
+          lida_em?: string
+          user_id: string
+        }
+        Update: {
+          avaliacao_id?: string
+          lida_em?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_super_lidas_avaliacao_id_fkey"
+            columns: ["avaliacao_id"]
+            isOneToOne: false
+            referencedRelation: "avaliacoes_super"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       avisos: {
         Row: {
           alunos_destino: string[] | null

@@ -369,7 +369,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
         </div>
       )}
     </section>
-    <SuperResponsavel uid={uid} alunos={alunos} />
+    <SuperResponsavel uid={uid} alunos={alunos} avisoHabilitado={avisoHabilitado && !aviso} />
     </>
   );
 }

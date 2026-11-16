@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ChevronRight, MoveRight, Search, Timer, Trophy, X, Zap } from "lucide-react";
 import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis } from "recharts";
 
 import { supabase } from "@/integrations/supabase/client";
@@ -442,15 +443,44 @@ function BotaoSuper({ titulo, descricao, icone, onClick }: { titulo: string; des
   );
 }
 
-export function SuperResponsavel({ uid, alunos }: { uid: string; alunos: { id: string; nome: string }[] }) {
+export function SuperResponsavel({ uid, alunos, avisoHabilitado = true }: { uid: string; alunos: { id: string; nome: string }[]; avisoHabilitado?: boolean }) {
   const [aberto, setAberto] = useState(false);
+  const [novas, setNovas] = useState<RegistroSuper[]>([]);
   const [tela, setTela] = useState<"menu" | "taf" | "exercicios" | "ranking">("menu");
   const [registros, setRegistros] = useState<RegistroSuper[]>([]);
   const [alunoId, setAlunoId] = useState(alunos[0]?.id ?? "");
   useEffect(() => {
     if (uid === "demo") return;
-    void supabase.from("avaliacoes_super").select("*").eq("user_id", uid).order("created_at").then(({ data }) => setRegistros((data ?? []) as RegistroSuper[]));
+    void supabase.from("avaliacoes_super").select("*").eq("user_id", uid).order("created_at").then(async ({ data }) => {
+      const regs = (data ?? []) as RegistroSuper[];
+      setRegistros(regs);
+      if (regs.length === 0) return;
+      try { if (sessionStorage.getItem(`super-lembrar-${uid}`)) return; } catch { /* ignore */ }
+      const { data: lidas, error } = await supabase.from("avaliacoes_super_lidas").select("avaliacao_id").eq("user_id", uid);
+      if (error) return;
+      const vistos = new Set((lidas ?? []).map((l) => l.avaliacao_id));
+      setNovas(regs.filter((r) => !vistos.has(r.id)));
+    });
   }, [uid]);
+
+  function responderAviso(ver: boolean) {
+    const pendentes = novas;
+    setNovas([]);
+    if (!ver) {
+      try { sessionStorage.setItem(`super-lembrar-${uid}`, "1"); } catch { /* ignore */ }
+      return;
+    }
+    void supabase.from("avaliacoes_super_lidas")
+      .upsert(pendentes.map((r) => ({ user_id: uid, avaliacao_id: r.id })), { onConflict: "user_id,avaliacao_id", ignoreDuplicates: true })
+      .then(() => undefined);
+    const ultima = pendentes[pendentes.length - 1];
+    if (ultima) setAlunoId(ultima.aluno_id);
+    setTela(pendentes.some((r) => r.tipo === "taf") && ultima?.tipo === "taf" ? "taf" : pendentes.every((r) => r.tipo === "taf") ? "taf" : "exercicios");
+    setAberto(true);
+  }
+  const ultimaNova = novas[novas.length - 1];
+  const nomesNovos = Array.from(new Set(novas.map((r) => alunos.find((a) => a.id === r.aluno_id)?.nome ?? "Aluno")));
+  const tiposNovos = Array.from(new Set(novas.map((r) => (r.tipo === "taf" ? "TAF SUPER CT" : "SUPER EXERCÍCIOS"))));
   const comDados = alunos.filter((a) => registros.some((r) => r.aluno_id === a.id));
   const atual = comDados.find((a) => a.id === alunoId) ?? comDados[0];
   const doAluno = atual ? registros.filter((r) => r.aluno_id === atual.id) : [];
@@ -463,6 +493,24 @@ export function SuperResponsavel({ uid, alunos }: { uid: string; alunos: { id: s
 
   return (
     <section className="mt-4 overflow-hidden rounded-lg border border-evaluation-blue/30 bg-evaluation-surface shadow-evaluation">
+      {avisoHabilitado && ultimaNova && !aberto && (
+        <div role="dialog" aria-modal="true" aria-labelledby="aviso-super-titulo" className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm overflow-hidden rounded-lg border border-primary/40 bg-evaluation-surface text-center shadow-evaluation">
+            <img src={arteAreaSuper} alt="" className="h-28 w-full object-cover" />
+            <div className="p-5">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-evaluation-orange">Nova avaliação da Área Super</p>
+              <h3 id="aviso-super-titulo" className="font-evaluation text-2xl leading-none text-foreground">{tiposNovos.join(" E ")}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Avaliação de {nomesNovos.join(", ")} realizada em {new Date(ultimaNova.created_at).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}.
+              </p>
+              <div className="mt-4 flex flex-col gap-2">
+                <Button onClick={() => responderAviso(true)}>VER AVALIAÇÃO</Button>
+                <Button variant="ghost" onClick={() => responderAviso(false)}>ME LEMBRAR DEPOIS</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <button type="button" onClick={() => { setTela("menu"); setAberto(true); }} className="relative block w-full text-left">
         <img src={arteAreaSuper} alt="Área Super — personagens saltando na caixa Cross e subindo na corda" loading="lazy" width={1536} height={640} className="h-36 w-full object-cover sm:h-44" />
         <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" aria-hidden="true" />

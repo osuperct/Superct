@@ -134,6 +134,13 @@
       "when": 1794838962162,
       "tag": "0018_ranking_super",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1794847545585,
+      "tag": "0019_avaliacoes_super_lidas",
+      "breakpoints": true
     }
   ]
 }
