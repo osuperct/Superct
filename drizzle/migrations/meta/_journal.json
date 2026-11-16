@@ -120,6 +120,13 @@
       "when": 1794837566954,
       "tag": "0016_parceiros_banner_responsavel_privado",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1794837801876,
+      "tag": "0017_storage_leitura_vinculada",
+      "breakpoints": true
     }
   ]
 }
