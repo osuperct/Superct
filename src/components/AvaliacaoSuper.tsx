@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ChevronDown, MoveRight, Timer, Trophy, Zap } from "lucide-react";
+import { ChevronRight, MoveRight, Search, Timer, Trophy, X, Zap } from "lucide-react";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { Bar, BarChart, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -70,18 +71,34 @@ function Voltas({ valor, onChange }: { valor: number; onChange: (v: number) => v
   );
 }
 
-function Topico({ titulo, icone, children, inicial = false }: { titulo: string; icone: React.ReactNode; children: React.ReactNode; inicial?: boolean }) {
-  const [aberto, setAberto] = useState(inicial);
+function Janela({ aberto, onOpenChange, titulo, icone, children }: { aberto: boolean; onOpenChange: (v: boolean) => void; titulo: string; icone: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="mt-3 rounded-md border border-border bg-background/40">
-      <button type="button" onClick={() => setAberto((v) => !v)} className="flex w-full items-center justify-between gap-2 px-3 py-3 font-display text-sm">
-        <span className="flex items-center gap-2">{icone} {titulo}</span>
-        <ChevronDown className={`size-4 transition-transform ${aberto ? "rotate-180" : ""}`} />
-      </button>
-      {aberto && <div className="border-t border-border p-3">{children}</div>}
-    </div>
+    <Dialog open={aberto} onOpenChange={onOpenChange}>
+      <DialogContent className="z-[70] flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg flex-col overflow-hidden p-0 [&>button.absolute]:hidden">
+        <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
+          <DialogTitle className="flex min-w-0 items-center gap-2 font-display text-base">{icone} <span className="truncate">{titulo}</span></DialogTitle>
+          <DialogClose className="rounded-md p-1 hover:bg-muted" aria-label="Fechar"><X className="size-5" /></DialogClose>
+        </div>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">{children}</div>
+      </DialogContent>
+    </Dialog>
   );
 }
+
+function Topico({ titulo, icone, children }: { titulo: string; icone: React.ReactNode; children: React.ReactNode }) {
+  const [aberto, setAberto] = useState(false);
+  return (
+    <>
+      <button type="button" onClick={() => setAberto(true)} className="mt-2 flex w-full items-center justify-between gap-2 rounded-md border border-border bg-background/40 px-3 py-3 font-display text-sm hover:border-primary">
+        <span className="flex items-center gap-2">{icone} {titulo}</span>
+        <ChevronRight className="size-4" />
+      </button>
+      <Janela aberto={aberto} onOpenChange={setAberto} titulo={titulo} icone={icone}>{children}</Janela>
+    </>
+  );
+}
+
+const semAcento = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 export function HistoricoSuper({ registros }: { registros: RegistroSuper[] }) {
   const tafs = registros.filter((r) => r.tipo === "taf").sort((a, b) => a.ano - b.ano);
@@ -192,6 +209,9 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
   const [salvando, setSalvando] = useState(false);
   const [caixa, setCaixa] = useState<CaixaSalto>("slim");
   const aluno = alunos.find((a) => a.id === alunoId) ?? null;
+  const [janela, setJanela] = useState(false);
+  const [busca, setBusca] = useState("");
+  const filtrados = alunos.filter((a) => semAcento(a.nome).includes(semAcento(busca.trim())));
   const tafAno = registros.find((r) => r.tipo === "taf" && r.ano === ano) ?? null;
 
   const carregar = useCallback(async (id: string) => {
@@ -238,13 +258,32 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
   }
 
   return (
-    <div className="mt-4 rounded-lg border border-primary/40 bg-background/40 p-3">
-      <h3 className="flex items-center gap-2 font-display text-base tracking-tight"><Zap className="size-4 text-primary" /> ÁREA SUPER</h3>
-      <p className="mt-1 text-xs text-muted-foreground">Somente alunos ativos. Os resultados aparecem automaticamente na avaliação do aluno para o responsável.</p>
-      <select value={alunoId} onChange={(e) => setAlunoId(e.target.value)} className="mt-2 w-full min-w-0 truncate rounded-md border border-border bg-background px-3 py-3 text-sm">
-        <option value="">Selecione o aluno ativo</option>
-        {alunos.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
-      </select>
+    <>
+    <button type="button" onClick={() => setJanela(true)} className="mt-4 flex w-full items-center justify-between gap-2 rounded-lg border border-primary/40 bg-background/40 p-3 text-left">
+      <span>
+        <span className="flex items-center gap-2 font-display text-base tracking-tight"><Zap className="size-4 text-primary" /> ÁREA SUPER</span>
+        <span className="mt-1 block text-xs text-muted-foreground">TAF, corrida, salto a distância e salto na caixa.</span>
+      </span>
+      <ChevronRight className="size-5 shrink-0" />
+    </button>
+    <Janela aberto={janela} onOpenChange={setJanela} titulo={aluno ? aluno.nome : "ÁREA SUPER"} icone={<Zap className="size-4 text-primary" />}>
+      {!aluno ? (
+        <>
+          <p className="text-xs text-muted-foreground">Somente alunos ativos. Os resultados aparecem automaticamente na avaliação do aluno para o responsável.</p>
+          <label className="mt-2 flex items-center gap-2 rounded-md border border-border bg-background px-3">
+            <Search className="size-4 text-muted-foreground" />
+            <input value={busca} onChange={(e) => setBusca(e.target.value)} placeholder="Buscar aluno pelo nome…" className="w-full bg-transparent py-3 text-sm outline-none" />
+          </label>
+          <ul className="mt-2 space-y-1">
+            {filtrados.map((a) => (
+              <li key={a.id}><button type="button" onClick={() => setAlunoId(a.id)} className="flex w-full items-center justify-between rounded-md border border-border px-3 py-3 text-left text-sm hover:border-primary"><span className="min-w-0 truncate">{a.nome}</span><ChevronRight className="size-4 shrink-0" /></button></li>
+            ))}
+            {filtrados.length === 0 && <li className="py-4 text-center text-xs text-muted-foreground">Nenhum aluno encontrado.</li>}
+          </ul>
+        </>
+      ) : (
+        <button type="button" onClick={() => setAlunoId("")} className="text-xs text-primary underline">← Trocar aluno</button>
+      )}
       {aluno && (
         <>
           <Topico titulo={`TAF SUPER CT ${ano}`} icone={<Trophy className="size-4 text-primary" />}>
@@ -276,8 +315,7 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
             <Voltas valor={voltas} onChange={setVoltas} />
             <div className="mt-2"><Cronometro aoParar={(ms) => void salvarCorrida(ms)} /></div>
           </Topico>
-          <Topico titulo="SUPER SALTO" icone={<MoveRight className="size-4 text-primary" />}>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">Salto a distância</p>
+          <Topico titulo="SALTO A DISTÂNCIA" icone={<MoveRight className="size-4 text-primary" />}>
             <p className="text-xs text-muted-foreground">Toque na distância alcançada para gravar.</p>
             <div className="mt-2 grid grid-cols-3 gap-2">
               {DISTANCIAS_SALTO.map((m) => (
@@ -286,7 +324,8 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
                 </button>
               ))}
             </div>
-            <p className="mt-4 font-mono text-[10px] uppercase tracking-widest text-primary">Salto na caixa</p>
+          </Topico>
+          <Topico titulo="SALTO NA CAIXA" icone={<MoveRight className="size-4 text-primary" />}>
             <p className="text-xs text-muted-foreground">Escolha a caixa. Máximo de 1 minuto — ao parar (ou ao chegar em 1 minuto) o tempo é gravado.</p>
             <div className="mt-2 grid grid-cols-4 gap-1">
               {CAIXAS_SALTO.map((c) => (
@@ -302,7 +341,8 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
           </Topico>
         </>
       )}
-    </div>
+    </Janela>
+    </>
   );
 }
 
