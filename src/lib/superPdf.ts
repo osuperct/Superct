@@ -22,7 +22,7 @@ export function linhasAluno(regs: RegistroSuper[]): string[] {
   const out: string[] = [];
   for (const r of regs.filter((x) => x.tipo === "taf")) {
     const d = (r.dados ?? {}) as DadosTaf;
-    out.push(`TAF SUPER CT ${r.ano} (${data(r.created_at)}) - ${trofeusTaf(d)} trofeu(s) de ouro`);
+    out.push(`TAF SUPER CT (${data(r.created_at)}) - ${trofeusTaf(d)} trofeu(s) de ouro`);
     const c = lerCorrida(d.corrida);
     if (c) out.push(`   Corrida: ${formatarTempo(c.tempo_ms)} - ${c.voltas} volta(s)`);
     for (const p of PROVAS_TAF) {

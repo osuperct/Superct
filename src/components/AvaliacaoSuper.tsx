@@ -241,7 +241,7 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
     const { error } = await q;
     setSalvando(false);
     if (error) { toast.error("Não foi possível salvar o TAF."); return; }
-    toast.success(`TAF ${ano} salvo — ${trofeusTaf(dados)} troféus de ouro!`);
+    toast.success(`TAF salvo — ${trofeusTaf(dados)} troféus de ouro!`);
     void carregar(aluno.id);
   }
 
@@ -301,7 +301,7 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
       )}
       {aluno && (
         <>
-          <Topico titulo={`TAF SUPER CT ${ano}`} icone={<Trophy className="size-4 text-primary" />}>
+          <Topico titulo="TAF SUPER CT" icone={<Trophy className="size-4 text-primary" />}>
             <p className="text-xs text-muted-foreground">Feito uma vez por ano.{tafAno ? " Este aluno já tem TAF neste ano — salvar vai atualizar." : ""}</p>
             <p className="mt-3 font-mono text-[10px] uppercase tracking-widest text-primary">Prova de corrida</p>
             <Voltas valor={voltasTaf} onChange={setVoltasTaf} />
