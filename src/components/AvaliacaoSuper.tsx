@@ -10,6 +10,10 @@ import { gerarPdfSuper } from "@/lib/superPdf";
 import { FileDown } from "lucide-react";
 import { TrofeuColorido } from "@/components/AvaliacaoEmblemas";
 import arteAreaSuper from "@/assets/area-super-super-ct.png";
+import imgTaf from "@/assets/super-taf-personagens.jpg";
+import imgCorrida from "@/assets/super-corrida-personagens.jpg";
+import imgDistancia from "@/assets/super-salto-distancia-personagens.jpg";
+import imgCaixa from "@/assets/super-caixa-personagens.jpg";
 import {
   MAX_VOLTAS,
   PROVAS_TAF,
@@ -443,6 +447,29 @@ function BotaoSuper({ titulo, descricao, icone, onClick }: { titulo: string; des
   );
 }
 
+function linhasAviso(r: RegistroSuper): [string, string][] {
+  if (r.tipo === "taf") {
+    const d = (r.dados ?? {}) as DadosTaf;
+    const out: [string, string][] = [];
+    const c = lerCorrida(d.corrida);
+    if (c) out.push(["Corrida", `${formatarTempo(c.tempo_ms)} · ${c.voltas} volta(s)`]);
+    for (const p of PROVAS_TAF) {
+      const v = d[p.chave];
+      if (v !== undefined) out.push([p.rotulo, `${v}${ganhouOuro(p.chave, v) ? " 🏆" : ""}`]);
+    }
+    out.push(["Troféus de ouro", String(trofeusTaf(d))]);
+    return out;
+  }
+  if (r.tipo === "corrida") {
+    const c = lerCorrida(r.dados);
+    return c ? [["Super Corrida", `${formatarTempo(c.tempo_ms)} · ${c.voltas} volta(s)`]] : [];
+  }
+  const s = lerSalto(r.dados);
+  if (!s) return [];
+  if (s.modo === "distancia") return [["Salto a distância", formatarMetros(s.metros)]];
+  return [[`Caixa ${CAIXAS_SALTO.find((c) => c.chave === s.caixa)?.rotulo ?? s.caixa}`, formatarTempo(s.tempo_ms)]];
+}
+
 export function SuperResponsavel({ uid, alunos, avisoHabilitado = true }: { uid: string; alunos: { id: string; nome: string }[]; avisoHabilitado?: boolean }) {
   const [aberto, setAberto] = useState(false);
   const [novas, setNovas] = useState<RegistroSuper[]>([]);
@@ -463,9 +490,9 @@ export function SuperResponsavel({ uid, alunos, avisoHabilitado = true }: { uid:
     });
   }, [uid]);
 
-  function responderAviso(ver: boolean) {
-    const pendentes = novas;
-    setNovas([]);
+  function responderAviso(ver: boolean, ehTaf: boolean) {
+    const pendentes = novas.filter((r) => (r.tipo === "taf") === ehTaf);
+    setNovas(ver ? novas.filter((r) => (r.tipo === "taf") !== ehTaf) : []);
     if (!ver) {
       try { sessionStorage.setItem(`super-lembrar-${uid}`, "1"); } catch { /* ignore */ }
       return;
@@ -475,12 +502,10 @@ export function SuperResponsavel({ uid, alunos, avisoHabilitado = true }: { uid:
       .then(() => undefined);
     const ultima = pendentes[pendentes.length - 1];
     if (ultima) setAlunoId(ultima.aluno_id);
-    setTela(pendentes.some((r) => r.tipo === "taf") && ultima?.tipo === "taf" ? "taf" : pendentes.every((r) => r.tipo === "taf") ? "taf" : "exercicios");
+    setTela(ehTaf ? "taf" : "exercicios");
     setAberto(true);
   }
   const ultimaNova = novas[novas.length - 1];
-  const nomesNovos = Array.from(new Set(novas.map((r) => alunos.find((a) => a.id === r.aluno_id)?.nome ?? "Aluno")));
-  const tiposNovos = Array.from(new Set(novas.map((r) => (r.tipo === "taf" ? "TAF SUPER CT" : "SUPER EXERCÍCIOS"))));
   const comDados = alunos.filter((a) => registros.some((r) => r.aluno_id === a.id));
   const atual = comDados.find((a) => a.id === alunoId) ?? comDados[0];
   const doAluno = atual ? registros.filter((r) => r.aluno_id === atual.id) : [];
@@ -493,24 +518,39 @@ export function SuperResponsavel({ uid, alunos, avisoHabilitado = true }: { uid:
 
   return (
     <section className="mt-4 overflow-hidden rounded-lg border border-evaluation-blue/30 bg-evaluation-surface shadow-evaluation">
-      {avisoHabilitado && ultimaNova && !aberto && (
+      {avisoHabilitado && ultimaNova && !aberto && (() => {
+        const ehTaf = ultimaNova.tipo === "taf";
+        const doGrupo = novas.filter((r) => (r.tipo === "taf") === ehTaf);
+        const linhas = doGrupo.flatMap(linhasAviso);
+        const salto = !ehTaf ? lerSalto(ultimaNova.dados) : null;
+        const arte = ehTaf ? imgTaf : ultimaNova.tipo === "corrida" ? imgCorrida : salto?.modo === "caixa" ? imgCaixa : imgDistancia;
+        return (
         <div role="dialog" aria-modal="true" aria-labelledby="aviso-super-titulo" className="fixed inset-0 z-[70] flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-sm overflow-hidden rounded-lg border border-primary/40 bg-evaluation-surface text-center shadow-evaluation">
-            <img src={arteAreaSuper} alt="" className="h-28 w-full object-cover" />
-            <div className="p-5">
-              <p className="font-mono text-[10px] uppercase tracking-widest text-evaluation-orange">Nova avaliação da Área Super</p>
-              <h3 id="aviso-super-titulo" className="font-evaluation text-2xl leading-none text-foreground">{tiposNovos.join(" E ")}</h3>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Avaliação de {nomesNovos.join(", ")} realizada em {new Date(ultimaNova.created_at).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}.
-              </p>
-              <div className="mt-4 flex flex-col gap-2">
-                <Button onClick={() => responderAviso(true)}>VER AVALIAÇÃO</Button>
-                <Button variant="ghost" onClick={() => responderAviso(false)}>ME LEMBRAR DEPOIS</Button>
-              </div>
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg border border-primary/40 bg-evaluation-surface p-4 shadow-evaluation">
+            <p className="text-center font-mono text-[10px] uppercase tracking-widest text-evaluation-orange">Nova avaliação da Área Super</p>
+            <h3 id="aviso-super-titulo" className="text-center font-evaluation text-2xl leading-none text-foreground">{ehTaf ? "TAF SUPER CT" : "SUPER EXERCÍCIOS"}</h3>
+            <p className="mt-1 text-center text-xs text-muted-foreground">
+              {Array.from(new Set(doGrupo.map((r) => alunos.find((x) => x.id === r.aluno_id)?.nome ?? "Aluno"))).join(", ")} · {new Date(ultimaNova.created_at).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
+            </p>
+            <div className="mt-3 flex items-start gap-3">
+              <table className="min-w-0 flex-1 text-left text-xs">
+                <thead><tr className="border-b border-border font-mono text-[9px] uppercase tracking-wider text-muted-foreground"><th className="py-1 pr-2">Avaliação</th><th className="py-1">Resultado</th></tr></thead>
+                <tbody>
+                  {linhas.map((l, i) => (
+                    <tr key={i} className="border-b border-border/40"><td className="py-1.5 pr-2 text-foreground">{l[0]}</td><td className="py-1.5 font-semibold text-primary">{l[1]}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+              <img src={arte} alt="Personagens do Super CT fazendo o exercício avaliado" width={816} height={816} className="size-24 shrink-0 rounded-md border border-primary/30 object-cover sm:size-28" />
+            </div>
+            <div className="mt-4 flex flex-col gap-2">
+              <Button onClick={() => responderAviso(true, ehTaf)}>VER AVALIAÇÃO</Button>
+              <Button variant="ghost" onClick={() => responderAviso(false, ehTaf)}>ME LEMBRAR DEPOIS</Button>
             </div>
           </div>
         </div>
-      )}
+        );
+      })()}
       <button type="button" onClick={() => { setTela("menu"); setAberto(true); }} className="relative block w-full text-left">
         <img src={arteAreaSuper} alt="Área Super — personagens saltando na caixa Cross e subindo na corda" loading="lazy" width={1536} height={640} className="h-36 w-full object-cover sm:h-44" />
         <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" aria-hidden="true" />
