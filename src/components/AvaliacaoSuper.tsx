@@ -106,6 +106,23 @@ function Topico({ titulo, icone, children }: { titulo: string; icone: React.Reac
   );
 }
 
+function ListaRegistros({ itens, onApagar, vazio }: { itens: { id: string; titulo: string; detalhe: string }[]; onApagar: (id: string) => void; vazio: string }) {
+  return (
+    <ul className="mt-3 space-y-1">
+      {itens.map((it) => (
+        <li key={it.id} className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-xs">
+          <span className="min-w-0">
+            <b>{it.titulo}</b>
+            <span className="block">{it.detalhe}</span>
+          </span>
+          <button type="button" onClick={() => onApagar(it.id)} className="shrink-0 text-destructive underline">apagar</button>
+        </li>
+      ))}
+      {itens.length === 0 && <li className="text-center text-xs text-muted-foreground">{vazio}</li>}
+    </ul>
+  );
+}
+
 const semAcento = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
 const dataBr = (iso: string) => new Date(iso).toLocaleDateString("pt-BR");
@@ -238,6 +255,9 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
   const [janela, setJanela] = useState(false);
   const [corridaMs, setCorridaMs] = useState<number | null>(null);
   const [verCorridas, setVerCorridas] = useState(false);
+  const [verTafs, setVerTafs] = useState(false);
+  const [verDistancias, setVerDistancias] = useState(false);
+  const [verCaixas, setVerCaixas] = useState(false);
   const [busca, setBusca] = useState("");
   const filtrados = alunos.filter((a) => semAcento(a.nome).includes(semAcento(busca.trim())));
   const tafAno = registros.find((r) => r.tipo === "taf" && r.ano === ano) ?? null;
@@ -348,6 +368,21 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
             <button type="button" disabled={salvando} onClick={() => void salvarTaf()} className="mt-3 w-full rounded-md bg-primary px-4 py-3 font-display text-sm text-primary-foreground disabled:opacity-50">
               SALVAR TAF ({trofeusTaf(taf)} TROFÉUS)
             </button>
+            <button type="button" onClick={() => setVerTafs((v) => !v)} className="mt-2 w-full rounded-md border border-border py-3 font-display text-xs">REGISTROS</button>
+            {verTafs && (
+              <ListaRegistros
+                vazio="Nenhum TAF salvo."
+                onApagar={(id) => void apagarRegistro(id)}
+                itens={registros.filter((r) => r.tipo === "taf").map((r) => {
+                  const d = r.dados as DadosTaf;
+                  return {
+                    id: r.id,
+                    titulo: `${dataBr(r.created_at)} · TAF ${r.ano}`,
+                    detalhe: `${trofeusTaf(d)} troféu(s) de ouro`,
+                  };
+                })}
+              />
+            )}
           </Topico>
           <Topico titulo="SUPER CORRIDA" icone={<Timer className="size-4 text-primary" />}>
             <p className="text-xs text-muted-foreground">Inicie e pare o cronômetro. Depois confira as voltas (1 a 10) e toque em SALVAR. Só vai para o histórico depois de salvar.</p>
@@ -388,6 +423,22 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
                 </button>
               ))}
             </div>
+            <button type="button" onClick={() => setVerDistancias((v) => !v)} className="mt-2 w-full rounded-md border border-border py-3 font-display text-xs">REGISTROS</button>
+            {verDistancias && (
+              <ListaRegistros
+                vazio="Nenhum salto a distância salvo."
+                onApagar={(id) => void apagarRegistro(id)}
+                itens={registros
+                  .filter((r) => r.tipo === "salto")
+                  .map((r) => ({ r, s: lerSalto(r.dados) }))
+                  .filter((x) => x.s?.modo === "distancia")
+                  .map(({ r, s }) => ({
+                    id: r.id,
+                    titulo: `${dataBr(r.created_at)} ${new Date(r.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`,
+                    detalhe: `Distância: ${s!.modo === "distancia" ? formatarMetros(s!.metros) : "—"}`,
+                  }))}
+              />
+            )}
           </Topico>
           <Topico titulo="SALTO NA CAIXA" icone={<MoveRight className="size-4 text-primary" />}>
             <p className="text-xs text-muted-foreground">Escolha a caixa. Máximo de 1 minuto — ao parar (ou ao chegar em 1 minuto) o tempo é gravado.</p>
@@ -399,6 +450,22 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
               ))}
             </div>
             <div className="mt-2"><Cronometro maxMs={MAX_TEMPO_CAIXA_MS} aoParar={(ms) => void salvarSalto({ modo: "caixa", caixa, tempo_ms: ms })} /></div>
+            <button type="button" onClick={() => setVerCaixas((v) => !v)} className="mt-2 w-full rounded-md border border-border py-3 font-display text-xs">REGISTROS</button>
+            {verCaixas && (
+              <ListaRegistros
+                vazio="Nenhum salto na caixa salvo."
+                onApagar={(id) => void apagarRegistro(id)}
+                itens={registros
+                  .filter((r) => r.tipo === "salto")
+                  .map((r) => ({ r, s: lerSalto(r.dados) }))
+                  .filter((x) => x.s?.modo === "caixa")
+                  .map(({ r, s }) => ({
+                    id: r.id,
+                    titulo: `${dataBr(r.created_at)} ${new Date(r.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`,
+                    detalhe: s!.modo === "caixa" ? `Caixa: ${CAIXAS_SALTO.find((c) => c.chave === s!.caixa)?.rotulo ?? s!.caixa} · Tempo: ${formatarTempo(s!.tempo_ms)}` : "—",
+                  }))}
+              />
+            )}
           </Topico>
           <Topico titulo="HISTÓRICO E GRÁFICO" icone={<Zap className="size-4 text-primary" />}>
             <HistoricoSuper registros={registros} />
