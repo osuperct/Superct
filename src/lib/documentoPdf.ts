@@ -5,7 +5,7 @@ import { assetUrl } from "@/lib/assetUrl";
 
 export type LinhaDoc = { rotulo: string; valor: string };
 
-async function carregarDataUrl(url: string): Promise<string | null> {
+export async function carregarDataUrl(url: string): Promise<string | null> {
   try {
     const resposta = await fetch(url);
     if (!resposta.ok) return null;

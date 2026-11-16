@@ -1,4 +1,8 @@
 import { jsPDF } from "jspdf";
+import assinaturaVictor from "@/assets/assinatura-victor.png.asset.json";
+import seloSuperCt from "@/assets/selo-superct.png.asset.json";
+import { assetUrl } from "@/lib/assetUrl";
+import { carregarDataUrl } from "@/lib/documentoPdf";
 import logoRelatorio from "@/assets/logo-super-ct-relatorio.png";
 import {
   CAIXAS_SALTO, PROVAS_TAF, type DadosTaf, type RegistroSuper,
@@ -73,5 +77,17 @@ export async function gerarPdfSuper(titulo: string, alunos: { id: string; nome: 
     }
     y += 10;
   }
+  const [prof, selo] = await Promise.all([carregarDataUrl(assetUrl(assinaturaVictor)), carregarDataUrl(assetUrl(seloSuperCt))]);
+  if (y > H - 130) { doc.addPage(); y = M; }
+  y += 30;
+  const dir = W / 2 + 10;
+  if (prof) doc.addImage(prof, "PNG", M, y, 170, 32);
+  if (selo) doc.addImage(selo, "PNG", dir + 40, y - 4, 52, 32);
+  y += 38;
+  doc.line(M, y, M + 200, y); doc.line(dir, y, dir + 200, y); y += 13;
+  doc.setFont("helvetica", "bold"); doc.setFontSize(8.5);
+  doc.text("VICTOR HUGO JORGE DE SIQUEIRA", M, y); doc.text("SUPER CT RECREACAO INFANTIL", dir, y); y += 12;
+  doc.setFont("helvetica", "normal"); doc.setFontSize(8);
+  doc.text("CREF: 057790-G/MG", M, y); doc.text("CNPJ: 61.251.274/0001-48", dir, y);
   doc.save(`area-super-${titulo.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.pdf`);
 }

@@ -533,7 +533,6 @@ function RelatorioPdfSuper({ alunos, aluno }: { alunos: Alu[]; aluno: Alu | null
         <button type="button" disabled={gerando} onClick={() => void gerar("mes")} className="rounded-md bg-primary py-3 font-display text-xs text-primary-foreground disabled:opacity-50">PDF DO MÊS</button>
         <button type="button" disabled={gerando} onClick={() => void gerar("ano")} className="rounded-md border border-primary py-3 font-display text-xs disabled:opacity-50">PDF DO ANO</button>
       </div>
-      {aluno && <button type="button" disabled={gerando} onClick={() => void gerar("aluno")} className="w-full rounded-md border border-border py-3 font-display text-xs disabled:opacity-50">PDF SÓ DE {aluno.nome.split(" ")[0]?.toUpperCase()}</button>}
     </div>
   );
 }
