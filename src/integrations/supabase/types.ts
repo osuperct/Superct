@@ -204,6 +204,50 @@ export type Database = {
           },
         ]
       }
+      avaliacoes_super: {
+        Row: {
+          aluno_id: string
+          ano: number
+          created_at: string
+          dados: Json
+          id: string
+          professor_id: string
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          aluno_id: string
+          ano?: number
+          created_at?: string
+          dados?: Json
+          id?: string
+          professor_id: string
+          tipo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          aluno_id?: string
+          ano?: number
+          created_at?: string
+          dados?: Json
+          id?: string
+          professor_id?: string
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "avaliacoes_super_aluno_id_fkey"
+            columns: ["aluno_id"]
+            isOneToOne: false
+            referencedRelation: "alunos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       avisos: {
         Row: {
           alunos_destino: string[] | null

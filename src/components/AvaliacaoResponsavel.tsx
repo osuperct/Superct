@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Estrelas } from "@/components/Estrelas";
 import { MedalhaColorida, TrofeuColorido } from "@/components/AvaliacaoEmblemas";
 import { Button } from "@/components/ui/button";
+import { SuperResponsavel } from "@/components/AvaliacaoSuper";
 import kael from "@/assets/heroi-kael.png";
 import miah from "@/assets/heroi-miah.png";
 import { relatorioAvaliacao } from "@/lib/avaliacaoPdf";
@@ -367,6 +368,7 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
           )}
         </div>
       )}
+      {aberto && <SuperResponsavel uid={uid} alunos={alunos} />}
     </section>
     </>
   );

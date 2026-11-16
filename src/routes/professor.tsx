@@ -706,7 +706,13 @@ function Painel({ professorId }: { professorId: string }) {
       <EnvioPush />
 
 
-      <AvaliacaoProfessor alunos={alunos} professorId={professorId} />
+      <AvaliacaoProfessor
+        alunos={alunos}
+        professorId={professorId}
+        ativos={porNome
+          .filter((a) => estaAtivo(a.id) && !perfis.find((p) => p.id === a.user_id)?.bloqueado_em)
+          .sort((x, y) => x.nome.localeCompare(y.nome, "pt-BR"))}
+      />
 
       <section className="rounded-lg border border-border bg-card/40 p-4">
         <h2 className="flex items-center gap-2 font-display text-lg tracking-tight">
