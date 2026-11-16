@@ -341,7 +341,10 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
                   const c = lerCorrida(r);
                   return (
                     <li key={r.id} className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-xs">
-                      <span>{new Date(r.created_at).toLocaleDateString("pt-BR")} · {c ? `${formatarTempo(c.tempo_ms)} · ${c.voltas} volta(s)` : "—"}</span>
+                      <span className="min-w-0">
+                        <b>{new Date(r.created_at).toLocaleDateString("pt-BR")}</b> {new Date(r.created_at).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}
+                        <span className="block">Tempo: <b>{c ? formatarTempo(c.tempo_ms) : "—"}</b> · Voltas: <b>{c ? c.voltas : "—"}</b></span>
+                      </span>
                       <button type="button" onClick={() => void apagarRegistro(r.id)} className="text-destructive underline">apagar</button>
                     </li>
                   );
@@ -376,6 +379,9 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
           </Topico>
         </>
       )}
+      <Topico titulo="RANKING" icone={<Trophy className="size-4 text-primary" />}>
+        <RankingSuper chave={registros.length} />
+      </Topico>
     </Janela>
     </>
   );
@@ -389,17 +395,61 @@ export function SuperResponsavel({ uid, alunos }: { uid: string; alunos: { id: s
     void supabase.from("avaliacoes_super").select("*").eq("user_id", uid).order("created_at").then(({ data }) => setRegistros((data ?? []) as RegistroSuper[]));
   }, [uid]);
   const comDados = alunos.filter((a) => registros.some((r) => r.aluno_id === a.id));
-  if (comDados.length === 0) return null;
-  const atual = comDados.find((a) => a.id === alunoId) ?? comDados[0]!;
+  const atual = comDados.find((a) => a.id === alunoId) ?? comDados[0];
   return (
     <div className="border-t border-evaluation-blue/20 p-4">
       <h4 className="flex items-center gap-2 font-display text-base"><Zap className="size-4 text-primary" /> ÁREA SUPER · TAF, CORRIDA E SALTO</h4>
-      {comDados.length > 1 && (
+      {atual && comDados.length > 1 && (
         <select value={atual.id} onChange={(e) => setAlunoId(e.target.value)} className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
           {comDados.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
         </select>
       )}
-      <div className="mt-3"><HistoricoSuper registros={registros.filter((r) => r.aluno_id === atual.id)} /></div>
+      {atual && <div className="mt-3"><HistoricoSuper registros={registros.filter((r) => r.aluno_id === atual.id)} /></div>}
+      <Topico titulo="RANKING DA ÁREA SUPER" icone={<Trophy className="size-4 text-primary" />}>
+        <RankingSuper />
+      </Topico>
+    </div>
+  );
+}
+
+type LinhaRanking = { modalidade: string; grupo: string; aluno: string; valor: number; meu: boolean };
+
+export function RankingSuper({ chave = 0 }: { chave?: number }) {
+  const [linhas, setLinhas] = useState<LinhaRanking[] | null>(null);
+  const [aba, setAba] = useState<"corrida" | "distancia" | "caixa">("corrida");
+  useEffect(() => {
+    void supabase.rpc("ranking_super").then(({ data, error }) => setLinhas(error ? [] : ((data ?? []) as LinhaRanking[])));
+  }, [chave]);
+  if (linhas === null) return <p className="text-xs text-muted-foreground">Carregando…</p>;
+  const daAba = linhas.filter((l) => l.modalidade === aba);
+  const grupos = [...new Set(daAba.map((l) => l.grupo))].sort((a, b) => aba === "corrida" ? Number(a) - Number(b) : a.localeCompare(b));
+  const rotuloGrupo = (g: string) => aba === "corrida" ? `${g} volta(s)` : aba === "caixa" ? `Caixa ${CAIXAS_SALTO.find((c) => c.chave === g)?.rotulo ?? g}` : "Salto a distância";
+  const fmt = (v: number) => aba === "distancia" ? formatarMetros(v) : formatarTempo(v);
+  return (
+    <div>
+      <div className="grid grid-cols-3 gap-1">
+        {([["corrida", "CORRIDA"], ["distancia", "DISTÂNCIA"], ["caixa", "CAIXA"]] as const).map(([k, r]) => (
+          <button key={k} type="button" onClick={() => setAba(k)} className={`rounded-md border py-2 text-[11px] font-display ${aba === k ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>{r}</button>
+        ))}
+      </div>
+      <p className="mt-2 text-[11px] text-muted-foreground">{aba === "corrida" ? "Separado por número de voltas · menor tempo primeiro." : aba === "distancia" ? "Maior distância primeiro." : "Separado por caixa · maior tempo primeiro."}</p>
+      {grupos.length === 0 && <p className="mt-3 text-center text-xs text-muted-foreground">Ainda não há resultados.</p>}
+      {grupos.map((g) => {
+        const lista = daAba.filter((l) => l.grupo === g).sort((a, b) => aba === "corrida" ? a.valor - b.valor : b.valor - a.valor);
+        return (
+          <div key={g} className="mt-3">
+            <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{rotuloGrupo(g)}</p>
+            <ol className="mt-1 space-y-1">
+              {lista.map((l, i) => (
+                <li key={i} className={`flex items-center justify-between rounded-md border px-3 py-2 text-sm ${l.meu ? "border-primary bg-primary/10" : "border-border"}`}>
+                  <span className="flex min-w-0 items-center gap-2"><b className="w-6 shrink-0">{i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}º`}</b><span className="truncate">{l.aluno}</span></span>
+                  <b className="tabular-nums">{fmt(Number(l.valor))}</b>
+                </li>
+              ))}
+            </ol>
+          </div>
+        );
+      })}
     </div>
   );
 }

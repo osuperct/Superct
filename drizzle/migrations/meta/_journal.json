@@ -127,6 +127,13 @@
       "when": 1794837801876,
       "tag": "0017_storage_leitura_vinculada",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1794838962162,
+      "tag": "0018_ranking_super",
+      "breakpoints": true
     }
   ]
 }

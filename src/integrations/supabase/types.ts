@@ -1236,6 +1236,16 @@ export type Database = {
         Args: { _referencia?: string }
         Returns: Json
       }
+      ranking_super: {
+        Args: never
+        Returns: {
+          aluno: string
+          grupo: string
+          meu: boolean
+          modalidade: string
+          valor: number
+        }[]
+      }
       recesso_arquivar: {
         Args: {
           _agente: string
