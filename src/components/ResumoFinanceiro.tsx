@@ -32,6 +32,8 @@ export function ResumoFinanceiro({
         const m = mensalidades.find((x) => x.aluno_id === a.id && x.referencia === ref);
         const plano = planoDe(a.id);
         if ((m && !m.ativo) || (!m && !plano)) return null;
+        // Meses antes do início do contrato não entram no fechamento.
+        if (!m && plano?.inicio && plano.inicio.slice(0, 7) > ref.slice(0, 7)) return null;
         const venc = vencimentoIso(ref, plano?.vencimento);
         return { a, m, venc, status: statusPagamento(m, venc, hoje), valor: Number(m?.valor ?? plano?.valor ?? 0) };
       })
