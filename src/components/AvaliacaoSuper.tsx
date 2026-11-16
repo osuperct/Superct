@@ -10,7 +10,7 @@ import { gerarPdfSuper } from "@/lib/superPdf";
 import { FileDown } from "lucide-react";
 import { TrofeuColorido } from "@/components/AvaliacaoEmblemas";
 import arteAreaSuper from "@/assets/area-super-super-ct.png";
-import mascotesExercicio from "@/assets/super-mascotes-exercicio.png";
+import mascotesExercicio from "@/assets/super-ct-personagens-escudo.jpg";
 import imgTaf from "@/assets/super-taf-personagens.jpg";
 import imgCorrida from "@/assets/super-corrida-personagens.jpg";
 import imgDistancia from "@/assets/super-salto-distancia-personagens.jpg";
@@ -80,14 +80,14 @@ function Voltas({ valor, onChange }: { valor: number; onChange: (v: number) => v
   );
 }
 
-function Janela({ aberto, onOpenChange, titulo, icone, children }: { aberto: boolean; onOpenChange: (v: boolean) => void; titulo: string; icone: React.ReactNode; children: React.ReactNode }) {
+function Janela({ aberto, onOpenChange, titulo, icone, children, semArte }: { aberto: boolean; onOpenChange: (v: boolean) => void; titulo: string; icone: React.ReactNode; children: React.ReactNode; semArte?: boolean }) {
   return (
     <Dialog open={aberto} onOpenChange={onOpenChange}>
       <DialogContent className="z-[70] flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg flex-col overflow-hidden p-0 [&>button.absolute]:hidden">
         <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
           <DialogTitle className="flex min-w-0 items-center gap-2 font-display text-base">{icone} <span className="truncate">{titulo}</span></DialogTitle>
           <span className="flex shrink-0 items-center gap-1">
-            <img src={mascotesExercicio} alt="Personagens do Super CT com o uniforme da academia" loading="lazy" width={1024} height={768} className="h-20 w-auto object-contain" />
+            {!semArte && <img src={mascotesExercicio} alt="Personagens do Super CT no escudo" loading="lazy" width={500} height={595} className="h-20 w-auto rounded-md object-contain" />}
             <DialogClose className="rounded-md p-1 hover:bg-muted" aria-label="Fechar"><X className="size-5" /></DialogClose>
           </span>
         </div>
@@ -329,7 +329,7 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
       </span>
       <ChevronRight className="size-5 shrink-0" />
     </button>
-    <Janela aberto={janela} onOpenChange={setJanela} titulo={aluno ? aluno.nome : "ÁREA SUPER"} icone={<Zap className="size-4 text-primary" />}>
+    <Janela aberto={janela} onOpenChange={setJanela} semArte={!!aluno} titulo={aluno ? aluno.nome : "ÁREA SUPER"} icone={<Zap className="size-4 text-primary" />}>
       {!aluno ? (
         <>
           <p className="text-xs text-muted-foreground">Somente alunos ativos. Os resultados aparecem automaticamente na avaliação do aluno para o responsável.</p>
