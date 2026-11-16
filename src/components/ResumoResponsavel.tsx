@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BellRing, CalendarClock, Star } from "lucide-react";
+import { BanknoteIcon, BellRing, CalendarClock, Star } from "lucide-react";
 
 import { supabase } from "@/integrations/supabase/client";
 import { formatarDataIso, formatarValor } from "@/lib/mensalidade";
@@ -45,7 +45,7 @@ export function ResumoResponsavel({
       <ul className="mt-2 space-y-1.5 text-sm">
         {mensalidades.map((m) => (
           <li key={m.nome} className="flex items-start gap-2">
-            <CalendarClock className="mt-0.5 size-4 shrink-0 text-primary" />
+            {m.situacao === "EM DIA" ? <BanknoteIcon className="mt-0.5 size-4 shrink-0 text-emerald-400" /> : <CalendarClock className="mt-0.5 size-4 shrink-0 text-primary" />}
             <span className="min-w-0">
               <span className="font-display">{m.nome.split(" ")[0]}</span>:{" "}
               <span className={`font-display ${COR[m.situacao ?? ""] ?? "text-muted-foreground"}`}>{m.situacao ?? "sem mensalidade lançada"}</span>
