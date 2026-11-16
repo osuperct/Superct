@@ -113,6 +113,13 @@
       "when": 1794837152429,
       "tag": "0015_avaliacoes_super_salto",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1794837566954,
+      "tag": "0016_parceiros_banner_responsavel_privado",
+      "breakpoints": true
     }
   ]
 }
