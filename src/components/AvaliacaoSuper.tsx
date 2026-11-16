@@ -210,6 +210,8 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
   const [caixa, setCaixa] = useState<CaixaSalto>("slim");
   const aluno = alunos.find((a) => a.id === alunoId) ?? null;
   const [janela, setJanela] = useState(false);
+  const [corridaMs, setCorridaMs] = useState<number | null>(null);
+  const [verCorridas, setVerCorridas] = useState(false);
   const [busca, setBusca] = useState("");
   const filtrados = alunos.filter((a) => semAcento(a.nome).includes(semAcento(busca.trim())));
   const tafAno = registros.find((r) => r.tipo === "taf" && r.ano === ano) ?? null;
@@ -241,10 +243,21 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
     void carregar(aluno.id);
   }
 
+  async function apagarRegistro(id: string) {
+    if (!aluno || !window.confirm("Apagar este registro?")) return;
+    const { error } = await supabase.from("avaliacoes_super").delete().eq("id", id);
+    if (error) { toast.error("Não foi possível apagar."); return; }
+    toast.success("Registro apagado.");
+    void carregar(aluno.id);
+  }
+
   async function salvarCorrida(ms: number) {
     if (!aluno) return;
+    setSalvando(true);
     const { error } = await supabase.from("avaliacoes_super").insert({ aluno_id: aluno.id, user_id: aluno.user_id, professor_id: professorId, tipo: "corrida", ano, dados: { tempo_ms: ms, voltas } });
+    setSalvando(false);
     if (error) { toast.error("Não foi possível gravar a corrida."); return; }
+    setCorridaMs(null);
     toast.success(`Corrida gravada: ${formatarTempo(ms)} · ${voltas} volta(s)`);
     void carregar(aluno.id);
   }
@@ -282,7 +295,7 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
           </ul>
         </>
       ) : (
-        <button type="button" onClick={() => setAlunoId("")} className="text-xs text-primary underline">← Trocar aluno</button>
+        <button type="button" onClick={() => { setAlunoId(""); setCorridaMs(null); }} className="text-xs text-primary underline">← Trocar aluno</button>
       )}
       {aluno && (
         <>
@@ -311,9 +324,31 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
             </button>
           </Topico>
           <Topico titulo="SUPER CORRIDA" icone={<Timer className="size-4 text-primary" />}>
-            <p className="text-xs text-muted-foreground">Escolha as voltas (1 a 10), inicie e, ao parar, a corrida é gravada na hora.</p>
+            <p className="text-xs text-muted-foreground">Inicie e pare o cronômetro. Depois confira as voltas (1 a 10) e toque em SALVAR. Só vai para o histórico depois de salvar.</p>
+            <div className="mt-2"><Cronometro rotulo="PARAR" aoParar={(ms) => setCorridaMs(ms)} /></div>
             <Voltas valor={voltas} onChange={setVoltas} />
-            <div className="mt-2"><Cronometro aoParar={(ms) => void salvarCorrida(ms)} /></div>
+            {corridaMs !== null && (
+              <p className="mt-2 text-center text-sm">Resultado: <b>{formatarTempo(corridaMs)}</b> · {voltas} volta(s)</p>
+            )}
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              <button type="button" disabled={corridaMs === null || salvando} onClick={() => corridaMs !== null && void salvarCorrida(corridaMs)} className="rounded-md bg-primary py-3 font-display text-xs text-primary-foreground disabled:opacity-40">SALVAR</button>
+              <button type="button" disabled={corridaMs === null} onClick={() => setCorridaMs(null)} className="rounded-md border border-destructive py-3 font-display text-xs text-destructive disabled:opacity-40">EXCLUIR</button>
+              <button type="button" onClick={() => setVerCorridas((v) => !v)} className="rounded-md border border-border py-3 font-display text-xs">REGISTROS</button>
+            </div>
+            {verCorridas && (
+              <ul className="mt-3 space-y-1">
+                {registros.filter((r) => r.tipo === "corrida").map((r) => {
+                  const c = lerCorrida(r);
+                  return (
+                    <li key={r.id} className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-xs">
+                      <span>{new Date(r.created_at).toLocaleDateString("pt-BR")} · {c ? `${formatarTempo(c.tempo_ms)} · ${c.voltas} volta(s)` : "—"}</span>
+                      <button type="button" onClick={() => void apagarRegistro(r.id)} className="text-destructive underline">apagar</button>
+                    </li>
+                  );
+                })}
+                {registros.every((r) => r.tipo !== "corrida") && <li className="text-center text-xs text-muted-foreground">Nenhuma corrida salva.</li>}
+              </ul>
+            )}
           </Topico>
           <Topico titulo="SALTO A DISTÂNCIA" icone={<MoveRight className="size-4 text-primary" />}>
             <p className="text-xs text-muted-foreground">Toque na distância alcançada para gravar.</p>
