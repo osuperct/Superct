@@ -3,7 +3,6 @@ import { ClipboardCheck, ChevronLeft, Calendar, Download, Target, Trophy } from 
 import { toast } from "sonner";
 
 import { supabase } from "@/integrations/supabase/client";
-import { AvaliacaoSuper } from "@/components/AvaliacaoSuper";
 import { Estrelas } from "@/components/Estrelas";
 import { baixarBlob } from "@/lib/relatorioPdf";
 import { relatorioAvaliacao } from "@/lib/avaliacaoPdf";
@@ -55,7 +54,7 @@ function Resumo({ avaliacao }: { avaliacao: Avaliacao }) {
   );
 }
 
-export function AvaliacaoProfessor({ alunos, professorId, ativos = [] }: { alunos: Alu[]; professorId: string; ativos?: Alu[] }) {
+export function AvaliacaoProfessor({ alunos, professorId }: { alunos: Alu[]; professorId: string }) {
   const [sel, setSel] = useState<Alu | null>(null);
   const [feitos, setFeitos] = useState<Set<string>>(new Set());
 
@@ -138,7 +137,6 @@ export function AvaliacaoProfessor({ alunos, professorId, ativos = [] }: { aluno
         </select>
         {alunos.length === 0 && <p className="mt-2 text-sm text-muted-foreground">Nenhum aluno matriculado ainda.</p>}
       </div>
-      <AvaliacaoSuper alunos={ativos} professorId={professorId} />
     </section>
   );
 }
