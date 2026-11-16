@@ -338,7 +338,7 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
             {verCorridas && (
               <ul className="mt-3 space-y-1">
                 {registros.filter((r) => r.tipo === "corrida").map((r) => {
-                  const c = lerCorrida(r);
+                  const c = lerCorrida(r.dados);
                   return (
                     <li key={r.id} className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-xs">
                       <span className="min-w-0">
