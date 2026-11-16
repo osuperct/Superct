@@ -490,6 +490,7 @@ export function AvaliacaoSuper({ alunos, professorId }: { alunos: Alu[]; profess
 function RelatorioPdfSuper({ alunos, aluno }: { alunos: Alu[]; aluno: Alu | null }) {
   const hoje = new Date();
   const [mes, setMes] = useState(`${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`);
+  const [conteudo, setConteudo] = useState<"tudo" | "taf" | "exercicios">("tudo");
   const [gerando, setGerando] = useState(false);
   async function gerar(escopo: "mes" | "ano" | "aluno") {
     setGerando(true);
@@ -503,15 +504,30 @@ function RelatorioPdfSuper({ alunos, aluno }: { alunos: Alu[]; aluno: Alu | null
       q = q.gte("created_at", `${mes}-01`).lt("created_at", fim);
       titulo = new Date(a, m - 1, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
     }
+    if (conteudo === "taf") { q = q.eq("tipo", "taf"); titulo = `TAF - ${titulo}`; }
+    else if (conteudo === "exercicios") { q = q.neq("tipo", "taf"); titulo = `Super Exercicios - ${titulo}`; }
     const { data, error } = await q;
     if (error) { setGerando(false); toast.error("Não foi possível gerar o PDF."); return; }
     try { await gerarPdfSuper(titulo, escopo === "aluno" && aluno ? [aluno] : alunos, (data ?? []) as RegistroSuper[]); }
     catch { toast.error("Não foi possível gerar o PDF."); }
     setGerando(false);
   }
+  const opcoes: { chave: "tudo" | "taf" | "exercicios"; rotulo: string }[] = [
+    { chave: "tudo", rotulo: "TUDO" },
+    { chave: "taf", rotulo: "TAF SUPER CT" },
+    { chave: "exercicios", rotulo: "SUPER EXERCÍCIOS" },
+  ];
   return (
     <div className="space-y-2">
-      <p className="text-xs text-muted-foreground">Baixe o relatório dos alunos avaliados: TAF, corrida, salto a distância e salto na caixa.</p>
+      <p className="text-xs text-muted-foreground">Escolha o que entra no relatório: só o TAF, só os Super Exercícios (corrida e saltos) ou tudo junto.</p>
+      <div className="grid grid-cols-3 gap-2">
+        {opcoes.map((o) => (
+          <button key={o.chave} type="button" onClick={() => setConteudo(o.chave)}
+            className={`rounded-md border py-2 font-display text-[10px] ${conteudo === o.chave ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}>
+            {o.rotulo}
+          </button>
+        ))}
+      </div>
       <input type="month" value={mes} onChange={(e) => setMes(e.target.value)} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" />
       <div className="grid grid-cols-2 gap-2">
         <button type="button" disabled={gerando} onClick={() => void gerar("mes")} className="rounded-md bg-primary py-3 font-display text-xs text-primary-foreground disabled:opacity-50">PDF DO MÊS</button>
