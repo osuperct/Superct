@@ -87,7 +87,7 @@ function Janela({ aberto, onOpenChange, titulo, icone, children }: { aberto: boo
         <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
           <DialogTitle className="flex min-w-0 items-center gap-2 font-display text-base">{icone} <span className="truncate">{titulo}</span></DialogTitle>
           <span className="flex shrink-0 items-center gap-1">
-            <img src={mascotesExercicio} alt="Personagens do Super CT com o uniforme da academia" loading="lazy" width={1024} height={768} className="h-12 w-auto object-contain" />
+            <img src={mascotesExercicio} alt="Personagens do Super CT com o uniforme da academia" loading="lazy" width={1024} height={768} className="h-20 w-auto object-contain" />
             <DialogClose className="rounded-md p-1 hover:bg-muted" aria-label="Fechar"><X className="size-5" /></DialogClose>
           </span>
         </div>
