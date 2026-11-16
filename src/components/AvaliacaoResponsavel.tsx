@@ -368,8 +368,8 @@ export function AvaliacaoResponsavel({ uid, alunos, demo, avisoHabilitado = true
           )}
         </div>
       )}
-      {aberto && <SuperResponsavel uid={uid} alunos={alunos} />}
     </section>
+    <SuperResponsavel uid={uid} alunos={alunos} />
     </>
   );
 }

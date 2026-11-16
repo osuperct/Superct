@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { gerarPdfSuper } from "@/lib/superPdf";
 import { FileDown } from "lucide-react";
 import { TrofeuColorido } from "@/components/AvaliacaoEmblemas";
+import arteAreaSuper from "@/assets/area-super-super-ct.png";
 import {
   MAX_VOLTAS,
   PROVAS_TAF,
@@ -461,10 +462,14 @@ export function SuperResponsavel({ uid, alunos }: { uid: string; alunos: { id: s
   } as const;
 
   return (
-    <div className="border-t border-evaluation-blue/20 p-4">
-      <button type="button" onClick={() => { setTela("menu"); setAberto(true); }} className="flex w-full items-center justify-between gap-2 rounded-md border border-evaluation-blue/30 bg-transparent px-3 py-3 text-left font-display text-base hover:border-primary">
-        <span className="flex items-center gap-2"><Zap className="size-4 text-primary" /> ÁREA SUPER</span>
-        <ChevronRight className="size-4 text-muted-foreground" />
+    <section className="mt-4 overflow-hidden rounded-lg border border-evaluation-blue/30 bg-evaluation-surface shadow-evaluation">
+      <button type="button" onClick={() => { setTela("menu"); setAberto(true); }} className="relative block w-full text-left">
+        <img src={arteAreaSuper} alt="Área Super — personagens saltando na caixa Cross e subindo na corda" loading="lazy" width={1536} height={640} className="h-36 w-full object-cover sm:h-44" />
+        <span className="absolute inset-0 bg-gradient-to-t from-background/70 via-transparent to-transparent" aria-hidden="true" />
+        <span className="absolute bottom-2 left-3 flex items-center gap-1.5 rounded-md border border-primary/40 bg-background/80 px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest text-primary">
+          <Zap className="size-3.5" /> Abrir Área Super
+        </span>
+        <ChevronRight className="absolute bottom-2 right-3 size-5 text-foreground/80" />
       </button>
       <Janela aberto={aberto} onOpenChange={(v) => { setAberto(v); if (!v) setTela("menu"); }} titulo={telas[tela].titulo} icone={telas[tela].icone}>
         {atual && comDados.length > 1 && (
@@ -489,7 +494,7 @@ export function SuperResponsavel({ uid, alunos }: { uid: string; alunos: { id: s
           </div>
         )}
       </Janela>
-    </div>
+    </section>
   );
 }
 
