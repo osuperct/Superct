@@ -37,15 +37,13 @@ export function linhasAluno(regs: RegistroSuper[]): string[] {
     const c = lerCorrida(r.dados);
     if (c) out.push(`   ${data(r.created_at)}: ${formatarTempo(c.tempo_ms)} - ${c.voltas} volta(s)`);
   }
-  const saltos = regs.filter((x) => x.tipo === "salto");
-  if (saltos.length) out.push("SUPER SALTO");
-  for (const r of saltos) {
-    const s = lerSalto(r.dados);
-    if (!s) continue;
-    out.push(s.modo === "distancia"
-      ? `   ${data(r.created_at)}: Salto a distancia ${formatarMetros(s.metros)}`
-      : `   ${data(r.created_at)}: Salto na caixa ${CAIXAS_SALTO.find((c) => c.chave === s.caixa)?.rotulo ?? s.caixa} - ${formatarTempo(s.tempo_ms)}`);
-  }
+  const saltos = regs.filter((x) => x.tipo === "salto").map((r) => ({ r, s: lerSalto(r.dados) }));
+  const dist = saltos.filter((x) => x.s?.modo === "distancia");
+  const caixa = saltos.filter((x) => x.s?.modo === "caixa");
+  if (dist.length) out.push("SALTO A DISTANCIA");
+  for (const { r, s } of dist) if (s?.modo === "distancia") out.push(`   ${data(r.created_at)}: ${formatarMetros(s.metros)}`);
+  if (caixa.length) out.push("SALTO NA CAIXA CROSS");
+  for (const { r, s } of caixa) if (s?.modo === "caixa") out.push(`   ${data(r.created_at)}: Caixa ${CAIXAS_SALTO.find((c) => c.chave === s.caixa)?.rotulo ?? s.caixa} - ${formatarTempo(s.tempo_ms)}`);
   return out;
 }
 
