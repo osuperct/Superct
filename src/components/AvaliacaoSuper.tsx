@@ -10,6 +10,7 @@ import { gerarPdfSuper } from "@/lib/superPdf";
 import { FileDown } from "lucide-react";
 import { TrofeuColorido } from "@/components/AvaliacaoEmblemas";
 import arteAreaSuper from "@/assets/area-super-super-ct.png";
+import mascotesExercicio from "@/assets/super-mascotes-exercicio.png";
 import imgTaf from "@/assets/super-taf-personagens.jpg";
 import imgCorrida from "@/assets/super-corrida-personagens.jpg";
 import imgDistancia from "@/assets/super-salto-distancia-personagens.jpg";
@@ -85,7 +86,10 @@ function Janela({ aberto, onOpenChange, titulo, icone, children }: { aberto: boo
       <DialogContent className="z-[70] flex max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg flex-col overflow-hidden p-0 [&>button.absolute]:hidden">
         <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-3">
           <DialogTitle className="flex min-w-0 items-center gap-2 font-display text-base">{icone} <span className="truncate">{titulo}</span></DialogTitle>
-          <DialogClose className="rounded-md p-1 hover:bg-muted" aria-label="Fechar"><X className="size-5" /></DialogClose>
+          <span className="flex shrink-0 items-center gap-1">
+            <img src={mascotesExercicio} alt="Personagens do Super CT com o uniforme da academia" loading="lazy" width={1024} height={768} className="h-12 w-auto object-contain" />
+            <DialogClose className="rounded-md p-1 hover:bg-muted" aria-label="Fechar"><X className="size-5" /></DialogClose>
+          </span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">{children}</div>
       </DialogContent>
