@@ -143,7 +143,12 @@ function FinanceiroPage() {
       if (!alunoId || vistos.has(alunoId) || !mantidos.has(alunoId)) continue;
       if (!conferidos.has(alunoId) && !alunosFisicos.has(alunoId)) continue;
       vistos.add(alunoId);
-      const plano = planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>);
+      const planoBase = planoDoContrato(alunoId, (ficha.dados ?? {}) as Record<string, unknown>);
+      // Sem data de início no contrato, considera a data em que ele foi assinado.
+      const plano = {
+        ...planoBase,
+        inicio: planoBase.inicio ?? (String(ficha.created_at ?? "").slice(0, 10) || null),
+      };
       if (alunosFisicos.has(alunoId)) {
         // Contrato em papel: completa o que faltar no contrato com o lançado na mensalidade.
         const mensal = (m ?? []).find((x: Mensalidade) => x.aluno_id === alunoId);

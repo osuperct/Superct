@@ -674,6 +674,8 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
   const [salvandoId, setSalvandoId] = useState<string | null>(null);
   const [dataPago, setDataPago] = useState<Record<string, string>>({});
   const [aberto, setAberto] = useState(false);
+  const [busca, setBusca] = useState("");
+  const normal = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
   // Histórico a partir de setembro de 2026.
   const mesInicial = "2026-09";
@@ -724,6 +726,8 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
       if (m && !m.ativo) return null;
       const plano = planos.find((p) => p.alunoId === a.id);
       if (!m && !plano) return null;
+      // Meses anteriores ao início do contrato não contam como atraso.
+      if (!m && plano?.inicio && mes < `${plano.inicio.slice(0, 7)}-01`) return null;
       const dia = Number(String(plano?.vencimento ?? "").replace(/\D+/g, "")) || 10;
       const [ano, mm] = mes.split("-").map(Number);
       const ultimo = new Date(ano ?? 2026, mm ?? 1, 0).getDate();
@@ -734,6 +738,7 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
       return { a, m, venc, status, valor: Number(m?.valor ?? plano?.valor ?? 0) };
     })
     .filter((l): l is NonNullable<typeof l> => !!l)
+    .filter((l) => !busca.trim() || normal(l.a.nome).includes(normal(busca.trim())))
     .filter((l) => filtro === "todos" || (filtro === "pagos" ? l.status === "pago" : l.status === filtro));
   const pagos = linhas.filter((l) => l.status.startsWith("pago"));
   return (
@@ -778,7 +783,14 @@ function ConferenciaMes({ alunos, mensalidades, planos, recarregar }: { alunos: 
           <option value="pago com atraso">Pagos com atraso</option>
           <option value="em atraso">Atrasados</option>
         </select>
-
+        <input
+          type="search"
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar nome…"
+          aria-label="Buscar aluno pelo nome"
+          className="min-w-0 flex-1 rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+        />
       </div>
       <p className="mt-2 text-xs text-muted-foreground">
         Recebido: <span className="text-primary">{formatarValor(pagos.reduce((s, l) => s + l.valor, 0))}</span> • {pagos.length} de {linhas.length} na lista
