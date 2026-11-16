@@ -108,6 +108,35 @@ function Topico({ titulo, icone, children }: { titulo: string; icone: React.Reac
 
 const semAcento = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
+const dataBr = (iso: string) => new Date(iso).toLocaleDateString("pt-BR");
+const diaMes = (iso: string) => new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+
+function SecaoHist({ titulo, colunas, linhas, grafico }: { titulo: string; colunas: string[]; linhas: string[][]; grafico: React.ReactElement }) {
+  const [modo, setModo] = useState<"tabela" | "grafico">("tabela");
+  return (
+    <div className="rounded-md border border-border p-2">
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-primary">{titulo}</p>
+        <div className="flex gap-1">
+          {(["tabela", "grafico"] as const).map((m) => (
+            <button key={m} type="button" onClick={() => setModo(m)} className={`rounded px-2 py-0.5 font-mono text-[9px] uppercase tracking-wider ${modo === m ? "bg-primary text-primary-foreground" : "border border-border text-muted-foreground"}`}>
+              {m === "tabela" ? "Tabela" : "Gráfico"}
+            </button>
+          ))}
+        </div>
+      </div>
+      {modo === "tabela" ? (
+        <table className="mt-2 w-full text-left text-xs">
+          <thead><tr className="border-b border-border font-mono text-[9px] uppercase tracking-wider text-muted-foreground">{colunas.map((c) => <th key={c} className="py-1 pr-2">{c}</th>)}</tr></thead>
+          <tbody>{linhas.map((l, i) => <tr key={i} className="border-b border-border/40">{l.map((v, j) => <td key={j} className={`py-1.5 pr-2 ${j === 0 ? "text-muted-foreground" : "font-semibold text-foreground"}`}>{v}</td>)}</tr>)}</tbody>
+        </table>
+      ) : (
+        <div className="mt-2 h-44"><ResponsiveContainer width="100%" height="100%">{grafico}</ResponsiveContainer></div>
+      )}
+    </div>
+  );
+}
+
 export function HistoricoSuper({ registros: todos, parte }: { registros: RegistroSuper[]; parte?: "taf" | "exercicios" }) {
   const registros = todos.filter((r) => !parte || (parte === "taf" ? r.tipo === "taf" : r.tipo !== "taf"));
   const tafs = registros.filter((r) => r.tipo === "taf").sort((a, b) => a.ano - b.ano);
@@ -122,10 +151,11 @@ export function HistoricoSuper({ registros: todos, parte }: { registros: Registr
     .map((r) => ({ r, s: lerSalto(r.dados) }))
     .filter((x) => x.s);
   const distancias = saltos.filter((x) => x.s!.modo === "distancia");
+  const caixas = saltos.filter((x) => x.s!.modo === "caixa");
   const nomeCaixa = (c: CaixaSalto) => CAIXAS_SALTO.find((x) => x.chave === c)?.rotulo ?? c;
   if (registros.length === 0) return <p className="text-sm text-muted-foreground">Nenhuma avaliação Super ainda.</p>;
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {tafs.length > 0 && (
         <div>
           <p className="font-mono text-[10px] uppercase tracking-widest text-primary">TAF SUPER CT</p>
@@ -160,50 +190,36 @@ export function HistoricoSuper({ registros: todos, parte }: { registros: Registr
         </div>
       )}
       {corridas.length > 0 && (
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">SUPER CORRIDA</p>
-          <ul className="mt-1 space-y-1 text-xs">
-            {corridas.slice().reverse().map(({ r, c }) => (
-              <li key={r.id} className="flex justify-between gap-2 border-b border-border/50 py-1">
-                <span className="text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</span>
-                <span>{formatarTempo(c!.tempo_ms)} · {c!.voltas} volta(s)</span>
-              </li>
-            ))}
-          </ul>
-          <div className="mt-2 h-40">
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ bottom: 12 }}>
-                <XAxis type="number" dataKey="voltas" name="Voltas" domain={[0, 10]} allowDecimals={false} fontSize={10} label={{ value: "Voltas", position: "insideBottom", offset: -6, fontSize: 10 }} />
-                <YAxis type="number" dataKey="seg" name="Tempo (s)" fontSize={10} width={32} label={{ value: "Tempo (s)", angle: -90, position: "insideLeft", fontSize: 10 }} />
-                <Tooltip formatter={(v, n) => (n === "Tempo (s)" ? `${v} s` : v)} />
-                <Scatter data={corridas.map(({ c }) => ({ voltas: c!.voltas, seg: Math.round(c!.tempo_ms / 100) / 10 }))} fill="var(--primary)" />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
+        <SecaoHist titulo="SUPER CORRIDA" colunas={["Data", "Tempo", "Voltas"]}
+          linhas={corridas.slice().reverse().map(({ r, c }) => [dataBr(r.created_at), formatarTempo(c!.tempo_ms), String(c!.voltas)])}
+          grafico={
+            <ScatterChart margin={{ bottom: 12 }}>
+              <XAxis type="number" dataKey="voltas" name="Voltas" domain={[0, 10]} allowDecimals={false} fontSize={10} label={{ value: "Voltas", position: "insideBottom", offset: -6, fontSize: 10 }} />
+              <YAxis type="number" dataKey="seg" name="Tempo (s)" fontSize={10} width={32} label={{ value: "Tempo (s)", angle: -90, position: "insideLeft", fontSize: 10 }} />
+              <Tooltip formatter={(v, n) => (n === "Tempo (s)" ? `${v} s` : v)} />
+              <Scatter data={corridas.map(({ c }) => ({ voltas: c!.voltas, seg: Math.round(c!.tempo_ms / 100) / 10 }))} fill="var(--primary)" />
+            </ScatterChart>
+          } />
       )}
-      {saltos.length > 0 && (
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-widest text-primary">SUPER SALTO</p>
-          <ul className="mt-1 space-y-1 text-xs">
-            {saltos.slice().reverse().map(({ r, s }) => (
-              <li key={r.id} className="flex justify-between gap-2 border-b border-border/50 py-1">
-                <span className="text-muted-foreground">{new Date(r.created_at).toLocaleDateString("pt-BR")}</span>
-                <span>{s!.modo === "distancia" ? `Distância: ${formatarMetros(s!.metros)}` : `Caixa ${nomeCaixa(s!.caixa)}: ${formatarTempo(s!.tempo_ms)}`}</span>
-              </li>
-            ))}
-          </ul>
-          {distancias.length > 1 && (
-            <div className="mt-2 h-40">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={distancias.map(({ r, s }) => ({ dia: new Date(r.created_at).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }), metros: s!.modo === "distancia" ? s!.metros : 0 }))}>
-                  <XAxis dataKey="dia" fontSize={10} /><YAxis domain={[0, 3]} fontSize={10} width={24} /><Tooltip />
-                  <Line dataKey="metros" name="Distância (m)" stroke="var(--primary)" strokeWidth={2} />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          )}
-        </div>
+      {distancias.length > 0 && (
+        <SecaoHist titulo="SALTO A DISTÂNCIA" colunas={["Data", "Distância"]}
+          linhas={distancias.slice().reverse().map(({ r, s }) => [dataBr(r.created_at), s!.modo === "distancia" ? formatarMetros(s!.metros) : "—"])}
+          grafico={
+            <LineChart data={distancias.map(({ r, s }) => ({ dia: diaMes(r.created_at), metros: s!.modo === "distancia" ? s!.metros : 0 }))}>
+              <XAxis dataKey="dia" fontSize={10} /><YAxis domain={[0, 3]} fontSize={10} width={24} /><Tooltip />
+              <Line dataKey="metros" name="Distância (m)" stroke="var(--primary)" strokeWidth={2} />
+            </LineChart>
+          } />
+      )}
+      {caixas.length > 0 && (
+        <SecaoHist titulo="SALTO NA CAIXA CROSS" colunas={["Data", "Caixa", "Tempo"]}
+          linhas={caixas.slice().reverse().map(({ r, s }) => [dataBr(r.created_at), s!.modo === "caixa" ? nomeCaixa(s!.caixa) : "—", s!.modo === "caixa" ? formatarTempo(s!.tempo_ms) : "—"])}
+          grafico={
+            <LineChart data={caixas.map(({ r, s }) => ({ dia: diaMes(r.created_at), seg: s!.modo === "caixa" ? Math.round(s!.tempo_ms / 100) / 10 : 0 }))}>
+              <XAxis dataKey="dia" fontSize={10} /><YAxis domain={[0, 60]} fontSize={10} width={24} /><Tooltip />
+              <Line dataKey="seg" name="Tempo (s)" stroke="var(--primary)" strokeWidth={2} />
+            </LineChart>
+          } />
       )}
     </div>
   );
