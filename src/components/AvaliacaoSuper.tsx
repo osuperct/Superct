@@ -678,6 +678,15 @@ export function SuperResponsavel({ uid, alunos, avisoHabilitado = true }: { uid:
             <button type="button" onClick={() => setTela("menu")} className="mb-3 flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground">
               <ChevronRight className="size-3 rotate-180" /> VOLTAR
             </button>
+            {(tela === "taf" || tela === "exercicios") && atual && (
+              <button type="button" onClick={() => {
+                const regs = doAluno.filter((r) => tela === "taf" ? r.tipo === "taf" : r.tipo !== "taf");
+                if (!regs.length) { toast.error("Ainda não há avaliações para exportar."); return; }
+                gerarPdfSuper(`${tela === "taf" ? "TAF" : "Super Exercicios"} - ${atual.nome}`, [atual], regs).catch(() => toast.error("Não foi possível gerar o PDF."));
+              }} className="mb-3 w-full rounded-md border border-primary/50 py-2.5 font-display text-xs text-primary hover:bg-primary/10">
+                EXPORTAR PDF
+              </button>
+            )}
             {tela === "taf" && <HistoricoSuper parte="taf" registros={doAluno} />}
             {tela === "exercicios" && <HistoricoSuper parte="exercicios" registros={doAluno} />}
             {tela === "ranking" && <RankingSuper />}
