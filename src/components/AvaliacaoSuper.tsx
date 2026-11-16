@@ -429,7 +429,21 @@ function RelatorioPdfSuper({ alunos, aluno }: { alunos: Alu[]; aluno: Alu | null
   );
 }
 
+function BotaoSuper({ titulo, descricao, icone, onClick }: { titulo: string; descricao: string; icone: React.ReactNode; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} className="flex w-full items-center justify-between gap-3 rounded-md border border-border bg-transparent px-3 py-4 text-left hover:border-primary">
+      <span className="min-w-0">
+        <span className="flex items-center gap-2 font-display text-sm">{icone} {titulo}</span>
+        <span className="mt-1 block text-xs leading-snug text-muted-foreground">{descricao}</span>
+      </span>
+      <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+    </button>
+  );
+}
+
 export function SuperResponsavel({ uid, alunos }: { uid: string; alunos: { id: string; nome: string }[] }) {
+  const [aberto, setAberto] = useState(false);
+  const [tela, setTela] = useState<"menu" | "taf" | "exercicios" | "ranking">("menu");
   const [registros, setRegistros] = useState<RegistroSuper[]>([]);
   const [alunoId, setAlunoId] = useState(alunos[0]?.id ?? "");
   useEffect(() => {
@@ -438,27 +452,43 @@ export function SuperResponsavel({ uid, alunos }: { uid: string; alunos: { id: s
   }, [uid]);
   const comDados = alunos.filter((a) => registros.some((r) => r.aluno_id === a.id));
   const atual = comDados.find((a) => a.id === alunoId) ?? comDados[0];
+  const doAluno = atual ? registros.filter((r) => r.aluno_id === atual.id) : [];
+  const telas = {
+    menu: { titulo: "ÁREA SUPER", icone: <Zap className="size-4 text-primary" /> },
+    taf: { titulo: "TAF SUPER CT", icone: <Trophy className="size-4 text-primary" /> },
+    exercicios: { titulo: "SUPER EXERCÍCIOS", icone: <Zap className="size-4 text-primary" /> },
+    ranking: { titulo: "RANKING DA ÁREA SUPER", icone: <Trophy className="size-4 text-primary" /> },
+  } as const;
+
   return (
     <div className="border-t border-evaluation-blue/20 p-4">
-      <h4 className="flex items-center gap-2 font-display text-base"><Zap className="size-4 text-primary" /> ÁREA SUPER</h4>
-      {atual && comDados.length > 1 && (
-        <select value={atual.id} onChange={(e) => setAlunoId(e.target.value)} className="mt-2 w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
-          {comDados.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
-        </select>
-      )}
-      {atual && (
-        <>
-          <Topico titulo="TAF SUPER CT" icone={<Trophy className="size-4 text-primary" />}>
-            <HistoricoSuper parte="taf" registros={registros.filter((r) => r.aluno_id === atual.id)} />
-          </Topico>
-          <Topico titulo="SUPER EXERCÍCIOS · CORRIDA, SALTO E CAIXA" icone={<Zap className="size-4 text-primary" />}>
-            <HistoricoSuper parte="exercicios" registros={registros.filter((r) => r.aluno_id === atual.id)} />
-          </Topico>
-        </>
-      )}
-      <Topico titulo="RANKING DA ÁREA SUPER" icone={<Trophy className="size-4 text-primary" />}>
-        <RankingSuper />
-      </Topico>
+      <button type="button" onClick={() => { setTela("menu"); setAberto(true); }} className="flex w-full items-center justify-between gap-2 rounded-md border border-evaluation-blue/30 bg-transparent px-3 py-3 text-left font-display text-base hover:border-primary">
+        <span className="flex items-center gap-2"><Zap className="size-4 text-primary" /> ÁREA SUPER</span>
+        <ChevronRight className="size-4 text-muted-foreground" />
+      </button>
+      <Janela aberto={aberto} onOpenChange={(v) => { setAberto(v); if (!v) setTela("menu"); }} titulo={telas[tela].titulo} icone={telas[tela].icone}>
+        {atual && comDados.length > 1 && (
+          <select value={atual.id} onChange={(e) => setAlunoId(e.target.value)} className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm">
+            {comDados.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
+          </select>
+        )}
+        {tela === "menu" ? (
+          <div className="mt-3 space-y-2">
+            <BotaoSuper titulo="TAF SUPER CT" descricao="Avaliação anual do aluno de aptidão física e desenvolvimento." icone={<Trophy className="size-4 text-primary" />} onClick={() => setTela("taf")} />
+            <BotaoSuper titulo="SUPER EXERCÍCIOS" descricao="Avaliação rotineira do aluno na corrida, salto à distância e na caixa Cross." icone={<Zap className="size-4 text-primary" />} onClick={() => setTela("exercicios")} />
+            <BotaoSuper titulo="RANKING DA ÁREA SUPER" descricao="Comparação com os demais alunos avaliados." icone={<Trophy className="size-4 text-primary" />} onClick={() => setTela("ranking")} />
+          </div>
+        ) : (
+          <div className="mt-3">
+            <button type="button" onClick={() => setTela("menu")} className="mb-3 flex items-center gap-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground">
+              <ChevronRight className="size-3 rotate-180" /> VOLTAR
+            </button>
+            {tela === "taf" && <HistoricoSuper parte="taf" registros={doAluno} />}
+            {tela === "exercicios" && <HistoricoSuper parte="exercicios" registros={doAluno} />}
+            {tela === "ranking" && <RankingSuper />}
+          </div>
+        )}
+      </Janela>
     </div>
   );
 }
