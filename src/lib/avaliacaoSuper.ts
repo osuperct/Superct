@@ -62,7 +62,7 @@ export const MAX_TEMPO_CAIXA_MS = 60_000;
 export type Salto = { modo: "distancia"; metros: number } | { modo: "caixa"; caixa: CaixaSalto; tempo_ms: number };
 
 export function lerSalto(d: unknown): Salto | null {
-  const s = d as Record<string, unknown> | null;
+  const s = d as { modo?: unknown; metros?: unknown; caixa?: unknown; tempo_ms?: unknown } | null;
   if (!s) return null;
   if (s.modo === "distancia" && typeof s.metros === "number" && (DISTANCIAS_SALTO as readonly number[]).includes(s.metros)) return { modo: "distancia", metros: s.metros };
   if (s.modo === "caixa" && typeof s.tempo_ms === "number" && CAIXAS_SALTO.some((c) => c.chave === s.caixa))
