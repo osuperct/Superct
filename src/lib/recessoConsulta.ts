@@ -20,7 +20,7 @@ export async function consultarAvisoRecesso(client: SupabaseClient<Database>) {
   }
   const pendentes = contratosPendentes(documentos.data ?? [], (aceites.data ?? []).map((a) => a.documento_original_id));
   return {
-    mostrar: Boolean(perfil.data?.aprovado && !perfil.data.bloqueado_em && (pendentes.length > 0 || !aceites.data?.length)),
+    mostrar: Boolean(perfil.data?.aprovado && !perfil.data.bloqueado_em && pendentes.length > 0),
     contratos: pendentes.length,
   };
 }
