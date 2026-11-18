@@ -12,6 +12,7 @@ import { RECESSO, recessoBloqueiaAcesso, recessoPodeConfirmar, type EstadoAvisoR
 import { useSidebarControl } from "@/components/SidebarContext";
 import { confirmarRecesso } from "@/lib/recesso.functions";
 import { consultarAvisoRecesso } from "@/lib/recessoConsulta";
+import { garantirPdfContrato } from "@/lib/contratoDaFicha";
 import { supabase } from "@/integrations/supabase/client";
 import recessoNatal from "@/assets/recesso-natal-super-ct.jpg";
 
@@ -42,7 +43,7 @@ export function RecessoResponsavel({ uid, enabled, onConfirmado, onBloqueioChang
     setErro("");
     setConsulta({ uid, estado: "consultando" });
     setAceitou(false);
-    void consultarAvisoRecesso(supabase).then((r) => { if (ativo) { setConsulta({ uid, estado: r.mostrar ? "pendente" : "liberado" }); setContratos(r.contratos); } }).catch((e) => { if (ativo) { setConsulta({ uid, estado: "erro" }); setErro(e instanceof Error ? e.message : "Não foi possível consultar o aviso de recesso."); } });
+    void garantirPdfContrato(supabase, uid).catch((e) => console.error("PDF do contrato", e)).then(() => consultarAvisoRecesso(supabase)).then((r) => { if (ativo) { setConsulta({ uid, estado: r.mostrar ? "pendente" : "liberado" }); setContratos(r.contratos); } }).catch((e) => { if (ativo) { setConsulta({ uid, estado: "erro" }); setErro(e instanceof Error ? e.message : "Não foi possível consultar o aviso de recesso."); } });
     void biometriaDisponivel().then((r) => { if (ativo) setBio(r); });
     return () => { ativo = false; };
   }, [uid, enabled, tentativa]);
